@@ -36,12 +36,12 @@ public class ConfigRow {
         return cells;
     }
 
-    public void addCell(ConfigCell cell) {
-        cells.add(cell);
-    }
-
     public void setCells(List<ConfigCell> cells) {
         this.cells = cells;
+    }
+
+    public void addCell(ConfigCell cell) {
+        cells.add(cell);
     }
 
     @Override

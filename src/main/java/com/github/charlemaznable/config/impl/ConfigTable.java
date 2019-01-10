@@ -9,7 +9,8 @@ public class ConfigTable {
 
     private List<ConfigRow> rows = new ArrayList<>();
 
-    public ConfigTable() {}
+    public ConfigTable() {
+    }
 
     public ConfigTable(String tableName) {
         this.tableName = tableName;
@@ -42,12 +43,12 @@ public class ConfigTable {
         return rows;
     }
 
-    public void addRow(ConfigRow row) {
-        rows.add(row);
-    }
-
     public void setRows(List<ConfigRow> rows) {
         this.rows = rows;
+    }
+
+    public void addRow(ConfigRow row) {
+        rows.add(row);
     }
 
     @Override

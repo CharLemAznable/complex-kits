@@ -1,8 +1,8 @@
 package com.github.charlemaznable.config.impl;
 
+import com.github.charlemaznable.config.ex.ConfigException;
 import com.google.common.base.Charsets;
 import com.google.common.io.Closeables;
-import com.github.charlemaznable.config.ex.ConfigException;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

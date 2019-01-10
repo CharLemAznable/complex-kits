@@ -7,7 +7,6 @@ import java.util.Properties;
  * 读取配置.
  *
  * @author Bingoo
- *
  */
 public interface Configable {
 

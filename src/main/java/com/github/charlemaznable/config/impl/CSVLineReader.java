@@ -5,7 +5,9 @@ import java.util.List;
 
 public class CSVLineReader {
 
-    /** The default separator to use if none is supplied to the constructor. */
+    /**
+     * The default separator to use if none is supplied to the constructor.
+     */
     public static final char DEFAULT_SEPARATOR = ',';
 
     /**
@@ -46,7 +48,7 @@ public class CSVLineReader {
                                 && line.charAt(i - 1) != separator // not at the  begining of an escape sequence
                                 && line.length() > i + 1
                                 && line.charAt(i + 1) != separator // not at the end of an escape sequence
-                        ) {
+                                ) {
                             sb.append(c);
                         }
                     }

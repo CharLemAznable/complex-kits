@@ -6,7 +6,8 @@ public class ConfigCell {
 
     private String cellText;
 
-    public ConfigCell() {}
+    public ConfigCell() {
+    }
 
     public ConfigCell(String cellName, String cellText) {
         this.cellName = cellName;

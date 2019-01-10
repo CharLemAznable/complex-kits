@@ -13,11 +13,6 @@ public class SpringContext implements ApplicationContextAware {
 
     private static ApplicationContext applicationContext;
 
-    @Override
-    public void setApplicationContext(@Nonnull ApplicationContext applicationContext) throws BeansException {
-        SpringContext.applicationContext = applicationContext;
-    }
-
     public static <T> T getBean(String beanName) {
         return getBean(beanName, null);
     }
@@ -48,5 +43,10 @@ public class SpringContext implements ApplicationContextAware {
         } catch (NoSuchBeanDefinitionException ignored) {
         }
         return defaultValue;
+    }
+
+    @Override
+    public void setApplicationContext(@Nonnull ApplicationContext applicationContext) throws BeansException {
+        SpringContext.applicationContext = applicationContext;
     }
 }

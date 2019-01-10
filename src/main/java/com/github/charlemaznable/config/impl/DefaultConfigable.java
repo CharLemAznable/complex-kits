@@ -34,6 +34,10 @@ public class DefaultConfigable extends BaseConfigable {
         return properties;
     }
 
+    public void setProperties(Properties properties) {
+        this.properties = properties;
+    }
+
     @Override
     public String getStr(String key) {
         String property = properties.getProperty(key);
@@ -74,9 +78,5 @@ public class DefaultConfigable extends BaseConfigable {
     @Override
     public long refreshConfigSet(String prefix) {
         return System.currentTimeMillis();
-    }
-
-    public void setProperties(Properties properties) {
-        this.properties = properties;
     }
 }

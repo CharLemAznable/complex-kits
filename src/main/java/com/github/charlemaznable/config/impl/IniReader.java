@@ -52,8 +52,7 @@ public class IniReader {
 
                 if (line.charAt(index) == '(' && value.charAt(value.length() - 1) == ')')
                     value = value.substring(0, value.length() - 1);
-            }
-            else key = line;
+            } else key = line;
             key = key.trim();
             // use space for properties with no key
             if (key.length() < 1) key = " ";
@@ -61,29 +60,6 @@ public class IniReader {
             createValueNodes(key, value);
         }
     }
-
-    private void createValueNodes(String key, String value) {
-        String lastSection = sections.get(sections.size() - 1);
-        Properties sectionProps = properties.get(lastSection);
-        if (sectionProps == null) {
-            sectionProps = new Properties();
-            properties.put(lastSection, sectionProps);
-        } else {
-            String oldValue = (String) sectionProps.get(key);
-            if (oldValue != null)
-                putIncKeyAndValue(sectionProps, key, oldValue);
-        }
-
-        sectionProps.put(key, value.trim());
-    }
-
-    private void putIncKeyAndValue(Properties props, String key, String oldValue) {
-        int seq = 0;
-        while(props.containsKey(key + "." + seq)) ++seq;
-
-        props.put(key + "." + seq, oldValue);
-    }
-
 
     private static String parseValue(String val, BufferedReader reader) throws IOException {
         StringBuilder propertyValue = new StringBuilder();
@@ -184,10 +160,10 @@ public class IniReader {
      * Checks for the occurrence of the specified separators in the given line.
      * The index of the first separator is returned.
      *
-     * @param line the line to be investigated
+     * @param line       the line to be investigated
      * @param separators a string with the separator characters to look for
      * @return the lowest index of a separator character or -1 if no separator
-     *         is found
+     * is found
      */
     private static int findFirstOccurrence(String line, String separators) {
         int index = -1;
@@ -209,10 +185,10 @@ public class IniReader {
      * separator, it is considered the "real" separator in this line - even if
      * there are other separators before.
      *
-     * @param line the line to be investigated
+     * @param line       the line to be investigated
      * @param quoteIndex the index of the quote character
      * @return the index of the separator before the quote or &lt; 0 if there is
-     *         none
+     * none
      */
     private static int findSeparatorBeforeQuote(String line, int quoteIndex) {
         int index = quoteIndex - 1;
@@ -222,12 +198,34 @@ public class IniReader {
         return index;
     }
 
+    private void createValueNodes(String key, String value) {
+        String lastSection = sections.get(sections.size() - 1);
+        Properties sectionProps = properties.get(lastSection);
+        if (sectionProps == null) {
+            sectionProps = new Properties();
+            properties.put(lastSection, sectionProps);
+        } else {
+            String oldValue = (String) sectionProps.get(key);
+            if (oldValue != null)
+                putIncKeyAndValue(sectionProps, key, oldValue);
+        }
+
+        sectionProps.put(key, value.trim());
+    }
+
+    private void putIncKeyAndValue(Properties props, String key, String oldValue) {
+        int seq = 0;
+        while (props.containsKey(key + "." + seq)) ++seq;
+
+        props.put(key + "." + seq, oldValue);
+    }
+
     /**
      * Determine if the given line is a comment line.
      *
      * @param line The line to check.
      * @return true if the line is empty or starts with one of the comment
-     *         characters
+     * characters
      */
     protected boolean isCommentLine(String line) {
         if (line == null) return false;
