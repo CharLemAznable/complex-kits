@@ -5,3 +5,13 @@
 [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)
 
 JAVA常用工具包.
+
+##### Maven Dependency
+
+```xml
+<dependency>
+  <groupId>com.github.charlemaznable</groupId>
+  <artifactId>complex-kits</artifactId>
+  <version>0.1.0</version>
+</dependency>
+```
