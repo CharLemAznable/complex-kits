@@ -8,13 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TextableTest {
 
-    @Data
-    public static class TestTextable extends Textable {
-
-        private int key1;
-        private String key2;
-    }
-
     @Test
     public void testTextable() {
         TestTextable bean = new TestTextable();
@@ -27,5 +20,12 @@ public class TextableTest {
                 return "'" + origin + "'";
             }
         }));
+    }
+
+    @Data
+    public static class TestTextable extends Textable {
+
+        private int key1;
+        private String key2;
     }
 }

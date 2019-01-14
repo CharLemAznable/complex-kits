@@ -2,7 +2,6 @@ package com.github.charlemaznable.lang;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.charlemaznable.lang.Listt.newArrayList;

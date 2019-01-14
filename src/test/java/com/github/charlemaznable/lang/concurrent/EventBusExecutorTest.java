@@ -25,24 +25,6 @@ public class EventBusExecutorTest {
         assertEquals("delay", testEventBusCachedExecutor.message);
     }
 
-    public static class TestEventBusCachedExecutor extends EventBusCachedExecutor {
-
-        public TestEventBusCachedExecutor() {
-            super();
-        }
-
-        public TestEventBusCachedExecutor(Object subscriber) {
-            super(subscriber);
-        }
-
-        private String message;
-
-        @Subscribe
-        public void testMethod(String message) {
-            this.message = message;
-        }
-    }
-
     @SneakyThrows
     @Test
     public void testEventBusFixedExecutor() {
@@ -57,6 +39,24 @@ public class EventBusExecutorTest {
         assertEquals("test", testEventBusFixedSubscriber.message);
         Thread.sleep(1000);
         assertEquals("delay", testEventBusFixedSubscriber.message);
+    }
+
+    public static class TestEventBusCachedExecutor extends EventBusCachedExecutor {
+
+        private String message;
+
+        public TestEventBusCachedExecutor() {
+            super();
+        }
+
+        public TestEventBusCachedExecutor(Object subscriber) {
+            super(subscriber);
+        }
+
+        @Subscribe
+        public void testMethod(String message) {
+            this.message = message;
+        }
     }
 
     public static class TestEventBusFixedExecutor extends EventBusFixedExecutor {
