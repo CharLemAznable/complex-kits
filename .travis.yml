@@ -3,6 +3,6 @@ install: mvn install -DskipTests -Dgpg.skip
 jdk:
   - oraclejdk8
 script:
-  - mvn clean test cobertura:cobertura
+  - mvn clean test
 after_success:
   - bash <(curl -s https://codecov.io/bash)
