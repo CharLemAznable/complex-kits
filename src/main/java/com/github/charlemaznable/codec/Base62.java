@@ -14,7 +14,7 @@ public class Base62 {
         }
     }
 
-    public static StringBuffer base64(byte[] data) {
+    public static String base64(byte[] data) {
         StringBuffer sb = new StringBuffer(data.length * 2);
         int pos = 0, val = 0;
         for (byte b : data) {
@@ -28,10 +28,11 @@ public class Base62 {
         if (pos > 0) {
             sb.append(encodes[val << (6 - pos)]);
         }
-        return sb;
+        return sb.toString();
     }
 
-    public static byte[] unBase64(char[] data) {
+    public static byte[] unBase64(String dataStr) {
+        char[] data = dataStr.toCharArray();
         ByteArrayOutputStream baos = new ByteArrayOutputStream(data.length);
         int pos = 0, val = 0;
         for (char c : data) {
@@ -45,7 +46,7 @@ public class Base62 {
         return baos.toByteArray();
     }
 
-    public static StringBuffer base62(byte[] data) {
+    public static String base62(byte[] data) {
         StringBuffer sb = new StringBuffer(data.length * 2);
         int pos = 0, val = 0;
         for (byte b : data) {
@@ -67,10 +68,11 @@ public class Base62 {
                             /**/c == '+' ? "ib" :
                             /**/c == '/' ? "ic" : String.valueOf(c));
         }
-        return sb;
+        return sb.toString();
     }
 
-    public static byte[] unBase62(char[] data) {
+    public static byte[] unBase62(String dataStr) {
+        char[] data = dataStr.toCharArray();
         ByteArrayOutputStream baos = new ByteArrayOutputStream(data.length);
         int pos = 0, val = 0;
         for (int i = 0; i < data.length; i++) {

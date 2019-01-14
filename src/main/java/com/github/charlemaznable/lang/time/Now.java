@@ -15,8 +15,7 @@ public class Now {
     }
 
     public static String now(String format) {
-        return new SimpleDateFormat(format)
-                .format(Calendar.getInstance().getTime());
+        return new SimpleDateFormat(format).format(date());
     }
 
     public static Date date() {

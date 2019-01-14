@@ -22,5 +22,9 @@ public class AESTest {
         assertEquals(hex(encrypt("1234567", key)), hex(encrypt("1234567", key)));
         assertEquals(hex(encrypt("汉", key)), hex(encrypt("汉", key)));
         assertEquals(hex(encrypt("中文", key)), hex(encrypt("中文", key)));
+
+        String key2 = key + key;
+        assertEquals(hex(encrypt("The quick brown fox jumps over the lazy dog", key2)),
+                hex(encrypt("The quick brown fox jumps over the lazy dog", key2)));
     }
 }

@@ -14,7 +14,7 @@ public class Base16 {
         return sb.toString();
     }
 
-    public static String base16(String str) {
+    public static String base16FromString(String str) {
         return base16(bytes(str));
     }
 

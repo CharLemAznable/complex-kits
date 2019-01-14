@@ -74,7 +74,7 @@ public enum Digest {
     }
 
     public String digestBase64(String info) {
-        return base64(digest(info), Base64.Format.Standard);
+        return digestBase64(bytes(info));
     }
 
     public String digestBase64(byte[] info, byte[] salt) {
@@ -82,15 +82,15 @@ public enum Digest {
     }
 
     public String digestBase64(byte[] info, String salt) {
-        return base64(digest(info, salt), Base64.Format.Standard);
+        return digestBase64(info, bytes(salt));
     }
 
     public String digestBase64(String info, byte[] salt) {
-        return base64(digest(info, salt), Base64.Format.Standard);
+        return digestBase64(bytes(info), salt);
     }
 
     public String digestBase64(String info, String salt) {
-        return base64(digest(info, salt), Base64.Format.Standard);
+        return digestBase64(bytes(info), bytes(salt));
     }
 
     public String digestHex(byte[] info) {
@@ -98,7 +98,7 @@ public enum Digest {
     }
 
     public String digestHex(String info) {
-        return hex(digest(info));
+        return digestHex(bytes(info));
     }
 
     public String digestHex(byte[] info, byte[] salt) {
@@ -106,15 +106,15 @@ public enum Digest {
     }
 
     public String digestHex(byte[] info, String salt) {
-        return hex(digest(info, salt));
+        return digestHex(info, bytes(salt));
     }
 
     public String digestHex(String info, byte[] salt) {
-        return hex(digest(info, salt));
+        return digestHex(bytes(info), salt);
     }
 
     public String digestHex(String info, String salt) {
-        return hex(digest(info, salt));
+        return digestHex(bytes(info), bytes(salt));
     }
 
     @Deprecated

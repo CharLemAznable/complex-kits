@@ -16,7 +16,7 @@ public class PoolProxyTest {
                     public TestPoolProxyObject create() {
                         return new TestPoolProxyObject();
                     }
-                }, new PoolProxyConfigBuilder().maxTotal(1000).build()
+                }, new PoolProxyConfigBuilder().maxTotal(1000).maxIdle(10).minIdle(0).build()
         );
         assertEquals("proxy invoked", testPoolProxyObject.invoke());
     }
