@@ -12,6 +12,7 @@ public class AESTest {
 
     @Test
     public void testAES() {
+        new AES();
         String key = String.valueOf(System.currentTimeMillis());
         assertEquals("123456", decrypt(encrypt("123456", key), key));
 

@@ -1,11 +1,36 @@
 package com.github.charlemaznable.lang;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import lombok.SneakyThrows;
 
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+
 public class LoadingCachee {
+
+    public static <K, V> LoadingCache<K, V> simpleCache(CacheLoader<K, V> loader) {
+        return CacheBuilder.newBuilder().build(loader);
+    }
+
+    public static <K, V> LoadingCache<K, V> accessCache(CacheLoader<K, V> loader, Duration duration) {
+        return accessCache(loader, duration.toNanos(), TimeUnit.NANOSECONDS);
+    }
+
+    public static <K, V> LoadingCache<K, V> accessCache(CacheLoader<K, V> loader, long duration, TimeUnit unit) {
+        return CacheBuilder.newBuilder().expireAfterAccess(duration, unit).build(loader);
+    }
+
+    public static <K, V> LoadingCache<K, V> writeCache(CacheLoader<K, V> loader, Duration duration) {
+        return writeCache(loader, duration.toNanos(), TimeUnit.NANOSECONDS);
+    }
+
+    public static <K, V> LoadingCache<K, V> writeCache(CacheLoader<K, V> loader, long duration, TimeUnit unit) {
+        return CacheBuilder.newBuilder().expireAfterWrite(duration, unit).build(loader);
+    }
 
     @SneakyThrows
     public static <K, V> V get

@@ -14,6 +14,7 @@ public class RandTest {
 
     @Test
     public void testRandWeighted() {
+        new Rand();
         Map<String, Integer> weightMap = newHashMap();
         weightMap.put("1", 0);
         weightMap.put("2", 0);
