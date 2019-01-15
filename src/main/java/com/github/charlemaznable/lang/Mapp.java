@@ -54,8 +54,8 @@ public class Mapp {
     }
 
     @SafeVarargs
-    public static <T> Map<T, Object> of(T... keyAndValues) {
-        Map<T, Object> map = newHashMap();
+    public static <T> Map<T, T> of(T... keyAndValues) {
+        Map<T, T> map = newHashMap();
         for (int i = 0; i < keyAndValues.length; i += 2) {
             T key = keyAndValues[i];
             T value = i + 1 < keyAndValues.length ? keyAndValues[i + 1] : null;
