@@ -20,7 +20,13 @@ public class SpringContextTest {
         TestClass testClassBean = TestSpringContext.getBean(TestClass.class);
         assertNotNull(testClassBean);
 
+        testClassBean = TestSpringContext.getBean("TestClass");
+        assertNotNull(testClassBean);
+
         ClzResolver clzResolverBean = TestSpringContext.getBean(ClzResolver.class);
+        assertNull(clzResolverBean);
+
+        clzResolverBean = TestSpringContext.getBean("ClzResolver");
         assertNull(clzResolverBean);
     }
 }

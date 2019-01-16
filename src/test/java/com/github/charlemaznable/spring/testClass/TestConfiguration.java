@@ -6,7 +6,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan
 public class TestConfiguration {
 
-    @Bean
+    @Bean("TestClass")
     public TestClass testClass() {
         return new TestClass();
     }

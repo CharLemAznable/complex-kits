@@ -10,6 +10,5 @@ public class IPTest {
     public void testIP() {
         String ip = IP.netIP();
         assertNotEquals("127.0.0.1", ip);
-        System.out.println(ip);
     }
 }
