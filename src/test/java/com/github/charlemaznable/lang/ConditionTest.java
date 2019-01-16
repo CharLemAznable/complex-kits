@@ -1,24 +1,21 @@
 package com.github.charlemaznable.lang;
 
+import com.github.charlemaznable.lang.ex.EmptyObjectException;
+import com.github.charlemaznable.lang.ex.BlankStringException;
 import org.junit.jupiter.api.Test;
 
-import static com.github.charlemaznable.lang.Condition.blankThen;
-import static com.github.charlemaznable.lang.Condition.emptyThen;
-import static com.github.charlemaznable.lang.Condition.nonBlank;
-import static com.github.charlemaznable.lang.Condition.nonEmpty;
-import static com.github.charlemaznable.lang.Condition.nonNull;
-import static com.github.charlemaznable.lang.Condition.notBlankThen;
-import static com.github.charlemaznable.lang.Condition.notEmptyThen;
-import static com.github.charlemaznable.lang.Condition.notNullThen;
-import static com.github.charlemaznable.lang.Condition.nullThen;
+import static com.github.charlemaznable.lang.Condition.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ConditionTest {
 
     @SuppressWarnings("ConstantConditions")
     @Test
     public void testCondition() {
+        new Condition();
+
         String strnull = null;
         String strempty = "";
         String strblank = "  ";
@@ -50,5 +47,29 @@ public class ConditionTest {
 
         assertEquals("nonNull", blankThen(strblank, () -> "nonNull"));
         assertEquals(string, blankThen(string, () -> "nonNull"));
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Test
+    public void testConditionCheck() {
+        String strnull = null;
+        String strempty = "";
+        String strblank = "  ";
+        String string = "string";
+
+        assertThrows(NullPointerException.class, () -> checkNotNull(strnull));
+        assertThrows(NullPointerException.class, () -> checkNotNull(strnull, "strnull is Null"));
+        assertEquals(strempty, checkNotNull(strempty));
+        assertEquals(strempty, checkNotNull(strempty, "strempty is Null"));
+
+        assertThrows(EmptyObjectException.class, () -> checkNotEmpty(strempty));
+        assertThrows(EmptyObjectException.class, () -> checkNotEmpty(strempty, "strempty is Empty"));
+        assertEquals(strblank, checkNotEmpty(strblank));
+        assertEquals(strblank, checkNotEmpty(strblank, "strblank is Empty"));
+
+        assertThrows(BlankStringException.class, () -> checkNotBlank(strblank));
+        assertThrows(BlankStringException.class, () -> checkNotBlank(strblank, "strblank is Blank"));
+        assertEquals(string, checkNotBlank(string));
+        assertEquals(string, checkNotBlank(string, "string is Blank"));
     }
 }

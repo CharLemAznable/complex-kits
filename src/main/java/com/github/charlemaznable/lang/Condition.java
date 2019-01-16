@@ -1,5 +1,11 @@
 package com.github.charlemaznable.lang;
 
+import com.github.charlemaznable.lang.ex.EmptyObjectException;
+import com.github.charlemaznable.lang.ex.BlankStringException;
+import com.google.common.base.Preconditions;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -54,5 +60,47 @@ public class Condition {
 
     public static String blankThen(String string, Supplier<String> action) {
         return isBlank(string) ? action.get() : string;
+    }
+
+    @CanIgnoreReturnValue
+    public static <T> T checkNotNull(T object) {
+        return Preconditions.checkNotNull(object);
+    }
+
+    @CanIgnoreReturnValue
+    public static <T> T checkNotNull(T object, @Nullable Object errorMessage) {
+        return Preconditions.checkNotNull(object, errorMessage);
+    }
+
+    @CanIgnoreReturnValue
+    public static <T> T checkNotEmpty(T object) {
+        if (isEmpty(object)) {
+            throw new EmptyObjectException();
+        }
+        return object;
+    }
+
+    @CanIgnoreReturnValue
+    public static <T> T checkNotEmpty(T object, @Nullable Object errorMessage) {
+        if (isEmpty(object)) {
+            throw new EmptyObjectException(String.valueOf(errorMessage));
+        }
+        return object;
+    }
+
+    @CanIgnoreReturnValue
+    public static String checkNotBlank(String string) {
+        if (isBlank(string)) {
+            throw new BlankStringException();
+        }
+        return string;
+    }
+
+    @CanIgnoreReturnValue
+    public static String checkNotBlank(String string, @Nullable Object errorMessage) {
+        if (isBlank(string)) {
+            throw new BlankStringException(String.valueOf(errorMessage));
+        }
+        return string;
     }
 }
