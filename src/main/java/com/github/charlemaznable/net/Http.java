@@ -1,7 +1,9 @@
 package com.github.charlemaznable.net;
 
+import com.google.common.base.Splitter;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
+import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -9,8 +11,13 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static com.github.charlemaznable.lang.Str.isNotEmpty;
+import static com.google.common.collect.Maps.newHashMap;
 
 public class Http {
 
@@ -37,6 +44,52 @@ public class Http {
         writer.write(content);
         writer.flush();
         writer.close();
+    }
+
+    public static Map<String, String> fetchParameterMap(HttpServletRequest request) {
+        Map<String, String> parameterMap = newHashMap();
+        Enumeration<String> parameterNames = request.getParameterNames();
+        while (parameterNames.hasMoreElements()) {
+            String parameterName = parameterNames.nextElement();
+            parameterMap.put(parameterName, request.getParameter(parameterName));
+        }
+        return parameterMap;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Map<String, String> fetchPathVariableMap(HttpServletRequest request) {
+        Map<String, String> pathVariableMap = newHashMap();
+        Object pathVariables = request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        if (pathVariables != null) pathVariableMap.putAll((Map) pathVariables);
+        return pathVariableMap;
+    }
+
+    public static String fetchRemoteAddr(HttpServletRequest request) {
+        String xForwardedFor = request.getHeader("x-forwarded-for");
+        if (isNotEmpty(xForwardedFor)) {
+            List<String> forwardedAddrList = Splitter.on(",")
+                    .trimResults().splitToList(xForwardedFor);
+            for (String forwardedAddr : forwardedAddrList) {
+                if (isNotEmpty(forwardedAddr) &&
+                        !"unknown".equalsIgnoreCase(forwardedAddr)) {
+                    return forwardedAddr;
+                }
+            }
+        }
+
+        String proxyClientIP = request.getHeader("Proxy-Client-IP");
+        if (isNotEmpty(proxyClientIP) &&
+                !"unknown".equalsIgnoreCase(proxyClientIP)) {
+            return proxyClientIP;
+        }
+
+        String wlProxyClientIP = request.getHeader("WL-Proxy-Client-IP");
+        if (isNotEmpty(wlProxyClientIP) &&
+                !"unknown".equalsIgnoreCase(wlProxyClientIP)) {
+            return wlProxyClientIP;
+        }
+
+        return request.getRemoteAddr();
     }
 
     @SneakyThrows
