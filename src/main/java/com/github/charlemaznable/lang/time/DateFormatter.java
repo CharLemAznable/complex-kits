@@ -1,6 +1,11 @@
 package com.github.charlemaznable.lang.time;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import lombok.SneakyThrows;
+
 import java.text.SimpleDateFormat;
+
+import static com.github.charlemaznable.lang.Condition.checkNotNull;
 
 public class DateFormatter {
 
@@ -24,5 +29,23 @@ public class DateFormatter {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    @CanIgnoreReturnValue
+    public String checkFormatQuietly(String dateString) {
+        try {
+            checkNotNull(dateString);
+            return dateString.equals(format.format(
+                    format.parse(dateString))) ? dateString : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @SneakyThrows
+    @CanIgnoreReturnValue
+    public String checkFormat(String dateString) {
+        return dateString.equals(format.format(
+                format.parse(dateString))) ? dateString : null;
     }
 }
