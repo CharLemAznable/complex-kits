@@ -1,58 +1,62 @@
 package com.github.charlemaznable.codec;
 
 import com.google.common.hash.Hasher;
-import com.google.common.hash.Hashing;
 
 import java.security.Key;
 
+import static com.github.charlemaznable.codec.Base64.Format.Standard;
 import static com.github.charlemaznable.codec.Base64.base64;
 import static com.github.charlemaznable.codec.Bytes.bytes;
 import static com.github.charlemaznable.codec.Hex.hex;
+import static com.google.common.hash.Hashing.hmacMd5;
+import static com.google.common.hash.Hashing.hmacSha1;
+import static com.google.common.hash.Hashing.hmacSha256;
+import static com.google.common.hash.Hashing.hmacSha512;
 
 public enum DigestHMAC {
 
     MD5 {
         @Override
         protected Hasher digestHasher(Key key) {
-            return Hashing.hmacMd5(key).newHasher();
+            return hmacMd5(key).newHasher();
         }
 
         @Override
         protected Hasher digestHasher(byte[] key) {
-            return Hashing.hmacMd5(key).newHasher();
+            return hmacMd5(key).newHasher();
         }
     },
     SHA1 {
         @Override
         protected Hasher digestHasher(Key key) {
-            return Hashing.hmacSha1(key).newHasher();
+            return hmacSha1(key).newHasher();
         }
 
         @Override
         protected Hasher digestHasher(byte[] key) {
-            return Hashing.hmacSha1(key).newHasher();
+            return hmacSha1(key).newHasher();
         }
     },
     SHA256 {
         @Override
         protected Hasher digestHasher(Key key) {
-            return Hashing.hmacSha256(key).newHasher();
+            return hmacSha256(key).newHasher();
         }
 
         @Override
         protected Hasher digestHasher(byte[] key) {
-            return Hashing.hmacSha256(key).newHasher();
+            return hmacSha256(key).newHasher();
         }
     },
     SHA512 {
         @Override
         protected Hasher digestHasher(Key key) {
-            return Hashing.hmacSha512(key).newHasher();
+            return hmacSha512(key).newHasher();
         }
 
         @Override
         protected Hasher digestHasher(byte[] key) {
-            return Hashing.hmacSha512(key).newHasher();
+            return hmacSha512(key).newHasher();
         }
     };
 
@@ -89,15 +93,15 @@ public enum DigestHMAC {
     }
 
     public String digestBase64(byte[] info, Key key) {
-        return base64(digest(info, key), Base64.Format.Standard);
+        return base64(digest(info, key), Standard);
     }
 
     public String digestBase64(byte[] info, byte[] key) {
-        return base64(digest(info, key), Base64.Format.Standard);
+        return base64(digest(info, key), Standard);
     }
 
     public String digestBase64(byte[] info, String key) {
-        return base64(digest(info, key), Base64.Format.Standard);
+        return base64(digest(info, key), Standard);
     }
 
     public String digestBase64(String info, Key key) {

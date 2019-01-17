@@ -1,11 +1,16 @@
 package com.github.charlemaznable.codec;
 
 import com.google.common.hash.Hasher;
-import com.google.common.hash.Hashing;
 
+import static com.github.charlemaznable.codec.Base64.Format.Standard;
 import static com.github.charlemaznable.codec.Base64.base64;
 import static com.github.charlemaznable.codec.Bytes.bytes;
 import static com.github.charlemaznable.codec.Hex.hex;
+import static com.google.common.hash.Hashing.md5;
+import static com.google.common.hash.Hashing.sha1;
+import static com.google.common.hash.Hashing.sha256;
+import static com.google.common.hash.Hashing.sha384;
+import static com.google.common.hash.Hashing.sha512;
 
 public enum Digest {
 
@@ -13,32 +18,32 @@ public enum Digest {
     MD5 {
         @Override
         protected Hasher digestHasher() {
-            return Hashing.md5().newHasher();
+            return md5().newHasher();
         }
     },
     @Deprecated
     SHA1 {
         @Override
         protected Hasher digestHasher() {
-            return Hashing.sha1().newHasher();
+            return sha1().newHasher();
         }
     },
     SHA256 {
         @Override
         protected Hasher digestHasher() {
-            return Hashing.sha256().newHasher();
+            return sha256().newHasher();
         }
     },
     SHA384 {
         @Override
         protected Hasher digestHasher() {
-            return Hashing.sha384().newHasher();
+            return sha384().newHasher();
         }
     },
     SHA512 {
         @Override
         protected Hasher digestHasher() {
-            return Hashing.sha512().newHasher();
+            return sha512().newHasher();
         }
     };
 
@@ -70,7 +75,7 @@ public enum Digest {
     }
 
     public String digestBase64(byte[] info) {
-        return base64(digest(info), Base64.Format.Standard);
+        return base64(digest(info), Standard);
     }
 
     public String digestBase64(String info) {
@@ -78,7 +83,7 @@ public enum Digest {
     }
 
     public String digestBase64(byte[] info, byte[] salt) {
-        return base64(digest(info, salt), Base64.Format.Standard);
+        return base64(digest(info, salt), Standard);
     }
 
     public String digestBase64(byte[] info, String salt) {
@@ -131,12 +136,12 @@ public enum Digest {
 
     @Deprecated
     public String digestBase64Deprecated(String info) {
-        return base64(digestDeprecated(info), Base64.Format.Standard);
+        return base64(digestDeprecated(info), Standard);
     }
 
     @Deprecated
     public String digestBase64Deprecated(String info, String salt) {
-        return base64(digestDeprecated(info, salt), Base64.Format.Standard);
+        return base64(digestDeprecated(info, salt), Standard);
     }
 
     @Deprecated

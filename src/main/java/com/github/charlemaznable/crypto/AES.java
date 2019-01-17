@@ -9,6 +9,9 @@ import java.security.Key;
 import static com.github.charlemaznable.codec.Bytes.bytes;
 import static com.github.charlemaznable.codec.Bytes.string;
 import static java.lang.System.arraycopy;
+import static javax.crypto.Cipher.DECRYPT_MODE;
+import static javax.crypto.Cipher.ENCRYPT_MODE;
+import static javax.crypto.Cipher.getInstance;
 
 public class AES {
 
@@ -18,15 +21,15 @@ public class AES {
 
     @SneakyThrows
     public static byte[] encrypt(String value, Key key) {
-        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
-        cipher.init(Cipher.ENCRYPT_MODE, key);
+        Cipher cipher = getInstance(CIPHER_ALGORITHM);
+        cipher.init(ENCRYPT_MODE, key);
         return cipher.doFinal(bytes(value));
     }
 
     @SneakyThrows
     public static String decrypt(byte[] value, Key key) {
-        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
-        cipher.init(Cipher.DECRYPT_MODE, key);
+        Cipher cipher = getInstance(CIPHER_ALGORITHM);
+        cipher.init(DECRYPT_MODE, key);
         byte[] decrypted = cipher.doFinal(value);
         return string(decrypted);
     }

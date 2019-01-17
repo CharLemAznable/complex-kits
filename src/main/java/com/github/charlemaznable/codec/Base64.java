@@ -8,6 +8,9 @@ import java.util.Arrays;
 import static com.github.charlemaznable.codec.Bytes.bytes;
 import static com.github.charlemaznable.codec.Bytes.string;
 import static com.github.charlemaznable.lang.Str.removeLastLetters;
+import static java.lang.Math.min;
+import static java.lang.String.format;
+import static java.lang.System.arraycopy;
 
 public class Base64 {
 
@@ -51,7 +54,7 @@ public class Base64 {
         return string(unBase64(value));
     }
 
-    public static enum Format {
+    public enum Format {
         Standard,
         // URL安全(将Base64中的URL非法字符'+'和'/'转为'-'和'_', 见RFC3548)
         UrlSafe,
@@ -59,10 +62,10 @@ public class Base64 {
         Purified
     }
 
+    @SuppressWarnings("SameParameterValue")
     private static abstract class ApacheBaseNCodec {
 
         public static final int MIME_CHUNK_SIZE = 76;
-        public static final int PEM_CHUNK_SIZE = 64;
         protected static final int MASK_8BITS = 0xff;
         protected static final byte PAD_DEFAULT = '='; // Allow static access to default
         static final int EOF = -1;
@@ -93,6 +96,7 @@ public class Base64 {
             this.pad = pad;
         }
 
+        @SuppressWarnings("BooleanMethodIsAlwaysInverted")
         protected static boolean isWhiteSpace(final byte byteToCheck) {
             switch (byteToCheck) {
                 case ' ':
@@ -124,7 +128,7 @@ public class Base64 {
                 context.readPos = 0;
             } else {
                 final byte[] b = new byte[context.buffer.length * DEFAULT_BUFFER_RESIZE_FACTOR];
-                System.arraycopy(context.buffer, 0, b, 0, context.buffer.length);
+                arraycopy(context.buffer, 0, b, 0, context.buffer.length);
                 context.buffer = b;
             }
             return context.buffer;
@@ -137,10 +141,11 @@ public class Base64 {
             return context.buffer;
         }
 
+        @SuppressWarnings("UnusedReturnValue")
         int readResults(final byte[] b, final int bPos, final int bAvail, final Context context) {
             if (context.buffer != null) {
-                final int len = Math.min(available(context), bAvail);
-                System.arraycopy(context.buffer, context.readPos, b, bPos, len);
+                final int len = min(available(context), bAvail);
+                arraycopy(context.buffer, context.readPos, b, bPos, len);
                 context.readPos += len;
                 if (context.readPos >= context.pos) {
                     context.buffer = null; // so hasData() will return false, and this method can return -1
@@ -272,7 +277,7 @@ public class Base64 {
             @SuppressWarnings("boxing") // OK to ignore boxing here
             @Override
             public String toString() {
-                return String.format("%s[buffer=%s, currentLinePos=%s, eof=%s, ibitWorkArea=%s, lbitWorkArea=%s, " +
+                return format("%s[buffer=%s, currentLinePos=%s, eof=%s, ibitWorkArea=%s, lbitWorkArea=%s, " +
                                 "modulus=%s, pos=%s, readPos=%s]", this.getClass().getSimpleName(), Arrays.toString(buffer),
                         currentLinePos, eof, ibitWorkArea, lbitWorkArea, modulus, pos, readPos);
             }
@@ -352,7 +357,7 @@ public class Base64 {
                 if (lineLength > 0) { // null line-sep forces no chunking rather than throwing IAE
                     this.encodeSize = BYTES_PER_ENCODED_BLOCK + lineSeparator.length;
                     this.lineSeparator = new byte[lineSeparator.length];
-                    System.arraycopy(lineSeparator, 0, this.lineSeparator, 0, lineSeparator.length);
+                    arraycopy(lineSeparator, 0, this.lineSeparator, 0, lineSeparator.length);
                 } else {
                     this.encodeSize = BYTES_PER_ENCODED_BLOCK;
                     this.lineSeparator = null;
@@ -473,7 +478,7 @@ public class Base64 {
             }
             final int startDst = bitlen / 8 - len; // to pad w/ nulls as per spec
             final byte[] resizedBytes = new byte[bitlen / 8];
-            System.arraycopy(bigBytes, startSrc, resizedBytes, startDst, len);
+            arraycopy(bigBytes, startSrc, resizedBytes, startDst, len);
             return resizedBytes;
         }
 
@@ -525,7 +530,7 @@ public class Base64 {
                 context.currentLinePos += context.pos - savedPos; // keep track of current line position
                 // if currentPos == 0 we are at the start of a line, so don't add CRLF
                 if (lineLength > 0 && context.currentLinePos > 0) {
-                    System.arraycopy(lineSeparator, 0, buffer, context.pos, lineSeparator.length);
+                    arraycopy(lineSeparator, 0, buffer, context.pos, lineSeparator.length);
                     context.pos += lineSeparator.length;
                 }
             } else {
@@ -544,7 +549,7 @@ public class Base64 {
                         buffer[context.pos++] = encodeTable[context.ibitWorkArea & MASK_6BITS];
                         context.currentLinePos += BYTES_PER_ENCODED_BLOCK;
                         if (lineLength > 0 && lineLength <= context.currentLinePos) {
-                            System.arraycopy(lineSeparator, 0, buffer, context.pos, lineSeparator.length);
+                            arraycopy(lineSeparator, 0, buffer, context.pos, lineSeparator.length);
                             context.pos += lineSeparator.length;
                             context.currentLinePos = 0;
                         }

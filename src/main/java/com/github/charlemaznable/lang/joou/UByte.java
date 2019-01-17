@@ -156,6 +156,6 @@ public final class UByte extends UNumber implements Comparable<UByte> {
 
     @Override
     public int compareTo(UByte o) {
-        return (value < o.value ? -1 : (value == o.value ? 0 : 1));
+        return Short.compare(value, o.value);
     }
 }

@@ -13,6 +13,7 @@ import static com.github.charlemaznable.codec.Hex.hex;
 import static com.github.charlemaznable.codec.Hex.unHex;
 import static com.github.charlemaznable.crypto.RSA.privateKey;
 import static com.github.charlemaznable.crypto.RSA.publicKey;
+import static java.security.Signature.getInstance;
 
 public enum SHAXWithRSA {
 
@@ -37,7 +38,7 @@ public enum SHAXWithRSA {
 
     @SneakyThrows
     public byte[] sign(String plainText, PrivateKey privateKey) {
-        Signature signature = Signature.getInstance(signAlgorithms());
+        Signature signature = getInstance(signAlgorithms());
         signature.initSign(privateKey);
         signature.update(bytes(plainText));
         return signature.sign();
@@ -49,7 +50,7 @@ public enum SHAXWithRSA {
 
     @SneakyThrows
     public boolean verify(String plainText, byte[] sign, PublicKey publicKey) {
-        Signature signature = Signature.getInstance(signAlgorithms());
+        Signature signature = getInstance(signAlgorithms());
         signature.initVerify(publicKey);
         signature.update(bytes(plainText));
         return signature.verify(sign);

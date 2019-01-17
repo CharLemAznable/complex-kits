@@ -6,15 +6,15 @@ import com.github.charlemaznable.config.impl.IniConfigable;
 import com.github.charlemaznable.config.impl.PropertiesConfigable;
 import com.github.charlemaznable.config.impl.PropsConfigable;
 import com.github.charlemaznable.config.impl.TableConfigable;
-import com.github.charlemaznable.config.utils.ParamsApplyUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.net.URL;
 import java.util.List;
 import java.util.Properties;
 
+import static com.github.charlemaznable.config.utils.ParamsApplyUtils.createObject;
 import static com.github.charlemaznable.lang.ClzPath.classResource;
 import static com.github.charlemaznable.lang.ClzPath.classResources;
+import static com.github.charlemaznable.lang.Str.isEmpty;
 
 public class Config {
 
@@ -34,7 +34,7 @@ public class Config {
         // config.implementation=org.n3r.config.impl.RedisConfigable(127.0.0.1,
         // 11211)
         String configImplementation = bizConfig.getStr("config.implementation");
-        if (StringUtils.isEmpty(configImplementation)) {
+        if (isEmpty(configImplementation)) {
             impl = bizConfig;
             return;
         }
@@ -46,7 +46,7 @@ public class Config {
     }
 
     private static Configable loadImpl(String configImplementation, Configable defConfig) {
-        return ParamsApplyUtils.createObject(configImplementation, Configable.class);
+        return createObject(configImplementation, Configable.class);
     }
 
     private static Configable createConfigable(String configKey, String defConfigDir, Configable defConfig) {

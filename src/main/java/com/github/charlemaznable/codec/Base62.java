@@ -15,7 +15,7 @@ public class Base62 {
     }
 
     public static String base64(byte[] data) {
-        StringBuffer sb = new StringBuffer(data.length * 2);
+        StringBuilder sb = new StringBuilder(data.length * 2);
         int pos = 0, val = 0;
         for (byte b : data) {
             val = (val << 8) | (b & 0xFF);
@@ -47,7 +47,7 @@ public class Base62 {
     }
 
     public static String base62(byte[] data) {
-        StringBuffer sb = new StringBuffer(data.length * 2);
+        StringBuilder sb = new StringBuilder(data.length * 2);
         int pos = 0, val = 0;
         for (byte b : data) {
             val = (val << 8) | (b & 0xFF);

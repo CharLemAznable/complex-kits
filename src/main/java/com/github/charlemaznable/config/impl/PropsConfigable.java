@@ -1,16 +1,16 @@
 package com.github.charlemaznable.config.impl;
 
 import com.github.charlemaznable.config.ex.ConfigException;
-import com.google.common.base.Charsets;
-import com.google.common.io.Closeables;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.Objects;
 import java.util.Properties;
 
 import static com.github.charlemaznable.lang.ClzPath.urlAsInputStream;
+import static com.google.common.base.Charsets.UTF_8;
+import static com.google.common.io.Closeables.closeQuietly;
+import static java.util.Objects.requireNonNull;
 
 public class PropsConfigable extends DefaultConfigable {
 
@@ -23,7 +23,7 @@ public class PropsConfigable extends DefaultConfigable {
         Properties props = new Properties();
         try {
             reader = new PropsReader(new InputStreamReader(
-                    Objects.requireNonNull(urlAsInputStream(url)), Charsets.UTF_8));
+                    requireNonNull(urlAsInputStream(url)), UTF_8));
             while (reader.nextProperty()) {
                 String propertyName = reader.getPropertyName();
                 if (props.containsKey(propertyName)) {
@@ -37,7 +37,7 @@ public class PropsConfigable extends DefaultConfigable {
         } catch (IOException ex) {
             throw new ConfigException("read props file error: ", ex);
         } finally {
-            Closeables.closeQuietly(reader);
+            closeQuietly(reader);
         }
     }
 }

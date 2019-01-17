@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.net.HttpURLConnection;
 import java.net.JarURLConnection;
 import java.net.URI;
@@ -18,7 +17,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -28,7 +26,16 @@ import java.util.jar.JarFile;
 
 import static com.github.charlemaznable.lang.Str.isEmpty;
 import static com.github.charlemaznable.lang.Str.toStr;
+import static com.google.common.collect.Sets.newLinkedHashSet;
+import static com.google.common.io.Resources.readLines;
+import static java.lang.Class.forName;
 import static java.lang.ClassLoader.getSystemResources;
+import static java.lang.System.identityHashCode;
+import static java.lang.Thread.currentThread;
+import static java.lang.reflect.Proxy.newProxyInstance;
+import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
+import static java.net.HttpURLConnection.HTTP_OK;
+import static java.util.Collections.emptySet;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.joor.Reflect.on;
 
@@ -36,7 +43,7 @@ public class ClzPath {
 
     public static boolean classExists(String className) {
         try {
-            Class.forName(className, false, getClassLoader());
+            forName(className, false, getClassLoader());
             return true;
         } catch (Throwable e) { // including ClassNotFoundException
             return false;
@@ -47,7 +54,7 @@ public class ClzPath {
         if (isEmpty(className)) return null;
 
         try {
-            return Class.forName(className, false, getClassLoader());
+            return forName(className, false, getClassLoader());
         } catch (ClassNotFoundException ignore) {
         }
         return null;
@@ -74,7 +81,7 @@ public class ClzPath {
      * @return The context classloader.
      */
     public static ClassLoader getClassLoader() {
-        return Thread.currentThread().getContextClassLoader();
+        return currentThread().getContextClassLoader();
     }
 
     public static URL classResource(String classPath) {
@@ -115,7 +122,7 @@ public class ClzPath {
 
     public static List<String> urlAsLines(URL url) {
         try {
-            return url != null ? Resources.readLines(url, Charsets.UTF_8) : null;
+            return url != null ? readLines(url, Charsets.UTF_8) : null;
         } catch (IOException e) {
             return null;
         }
@@ -244,9 +251,9 @@ public class ClzPath {
                         (HttpURLConnection) con : null;
                 if (httpCon != null) {
                     int code = httpCon.getResponseCode();
-                    if (code == HttpURLConnection.HTTP_OK) {
+                    if (code == HTTP_OK) {
                         return true;
-                    } else if (code == HttpURLConnection.HTTP_NOT_FOUND) {
+                    } else if (code == HTTP_NOT_FOUND) {
                         return false;
                     }
                 }
@@ -385,7 +392,7 @@ public class ClzPath {
             try {
                 rootDir = getFile(rootDirResource).getAbsoluteFile();
             } catch (IOException ex) {
-                return Collections.emptySet();
+                return emptySet();
             }
             return doFindMatchingFileSystemResources(rootDir, extension);
         }
@@ -417,8 +424,7 @@ public class ClzPath {
         }
 
         private static Set<File> retrieveMatchingFiles(File rootDir, String extension) {
-            if (!rootDir.exists() || !rootDir.isDirectory() ||
-                    !rootDir.canRead()) return Collections.emptySet();
+            if (!rootDir.exists() || !rootDir.isDirectory() || !rootDir.canRead()) return emptySet();
 
             Set<File> result = new LinkedHashSet<>(8);
             doRetrieveMatchingFiles(extension, rootDir, result);
@@ -471,7 +477,7 @@ public class ClzPath {
         }
 
         public static void visit(Object resource, InvocationHandler visitor) {
-            on(resource).call("visit", Proxy.newProxyInstance(getClassLoader(),
+            on(resource).call("visit", newProxyInstance(getClassLoader(),
                     new Class<?>[]{getVirtualFileVisitor()}, visitor));
         }
 
@@ -497,7 +503,7 @@ public class ClzPath {
 
         private final String rootPath;
 
-        private final Set<URL> resources = new LinkedHashSet<>();
+        private final Set<URL> resources = newLinkedHashSet();
 
         public ExtensionMatchVFVisitor(String rootPath, String extension) {
             this.extension = extension;
@@ -512,7 +518,7 @@ public class ClzPath {
                     // Only consider equal when proxies are identical.
                     return (proxy == args[0]);
                 } else if (methodName.equals("hashCode")) {
-                    return System.identityHashCode(proxy);
+                    return identityHashCode(proxy);
                 }
             } else if ("getAttributes".equals(methodName)) {
                 return getAttributes();

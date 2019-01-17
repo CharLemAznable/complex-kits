@@ -3,11 +3,14 @@ package com.github.charlemaznable.config.impl;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import static com.github.charlemaznable.lang.Listt.newArrayList;
+import static com.github.charlemaznable.lang.Mapp.newHashMap;
+import static java.lang.Character.isWhitespace;
+import static java.lang.System.getProperty;
 
 public class IniReader {
 
@@ -15,15 +18,15 @@ public class IniReader {
 
     protected static final String SEPARATOR_CHARS = "=:(";
 
-    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+    private static final String LINE_SEPARATOR = getProperty("line.separator");
 
     private static final String QUOTE_CHARACTERS = "\"'";
 
     private static final String LINE_CONT = "\\";
 
-    private Map<String, Properties> properties = new HashMap<>();
+    private Map<String, Properties> properties = newHashMap();
 
-    private List<String> sections = new ArrayList<>();
+    private List<String> sections = newArrayList();
 
     private int lineNumber;
 
@@ -95,7 +98,7 @@ public class IniReader {
                         result.append(c);
                     }
                 } else {
-                    if (isCommentChar(c) && Character.isWhitespace(lastChar)) stop = true;
+                    if (isCommentChar(c) && isWhitespace(lastChar)) stop = true;
                     else result.append(c);
                 }
 
@@ -126,7 +129,7 @@ public class IniReader {
     private static boolean lineContinues(String line) {
         String s = line.trim();
         return s.equals(LINE_CONT) || s.length() > 2 && s.endsWith(LINE_CONT)
-                && Character.isWhitespace(s.charAt(s.length() - 2));
+                && isWhitespace(s.charAt(s.length() - 2));
     }
 
     private static boolean lineContinues(String line, int pos) {
@@ -192,7 +195,7 @@ public class IniReader {
      */
     private static int findSeparatorBeforeQuote(String line, int quoteIndex) {
         int index = quoteIndex - 1;
-        while (index >= 0 && Character.isWhitespace(line.charAt(index))) index--;
+        while (index >= 0 && isWhitespace(line.charAt(index))) index--;
         if (index >= 0 && SEPARATOR_CHARS.indexOf(line.charAt(index)) < 0) index = -1;
 
         return index;

@@ -9,6 +9,8 @@ import java.io.Reader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.regex.Pattern.compile;
+
 public class PropsReader extends LineNumberReader {
 
     static final String COMMENT_CHARS = "#!";
@@ -21,10 +23,8 @@ public class PropsReader extends LineNumberReader {
     /**
      * The regular expression to parse the key and the value of a property.
      */
-    private static final Pattern PROPERTY_PATTERN = Pattern
-            .compile("(([\\S&&[^\\\\" + new String(SEPARATORS)
-                    + "]]|\\\\.)*)(\\s*(\\s+|[" + new String(SEPARATORS)
-                    + "])\\s*)(.*)");
+    private static final Pattern PROPERTY_PATTERN = compile("(([\\S&&[^\\\\" + new String(SEPARATORS)
+                    + "]]|\\\\.)*)(\\s*(\\s+|[" + new String(SEPARATORS) + "])\\s*)(.*)");
     /**
      * Constant for the radix of hex numbers.
      */

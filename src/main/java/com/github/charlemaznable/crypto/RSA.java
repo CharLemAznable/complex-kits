@@ -26,6 +26,8 @@ import static com.github.charlemaznable.codec.Base64.base64;
 import static com.github.charlemaznable.codec.Base64.unBase64;
 import static com.github.charlemaznable.codec.Bytes.bytes;
 import static com.github.charlemaznable.codec.Bytes.string;
+import static javax.crypto.Cipher.DECRYPT_MODE;
+import static javax.crypto.Cipher.ENCRYPT_MODE;
 
 public class RSA {
 
@@ -132,12 +134,12 @@ public class RSA {
 
     @SneakyThrows
     private static byte[] encryptByBlock(Key key, int keySize, byte[] data) {
-        return cryptByBlock(Cipher.ENCRYPT_MODE, key, keySize, data);
+        return cryptByBlock(ENCRYPT_MODE, key, keySize, data);
     }
 
     @SneakyThrows
     private static byte[] decryptByBlock(Key key, int keySize, byte[] data) {
-        return cryptByBlock(Cipher.DECRYPT_MODE, key, keySize, data);
+        return cryptByBlock(DECRYPT_MODE, key, keySize, data);
     }
 
     private static byte[] cryptByBlock(int mode, Key key, int keySize, byte[] data) throws
@@ -145,7 +147,7 @@ public class RSA {
             IllegalBlockSizeException, BadPaddingException, IOException {
         Cipher cipher = Cipher.getInstance(RSA);
         cipher.init(mode, key);
-        int maxBlock = keySize / 8 - (Cipher.ENCRYPT_MODE == mode ? 11 : 0);
+        int maxBlock = keySize / 8 - (ENCRYPT_MODE == mode ? 11 : 0);
         int inputLen = data.length;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         int offSet = 0;

@@ -1,18 +1,18 @@
 package com.github.charlemaznable.config.impl;
 
 import com.github.charlemaznable.config.ex.ConfigException;
-import com.google.common.base.Charsets;
-import com.google.common.io.Closeables;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 
 import static com.github.charlemaznable.lang.ClzPath.urlAsInputStream;
+import static com.google.common.base.Charsets.UTF_8;
+import static com.google.common.io.Closeables.closeQuietly;
+import static java.util.Objects.requireNonNull;
 
 public class IniConfigable extends DefaultConfigable {
 
@@ -24,8 +24,7 @@ public class IniConfigable extends DefaultConfigable {
         Reader reader = null;
         Properties props = new Properties();
         try {
-            reader = new InputStreamReader(
-                    Objects.requireNonNull(urlAsInputStream(url)), Charsets.UTF_8);
+            reader = new InputStreamReader(requireNonNull(urlAsInputStream(url)), UTF_8);
             IniReader iniReader = new IniReader(reader);
             for (String section : iniReader.getSections()) {
                 Properties sectionProps = iniReader.getSection(section);
@@ -47,7 +46,7 @@ public class IniConfigable extends DefaultConfigable {
         } catch (IOException ex) {
             throw new ConfigException("read ini file error " + url, ex);
         } finally {
-            Closeables.closeQuietly(reader);
+            closeQuietly(reader);
         }
         return props;
     }

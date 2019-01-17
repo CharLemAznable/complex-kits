@@ -2,11 +2,15 @@ package com.github.charlemaznable.lang.pool;
 
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
+import static org.apache.commons.pool2.impl.GenericObjectPoolConfig.DEFAULT_MAX_IDLE;
+import static org.apache.commons.pool2.impl.GenericObjectPoolConfig.DEFAULT_MAX_TOTAL;
+import static org.apache.commons.pool2.impl.GenericObjectPoolConfig.DEFAULT_MIN_IDLE;
+
 public class PoolProxyConfigBuilder {
 
-    private int maxTotal = GenericObjectPoolConfig.DEFAULT_MAX_TOTAL;
-    private int maxIdle = GenericObjectPoolConfig.DEFAULT_MAX_IDLE;
-    private int minIdle = GenericObjectPoolConfig.DEFAULT_MIN_IDLE;
+    private int maxTotal = DEFAULT_MAX_TOTAL;
+    private int maxIdle = DEFAULT_MAX_IDLE;
+    private int minIdle = DEFAULT_MIN_IDLE;
 
     public PoolProxyConfigBuilder maxTotal(int maxTotal) {
         this.maxTotal = maxTotal;

@@ -2,6 +2,7 @@ package com.github.charlemaznable.codec;
 
 import static com.github.charlemaznable.codec.Bytes.bytes;
 import static com.github.charlemaznable.codec.Bytes.string;
+import static java.lang.Integer.parseInt;
 
 public class Base16 {
 
@@ -21,8 +22,7 @@ public class Base16 {
     public static byte[] unBase16(String value) {
         byte[] bytes = new byte[value.length() / 2];
         for (int i = 0; i < bytes.length; i++) {
-            bytes[i] = (byte) Integer.parseInt(
-                    value.substring(2 * i, 2 * i + 2), 16);
+            bytes[i] = (byte) parseInt(value.substring(2 * i, 2 * i + 2), 16);
         }
         return bytes;
     }

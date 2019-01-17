@@ -1,7 +1,6 @@
 package com.github.charlemaznable.lang;
 
 import com.github.charlemaznable.lang.joou.ULong;
-import org.apache.commons.lang3.RandomStringUtils;
 
 import java.security.SecureRandom;
 import java.util.Map;
@@ -9,6 +8,7 @@ import java.util.Map;
 import static com.github.charlemaznable.lang.Empty.isEmpty;
 import static com.google.common.collect.Maps.newHashMap;
 import static java.lang.Math.max;
+import static org.apache.commons.lang3.RandomStringUtils.random;
 
 public class Rand {
 
@@ -52,15 +52,15 @@ public class Rand {
     }
 
     public static String randAscii(int count) {
-        return RandomStringUtils.random(count, 32, 127, false, false, null, RANDOM);
+        return random(count, 32, 127, false, false, null, RANDOM);
     }
 
     public static String randLetters(int count) {
-        return RandomStringUtils.random(count, 0, 0, true, false, null, RANDOM);
+        return random(count, 0, 0, true, false, null, RANDOM);
     }
 
     public static String randAlphanumeric(int count) {
-        return RandomStringUtils.random(count, 0, 0, true, true, null, RANDOM);
+        return random(count, 0, 0, true, true, null, RANDOM);
     }
 
     public static <T> T randWeighted(Map<T, Integer> weightedMap) {

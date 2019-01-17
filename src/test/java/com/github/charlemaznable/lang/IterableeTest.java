@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static com.github.charlemaznable.lang.Iterablee.NOT_FOUND;
+import static com.github.charlemaznable.lang.Iterablee.find;
 import static com.github.charlemaznable.lang.Listt.newArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -23,13 +25,13 @@ public class IterableeTest {
 
     @Test
     public void testFind() {
-        assertEquals(0, Iterablee.find(list, "aaa"::equals));
-        assertEquals(Iterablee.NOT_FOUND, Iterablee.find(list, "ddd"::equals));
+        assertEquals(0, find(list, "aaa"::equals));
+        assertEquals(NOT_FOUND, find(list, "ddd"::equals));
     }
 
     @Test
     public void testFindWithIndex() {
-        assertEquals(0, Iterablee.find(list, (index, string) -> "aaa".equals(string)));
-        assertEquals(Iterablee.NOT_FOUND, Iterablee.find(list, (index, string) -> "ddd".equals(string)));
+        assertEquals(0, find(list, (index, string) -> "aaa".equals(string)));
+        assertEquals(NOT_FOUND, find(list, (index, string) -> "ddd".equals(string)));
     }
 }

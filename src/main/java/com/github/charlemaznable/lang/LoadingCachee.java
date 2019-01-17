@@ -1,6 +1,5 @@
 package com.github.charlemaznable.lang;
 
-import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
@@ -10,26 +9,29 @@ import lombok.SneakyThrows;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
+import static com.google.common.cache.CacheBuilder.newBuilder;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
+
 public class LoadingCachee {
 
     public static <K, V> LoadingCache<K, V> simpleCache(CacheLoader<K, V> loader) {
-        return CacheBuilder.newBuilder().build(loader);
+        return newBuilder().build(loader);
     }
 
     public static <K, V> LoadingCache<K, V> accessCache(CacheLoader<K, V> loader, Duration duration) {
-        return accessCache(loader, duration.toNanos(), TimeUnit.NANOSECONDS);
+        return accessCache(loader, duration.toNanos(), NANOSECONDS);
     }
 
     public static <K, V> LoadingCache<K, V> accessCache(CacheLoader<K, V> loader, long duration, TimeUnit unit) {
-        return CacheBuilder.newBuilder().expireAfterAccess(duration, unit).build(loader);
+        return newBuilder().expireAfterAccess(duration, unit).build(loader);
     }
 
     public static <K, V> LoadingCache<K, V> writeCache(CacheLoader<K, V> loader, Duration duration) {
-        return writeCache(loader, duration.toNanos(), TimeUnit.NANOSECONDS);
+        return writeCache(loader, duration.toNanos(), NANOSECONDS);
     }
 
     public static <K, V> LoadingCache<K, V> writeCache(CacheLoader<K, V> loader, long duration, TimeUnit unit) {
-        return CacheBuilder.newBuilder().expireAfterWrite(duration, unit).build(loader);
+        return newBuilder().expireAfterWrite(duration, unit).build(loader);
     }
 
     @SneakyThrows

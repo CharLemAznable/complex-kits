@@ -1,16 +1,17 @@
 package com.github.charlemaznable.lang;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.util.regex.Pattern.compile;
+import static org.apache.commons.lang3.StringUtils.repeat;
 
 public class Str {
 
     /**
      * 整数匹配模式.
      */
-    public static final Pattern INTEGER_PATTERN = Pattern.compile("[-+]?([0-9]+)$");
+    public static final Pattern INTEGER_PATTERN = compile("[-+]?([0-9]+)$");
 
     public static boolean isNull(String str) {
         return str == null;
@@ -60,6 +61,7 @@ public class Str {
         return left == '{' && right == '}';
     }
 
+    @SuppressWarnings("Duplicates")
     public static String substrInQuotes(String str, char left, int pos) {
         int leftTimes = 0;
         int leftPos = str.indexOf(left, pos);
@@ -127,6 +129,6 @@ public class Str {
         if (null == cs) return null;
         int len = cs.length();
         if (len >= width) return cs.toString();
-        return StringUtils.repeat(c, width - len) + cs;
+        return repeat(c, width - len) + cs;
     }
 }

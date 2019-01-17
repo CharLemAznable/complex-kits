@@ -1,23 +1,25 @@
 package com.github.charlemaznable.config.utils;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.joor.Reflect;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.github.charlemaznable.lang.Listt.newArrayList;
+import static com.github.charlemaznable.lang.Str.isEmpty;
 import static com.github.charlemaznable.lang.Str.substrInQuotes;
-import static org.joor.Reflect.on;
+import static com.google.common.collect.Iterables.toArray;
+import static java.util.regex.Pattern.compile;
+import static org.apache.commons.lang3.StringUtils.trim;
 
 @Slf4j
 public class ParamsApplyUtils {
 
-    private static final Pattern paramParams = Pattern
-            .compile("\\w+([.$]\\w+)*\\s*(\\(\\s*[.\\w]+\\s*(,\\s*[.\\w]+\\s*)*\\))?");
+    private static final Pattern paramParams = compile(
+            "\\w+([.$]\\w+)*\\s*(\\(\\s*[.\\w]+\\s*(,\\s*[.\\w]+\\s*)*\\))?");
 
     /*
      * 根据形如com.ailk.xxx.yyy(a123,b23)的字符串，生成对象。
@@ -25,8 +27,8 @@ public class ParamsApplyUtils {
      */
     @SuppressWarnings("unchecked")
     public static <T> List<T> createObjects(String propertyValue, Class<? super T> cls) {
-        List<T> lst = new ArrayList();
-        if (StringUtils.isEmpty(propertyValue)) return lst;
+        List<T> lst = newArrayList();
+        if (isEmpty(propertyValue)) return lst;
 
         Matcher matcher = paramParams.matcher(propertyValue);
         Splitter splitter = Splitter.on(',').trimResults();
@@ -35,7 +37,7 @@ public class ParamsApplyUtils {
             String group = matcher.group().trim();
             int posBrace = group.indexOf('(');
             String functor = posBrace < 0 ? group : group.substring(0, posBrace);
-            Object obj = on(StringUtils.trim(functor)).create().get();
+            Object obj = Reflect.on(trim(functor)).create().get();
             if (!cls.isInstance(obj)) {
                 log.warn("{} can not instantized to {}", functor, cls.getName());
                 continue;
@@ -45,7 +47,7 @@ public class ParamsApplyUtils {
 
             if (obj instanceof ParamsAppliable)
                 ((ParamsAppliable) obj).applyParams(posBrace <= 0 ? new String[]{}
-                        : Iterables.toArray(splitter.split(substrInQuotes(group, '(', posBrace)), String.class));
+                        : toArray(splitter.split(substrInQuotes(group, '(', posBrace)), String.class));
         }
 
         return lst;

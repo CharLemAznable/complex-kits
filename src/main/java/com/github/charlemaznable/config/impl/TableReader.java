@@ -1,15 +1,21 @@
 package com.github.charlemaznable.config.impl;
 
 import com.github.charlemaznable.config.ex.ConfigException;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static com.github.charlemaznable.lang.Listt.newArrayList;
+import static com.github.charlemaznable.lang.Str.isEmpty;
+import static com.google.common.collect.Sets.newHashSet;
+import static org.apache.commons.lang3.StringUtils.endsWith;
+import static org.apache.commons.lang3.StringUtils.split;
+import static org.apache.commons.lang3.StringUtils.substring;
+import static org.apache.commons.lang3.StringUtils.substringBeforeLast;
+import static org.apache.commons.lang3.StringUtils.trim;
 
 public class TableReader {
 
@@ -17,11 +23,11 @@ public class TableReader {
 
     private static final String ROW_PREFIX = "#!";
 
-    private List<ConfigTable> tables = new ArrayList<>();
+    private List<ConfigTable> tables = newArrayList();
 
     private String tableName = "";
 
-    private Set<Integer> rowKeyIndex = new HashSet<>();
+    private Set<Integer> rowKeyIndex = newHashSet();
 
     private ConfigTable configTable = null;
 
@@ -42,8 +48,8 @@ public class TableReader {
     }
 
     private static String generateTableNameFromLine(String line) {
-        String trimLine = StringUtils.trim(line);
-        return StringUtils.trim(StringUtils.substring(trimLine, 1, trimLine.length() - 1));
+        String trimLine = trim(line);
+        return trim(substring(trimLine, 1, trimLine.length() - 1));
     }
 
     private static boolean isTableName(String line) {
@@ -53,9 +59,9 @@ public class TableReader {
     private void dealEachLine(BufferedReader bufferedReader) throws IOException {
         for (String line = bufferedReader.readLine(); line != null; line = bufferedReader
                 .readLine()) {
-            if (StringUtils.isEmpty(line) || isCommentLine(line)) continue;
+            if (isEmpty(line) || isCommentLine(line)) continue;
 
-            line = StringUtils.trim(line);
+            line = trim(line);
             if (isTableName(line)) {
                 doWhenIsTableName(line);
                 continue;
@@ -75,7 +81,7 @@ public class TableReader {
         ConfigRow row = new ConfigRow();
         StringBuilder rowKey = new StringBuilder();
         for (int i = 0; i < splitLine.length; i++) {
-            String value = StringUtils.trim(splitLine[i]);
+            String value = trim(splitLine[i]);
             if (rowKeyIndex.contains(i)) {
                 rowKey.append(value);
             }
@@ -83,7 +89,7 @@ public class TableReader {
             row.addCell(cell);
         }
         String rowKeyStr = rowKey.toString();
-        if (StringUtils.isEmpty(rowKeyStr)) {
+        if (isEmpty(rowKeyStr)) {
             throw new ConfigException(
                     "table [" + tableName + "] config has no rowKey!");
         }
@@ -92,13 +98,12 @@ public class TableReader {
     }
 
     private void doWhenIsRowCols(String line) {
-        String[] splitLine = StringUtils.split(
-                StringUtils.substring(line, 2, line.length()), ',');
+        String[] splitLine = split(substring(line, 2, line.length()), ',');
         cols = new String[splitLine.length];
         for (int i = 0; i < splitLine.length; i++) {
-            String str = StringUtils.trim(splitLine[i]);
-            if (StringUtils.endsWith(str, "*")) {
-                str = StringUtils.substringBeforeLast(str, "*");
+            String str = trim(splitLine[i]);
+            if (endsWith(str, "*")) {
+                str = substringBeforeLast(str, "*");
                 rowKeyIndex.add(i);
             }
             cols[i] = str;

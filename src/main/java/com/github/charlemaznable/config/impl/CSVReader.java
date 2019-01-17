@@ -1,12 +1,13 @@
 package com.github.charlemaznable.config.impl;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
 import java.util.List;
+
+import static com.github.charlemaznable.lang.Listt.newArrayList;
+import static org.apache.commons.lang3.StringUtils.startsWith;
+import static org.apache.commons.lang3.StringUtils.trim;
 
 /**
  * CSV读取器。
@@ -97,7 +98,7 @@ public class CSVReader {
      * @throws IOException if bad things happen during the read
      */
     public List<String[]> readAll() throws IOException {
-        List<String[]> allElements = new ArrayList<>();
+        List<String[]> allElements = newArrayList();
         while (hasNext) {
             String[] nextLineAsTokens = readNext();
             if (nextLineAsTokens != null) {
@@ -118,7 +119,7 @@ public class CSVReader {
         String nextLine = getNextLine();
         if (nextLine == null) return null;
 
-        if (!StringUtils.startsWith(StringUtils.trim(nextLine), "#")) {
+        if (!startsWith(trim(nextLine), "#")) {
             return hasNext ? parseLine(nextLine) : null;
         }
 
@@ -150,8 +151,9 @@ public class CSVReader {
      * @return the comma-tokenized list of elements, or null if nextLine is null
      * @throws IOException if bad things happen during the read
      */
+    @SuppressWarnings("Duplicates")
     private String[] parseLine(String nextLine) throws IOException {
-        List<String> tokensOnThisLine = new ArrayList<>();
+        List<String> tokensOnThisLine = newArrayList();
         StringBuilder sb = new StringBuilder();
         boolean inQuotes = false;
         do {

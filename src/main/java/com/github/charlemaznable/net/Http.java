@@ -1,9 +1,7 @@
 package com.github.charlemaznable.net;
 
-import com.google.common.base.Splitter;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
-import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,12 +10,14 @@ import java.io.DataInputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static com.github.charlemaznable.lang.Str.isNotEmpty;
+import static com.google.common.base.Charsets.ISO_8859_1;
+import static com.google.common.base.Splitter.on;
 import static com.google.common.collect.Maps.newHashMap;
+import static org.springframework.web.servlet.HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE;
 
 public class Http {
 
@@ -59,7 +59,7 @@ public class Http {
     @SuppressWarnings("unchecked")
     public static Map<String, String> fetchPathVariableMap(HttpServletRequest request) {
         Map<String, String> pathVariableMap = newHashMap();
-        Object pathVariables = request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        Object pathVariables = request.getAttribute(URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         if (pathVariables != null) pathVariableMap.putAll((Map) pathVariables);
         return pathVariableMap;
     }
@@ -67,8 +67,7 @@ public class Http {
     public static String fetchRemoteAddr(HttpServletRequest request) {
         String xForwardedFor = request.getHeader("x-forwarded-for");
         if (isNotEmpty(xForwardedFor)) {
-            List<String> forwardedAddrList = Splitter.on(",")
-                    .trimResults().splitToList(xForwardedFor);
+            List<String> forwardedAddrList = on(",").trimResults().splitToList(xForwardedFor);
             for (String forwardedAddr : forwardedAddrList) {
                 if (isNotEmpty(forwardedAddr) &&
                         !"unknown".equalsIgnoreCase(forwardedAddr)) {
@@ -94,7 +93,7 @@ public class Http {
 
     @SneakyThrows
     public static Map<String, String> dealReqParams(Map<String, String[]> requestParams) {
-        Map<String, String> params = new HashMap<>();
+        Map<String, String> params = newHashMap();
         for (String key : requestParams.keySet()) {
             String[] values = requestParams.get(key);
 
@@ -102,7 +101,7 @@ public class Http {
             for (int i = 0; i < values.length; i++) {
                 valueStr = (i == values.length - 1) ? valueStr + values[i] : valueStr + values[i] + ",";
             }
-            valueStr = new String(valueStr.getBytes("ISO-8859-1"), "gbk");
+            valueStr = new String(valueStr.getBytes(ISO_8859_1), "gbk");
             params.put(key, valueStr);
         }
         return params;

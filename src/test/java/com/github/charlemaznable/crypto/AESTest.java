@@ -1,11 +1,12 @@
 package com.github.charlemaznable.crypto;
 
-import com.github.charlemaznable.lang.Rand;
 import org.junit.jupiter.api.Test;
 
 import static com.github.charlemaznable.codec.Hex.hex;
 import static com.github.charlemaznable.crypto.AES.decrypt;
 import static com.github.charlemaznable.crypto.AES.encrypt;
+import static com.github.charlemaznable.lang.Rand.randLetters;
+import static java.lang.System.currentTimeMillis;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AESTest {
@@ -13,10 +14,10 @@ public class AESTest {
     @Test
     public void testAES() {
         new AES();
-        String key = String.valueOf(System.currentTimeMillis());
+        String key = String.valueOf(currentTimeMillis());
         assertEquals("123456", decrypt(encrypt("123456", key), key));
 
-        key = Rand.randLetters(10);
+        key = randLetters(10);
         assertEquals(10, key.length());
         assertEquals(hex(encrypt("12345", key)), hex(encrypt("12345", key)));
         assertEquals(hex(encrypt("123456", key)), hex(encrypt("123456", key)));

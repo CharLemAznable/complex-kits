@@ -13,13 +13,13 @@ import org.xml.sax.SAXException;
 
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
 import static com.github.charlemaznable.lang.Listt.isNotEmpty;
+import static com.github.charlemaznable.lang.Listt.newArrayList;
 import static com.github.charlemaznable.lang.Mapp.of;
 import static org.dom4j.DocumentHelper.createDocument;
 import static org.dom4j.DocumentHelper.createElement;
@@ -121,14 +121,14 @@ public class Xml {
 
             if (elements.size() > 0) {
                 for (Element elem : elements) {
-                    List mapList = new ArrayList();
+                    List mapList = newArrayList();
 
                     if (elem.elements().size() > 0) {
                         Map m = element2Map(elem, parseAttr);
                         if (map.get(elem.getName()) != null) {
                             Object obj = map.get(elem.getName());
                             if (!(obj instanceof List)) {
-                                mapList = new ArrayList();
+                                mapList = newArrayList();
                                 mapList.add(obj);
                                 mapList.add(m);
                             }
@@ -156,7 +156,7 @@ public class Xml {
                         if (map.get(elem.getName()) != null) {
                             Object obj = map.get(elem.getName());
                             if (!(obj instanceof List)) {
-                                mapList = new ArrayList();
+                                mapList = newArrayList();
                                 mapList.add(obj);
                                 if (parseAttr && hasAttributes) {
                                     attributesMap.put("#text", elem.getText());

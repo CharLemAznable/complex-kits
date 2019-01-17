@@ -1,16 +1,17 @@
 package com.github.charlemaznable.config.impl;
 
 import com.github.charlemaznable.config.Configable;
-import org.apache.commons.text.StringSubstitutor;
 
 import java.util.Map;
 import java.util.Properties;
 
 import static com.github.charlemaznable.codec.Base64.unBase64;
 import static com.github.charlemaznable.crypto.AES.decrypt;
+import static java.lang.System.currentTimeMillis;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.startsWith;
 import static org.apache.commons.lang3.StringUtils.trim;
+import static org.apache.commons.text.StringSubstitutor.replace;
 
 public class DefaultConfigable extends BaseConfigable {
 
@@ -44,7 +45,7 @@ public class DefaultConfigable extends BaseConfigable {
         if (property == null) return null;
 
         // ${key}会在properties中定义了key时进行替换，否则保持原样
-        property = StringSubstitutor.replace(property, properties);
+        property = replace(property, properties);
 
         if (startsWith(property, "{AES}")) {
             property = decrypt(unBase64(property.substring(5)), "defaultconfig");
@@ -77,6 +78,6 @@ public class DefaultConfigable extends BaseConfigable {
 
     @Override
     public long refreshConfigSet(String prefix) {
-        return System.currentTimeMillis();
+        return currentTimeMillis();
     }
 }

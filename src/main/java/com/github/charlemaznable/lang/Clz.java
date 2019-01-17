@@ -5,7 +5,8 @@ import org.apache.commons.lang3.ClassUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+
+import static java.lang.reflect.Modifier.isAbstract;
 
 public class Clz {
 
@@ -17,19 +18,19 @@ public class Clz {
     }
 
     public static boolean isConcrete(Class<?> clazz) {
-        return !clazz.isInterface() && !Modifier.isAbstract(clazz.getModifiers());
+        return !clazz.isInterface() && !isAbstract(clazz.getModifiers());
     }
 
     /**
      * Get method.
      *
-     * @param class1     class
+     * @param clazz      class
      * @param methodName method name
      * @return method
      */
     @SneakyThrows
-    public static Method getMethod(Class<?> class1, String methodName) {
-        return class1.getMethod(methodName);
+    public static Method getMethod(Class<?> clazz, String methodName) {
+        return clazz.getMethod(methodName);
     }
 
     /**

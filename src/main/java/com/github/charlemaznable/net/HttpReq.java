@@ -1,6 +1,5 @@
 package com.github.charlemaznable.net;
 
-import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -18,8 +17,12 @@ import java.util.List;
 import java.util.Map;
 
 import static com.github.charlemaznable.codec.Json.json;
+import static com.github.charlemaznable.lang.Listt.newArrayList;
 import static com.github.charlemaznable.lang.Str.isEmpty;
+import static com.github.charlemaznable.net.Url.encode;
 import static java.lang.String.format;
+import static java.net.HttpURLConnection.setFollowRedirects;
+import static org.apache.commons.lang3.tuple.Pair.of;
 
 @Slf4j
 public class HttpReq {
@@ -30,7 +33,7 @@ public class HttpReq {
 
     private StringBuilder params = new StringBuilder();
 
-    private List<Pair<String, String>> props = Lists.newArrayList();
+    private List<Pair<String, String>> props = newArrayList();
 
     private SSLSocketFactory sslSocketFactory;
 
@@ -96,13 +99,13 @@ public class HttpReq {
     }
 
     public HttpReq prop(String name, String value) {
-        props.add(Pair.of(name, value));
+        props.add(of(name, value));
         return this;
     }
 
     public HttpReq param(String name, String value) {
         if (params.length() > 0) params.append('&');
-        params.append(name).append('=').append(Url.encode(value));
+        params.append(name).append('=').append(encode(value));
 
         return this;
     }
@@ -212,9 +215,9 @@ public class HttpReq {
     }
 
     private HttpURLConnection commonSettings(String url) throws IOException {
+        setFollowRedirects(true);
         HttpURLConnection http = (HttpURLConnection) new URL(url).openConnection();
         http.setRequestProperty("Accept-Charset", "UTF-8");
-        HttpURLConnection.setFollowRedirects(true);
         http.setConnectTimeout(60 * 1000);
         http.setReadTimeout(60 * 1000);
         return http;

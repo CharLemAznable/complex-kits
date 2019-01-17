@@ -157,6 +157,6 @@ public final class UInteger extends UNumber implements Comparable<UInteger> {
 
     @Override
     public int compareTo(UInteger o) {
-        return (value < o.value ? -1 : (value == o.value ? 0 : 1));
+        return Long.compare(value, o.value);
     }
 }

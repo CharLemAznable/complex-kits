@@ -1,46 +1,49 @@
 package com.github.charlemaznable.codec;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import java.util.List;
 import java.util.Map;
 
+import static com.alibaba.fastjson.JSON.parse;
+import static com.alibaba.fastjson.JSON.parseArray;
+import static com.alibaba.fastjson.JSON.parseObject;
+import static com.alibaba.fastjson.JSON.toJSONString;
 import static com.github.charlemaznable.lang.Mapp.map;
 
 public class Json {
 
     public static String jsonWithType(Object obj) {
-        return JSON.toJSONString(obj, SerializerFeature.WriteClassName);
+        return toJSONString(obj, SerializerFeature.WriteClassName);
     }
 
     @SuppressWarnings("unchecked")
     public static <T> T unJsonWithType(String json) {
-        return (T) JSON.parse(json);
+        return (T) parse(json);
     }
 
     public static String json(Object obj) {
-        return JSON.toJSONString(obj);
+        return toJSONString(obj);
     }
 
     public static String jsonOf(Object... keyAndValues) {
-        return JSON.toJSONString(map(keyAndValues));
+        return toJSONString(map(keyAndValues));
     }
 
     public static Map<String, Object> unJson(String json) {
-        return JSON.parseObject(json);
+        return parseObject(json);
     }
 
     public static <T> T unJson(String json, Class<T> clazz) {
-        return JSON.parseObject(json, clazz);
+        return parseObject(json, clazz);
     }
 
     public static List unJsonArray(String json) {
-        return JSON.parseArray(json);
+        return parseArray(json);
     }
 
     public static <T> List<T> unJsonArray(String json, Class<T> clazz) {
-        return JSON.parseArray(json, clazz);
+        return parseArray(json, clazz);
     }
 
     @SuppressWarnings("unchecked")

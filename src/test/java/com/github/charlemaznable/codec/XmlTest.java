@@ -1,13 +1,13 @@
 package com.github.charlemaznable.codec;
 
-import com.github.charlemaznable.lang.Listt;
-import com.github.charlemaznable.lang.Mapp;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
 import static com.github.charlemaznable.codec.Xml.unXml;
 import static com.github.charlemaznable.codec.Xml.xml;
+import static com.github.charlemaznable.lang.Listt.newArrayList;
+import static com.github.charlemaznable.lang.Mapp.of;
 import static com.google.common.collect.Maps.newHashMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -31,11 +31,11 @@ public class XmlTest {
         xml = xml(map);
         assertEquals(map, unXml(xml));
 
-        map.put("name4", Listt.newArrayList("value41", "value42"));
+        map.put("name4", newArrayList("value41", "value42"));
         xml = xml(map);
         assertEquals(map, unXml(xml));
 
-        map.put("name5", Mapp.of("key5", "value5"));
+        map.put("name5", of("key5", "value5"));
         xml = xml(map);
         assertEquals(map, unXml(xml));
     }

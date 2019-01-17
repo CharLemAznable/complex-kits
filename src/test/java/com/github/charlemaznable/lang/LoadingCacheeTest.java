@@ -13,6 +13,7 @@ import static com.github.charlemaznable.lang.LoadingCachee.get;
 import static com.github.charlemaznable.lang.LoadingCachee.getAll;
 import static com.github.charlemaznable.lang.LoadingCachee.getUnchecked;
 import static com.github.charlemaznable.lang.Str.toStr;
+import static java.lang.System.currentTimeMillis;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,7 +29,7 @@ public class LoadingCacheeTest {
                         if (s.equals("ex")) {
                             throw new RuntimeException("ex");
                         }
-                        return s + toStr(System.currentTimeMillis());
+                        return s + toStr(currentTimeMillis());
                     }
                 });
 
@@ -47,7 +48,7 @@ public class LoadingCacheeTest {
                 LoadingCachee.accessCache(new CacheLoader<String, String>() {
                     @Override
                     public String load(@Nonnull String s) {
-                        return s + toStr(System.currentTimeMillis());
+                        return s + toStr(currentTimeMillis());
                     }
                 }, Duration.ofMillis(20));
 
@@ -68,7 +69,7 @@ public class LoadingCacheeTest {
                 LoadingCachee.writeCache(new CacheLoader<String, String>() {
                     @Override
                     public String load(@Nonnull String s) {
-                        return s + toStr(System.currentTimeMillis());
+                        return s + toStr(currentTimeMillis());
                     }
                 }, Duration.ofMillis(20));
 

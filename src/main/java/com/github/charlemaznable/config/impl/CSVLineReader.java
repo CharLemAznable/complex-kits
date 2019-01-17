@@ -1,7 +1,8 @@
 package com.github.charlemaznable.config.impl;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import static com.github.charlemaznable.lang.Listt.newArrayList;
 
 public class CSVLineReader {
 
@@ -20,8 +21,9 @@ public class CSVLineReader {
 
     private static final char quotechar = DEFAULT_QUOTE_CHARACTER; // 引号符
 
+    @SuppressWarnings("Duplicates")
     public String[] parseLine(String line) {
-        List<String> tokensOnThisLine = new ArrayList<>();
+        List<String> tokensOnThisLine = newArrayList();
         StringBuilder sb = new StringBuilder();
         boolean inQuotes = false;
         do {

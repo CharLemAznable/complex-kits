@@ -1,13 +1,12 @@
 package com.github.charlemaznable.config.impl;
 
-import com.google.common.io.Closeables;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
 
 import static com.github.charlemaznable.lang.ClzPath.urlAsInputStream;
+import static com.google.common.io.Closeables.closeQuietly;
 
 public class PropertiesConfigable extends DefaultConfigable {
 
@@ -23,7 +22,7 @@ public class PropertiesConfigable extends DefaultConfigable {
             properties.load(inputStream);
         } catch (IOException ignore) {
         } finally {
-            Closeables.closeQuietly(inputStream);
+            closeQuietly(inputStream);
         }
 
         return properties;

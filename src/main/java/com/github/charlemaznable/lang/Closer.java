@@ -3,6 +3,9 @@ package com.github.charlemaznable.lang;
 import java.io.Closeable;
 import java.lang.reflect.Method;
 
+import static com.github.charlemaznable.lang.Clz.getMethod;
+import static com.github.charlemaznable.lang.Clz.invokeQuietly;
+
 public class Closer {
 
     private Closer() {
@@ -37,9 +40,9 @@ public class Closer {
             return;
         }
 
-        Method method = Clz.getMethod(obj.getClass(), "close");
+        Method method = getMethod(obj.getClass(), "close");
         if (method != null && method.getParameterTypes().length == 0) {
-            Clz.invokeQuietly(obj, method);
+            invokeQuietly(obj, method);
         }
     }
 }

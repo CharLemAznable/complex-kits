@@ -1,13 +1,14 @@
 package com.github.charlemaznable.config.impl;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import static com.github.charlemaznable.lang.Listt.newArrayList;
 
 public class ConfigRow {
 
     private String rowKey;
 
-    private List<ConfigCell> cells = new ArrayList<>();
+    private List<ConfigCell> cells = newArrayList();
 
     public ConfigCell getCell(String cellName) {
         ConfigCell ret = null;
