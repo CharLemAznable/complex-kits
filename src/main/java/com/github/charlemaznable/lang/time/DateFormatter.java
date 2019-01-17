@@ -45,6 +45,7 @@ public class DateFormatter {
     @SneakyThrows
     @CanIgnoreReturnValue
     public String checkFormat(String dateString) {
+        checkNotNull(dateString);
         return dateString.equals(format.format(
                 format.parse(dateString))) ? dateString : null;
     }
