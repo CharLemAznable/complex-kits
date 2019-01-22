@@ -19,18 +19,18 @@ public enum SHAXWithRSA {
 
     SHA1WithRSA {
         @Override
-        public String signAlgorithms() {
+        protected String signAlgorithms() {
             return "SHA1WithRSA";
         }
     },
     SHA256WithRSA {
         @Override
-        public String signAlgorithms() {
+        protected String signAlgorithms() {
             return "SHA256WithRSA";
         }
     };
 
-    public abstract String signAlgorithms();
+    protected abstract String signAlgorithms();
 
     public byte[] sign(String plainText, String privateKey) {
         return sign(plainText, privateKey(privateKey));

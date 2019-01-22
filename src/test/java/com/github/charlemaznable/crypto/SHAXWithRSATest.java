@@ -1,5 +1,8 @@
 package com.github.charlemaznable.crypto;
 
+import com.github.charlemaznable.lang.Rand;
+import lombok.SneakyThrows;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import java.security.KeyPair;
@@ -9,6 +12,7 @@ import static com.github.charlemaznable.crypto.RSA.getPrivateKeyString;
 import static com.github.charlemaznable.crypto.RSA.getPublicKeyString;
 import static com.github.charlemaznable.crypto.SHAXWithRSA.SHA1WithRSA;
 import static com.github.charlemaznable.crypto.SHAXWithRSA.SHA256WithRSA;
+import static java.lang.Runtime.getRuntime;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SHAXWithRSATest {
@@ -51,5 +55,39 @@ public class SHAXWithRSATest {
 
         String signBase64 = SHA256WithRSA.signBase64(plainText, privateKeyString);
         assertTrue(SHA256WithRSA.verifyBase64(plainText, signBase64, publicKeyString));
+    }
+
+    public void batchRun(SHAXWithRSA shax, int times) {
+        String rand = Rand.randAlphanumeric(100);
+        KeyPair keyPair = generateKeyPair();
+        String publicKeyString = getPublicKeyString(keyPair);
+        String privateKeyString = getPrivateKeyString(keyPair);
+
+        for (int i = 0; i < times; ++i) {
+            String plainText = rand + i;
+            String signBase64 = shax.signBase64(plainText, privateKeyString);
+            assertTrue(shax.verifyBase64(plainText, signBase64, publicKeyString));
+        }
+    }
+
+    public final int TIMES = 10000;
+
+    @SneakyThrows
+    public void routineRun(SHAXWithRSA shax, int threads) {
+        val service = new Thread[threads];
+        for (int i = 0; i < threads; i++) {
+            service[i] = new Thread(() -> batchRun(shax, TIMES));
+            service[i].start();
+        }
+
+        for (int i = 0; i < threads; i++) {
+            service[i].join();
+        }
+    }
+
+    @Test
+    public void testSHXWithRSABatch() {
+        routineRun(SHA1WithRSA, getRuntime().availableProcessors() + 1);
+        routineRun(SHA256WithRSA, getRuntime().availableProcessors() + 1);
     }
 }

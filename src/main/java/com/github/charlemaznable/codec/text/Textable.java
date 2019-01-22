@@ -15,7 +15,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 public abstract class Textable {
 
     public String toText() {
-        return this.toText(null);
+        return this.toText(defaultProcessor());
     }
 
     public String toText(Processor processor) {
@@ -37,7 +37,7 @@ public abstract class Textable {
     }
 
     protected List<String> excludedKeys() {
-        return newArrayList("sign");
+        return newArrayList();
     }
 
     protected String entrySeparator() {
@@ -46,6 +46,10 @@ public abstract class Textable {
 
     protected String keyValueSeparator() {
         return "=";
+    }
+
+    protected Processor defaultProcessor() {
+        return null;
     }
 
     public interface Processor {
