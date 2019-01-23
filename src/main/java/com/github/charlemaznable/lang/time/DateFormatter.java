@@ -4,6 +4,7 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import lombok.SneakyThrows;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static com.github.charlemaznable.lang.Condition.checkNotNull;
 
@@ -16,16 +17,26 @@ public class DateFormatter {
     }
 
     public String transToFormat(String dateString, String toPattern) {
+        Date parsed = parse(dateString);
+        if (null == parsed) return null;
+        return new SimpleDateFormat(toPattern).format(parse(dateString));
+    }
+
+    public String transFromFormat(String dateString, String fromPattern) {
         try {
-            return new SimpleDateFormat(toPattern).format(this.format.parse(dateString));
+            return format(new SimpleDateFormat(fromPattern).parse(dateString));
         } catch (Exception e) {
             return null;
         }
     }
 
-    public String transFromFormat(String dateString, String fromPattern) {
+    public String format(Date date) {
+        return format.format(date);
+    }
+
+    public Date parse(String dateString) {
         try {
-            return format.format(new SimpleDateFormat(fromPattern).parse(dateString));
+            return format.parse(dateString);
         } catch (Exception e) {
             return null;
         }

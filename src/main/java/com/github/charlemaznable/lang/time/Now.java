@@ -16,7 +16,15 @@ public class Now {
     }
 
     public static String now(String format) {
-        return new SimpleDateFormat(format).format(date());
+        return now(new SimpleDateFormat(format));
+    }
+
+    public static String now(SimpleDateFormat simpleDateFormat) {
+        return simpleDateFormat.format(date());
+    }
+
+    public static String now(DateFormatter dateFormatter) {
+        return dateFormatter.format(date());
     }
 
     public static Date date() {

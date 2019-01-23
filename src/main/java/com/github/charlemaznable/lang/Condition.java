@@ -1,9 +1,10 @@
 package com.github.charlemaznable.lang;
 
-import com.github.charlemaznable.lang.ex.EmptyObjectException;
 import com.github.charlemaznable.lang.ex.BlankStringException;
+import com.github.charlemaznable.lang.ex.EmptyObjectException;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.function.Function;
@@ -73,6 +74,14 @@ public class Condition {
     }
 
     @CanIgnoreReturnValue
+    public static <T> T checkNotNull(T object, @NonNull RuntimeException errorException) {
+        if (null == object) {
+            throw nullThen(errorException, NullPointerException::new);
+        }
+        return object;
+    }
+
+    @CanIgnoreReturnValue
     public static <T> T checkNotEmpty(T object) {
         if (isEmpty(object)) {
             throw new EmptyObjectException();
@@ -89,6 +98,14 @@ public class Condition {
     }
 
     @CanIgnoreReturnValue
+    public static <T> T checkNotEmpty(T object, @NonNull RuntimeException errorException) {
+        if (isEmpty(object)) {
+            throw nullThen(errorException, EmptyObjectException::new);
+        }
+        return object;
+    }
+
+    @CanIgnoreReturnValue
     public static String checkNotBlank(String string) {
         if (isBlank(string)) {
             throw new BlankStringException();
@@ -100,6 +117,14 @@ public class Condition {
     public static String checkNotBlank(String string, @Nullable Object errorMessage) {
         if (isBlank(string)) {
             throw new BlankStringException(String.valueOf(errorMessage));
+        }
+        return string;
+    }
+
+    @CanIgnoreReturnValue
+    public static String checkNotBlank(String string, @NonNull RuntimeException errorException) {
+        if (isBlank(string)) {
+            throw nullThen(errorException, BlankStringException::new);
         }
         return string;
     }

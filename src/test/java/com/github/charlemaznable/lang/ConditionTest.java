@@ -59,17 +59,31 @@ public class ConditionTest {
 
         assertThrows(NullPointerException.class, () -> checkNotNull(strnull));
         assertThrows(NullPointerException.class, () -> checkNotNull(strnull, "strnull is Null"));
+        assertThrows(ConditionTestException.class, () -> checkNotNull(strnull, new ConditionTestException()));
+
         assertEquals(strempty, checkNotNull(strempty));
         assertEquals(strempty, checkNotNull(strempty, "strempty is Null"));
+        assertEquals(strempty, checkNotNull(strempty, new ConditionTestException()));
 
         assertThrows(EmptyObjectException.class, () -> checkNotEmpty(strempty));
         assertThrows(EmptyObjectException.class, () -> checkNotEmpty(strempty, "strempty is Empty"));
+        assertThrows(ConditionTestException.class, () -> checkNotEmpty(strempty, new ConditionTestException()));
+
         assertEquals(strblank, checkNotEmpty(strblank));
         assertEquals(strblank, checkNotEmpty(strblank, "strblank is Empty"));
+        assertEquals(strblank, checkNotEmpty(strblank, new ConditionTestException()));
 
         assertThrows(BlankStringException.class, () -> checkNotBlank(strblank));
         assertThrows(BlankStringException.class, () -> checkNotBlank(strblank, "strblank is Blank"));
+        assertThrows(ConditionTestException.class, () -> checkNotBlank(strblank, new ConditionTestException()));
+
         assertEquals(string, checkNotBlank(string));
         assertEquals(string, checkNotBlank(string, "string is Blank"));
+        assertEquals(string, checkNotBlank(string, new ConditionTestException()));
+    }
+
+    public static class ConditionTestException extends RuntimeException {
+
+        private static final long serialVersionUID = -4697342496228582709L;
     }
 }
