@@ -1,5 +1,8 @@
 package com.github.charlemaznable.config.impl;
 
+import lombok.val;
+import lombok.var;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -100,7 +103,7 @@ public class CSVReader {
     public List<String[]> readAll() throws IOException {
         List<String[]> allElements = newArrayList();
         while (hasNext) {
-            String[] nextLineAsTokens = readNext();
+            val nextLineAsTokens = readNext();
             if (nextLineAsTokens != null) {
                 allElements.add(nextLineAsTokens);
             }
@@ -116,7 +119,7 @@ public class CSVReader {
      * @throws IOException if bad things happen during the read
      */
     public String[] readNext() throws IOException {
-        String nextLine = getNextLine();
+        val nextLine = getNextLine();
         if (nextLine == null) return null;
 
         if (!startsWith(trim(nextLine), "#")) {
@@ -134,12 +137,12 @@ public class CSVReader {
      */
     private String getNextLine() throws IOException {
         if (!linesSkiped) {
-            for (int i = 0; i < skipLines; i++) {
+            for (var i = 0; i < skipLines; i++) {
                 br.readLine();
             }
             linesSkiped = true;
         }
-        String nextLine = br.readLine();
+        val nextLine = br.readLine();
         if (nextLine == null) hasNext = false;
         return hasNext ? nextLine : null;
     }
@@ -154,8 +157,8 @@ public class CSVReader {
     @SuppressWarnings("Duplicates")
     private String[] parseLine(String nextLine) throws IOException {
         List<String> tokensOnThisLine = newArrayList();
-        StringBuilder sb = new StringBuilder();
-        boolean inQuotes = false;
+        var sb = new StringBuilder();
+        var inQuotes = false;
         do {
             if (inQuotes) {
                 // continuing a quoted section, reappend newline
@@ -165,8 +168,8 @@ public class CSVReader {
                     break;
                 }
             }
-            for (int i = 0; i < nextLine.length(); i++) {
-                char c = nextLine.charAt(i);
+            for (var i = 0; i < nextLine.length(); i++) {
+                val c = nextLine.charAt(i);
                 if (c == quotechar) {
                     // this gets complex... the quote may end a quoted block, or
                     // escape another quote.

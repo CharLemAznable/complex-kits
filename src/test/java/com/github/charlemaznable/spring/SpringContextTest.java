@@ -3,6 +3,7 @@ package com.github.charlemaznable.spring;
 import com.github.charlemaznable.spring.testClass.TestClass;
 import com.github.charlemaznable.spring.testClass.TestConfiguration;
 import com.github.charlemaznable.spring.testClass.TestSpringContext;
+import lombok.var;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -17,13 +18,13 @@ public class SpringContextTest {
 
     @Test
     public void testSpringContext() {
-        TestClass testClassBean = TestSpringContext.getBean(TestClass.class);
+        var testClassBean = TestSpringContext.getBean(TestClass.class);
         assertNotNull(testClassBean);
 
         testClassBean = TestSpringContext.getBean("TestClass");
         assertNotNull(testClassBean);
 
-        ClzResolver clzResolverBean = TestSpringContext.getBean(ClzResolver.class);
+        var clzResolverBean = TestSpringContext.getBean(ClzResolver.class);
         assertNull(clzResolverBean);
 
         clzResolverBean = TestSpringContext.getBean("ClzResolver");

@@ -1,7 +1,8 @@
 package com.github.charlemaznable.lang;
 
+import lombok.val;
+
 import java.io.Closeable;
-import java.lang.reflect.Method;
 
 import static com.github.charlemaznable.lang.Clz.getMethod;
 import static com.github.charlemaznable.lang.Clz.invokeQuietly;
@@ -18,7 +19,7 @@ public class Closer {
      * @param objs 对象列表
      */
     public static void closeQuietly(Object... objs) {
-        for (Object obj : objs) {
+        for (val obj : objs) {
             closeQuietly(obj);
         }
     }
@@ -40,7 +41,7 @@ public class Closer {
             return;
         }
 
-        Method method = getMethod(obj.getClass(), "close");
+        val method = getMethod(obj.getClass(), "close");
         if (method != null && method.getParameterTypes().length == 0) {
             invokeQuietly(obj, method);
         }

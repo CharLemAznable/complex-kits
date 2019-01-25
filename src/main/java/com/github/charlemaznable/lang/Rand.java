@@ -1,6 +1,8 @@
 package com.github.charlemaznable.lang;
 
 import com.github.charlemaznable.lang.joou.ULong;
+import lombok.val;
+import lombok.var;
 
 import java.security.SecureRandom;
 import java.util.Map;
@@ -43,7 +45,7 @@ public class Rand {
     }
 
     public static String randNum(int count) {
-        StringBuilder sb = new StringBuilder(count);
+        val sb = new StringBuilder(count);
         while (sb.length() < count) {
             sb.append(new ULong(randLong()));
         }
@@ -66,11 +68,11 @@ public class Rand {
     public static <T> T randWeighted(Map<T, Integer> weightedMap) {
         if (isEmpty(weightedMap)) return null;
 
-        Integer sum = 1;
-        for (Integer value : weightedMap.values()) sum += value;
-        Integer rand = randInt(sum);
+        var sum = 1;
+        for (val value : weightedMap.values()) sum += value;
+        var rand = randInt(sum);
 
-        for (Map.Entry<T, Integer> entry : weightedMap.entrySet()) {
+        for (val entry : weightedMap.entrySet()) {
             rand -= entry.getValue();
             if (rand <= 0) return entry.getKey();
         }
@@ -80,11 +82,11 @@ public class Rand {
     public static <T> T randInverseWeighted(Map<T, Integer> weightedMap) {
         if (isEmpty(weightedMap)) return null;
 
-        Integer sum = 0;
-        for (Integer value : weightedMap.values()) sum += value;
+        var sum = 0;
+        for (val value : weightedMap.values()) sum += value;
 
         Map<T, Integer> inverseWeightedMap = newHashMap();
-        for (Map.Entry<T, Integer> entry : weightedMap.entrySet()) {
+        for (val entry : weightedMap.entrySet()) {
             inverseWeightedMap.put(entry.getKey(),
                     (int) (10. * sum / max(0.1, entry.getValue())));
         }

@@ -3,6 +3,7 @@ package com.github.charlemaznable.lang.pool;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import lombok.val;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
@@ -39,7 +40,7 @@ public class PoolProxy {
 
     public static <T> T create(@NonNull PooledObjectCreator<T> creator,
                                GenericObjectPoolConfig<T> config) {
-        PoolProxyPooledObjectFactory<T> factory = new PoolProxyPooledObjectFactory<>(creator);
+        val factory = new PoolProxyPooledObjectFactory<T>(creator);
         return create(config == null ? new GenericObjectPool<>(factory)
                 : new GenericObjectPool<>(factory, config));
     }

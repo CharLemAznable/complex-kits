@@ -1,5 +1,7 @@
 package com.github.charlemaznable.codec.text;
 
+import lombok.val;
+
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -22,11 +24,11 @@ public abstract class Textable {
         Map<String, String> result = newHashMap();
 
         Map<String, Object> describe = desc(this);
-        for (String key : describe.keySet()) {
+        for (val key : describe.keySet()) {
             if (isNotEmpty(excludedKeys()) &&
                     excludedKeys().contains(key)) continue;
 
-            String value = toStr(describe.get(key));
+            val value = toStr(describe.get(key));
             if (isEmpty(value)) continue;
             result.put(key, processor == null ?
                     value : processor.process(value));

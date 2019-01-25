@@ -1,5 +1,6 @@
 package com.github.charlemaznable.codec;
 
+import lombok.var;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -16,7 +17,7 @@ public class XmlTest {
     @Test
     public void testXml() {
         Map<String, Object> map = newHashMap();
-        String xml = xml(map);
+        var xml = xml(map);
         assertEquals(map, unXml(xml));
 
         map.put("name1", "value1");
@@ -43,7 +44,7 @@ public class XmlTest {
     @Test
     public void testUnXml() {
         Map<String, Object> map = newHashMap();
-        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><xml/>";
+        var xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><xml/>";
         assertEquals(map, unXml(xml));
         xml = "<xml/>";
         assertEquals(map, unXml(xml));

@@ -1,6 +1,8 @@
 package com.github.charlemaznable.lang;
 
-import java.util.regex.Matcher;
+import lombok.val;
+import lombok.var;
+
 import java.util.regex.Pattern;
 
 import static java.util.regex.Pattern.compile;
@@ -38,7 +40,7 @@ public class Str {
     }
 
     public static StringBuilder padding(String s, char letter, int repeats) {
-        StringBuilder sb = new StringBuilder(s);
+        val sb = new StringBuilder(s);
         while (repeats-- > 0) {
             sb.append(letter);
         }
@@ -47,7 +49,7 @@ public class Str {
     }
 
     public static StringBuilder removeLastLetters(String s, char letter) {
-        StringBuilder sb = new StringBuilder(s);
+        val sb = new StringBuilder(s);
         while (sb.charAt(sb.length() - 1) == letter)
             sb.deleteCharAt(sb.length() - 1);
 
@@ -63,12 +65,12 @@ public class Str {
 
     @SuppressWarnings("Duplicates")
     public static String substrInQuotes(String str, char left, int pos) {
-        int leftTimes = 0;
-        int leftPos = str.indexOf(left, pos);
+        var leftTimes = 0;
+        val leftPos = str.indexOf(left, pos);
         if (leftPos < 0) return "";
 
-        for (int i = leftPos + 1; i < str.length(); ++i) {
-            char charAt = str.charAt(i);
+        for (var i = leftPos + 1; i < str.length(); ++i) {
+            val charAt = str.charAt(i);
             if (charAt == left) ++leftTimes;
             else if (matches(left, charAt)) {
                 if (leftTimes == 0) return str.substring(leftPos + 1, i);
@@ -90,11 +92,11 @@ public class Str {
      * @return true 是整数。
      */
     public static boolean isInteger(String string) {
-        Matcher matcher = INTEGER_PATTERN.matcher(string);
+        val matcher = INTEGER_PATTERN.matcher(string);
         if (!matcher.matches()) return false;
 
-        String number = matcher.group(1);
-        String maxValue = "" + Integer.MAX_VALUE;
+        val number = matcher.group(1);
+        val maxValue = "" + Integer.MAX_VALUE;
         return number.length() <= maxValue.length() &&
                 alignRight(number, maxValue.length(), '0').compareTo(maxValue) <= 0;
 
@@ -107,11 +109,11 @@ public class Str {
      * @return true 是长整数。
      */
     public static boolean isLong(String string) {
-        Matcher matcher = INTEGER_PATTERN.matcher(string);
+        val matcher = INTEGER_PATTERN.matcher(string);
         if (!matcher.matches()) return false;
 
-        String number = matcher.group(1);
-        String maxValue = "" + Long.MAX_VALUE;
+        val number = matcher.group(1);
+        val maxValue = "" + Long.MAX_VALUE;
         return number.length() <= maxValue.length() &&
                 alignRight(number, maxValue.length(), '0').compareTo(maxValue) <= 0;
 
@@ -127,7 +129,7 @@ public class Str {
      */
     public static String alignRight(CharSequence cs, int width, char c) {
         if (null == cs) return null;
-        int len = cs.length();
+        val len = cs.length();
         if (len >= width) return cs.toString();
         return repeat(c, width - len) + cs;
     }

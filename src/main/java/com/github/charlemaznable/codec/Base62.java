@@ -1,5 +1,8 @@
 package com.github.charlemaznable.codec;
 
+import lombok.val;
+import lombok.var;
+
 import java.io.ByteArrayOutputStream;
 
 public class Base62 {
@@ -9,15 +12,16 @@ public class Base62 {
     private static byte[] decodes = new byte[256];
 
     static {
-        for (int i = 0; i < encodes.length; i++) {
+        for (var i = 0; i < encodes.length; i++) {
             decodes[encodes[i]] = (byte) i;
         }
     }
 
     public static String base64(byte[] data) {
-        StringBuilder sb = new StringBuilder(data.length * 2);
-        int pos = 0, val = 0;
-        for (byte b : data) {
+        val sb = new StringBuilder(data.length * 2);
+        var pos = 0;
+        var val = 0;
+        for (val b : data) {
             val = (val << 8) | (b & 0xFF);
             pos += 8;
             while (pos > 5) {
@@ -32,10 +36,11 @@ public class Base62 {
     }
 
     public static byte[] unBase64(String dataStr) {
-        char[] data = dataStr.toCharArray();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(data.length);
-        int pos = 0, val = 0;
-        for (char c : data) {
+        val data = dataStr.toCharArray();
+        val baos = new ByteArrayOutputStream(data.length);
+        var pos = 0;
+        var val = 0;
+        for (val c : data) {
             val = (val << 6) | decodes[c];
             pos += 6;
             while (pos > 7) {
@@ -47,13 +52,14 @@ public class Base62 {
     }
 
     public static String base62(byte[] data) {
-        StringBuilder sb = new StringBuilder(data.length * 2);
-        int pos = 0, val = 0;
-        for (byte b : data) {
+        val sb = new StringBuilder(data.length * 2);
+        var pos = 0;
+        var val = 0;
+        for (val b : data) {
             val = (val << 8) | (b & 0xFF);
             pos += 8;
             while (pos > 5) {
-                char c = encodes[val >> (pos -= 6)];
+                val c = encodes[val >> (pos -= 6)];
                 sb.append(
                         /**/c == 'i' ? "ia" :
                                 /**/c == '+' ? "ib" :
@@ -62,7 +68,7 @@ public class Base62 {
             }
         }
         if (pos > 0) {
-            char c = encodes[val << (6 - pos)];
+            val c = encodes[val << (6 - pos)];
             sb.append(
                     /**/c == 'i' ? "ia" :
                             /**/c == '+' ? "ib" :
@@ -72,11 +78,12 @@ public class Base62 {
     }
 
     public static byte[] unBase62(String dataStr) {
-        char[] data = dataStr.toCharArray();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(data.length);
-        int pos = 0, val = 0;
-        for (int i = 0; i < data.length; i++) {
-            char c = data[i];
+        val data = dataStr.toCharArray();
+        val baos = new ByteArrayOutputStream(data.length);
+        var pos = 0;
+        var val = 0;
+        for (var i = 0; i < data.length; i++) {
+            var c = data[i];
             if (c == 'i') {
                 c = data[++i];
                 c =

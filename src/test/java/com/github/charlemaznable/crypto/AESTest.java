@@ -3,6 +3,7 @@ package com.github.charlemaznable.crypto;
 import com.github.charlemaznable.lang.Rand;
 import lombok.SneakyThrows;
 import lombok.val;
+import lombok.var;
 import org.junit.jupiter.api.Test;
 
 import static com.github.charlemaznable.codec.Hex.hex;
@@ -19,7 +20,7 @@ public class AESTest {
     @Test
     public void testAES() {
         new AES();
-        String key = String.valueOf(currentTimeMillis());
+        var key = String.valueOf(currentTimeMillis());
         assertEquals("123456", decrypt(encrypt("123456", key), key));
 
         key = randLetters(10);
@@ -30,19 +31,19 @@ public class AESTest {
         assertEquals(hex(encrypt("汉", key)), hex(encrypt("汉", key)));
         assertEquals(hex(encrypt("中文", key)), hex(encrypt("中文", key)));
 
-        String key2 = key + key;
+        val key2 = key + key;
         assertEquals(hex(encrypt("The quick brown fox jumps over the lazy dog", key2)),
                 hex(encrypt("The quick brown fox jumps over the lazy dog", key2)));
     }
 
     public void batchRun(int times) {
-        String rand = Rand.randAlphanumeric(100);
-        String key = String.valueOf(currentTimeMillis());
+        val rand = Rand.randAlphanumeric(100);
+        val key = String.valueOf(currentTimeMillis());
 
-        for (int i = 0; i < times; ++i) {
-            String src = rand + i;
-            String enc = hex(encrypt(src, key));
-            String dec = decrypt(unHex(enc), key);
+        for (var i = 0; i < times; ++i) {
+            val src = rand + i;
+            val enc = hex(encrypt(src, key));
+            val dec = decrypt(unHex(enc), key);
             assertEquals(src, dec);
         }
     }
@@ -52,12 +53,12 @@ public class AESTest {
     @SneakyThrows
     public void routineRun(int threads) {
         val service = new Thread[threads];
-        for (int i = 0; i < threads; i++) {
+        for (var i = 0; i < threads; i++) {
             service[i] = new Thread(() -> batchRun(TIMES));
             service[i].start();
         }
 
-        for (int i = 0; i < threads; i++) {
+        for (var i = 0; i < threads; i++) {
             service[i].join();
         }
     }

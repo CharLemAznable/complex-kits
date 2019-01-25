@@ -1,5 +1,8 @@
 package com.github.charlemaznable.lang;
 
+import lombok.val;
+import lombok.var;
+
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -15,8 +18,8 @@ public class Iterablee {
         requireNonNull(elements);
         requireNonNull(action);
 
-        int index = 0;
-        for (E element : elements) {
+        var index = 0;
+        for (val element : elements) {
             action.accept(index++, element);
         }
     }
@@ -26,8 +29,8 @@ public class Iterablee {
         requireNonNull(elements);
         requireNonNull(action);
 
-        int index = 0;
-        for (E element : elements) {
+        var index = 0;
+        for (val element : elements) {
             if (action.apply(index, element)) return index;
             index++;
         }
@@ -39,8 +42,8 @@ public class Iterablee {
         requireNonNull(elements);
         requireNonNull(action);
 
-        int index = 0;
-        for (E element : elements) {
+        var index = 0;
+        for (val element : elements) {
             if (action.apply(element)) return index;
             index++;
         }

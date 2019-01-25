@@ -1,10 +1,7 @@
 package com.github.charlemaznable.net;
 
 import lombok.SneakyThrows;
-
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.util.Enumeration;
+import lombok.val;
 
 import static java.net.NetworkInterface.getNetworkInterfaces;
 
@@ -12,12 +9,12 @@ public class IP {
 
     @SneakyThrows
     public static String localIP() {
-        Enumeration<NetworkInterface> netInterfaces = getNetworkInterfaces();
+        val netInterfaces = getNetworkInterfaces();
         while (netInterfaces.hasMoreElements()) {
-            NetworkInterface ni = netInterfaces.nextElement();
-            Enumeration<InetAddress> address = ni.getInetAddresses();
+            val ni = netInterfaces.nextElement();
+            val address = ni.getInetAddresses();
             while (address.hasMoreElements()) {
-                InetAddress ip = address.nextElement();
+                val ip = address.nextElement();
                 if (ip.isSiteLocalAddress()
                         && !ip.isLoopbackAddress()
                         && !ip.getHostAddress().contains(":")) {
@@ -30,12 +27,12 @@ public class IP {
 
     @SneakyThrows
     public static String netIP() {
-        Enumeration<NetworkInterface> netInterfaces = getNetworkInterfaces();
+        val netInterfaces = getNetworkInterfaces();
         while (netInterfaces.hasMoreElements()) {
-            NetworkInterface ni = netInterfaces.nextElement();
-            Enumeration<InetAddress> address = ni.getInetAddresses();
+            val ni = netInterfaces.nextElement();
+            val address = ni.getInetAddresses();
             while (address.hasMoreElements()) {
-                InetAddress ip = address.nextElement();
+                val ip = address.nextElement();
                 if (!ip.isSiteLocalAddress()
                         && !ip.isLoopbackAddress()
                         && !ip.getHostAddress().contains(":")) {

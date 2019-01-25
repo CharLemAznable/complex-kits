@@ -1,6 +1,8 @@
 package com.github.charlemaznable.codec;
 
 import com.github.charlemaznable.lang.Str;
+import lombok.val;
+import lombok.var;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -89,7 +91,7 @@ public class Base64 {
                                    final int lineLength, final int chunkSeparatorLength, final byte pad) {
             this.unencodedBlockSize = unencodedBlockSize;
             this.encodedBlockSize = encodedBlockSize;
-            final boolean useChunking = lineLength > 0 && chunkSeparatorLength > 0;
+            val useChunking = lineLength > 0 && chunkSeparatorLength > 0;
             this.lineLength = useChunking ? (lineLength / encodedBlockSize) * encodedBlockSize : 0;
             this.chunkSeparatorLength = chunkSeparatorLength;
 
@@ -127,7 +129,7 @@ public class Base64 {
                 context.pos = 0;
                 context.readPos = 0;
             } else {
-                final byte[] b = new byte[context.buffer.length * DEFAULT_BUFFER_RESIZE_FACTOR];
+                val b = new byte[context.buffer.length * DEFAULT_BUFFER_RESIZE_FACTOR];
                 arraycopy(context.buffer, 0, b, 0, context.buffer.length);
                 context.buffer = b;
             }
@@ -144,7 +146,7 @@ public class Base64 {
         @SuppressWarnings("UnusedReturnValue")
         int readResults(final byte[] b, final int bPos, final int bAvail, final Context context) {
             if (context.buffer != null) {
-                final int len = min(available(context), bAvail);
+                val len = min(available(context), bAvail);
                 arraycopy(context.buffer, context.readPos, b, bPos, len);
                 context.readPos += len;
                 if (context.readPos >= context.pos) {
@@ -188,10 +190,10 @@ public class Base64 {
             if (pArray == null || pArray.length == 0) {
                 return pArray;
             }
-            final Context context = new Context();
+            val context = new Context();
             decode(pArray, 0, pArray.length, context);
             decode(pArray, 0, EOF, context); // Notify decoder of EOF.
-            final byte[] result = new byte[context.pos];
+            val result = new byte[context.pos];
             readResults(result, 0, result.length, context);
             return result;
         }
@@ -200,10 +202,10 @@ public class Base64 {
             if (pArray == null || pArray.length == 0) {
                 return pArray;
             }
-            final Context context = new Context();
+            val context = new Context();
             encode(pArray, 0, pArray.length, context);
             encode(pArray, 0, EOF, context); // Notify encoder of EOF.
-            final byte[] buf = new byte[context.pos - context.readPos];
+            val buf = new byte[context.pos - context.readPos];
             readResults(buf, 0, buf.length, context);
             return buf;
         }
@@ -217,7 +219,7 @@ public class Base64 {
         protected abstract boolean isInAlphabet(byte value);
 
         public boolean isInAlphabet(final byte[] arrayOctet, final boolean allowWSPad) {
-            for (byte anArrayOctet : arrayOctet) {
+            for (val anArrayOctet : arrayOctet) {
                 if (!isInAlphabet(anArrayOctet) &&
                         (!allowWSPad || (anArrayOctet != pad) && !isWhiteSpace(anArrayOctet))) {
                     return false;
@@ -234,7 +236,7 @@ public class Base64 {
             if (arrayOctet == null) {
                 return false;
             }
-            for (final byte element : arrayOctet) {
+            for (val element : arrayOctet) {
                 if (pad == element || isInAlphabet(element)) {
                     return true;
                 }
@@ -245,7 +247,7 @@ public class Base64 {
         public long getEncodedLength(final byte[] pArray) {
             // Calculate non-chunked size - rounded up to allow for padding
             // cast to long is needed to avoid possibility of overflow
-            long len = ((pArray.length + unencodedBlockSize - 1) / unencodedBlockSize) * (long) encodedBlockSize;
+            var len = ((pArray.length + unencodedBlockSize - 1) / unencodedBlockSize) * (long) encodedBlockSize;
             if (lineLength > 0) { // We're using chunking
                 // Round up to nearest multiple
                 len += ((len + lineLength - 1) / lineLength) * chunkSeparatorLength;
@@ -351,7 +353,7 @@ public class Base64 {
                     lineSeparator == null ? 0 : lineSeparator.length);
             if (lineSeparator != null) {
                 if (containsAlphabetOrPad(lineSeparator)) {
-                    final String sep = string(lineSeparator);
+                    val sep = string(lineSeparator);
                     throw new IllegalArgumentException("lineSeparator must not contain base64 characters: [" + sep + "]");
                 }
                 if (lineLength > 0) { // null line-sep forces no chunking rather than throwing IAE
@@ -384,7 +386,7 @@ public class Base64 {
         }
 
         public static boolean isBase64(final byte[] arrayOctet) {
-            for (byte anArrayOctet : arrayOctet) {
+            for (val anArrayOctet : arrayOctet) {
                 if (!isBase64(anArrayOctet) && !isWhiteSpace(anArrayOctet)) {
                     return false;
                 }
@@ -428,8 +430,8 @@ public class Base64 {
 
             // Create this so can use the super-class method
             // Also ensures that the same roundings are performed by the ctor and the code
-            final ApacheBase64 b64 = isChunked ? new ApacheBase64(urlSafe) : new ApacheBase64(0, CHUNK_SEPARATOR, urlSafe);
-            final long len = b64.getEncodedLength(binaryData);
+            val b64 = isChunked ? new ApacheBase64(urlSafe) : new ApacheBase64(0, CHUNK_SEPARATOR, urlSafe);
+            val len = b64.getEncodedLength(binaryData);
             if (len > maxResultSize) {
                 throw new IllegalArgumentException("Input array too big, the output array would be bigger (" +
                         len +
@@ -459,25 +461,25 @@ public class Base64 {
         }
 
         static byte[] toIntegerBytes(final BigInteger bigInt) {
-            int bitlen = bigInt.bitLength();
+            var bitlen = bigInt.bitLength();
             // round bitlen
             bitlen = ((bitlen + 7) >> 3) << 3;
-            final byte[] bigBytes = bigInt.toByteArray();
+            val bigBytes = bigInt.toByteArray();
 
             if (((bigInt.bitLength() % 8) != 0) && (((bigInt.bitLength() / 8) + 1) == (bitlen / 8))) {
                 return bigBytes;
             }
             // set up params for copying everything but sign bit
-            int startSrc = 0;
-            int len = bigBytes.length;
+            var startSrc = 0;
+            var len = bigBytes.length;
 
             // if bigInt is exactly byte-aligned, just skip signbit in copy
             if ((bigInt.bitLength() % 8) == 0) {
                 startSrc = 1;
                 len--;
             }
-            final int startDst = bitlen / 8 - len; // to pad w/ nulls as per spec
-            final byte[] resizedBytes = new byte[bitlen / 8];
+            val startDst = bitlen / 8 - len; // to pad w/ nulls as per spec
+            val resizedBytes = new byte[bitlen / 8];
             arraycopy(bigBytes, startSrc, resizedBytes, startDst, len);
             return resizedBytes;
         }
@@ -498,8 +500,8 @@ public class Base64 {
                 if (0 == context.modulus && lineLength == 0) {
                     return; // no leftovers to process and not using chunking
                 }
-                final byte[] buffer = ensureBufferSize(encodeSize, context);
-                final int savedPos = context.pos;
+                val buffer = ensureBufferSize(encodeSize, context);
+                val savedPos = context.pos;
                 switch (context.modulus) { // 0-2
                     case 0: // nothing to do here
                         break;
@@ -534,10 +536,10 @@ public class Base64 {
                     context.pos += lineSeparator.length;
                 }
             } else {
-                for (int i = 0; i < inAvail; i++) {
-                    final byte[] buffer = ensureBufferSize(encodeSize, context);
+                for (var i = 0; i < inAvail; i++) {
+                    val buffer = ensureBufferSize(encodeSize, context);
                     context.modulus = (context.modulus + 1) % BYTES_PER_UNENCODED_BLOCK;
-                    int b = in[inPos++];
+                    var b = (int) in[inPos++];
                     if (b < 0) {
                         b += 256;
                     }
@@ -566,16 +568,16 @@ public class Base64 {
             if (inAvail < 0) {
                 context.eof = true;
             }
-            for (int i = 0; i < inAvail; i++) {
-                final byte[] buffer = ensureBufferSize(decodeSize, context);
-                final byte b = in[inPos++];
+            for (var i = 0; i < inAvail; i++) {
+                val buffer = ensureBufferSize(decodeSize, context);
+                var b = in[inPos++];
                 if (b == pad) {
                     // We're done.
                     context.eof = true;
                     break;
                 } else {
                     if (b >= 0 && b < DECODE_TABLE.length) {
-                        final int result = DECODE_TABLE[b];
+                        val result = (int) DECODE_TABLE[b];
                         if (result >= 0) {
                             context.modulus = (context.modulus + 1) % BYTES_PER_ENCODED_BLOCK;
                             context.ibitWorkArea = (context.ibitWorkArea << BITS_PER_ENCODED_BYTE) + result;
@@ -593,7 +595,7 @@ public class Base64 {
             // EOF (-1) and first time '=' character is encountered in stream.
             // This approach makes the '=' padding characters completely optional.
             if (context.eof && context.modulus != 0) {
-                final byte[] buffer = ensureBufferSize(decodeSize, context);
+                val buffer = ensureBufferSize(decodeSize, context);
 
                 // We have some spare bits remaining
                 // Output all whole multiples of 8 bits and ignore the rest

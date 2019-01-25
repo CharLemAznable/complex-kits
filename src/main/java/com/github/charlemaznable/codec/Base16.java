@@ -1,5 +1,8 @@
 package com.github.charlemaznable.codec;
 
+import lombok.val;
+import lombok.var;
+
 import static com.github.charlemaznable.codec.Bytes.bytes;
 import static com.github.charlemaznable.codec.Bytes.string;
 import static java.lang.Integer.parseInt;
@@ -7,8 +10,8 @@ import static java.lang.Integer.parseInt;
 public class Base16 {
 
     public static String base16(byte[] bytes) {
-        StringBuilder sb = new StringBuilder(bytes.length * 2);
-        for (byte aByte : bytes) {
+        val sb = new StringBuilder(bytes.length * 2);
+        for (val aByte : bytes) {
             if ((aByte & 0xFF) < 16) sb.append("0");
             sb.append(Long.toString(aByte & 0xFF, 16));
         }
@@ -20,8 +23,8 @@ public class Base16 {
     }
 
     public static byte[] unBase16(String value) {
-        byte[] bytes = new byte[value.length() / 2];
-        for (int i = 0; i < bytes.length; i++) {
+        val bytes = new byte[value.length() / 2];
+        for (var i = 0; i < bytes.length; i++) {
             bytes[i] = (byte) parseInt(value.substring(2 * i, 2 * i + 2), 16);
         }
         return bytes;

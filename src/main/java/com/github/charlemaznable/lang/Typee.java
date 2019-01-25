@@ -1,7 +1,8 @@
 package com.github.charlemaznable.lang;
 
+import lombok.val;
+
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 
 import static com.github.charlemaznable.lang.Clz.isAssignable;
 
@@ -17,18 +18,18 @@ public class Typee {
             Class<?> subClass,
             Class<?> genericInterface,
             int argumentOrder) {
-        for (Type generic : subClass.getGenericInterfaces()) {
+        for (val generic : subClass.getGenericInterfaces()) {
             if (!(generic instanceof ParameterizedType)) continue;
 
-            ParameterizedType pt = (ParameterizedType) generic;
+            val pt = (ParameterizedType) generic;
             if (pt.getRawType() != genericInterface) continue;
 
-            Type type = pt.getActualTypeArguments()[argumentOrder];
+            val type = pt.getActualTypeArguments()[argumentOrder];
             return (Class<?>) type;
         }
 
-        Class<?>[] interfaces = subClass.getInterfaces();
-        for (Class<?> impInterface : interfaces) {
+        val interfaces = subClass.getInterfaces();
+        for (val impInterface : interfaces) {
             if (isAssignable(impInterface, genericInterface)) {
                 return getActualTypeArgument(
                         impInterface,

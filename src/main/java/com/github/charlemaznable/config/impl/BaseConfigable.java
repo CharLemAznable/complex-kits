@@ -4,9 +4,9 @@ import com.github.charlemaznable.config.Configable;
 import com.github.charlemaznable.config.ex.ConfigNotFoundException;
 import com.github.charlemaznable.config.ex.ConfigValueFormatException;
 import com.github.charlemaznable.config.utils.AfterPropertiesSet;
+import lombok.val;
 
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.github.charlemaznable.codec.Json.unJson;
@@ -23,14 +23,14 @@ public abstract class BaseConfigable implements Configable {
 
     @Override
     public int getInt(String key) {
-        String str = getStr(key);
+        val str = getStr(key);
         if (isEmpty(str)) throw new ConfigNotFoundException(key + " not found in config system");
 
-        Matcher matcher = numberPattern.matcher(str);
+        val matcher = numberPattern.matcher(str);
         if (!matcher.matches())
             throw new ConfigValueFormatException(key + "'s value [" + str + "] is not an int");
 
-        String intStr = substringBefore(matcher.group(1), ".");
+        val intStr = substringBefore(matcher.group(1), ".");
         if (isEmpty(intStr)) return 0;
 
         return Integer.valueOf(intStr);
@@ -38,15 +38,15 @@ public abstract class BaseConfigable implements Configable {
 
     @Override
     public long getLong(String key) {
-        String str = getStr(key);
+        val str = getStr(key);
         if (isEmpty(str))
             throw new ConfigNotFoundException(key + " not found in config system");
 
-        Matcher matcher = numberPattern.matcher(str);
+        val matcher = numberPattern.matcher(str);
         if (!matcher.matches())
             throw new ConfigValueFormatException(key + "'s value [" + str + "] is not a long");
 
-        String intStr = substringBefore(matcher.group(1), ".");
+        val intStr = substringBefore(matcher.group(1), ".");
         if (isEmpty(intStr)) return 0;
 
         return Long.valueOf(intStr);
@@ -54,7 +54,7 @@ public abstract class BaseConfigable implements Configable {
 
     @Override
     public boolean getBool(String key) {
-        String str = getStr(key);
+        val str = getStr(key);
         if (isEmpty(str))
             throw new ConfigNotFoundException(key + " not found in config system");
 
@@ -63,11 +63,11 @@ public abstract class BaseConfigable implements Configable {
 
     @Override
     public float getFloat(String key) {
-        String str = getStr(key);
+        val str = getStr(key);
         if (isEmpty(str))
             throw new ConfigNotFoundException(key + " not found in config system");
 
-        Matcher matcher = numberPattern.matcher(str);
+        val matcher = numberPattern.matcher(str);
         if (!matcher.matches())
             throw new ConfigValueFormatException(key + "'s value [" + str + "] is not a float");
 
@@ -76,11 +76,11 @@ public abstract class BaseConfigable implements Configable {
 
     @Override
     public double getDouble(String key) {
-        String str = getStr(key);
+        val str = getStr(key);
         if (isEmpty(str))
             throw new ConfigNotFoundException(key + " not found in config system");
 
-        Matcher matcher = numberPattern.matcher(str);
+        val matcher = numberPattern.matcher(str);
         if (!matcher.matches())
             throw new ConfigValueFormatException(key + "'s value [" + str + "] is not a double");
 
@@ -89,13 +89,13 @@ public abstract class BaseConfigable implements Configable {
 
     @Override
     public int getInt(String key, int defaultValue) {
-        String str = getStr(key);
+        val str = getStr(key);
         if (isEmpty(str)) return defaultValue;
 
-        Matcher matcher = numberPattern.matcher(str);
+        val matcher = numberPattern.matcher(str);
         if (!matcher.matches()) return defaultValue;
 
-        String intStr = substringBefore(matcher.group(1), ".");
+        val intStr = substringBefore(matcher.group(1), ".");
         if (isEmpty(intStr)) return defaultValue;
 
         return Integer.valueOf(intStr);
@@ -103,13 +103,13 @@ public abstract class BaseConfigable implements Configable {
 
     @Override
     public long getLong(String key, long defaultValue) {
-        String str = getStr(key);
+        val str = getStr(key);
         if (isEmpty(str)) return defaultValue;
 
-        Matcher matcher = numberPattern.matcher(str);
+        val matcher = numberPattern.matcher(str);
         if (!matcher.matches()) return defaultValue;
 
-        String intStr = substringBefore(matcher.group(1), ".");
+        val intStr = substringBefore(matcher.group(1), ".");
         if (isEmpty(intStr)) return defaultValue;
 
         return Long.valueOf(intStr);
@@ -117,7 +117,7 @@ public abstract class BaseConfigable implements Configable {
 
     @Override
     public boolean getBool(String key, boolean defaultValue) {
-        String str = getStr(key);
+        val str = getStr(key);
         if (isEmpty(str)) return defaultValue;
 
         return toBool(str);
@@ -130,10 +130,10 @@ public abstract class BaseConfigable implements Configable {
 
     @Override
     public float getFloat(String key, float defaultValue) {
-        String str = getStr(key);
+        val str = getStr(key);
         if (isEmpty(str)) return defaultValue;
 
-        Matcher matcher = numberPattern.matcher(str);
+        val matcher = numberPattern.matcher(str);
         if (!matcher.matches()) return defaultValue;
 
         return Float.valueOf(matcher.group(1));
@@ -141,10 +141,10 @@ public abstract class BaseConfigable implements Configable {
 
     @Override
     public double getDouble(String key, double defaultValue) {
-        String str = getStr(key);
+        val str = getStr(key);
         if (isEmpty(str)) return defaultValue;
 
-        Matcher matcher = numberPattern.matcher(str);
+        val matcher = numberPattern.matcher(str);
         if (!matcher.matches()) return defaultValue;
 
         return Double.valueOf(matcher.group(1));
@@ -159,10 +159,10 @@ public abstract class BaseConfigable implements Configable {
     public List<String> getKeyPrefixes() {
         List<String> keyPrefixes = newArrayList();
 
-        for (Object key : getProperties().keySet()) {
-            String strKey = (String) key;
+        for (val key : getProperties().keySet()) {
+            val strKey = (String) key;
 
-            String keyPrefix = substringBefore(strKey, ".");
+            val keyPrefix = substringBefore(strKey, ".");
             if (!keyPrefixes.contains(keyPrefix)) keyPrefixes.add(keyPrefix);
         }
 
@@ -171,7 +171,7 @@ public abstract class BaseConfigable implements Configable {
 
     @Override
     public <T> T getBean(String key, Class<T> beanClass) {
-        String json = getStr(key);
+        val json = getStr(key);
         if (isEmpty(json)) return null;
 
         T bean;
@@ -190,7 +190,7 @@ public abstract class BaseConfigable implements Configable {
     @Override
     public <T> List<T> getBeans(String key, Class<T> beanClass) {
         List<T> beans = newArrayList();
-        String json = getStr(key);
+        val json = getStr(key);
         if (isEmpty(json)) return beans;
 
         try {

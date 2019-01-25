@@ -2,6 +2,8 @@ package com.github.charlemaznable.lang;
 
 import com.google.common.collect.Maps;
 import lombok.SneakyThrows;
+import lombok.val;
+import lombok.var;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.NumberFormat;
@@ -56,9 +58,9 @@ public class Mapp {
     @SafeVarargs
     public static <T> Map<T, T> of(T... keyAndValues) {
         Map<T, T> map = newHashMap();
-        for (int i = 0; i < keyAndValues.length; i += 2) {
-            T key = keyAndValues[i];
-            T value = i + 1 < keyAndValues.length ? keyAndValues[i + 1] : null;
+        for (var i = 0; i < keyAndValues.length; i += 2) {
+            val key = keyAndValues[i];
+            val value = i + 1 < keyAndValues.length ? keyAndValues[i + 1] : null;
             map.put(key, value);
         }
 
@@ -68,8 +70,8 @@ public class Mapp {
     public static Map<Object, Object> map(Object... keyAndValues) {
         Map<Object, Object> map = newHashMap();
         for (int i = 0; i < keyAndValues.length; i += 2) {
-            Object key = keyAndValues[i];
-            Object value = i + 1 < keyAndValues.length ? keyAndValues[i + 1] : null;
+            val key = keyAndValues[i];
+            val value = i + 1 < keyAndValues.length ? keyAndValues[i + 1] : null;
             map.put(key, value);
         }
 
@@ -86,7 +88,7 @@ public class Mapp {
 
     public static String getStr(Map m, Object key, String defaultValue) {
         if (m == null) return defaultValue;
-        Object value = m.get(key);
+        val value = m.get(key);
         if (value == null) return defaultValue;
         return value.toString();
     }
@@ -94,7 +96,7 @@ public class Mapp {
     @SneakyThrows
     public static Number getNum(Map m, Object key) {
         if (m == null) return null;
-        Object value = m.get(key);
+        val value = m.get(key);
         if (value == null) return null;
         if (value instanceof Number) return (Number) value;
         if (!(value instanceof String)) return null;
@@ -107,12 +109,12 @@ public class Mapp {
 
     public static Boolean getBool(Map m, Object key, Boolean defaultValue) {
         if (m == null) return defaultValue;
-        Object value = m.get(key);
+        val value = m.get(key);
         if (value == null) return defaultValue;
         if (value instanceof Boolean) return (Boolean) value;
         if (value instanceof Number) return ((Number) value).intValue() != 0;
         if (!(value instanceof String)) return defaultValue;
-        String valStr = (String) value;
+        val valStr = (String) value;
         return "true".equalsIgnoreCase(valStr)
                 || "yes".equalsIgnoreCase(valStr)
                 || "on".equalsIgnoreCase(valStr);
@@ -123,7 +125,7 @@ public class Mapp {
     }
 
     public static Integer getInt(Map m, Object key, Integer defaultValue) {
-        Number value = getNum(m, key);
+        val value = getNum(m, key);
         if (value == null) return defaultValue;
         return value instanceof Integer ? (Integer) value : new Integer(value.intValue());
     }
@@ -133,7 +135,7 @@ public class Mapp {
     }
 
     public static Long getLong(Map m, Object key, Long defaultValue) {
-        Number value = getNum(m, key);
+        val value = getNum(m, key);
         if (value == null) return defaultValue;
         return value instanceof Long ? (Long) value : new Long(value.longValue());
     }
@@ -142,7 +144,7 @@ public class Mapp {
         if (list == null) return newHashMap();
 
         Map<T, T> result = newHashMap();
-        for (Map<String, T> map : list) {
+        for (val map : list) {
             if (!map.containsKey(keyKey) || StringUtils.isEmpty(getStr(map, keyKey)) ||
                     !map.containsKey(valueKey) || StringUtils.isEmpty(getStr(map, valueKey))) continue;
             result.put(map.get(keyKey), map.get(valueKey));

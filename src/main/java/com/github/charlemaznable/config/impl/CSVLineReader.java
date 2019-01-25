@@ -1,5 +1,8 @@
 package com.github.charlemaznable.config.impl;
 
+import lombok.val;
+import lombok.var;
+
 import java.util.List;
 
 import static com.github.charlemaznable.lang.Listt.newArrayList;
@@ -24,11 +27,11 @@ public class CSVLineReader {
     @SuppressWarnings("Duplicates")
     public String[] parseLine(String line) {
         List<String> tokensOnThisLine = newArrayList();
-        StringBuilder sb = new StringBuilder();
-        boolean inQuotes = false;
+        var sb = new StringBuilder();
+        var inQuotes = false;
         do {
-            for (int i = 0; i < line.length(); i++) {
-                char c = line.charAt(i);
+            for (var i = 0; i < line.length(); i++) {
+                val c = line.charAt(i);
                 if (c == quotechar) {
                     // this gets complex... the quote may end a quoted block, or
                     // escape another quote. do a 1-char lookahead:

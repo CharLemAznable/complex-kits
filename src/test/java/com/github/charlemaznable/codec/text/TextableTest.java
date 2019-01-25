@@ -2,6 +2,7 @@ package com.github.charlemaznable.codec.text;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,7 +11,7 @@ public class TextableTest {
 
     @Test
     public void testTextable() {
-        TestTextable bean = new TestTextable();
+        val bean = new TestTextable();
         bean.setKey1(42);
         bean.setKey2("answer");
         assertEquals("key1=42&key2=answer", bean.toText());

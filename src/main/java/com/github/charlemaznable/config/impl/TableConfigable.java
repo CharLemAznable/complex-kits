@@ -1,12 +1,12 @@
 package com.github.charlemaznable.config.impl;
 
 import com.github.charlemaznable.config.ex.ConfigException;
+import lombok.val;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
-import java.util.List;
 import java.util.Properties;
 
 import static com.github.charlemaznable.lang.ClzPath.urlAsInputStream;
@@ -21,16 +21,16 @@ public class TableConfigable extends DefaultConfigable {
     }
 
     private static Properties buildProperties(URL url) {
-        Properties props = new Properties();
+        val props = new Properties();
 
         Reader reader = null;
         try {
             reader = new InputStreamReader(
                     requireNonNull(urlAsInputStream(url)), UTF_8);
-            TableReader tableReader = new TableReader(reader);
-            List<ConfigTable> tables = tableReader.getTables();
-            for (ConfigTable table : tables) {
-                String tableName = table.getTableName();
+            val tableReader = new TableReader(reader);
+            val tables = tableReader.getTables();
+            for (val table : tables) {
+                val tableName = table.getTableName();
                 if (props.containsKey(tableName)) {
                     throw new ConfigException(
                             "duplicate key [" + tableName + "] in file...");

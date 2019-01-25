@@ -1,6 +1,7 @@
 package com.github.charlemaznable.codec;
 
 
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import static com.github.charlemaznable.codec.Base92.base92;
@@ -13,9 +14,9 @@ public class BaseXTest {
 
     @Test
     public void testBaseX() {
-        BaseX base64 = new BaseX("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
+        val base64 = new BaseX("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
         assertEquals("ASDFGHJ", string(base64.decode(base64.encode(bytes("ASDFGHJ")))));
-        BaseX base92 = new BaseX("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz`1234567890-=~!@#$%^&*()_+[]{}|;':,./<>?");
+        val base92 = new BaseX("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz`1234567890-=~!@#$%^&*()_+[]{}|;':,./<>?");
         assertEquals("ASDFGHJ", string(base92.decode(base92.encode(bytes("ASDFGHJ")))));
         assertEquals("ASDFGHJ", string(unBase92(base92(bytes("ASDFGHJ")))));
     }

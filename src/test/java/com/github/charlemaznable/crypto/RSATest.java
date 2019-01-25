@@ -4,11 +4,8 @@ package com.github.charlemaznable.crypto;
 import com.github.charlemaznable.lang.Rand;
 import lombok.SneakyThrows;
 import lombok.val;
+import lombok.var;
 import org.junit.jupiter.api.Test;
-
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 
 import static com.github.charlemaznable.codec.Hex.hex;
 import static com.github.charlemaznable.codec.Hex.unHex;
@@ -20,13 +17,13 @@ public class RSATest {
 
     @Test
     public void testRSA() {
-        String plainText = "{ mac=\"MAC Address\", appId=\"16位字符串\", signature=SHA1(\"appId=xxx&mac=yyy\") }";
-        KeyPair keyPair = generateKeyPair();
-        String publicKeyString = getPublicKeyString(keyPair);
-        String privateKeyString = getPrivateKeyString(keyPair);
+        val plainText = "{ mac=\"MAC Address\", appId=\"16位字符串\", signature=SHA1(\"appId=xxx&mac=yyy\") }";
+        val keyPair = generateKeyPair();
+        val publicKeyString = getPublicKeyString(keyPair);
+        val privateKeyString = getPrivateKeyString(keyPair);
 
-        PublicKey publicKey = publicKey(publicKeyString);
-        PrivateKey privateKey = privateKey(privateKeyString);
+        val publicKey = publicKey(publicKeyString);
+        val privateKey = privateKey(privateKeyString);
 
         assertEquals(plainText, prvDecrypt(pubEncrypt(plainText, publicKey), privateKey));
         assertEquals(plainText, pubDecrypt(prvEncrypt(plainText, privateKey), publicKey));
@@ -34,33 +31,33 @@ public class RSATest {
 
     @Test
     public void testRSA2() {
-        String plainText = "{ mac=\"MAC Address\", appId=\"16位字符串\", signature=SHA1(\"appId=xxx&mac=yyy\") }";
-        KeyPair keyPair = generateKeyPair(2048);
-        String publicKeyString = getPublicKeyString(keyPair);
-        String privateKeyString = getPrivateKeyString(keyPair);
+        val plainText = "{ mac=\"MAC Address\", appId=\"16位字符串\", signature=SHA1(\"appId=xxx&mac=yyy\") }";
+        val keyPair = generateKeyPair(2048);
+        val publicKeyString = getPublicKeyString(keyPair);
+        val privateKeyString = getPrivateKeyString(keyPair);
 
-        PublicKey publicKey = publicKey(publicKeyString);
-        PrivateKey privateKey = privateKey(privateKeyString);
+        val publicKey = publicKey(publicKeyString);
+        val privateKey = privateKey(privateKeyString);
 
         assertEquals(plainText, prvDecrypt(pubEncrypt(plainText, publicKey), privateKey));
         assertEquals(plainText, pubDecrypt(prvEncrypt(plainText, privateKey), publicKey));
     }
 
     public void batchRun(int times) {
-        String rand = Rand.randAlphanumeric(100);
-        KeyPair keyPair = generateKeyPair();
-        PublicKey publicKey = getPublicKey(keyPair);
-        PrivateKey privateKey = getPrivateKey(keyPair);
+        val rand = Rand.randAlphanumeric(100);
+        val keyPair = generateKeyPair();
+        val publicKey = getPublicKey(keyPair);
+        val privateKey = getPrivateKey(keyPair);
 
-        for (int i = 0; i < times; ++i) {
-            String plainText = rand + i;
+        for (var i = 0; i < times; ++i) {
+            val plainText = rand + i;
 
-            String enc1 = hex(pubEncrypt(plainText, publicKey));
-            String dec1 = prvDecrypt(unHex(enc1), privateKey);
+            val enc1 = hex(pubEncrypt(plainText, publicKey));
+            val dec1 = prvDecrypt(unHex(enc1), privateKey);
             assertEquals(plainText, dec1);
 
-            String enc2 = hex(prvEncrypt(plainText, privateKey));
-            String dec2 = pubDecrypt(unHex(enc2), publicKey);
+            val enc2 = hex(prvEncrypt(plainText, privateKey));
+            val dec2 = pubDecrypt(unHex(enc2), publicKey);
             assertEquals(plainText, dec2);
         }
     }
@@ -70,12 +67,12 @@ public class RSATest {
     @SneakyThrows
     public void routineRun(int threads) {
         val service = new Thread[threads];
-        for (int i = 0; i < threads; i++) {
+        for (var i = 0; i < threads; i++) {
             service[i] = new Thread(() -> batchRun(TIMES));
             service[i].start();
         }
 
-        for (int i = 0; i < threads; i++) {
+        for (var i = 0; i < threads; i++) {
             service[i].join();
         }
     }

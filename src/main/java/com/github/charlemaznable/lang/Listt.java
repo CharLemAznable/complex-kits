@@ -1,6 +1,8 @@
 package com.github.charlemaznable.lang;
 
 import com.google.common.collect.Lists;
+import lombok.val;
+import lombok.var;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,7 +43,7 @@ public class Listt {
         if (map == null) return newArrayList();
 
         List<Map<String, T>> result = newArrayList();
-        for (Map.Entry<T, T> entry : map.entrySet()) {
+        for (val entry : map.entrySet()) {
             result.add(of(keyKey, entry.getKey(), valueKey, entry.getValue()));
         }
         return result;
@@ -66,7 +68,7 @@ public class Listt {
 
     public static <E> ArrayList<E> newArrayListOfType(int count, Class<? extends E> itemType) {
         ArrayList<E> list = Lists.newArrayList();
-        for (int i = 0; i < count; ++i) {
+        for (var i = 0; i < count; ++i) {
             list.add(on(itemType).create().get());
         }
         return list;

@@ -2,10 +2,10 @@ package com.github.charlemaznable.config.utils;
 
 import com.google.common.base.Splitter;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.joor.Reflect;
 
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.github.charlemaznable.lang.Listt.newArrayList;
@@ -30,14 +30,14 @@ public class ParamsApplyUtils {
         List<T> lst = newArrayList();
         if (isEmpty(propertyValue)) return lst;
 
-        Matcher matcher = paramParams.matcher(propertyValue);
-        Splitter splitter = Splitter.on(',').trimResults();
+        val matcher = paramParams.matcher(propertyValue);
+        val splitter = Splitter.on(',').trimResults();
 
         while (matcher.find()) {
-            String group = matcher.group().trim();
-            int posBrace = group.indexOf('(');
-            String functor = posBrace < 0 ? group : group.substring(0, posBrace);
-            Object obj = Reflect.on(trim(functor)).create().get();
+            val group = matcher.group().trim();
+            val posBrace = group.indexOf('(');
+            val functor = posBrace < 0 ? group : group.substring(0, posBrace);
+            val obj = Reflect.on(trim(functor)).create().get();
             if (!cls.isInstance(obj)) {
                 log.warn("{} can not instantized to {}", functor, cls.getName());
                 continue;

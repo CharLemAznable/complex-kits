@@ -4,6 +4,7 @@ import com.github.charlemaznable.lang.ex.BlankStringException;
 import com.github.charlemaznable.lang.ex.EmptyObjectException;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import lombok.val;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -18,7 +19,7 @@ public class Condition {
 
     @SafeVarargs
     public static <T> T nonNull(T... objects) {
-        for (T object : objects) {
+        for (val object : objects) {
             if (null != object) return object;
         }
         return null;
@@ -26,14 +27,14 @@ public class Condition {
 
     @SafeVarargs
     public static <T> T nonEmpty(T... objects) {
-        for (T object : objects) {
+        for (val object : objects) {
             if (!isEmpty(object)) return object;
         }
         return null;
     }
 
     public static String nonBlank(String... strings) {
-        for (String string : strings) {
+        for (val string : strings) {
             if (isNotBlank(string)) return string;
         }
         return null;

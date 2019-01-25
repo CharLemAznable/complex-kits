@@ -6,8 +6,9 @@ import com.github.charlemaznable.config.impl.IniConfigable;
 import com.github.charlemaznable.config.impl.PropertiesConfigable;
 import com.github.charlemaznable.config.impl.PropsConfigable;
 import com.github.charlemaznable.config.impl.TableConfigable;
+import lombok.val;
+import lombok.var;
 
-import java.net.URL;
 import java.util.List;
 import java.util.Properties;
 
@@ -25,15 +26,15 @@ public class Config {
     }
 
     private static void loadConfigImplementation() {
-        Configable defConfig = createConfigable("defconfigdir", "defconfig", null);
-        Configable bizConfig = createConfigable("bizconfigdir", "bizconfig", defConfig);
+        val defConfig = createConfigable("defconfigdir", "defconfig", null);
+        val bizConfig = createConfigable("bizconfigdir", "bizconfig", defConfig);
 
         // 加载配置系统独立实现类（比如从Redis、Mysql、Oracle等读取配置的具体实现）
         // 要求具体配置类必须实现Configable接口，按照需要实现ParamsAppliable、DefConfigSetter接口
         // 例如：
         // config.implementation=org.n3r.config.impl.RedisConfigable(127.0.0.1,
         // 11211)
-        String configImplementation = bizConfig.getStr("config.implementation");
+        val configImplementation = bizConfig.getStr("config.implementation");
         if (isEmpty(configImplementation)) {
             impl = bizConfig;
             return;
@@ -50,31 +51,31 @@ public class Config {
     }
 
     private static Configable createConfigable(String configKey, String defConfigDir, Configable defConfig) {
-        ConfigBuilder configBuilder = new ConfigBuilder();
+        val configBuilder = new ConfigBuilder();
         configBuilder.setDefConfig(defConfig);
 
-        String basePackage = defConfigDir;
-        URL envURL = classResource("envspace.props");
+        var basePackage = defConfigDir;
+        val envURL = classResource("envspace.props");
         if (envURL != null) {
-            PropsConfigable envSpaceConfig = new PropsConfigable(envURL);
+            val envSpaceConfig = new PropsConfigable(envURL);
             basePackage = envSpaceConfig.getStr(configKey, defConfigDir);
             configBuilder.addConfig(envSpaceConfig);
         }
 
-        URL[] propertiesURL = classResources(basePackage, "properties");
-        for (URL propertyURL : propertiesURL) {
+        val propertiesURL = classResources(basePackage, "properties");
+        for (val propertyURL : propertiesURL) {
             configBuilder.addConfig(new PropertiesConfigable(propertyURL));
         }
-        URL[] propsURL = classResources(basePackage, "props");
-        for (URL propURL : propsURL) {
+        val propsURL = classResources(basePackage, "props");
+        for (val propURL : propsURL) {
             configBuilder.addConfig(new PropsConfigable(propURL));
         }
-        URL[] inisURL = classResources(basePackage, "ini");
-        for (URL iniURL : inisURL) {
+        val inisURL = classResources(basePackage, "ini");
+        for (val iniURL : inisURL) {
             configBuilder.addConfig(new IniConfigable(iniURL));
         }
-        URL[] tablesURL = classResources(basePackage, "table");
-        for (URL tableURL : tablesURL) {
+        val tablesURL = classResources(basePackage, "table");
+        for (val tableURL : tablesURL) {
             configBuilder.addConfig(new TableConfigable(tableURL));
         }
 

@@ -1,10 +1,9 @@
 package com.github.charlemaznable.spring;
 
 import lombok.SneakyThrows;
-import org.springframework.core.io.Resource;
+import lombok.val;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
-import org.springframework.core.type.classreading.MetadataReaderFactory;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
@@ -23,18 +22,18 @@ public class ClzResolver {
 
     @SneakyThrows
     public static List<Class<?>> getClasses(String basePackage, Predicate<Class<?>> classPredicate) {
-        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        MetadataReaderFactory metaFactory = new CachingMetadataReaderFactory(resolver);
+        val resolver = new PathMatchingResourcePatternResolver();
+        val metaFactory = new CachingMetadataReaderFactory(resolver);
 
-        Resource[] resources = resolver.getResources(
-                CLASSPATH_ALL_URL_PREFIX + resolveBasePackage(basePackage) + PATTERN);
+        val resources = resolver.getResources(CLASSPATH_ALL_URL_PREFIX
+                + resolveBasePackage(basePackage) + PATTERN);
 
         List<Class<?>> classes = newArrayList();
-        for (Resource res : resources) {
+        for (val res : resources) {
             if (!res.isReadable()) continue;
 
-            Class<?> clazz = findClass(metaFactory.
-                    getMetadataReader(res).getClassMetadata().getClassName());
+            val clazz = findClass(metaFactory.getMetadataReader(res)
+                    .getClassMetadata().getClassName());
             if (null == clazz) continue;
             if (null == classPredicate || classPredicate.test(clazz)) classes.add(clazz);
         }

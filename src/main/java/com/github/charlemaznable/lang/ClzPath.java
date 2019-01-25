@@ -3,6 +3,8 @@ package com.github.charlemaznable.lang;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import lombok.SneakyThrows;
+import lombok.val;
+import lombok.var;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,11 +19,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
-import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import static com.github.charlemaznable.lang.Str.isEmpty;
@@ -153,11 +153,11 @@ public class ClzPath {
                 = classExists("org.eclipse.core.runtime.FileLocator");
 
         public static URL[] classResources(String basePath, String extension) throws IOException {
-            String base = resolveBasePath(basePath);
-            String extn = resolveExtension(extension);
-            URL[] rootDirResources = findRootClassResources(base);
-            Set<URL> result = new LinkedHashSet<>(16);
-            for (URL rootDirResource : rootDirResources) {
+            val base = resolveBasePath(basePath);
+            val extn = resolveExtension(extension);
+            val rootDirResources = findRootClassResources(base);
+            val result = new LinkedHashSet<URL>(16);
+            for (var rootDirResource : rootDirResources) {
                 rootDirResource = resolveRootDirResource(rootDirResource);
                 if (rootDirResource.getProtocol().startsWith(URL_PROTOCOL_VFS)) {
                     result.addAll(VfsResourceMatchingDelegate.findMatchingResources(rootDirResource, extension));
@@ -172,11 +172,11 @@ public class ClzPath {
 
         public static boolean isReadable(URL url) {
             try {
-                String protocol = url.getProtocol();
+                val protocol = url.getProtocol();
                 if (URL_PROTOCOL_FILE.equals(protocol) || URL_PROTOCOL_VFSFILE.equals(protocol) ||
                         URL_PROTOCOL_VFS.equals(protocol)) {
                     // Proceed with file system resolution...
-                    File file = getFile(url);
+                    val file = getFile(url);
                     return (file.canRead() && !file.isDirectory());
                 } else {
                     return true;
@@ -200,9 +200,9 @@ public class ClzPath {
         }
 
         private static URL[] findRootClassResources(String basePath) throws IOException {
-            Set<URL> result = new LinkedHashSet<>(16);
-            ClassLoader classLoader = getClassLoader();
-            Enumeration<URL> urlEnumer = (classLoader != null ?
+            val result = new LinkedHashSet<URL>(16);
+            val classLoader = getClassLoader();
+            val urlEnumer = (classLoader != null ?
                     classLoader.getResources(basePath) : getSystemResources(basePath));
             while (urlEnumer.hasMoreElements()) {
                 result.add(urlEnumer.nextElement());
@@ -218,10 +218,10 @@ public class ClzPath {
         private static void addAllClassLoaderJarRoots(ClassLoader classLoader, Set<URL> result) {
             if (classLoader instanceof URLClassLoader) {
                 try {
-                    URL[] urls = ((URLClassLoader) classLoader).getURLs();
-                    for (URL url : urls) {
+                    val urls = ((URLClassLoader) classLoader).getURLs();
+                    for (val url : urls) {
                         if (isJarFileURL(url)) {
-                            URL newURL = new URL(JAR_URL_PREFIX +
+                            val newURL = new URL(JAR_URL_PREFIX +
                                     url.toString() + JAR_URL_SEPARATOR);
                             if (existsJarFileURL(newURL)) result.add(newURL);
                         }
@@ -245,12 +245,12 @@ public class ClzPath {
         private static boolean existsJarFileURL(URL url) {
             try {
                 // Try a URL connection content-length header...
-                URLConnection con = url.openConnection();
+                val con = url.openConnection();
                 customizeConnection(con);
                 HttpURLConnection httpCon = con instanceof HttpURLConnection ?
                         (HttpURLConnection) con : null;
                 if (httpCon != null) {
-                    int code = httpCon.getResponseCode();
+                    val code = httpCon.getResponseCode();
                     if (code == HTTP_OK) {
                         return true;
                     } else if (code == HTTP_NOT_FOUND) {
@@ -264,7 +264,7 @@ public class ClzPath {
                     return false;
                 } else {
                     // Fall back to stream existence: can we open the stream?
-                    InputStream is = getInputStream(url);
+                    val is = getInputStream(url);
                     is.close();
                     return true;
                 }
@@ -287,7 +287,7 @@ public class ClzPath {
         }
 
         private static InputStream getInputStream(URL url) throws IOException {
-            URLConnection con = url.openConnection();
+            val con = url.openConnection();
             useCachesIfNecessary(con);
             try {
                 return con.getInputStream();
@@ -310,31 +310,31 @@ public class ClzPath {
         }
 
         private static boolean isJarResource(URL url) {
-            String protocol = url.getProtocol();
+            val protocol = url.getProtocol();
             return URL_PROTOCOL_JAR.equals(protocol) || URL_PROTOCOL_ZIP.equals(protocol) ||
                     URL_PROTOCOL_VFSZIP.equals(protocol) || URL_PROTOCOL_WSJAR.equals(protocol);
         }
 
         private static Set<URL> findExtMatchingJarResources(URL rootDirResource, String extension) throws IOException {
-            URLConnection con = rootDirResource.openConnection();
+            val con = rootDirResource.openConnection();
             JarFile jarFile;
             String rootEntryPath;
-            boolean newJarFile = false;
+            var newJarFile = false;
 
             if (con instanceof JarURLConnection) {
                 // Should usually be the case for traditional JAR files.
-                JarURLConnection jarCon = (JarURLConnection) con;
+                val jarCon = (JarURLConnection) con;
                 useCachesIfNecessary(jarCon);
                 jarFile = jarCon.getJarFile();
-                JarEntry jarEntry = jarCon.getJarEntry();
+                val jarEntry = jarCon.getJarEntry();
                 rootEntryPath = (jarEntry != null ? jarEntry.getName() : "");
             } else {
                 // No JarURLConnection -> need to resort to URL file parsing.
                 // We'll assume URLs of the format "jar:path!/entry", with the protocol
                 // being arbitrary as long as following the entry format.
                 // We'll also handle paths with and without leading "file:" prefix.
-                String urlFile = rootDirResource.getFile();
-                int separatorIndex = urlFile.indexOf(JAR_URL_SEPARATOR);
+                val urlFile = rootDirResource.getFile();
+                val separatorIndex = urlFile.indexOf(JAR_URL_SEPARATOR);
                 if (separatorIndex != -1) {
                     rootEntryPath = urlFile.substring(separatorIndex + JAR_URL_SEPARATOR.length());
                     jarFile = getJarFile(urlFile.substring(0, separatorIndex));
@@ -351,13 +351,13 @@ public class ClzPath {
                     // The Sun JRE does not return a slash here, but BEA JRockit does.
                     rootEntryPath = rootEntryPath + "/";
                 }
-                Set<URL> result = new LinkedHashSet<>(8);
-                for (Enumeration<JarEntry> entries = jarFile.entries(); entries.hasMoreElements(); ) {
-                    JarEntry entry = entries.nextElement();
-                    String entryPath = entry.getName();
+                val result = new LinkedHashSet<URL>(8);
+                for (var entries = jarFile.entries(); entries.hasMoreElements(); ) {
+                    val entry = entries.nextElement();
+                    val entryPath = entry.getName();
                     if (entryPath.startsWith(rootEntryPath) &&
                             entryPath.endsWith(extension)) {
-                        String relativePath = entryPath.substring(rootEntryPath.length());
+                        var relativePath = entryPath.substring(rootEntryPath.length());
                         if (relativePath.startsWith("/")) relativePath = relativePath.substring(1);
                         result.add(new URL(rootDirResource, relativePath));
                     }
@@ -415,9 +415,9 @@ public class ClzPath {
         }
 
         private static Set<URL> doFindMatchingFileSystemResources(File rootDir, String extension) throws IOException {
-            Set<File> matchingFiles = retrieveMatchingFiles(rootDir, extension);
-            Set<URL> result = new LinkedHashSet<>(matchingFiles.size());
-            for (File file : matchingFiles) {
+            val matchingFiles = retrieveMatchingFiles(rootDir, extension);
+            val result = new LinkedHashSet<URL>(matchingFiles.size());
+            for (val file : matchingFiles) {
                 result.add(file.toURI().toURL());
             }
             return result;
@@ -426,18 +426,18 @@ public class ClzPath {
         private static Set<File> retrieveMatchingFiles(File rootDir, String extension) {
             if (!rootDir.exists() || !rootDir.isDirectory() || !rootDir.canRead()) return emptySet();
 
-            Set<File> result = new LinkedHashSet<>(8);
+            val result = new LinkedHashSet<File>(8);
             doRetrieveMatchingFiles(extension, rootDir, result);
             return result;
         }
 
         private static void doRetrieveMatchingFiles(String extension, File dir, Set<File> result) {
-            File[] dirContents = dir.listFiles();
+            val dirContents = dir.listFiles();
             if (dirContents == null) return;
 
-            String abnormalPattern = File.separator + extension;
-            for (File content : dirContents) {
-                String currPath = replace(content.getAbsolutePath(), File.separator, "/");
+            val abnormalPattern = File.separator + extension;
+            for (val content : dirContents) {
+                val currPath = replace(content.getAbsolutePath(), File.separator, "/");
                 if (content.isDirectory() && content.canRead()) {
                     doRetrieveMatchingFiles(extension, content, result);
                 } else if (currPath.endsWith(extension) &&
@@ -489,9 +489,8 @@ public class ClzPath {
     private static class VfsResourceMatchingDelegate {
 
         public static Set<URL> findMatchingResources(URL rootResource, String extension) {
-            Object root = VfsFileDelegate.getRoot(rootResource);
-            ExtensionMatchVFVisitor visitor = new ExtensionMatchVFVisitor(
-                    VfsFileDelegate.getPath(root), extension);
+            val root = VfsFileDelegate.getRoot(rootResource);
+            val visitor = new ExtensionMatchVFVisitor(VfsFileDelegate.getPath(root), extension);
             VfsFileDelegate.visit(root, visitor);
             return visitor.getResources();
         }
@@ -512,7 +511,7 @@ public class ClzPath {
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) {
-            String methodName = method.getName();
+            val methodName = method.getName();
             if (Object.class.equals(method.getDeclaringClass())) {
                 if (methodName.equals("equals")) {
                     // Only consider equal when proxies are identical.

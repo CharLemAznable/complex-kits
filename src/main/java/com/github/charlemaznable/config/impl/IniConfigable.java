@@ -1,12 +1,12 @@
 package com.github.charlemaznable.config.impl;
 
 import com.github.charlemaznable.config.ex.ConfigException;
+import lombok.val;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
-import java.util.Map;
 import java.util.Properties;
 
 import static com.github.charlemaznable.lang.ClzPath.urlAsInputStream;
@@ -22,17 +22,17 @@ public class IniConfigable extends DefaultConfigable {
 
     private static Properties buildProperties(URL url) {
         Reader reader = null;
-        Properties props = new Properties();
+        val props = new Properties();
         try {
             reader = new InputStreamReader(requireNonNull(urlAsInputStream(url)), UTF_8);
-            IniReader iniReader = new IniReader(reader);
-            for (String section : iniReader.getSections()) {
-                Properties sectionProps = iniReader.getSection(section);
+            val iniReader = new IniReader(reader);
+            for (val section : iniReader.getSections()) {
+                val sectionProps = iniReader.getSection(section);
                 if (sectionProps == null) continue;
 
-                String prefix = section.equals("") ? "" : section + '.';
-                for (Map.Entry<Object, Object> entry : sectionProps.entrySet()) {
-                    String key = prefix + entry.getKey();
+                val prefix = section.equals("") ? "" : section + '.';
+                for (val entry : sectionProps.entrySet()) {
+                    val key = prefix + entry.getKey();
 
                     if (!props.containsKey(key)) {
                         props.put(key, entry.getValue().toString());

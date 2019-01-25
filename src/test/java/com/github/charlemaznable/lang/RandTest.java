@@ -1,6 +1,8 @@
 package com.github.charlemaznable.lang;
 
 
+import lombok.val;
+import lombok.var;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -20,11 +22,11 @@ public class RandTest {
         weightMap.put("2", 0);
         weightMap.put("3", 0);
         weightMap.put("4", 0);
-        int count = 100000;
-        double percent = 1. / weightMap.size();
+        val count = 100000;
+        val percent = 1. / weightMap.size();
 
-        for (int i = 0; i < count; i++) {
-            String item = randInverseWeighted(weightMap);
+        for (var i = 0; i < count; i++) {
+            val item = randInverseWeighted(weightMap);
             weightMap.put(item, weightMap.get(item) + 1);
         }
 

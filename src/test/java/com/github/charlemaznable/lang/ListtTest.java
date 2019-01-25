@@ -1,6 +1,7 @@
 package com.github.charlemaznable.lang;
 
 
+import lombok.var;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -16,10 +17,10 @@ public class ListtTest {
     @Test
     public void testShuffle() {
         List<Integer> list = newArrayList();
-        List<Integer> newList = shuffle(list);
+        var newList = shuffle(list);
         assertEquals(newList, list);
 
-        for (int i = 0; i < 10; i++) list.add(i);
+        for (var i = 0; i < 10; i++) list.add(i);
         newList = shuffle(list);
         assertNotEquals(newList, list);
     }

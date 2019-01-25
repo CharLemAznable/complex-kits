@@ -1,6 +1,8 @@
 package com.github.charlemaznable.config.impl;
 
 import com.github.charlemaznable.config.ex.ConfigException;
+import lombok.val;
+import lombok.var;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,7 +36,7 @@ public class TableReader {
     private String[] cols = null;
 
     public TableReader(Reader reader) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(reader);
+        val bufferedReader = new BufferedReader(reader);
         dealEachLine(bufferedReader);
         tables.add(configTable);
     }
@@ -48,7 +50,7 @@ public class TableReader {
     }
 
     private static String generateTableNameFromLine(String line) {
-        String trimLine = trim(line);
+        val trimLine = trim(line);
         return trim(substring(trimLine, 1, trimLine.length() - 1));
     }
 
@@ -57,7 +59,7 @@ public class TableReader {
     }
 
     private void dealEachLine(BufferedReader bufferedReader) throws IOException {
-        for (String line = bufferedReader.readLine(); line != null; line = bufferedReader
+        for (var line = bufferedReader.readLine(); line != null; line = bufferedReader
                 .readLine()) {
             if (isEmpty(line) || isCommentLine(line)) continue;
 
@@ -77,18 +79,18 @@ public class TableReader {
     }
 
     private void doWhenIsData(String line) {
-        String[] splitLine = new CSVLineReader().parseLine(line);
-        ConfigRow row = new ConfigRow();
-        StringBuilder rowKey = new StringBuilder();
-        for (int i = 0; i < splitLine.length; i++) {
-            String value = trim(splitLine[i]);
+        val splitLine = new CSVLineReader().parseLine(line);
+        val row = new ConfigRow();
+        val rowKey = new StringBuilder();
+        for (var i = 0; i < splitLine.length; i++) {
+            val value = trim(splitLine[i]);
             if (rowKeyIndex.contains(i)) {
                 rowKey.append(value);
             }
-            ConfigCell cell = new ConfigCell(cols[i], value);
+            val cell = new ConfigCell(cols[i], value);
             row.addCell(cell);
         }
-        String rowKeyStr = rowKey.toString();
+        val rowKeyStr = rowKey.toString();
         if (isEmpty(rowKeyStr)) {
             throw new ConfigException(
                     "table [" + tableName + "] config has no rowKey!");
@@ -98,10 +100,10 @@ public class TableReader {
     }
 
     private void doWhenIsRowCols(String line) {
-        String[] splitLine = split(substring(line, 2, line.length()), ',');
+        val splitLine = split(substring(line, 2, line.length()), ',');
         cols = new String[splitLine.length];
-        for (int i = 0; i < splitLine.length; i++) {
-            String str = trim(splitLine[i]);
+        for (var i = 0; i < splitLine.length; i++) {
+            var str = trim(splitLine[i]);
             if (endsWith(str, "*")) {
                 str = substringBeforeLast(str, "*");
                 rowKeyIndex.add(i);

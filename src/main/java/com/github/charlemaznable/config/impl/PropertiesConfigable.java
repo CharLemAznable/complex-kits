@@ -1,5 +1,7 @@
 package com.github.charlemaznable.config.impl;
 
+import lombok.val;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -15,7 +17,7 @@ public class PropertiesConfigable extends DefaultConfigable {
     }
 
     private static Properties buildProperties(URL url) {
-        Properties properties = new Properties();
+        val properties = new Properties();
         InputStream inputStream = null;
         try {
             inputStream = urlAsInputStream(url);

@@ -1,6 +1,7 @@
 package com.github.charlemaznable.lang.pool;
 
 import lombok.NoArgsConstructor;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -9,7 +10,7 @@ public class PoolProxyTest {
 
     @Test
     public void testPoolProxy() {
-        TestPoolProxyObject testPoolProxyObject = PoolProxy.create(
+        val testPoolProxyObject = PoolProxy.create(
                 new PooledObjectCreator<TestPoolProxyObject>() {
 
                     @Override

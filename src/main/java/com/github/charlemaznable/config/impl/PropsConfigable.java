@@ -1,6 +1,7 @@
 package com.github.charlemaznable.config.impl;
 
 import com.github.charlemaznable.config.ex.ConfigException;
+import lombok.val;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -20,12 +21,12 @@ public class PropsConfigable extends DefaultConfigable {
 
     private static Properties buildProperties(URL url) {
         PropsReader reader = null;
-        Properties props = new Properties();
+        val props = new Properties();
         try {
             reader = new PropsReader(new InputStreamReader(
                     requireNonNull(urlAsInputStream(url)), UTF_8));
             while (reader.nextProperty()) {
-                String propertyName = reader.getPropertyName();
+                val propertyName = reader.getPropertyName();
                 if (props.containsKey(propertyName)) {
                     throw new ConfigException("duplicate key ["
                             + propertyName + "] in file...");

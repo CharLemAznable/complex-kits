@@ -1,6 +1,7 @@
 package com.github.charlemaznable.lang;
 
 import lombok.SneakyThrows;
+import lombok.val;
 import org.apache.commons.lang3.ClassUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -11,7 +12,7 @@ import static java.lang.reflect.Modifier.isAbstract;
 public class Clz {
 
     public static boolean isAssignable(Class<?> fromClass, Class<?>... toClasses) {
-        for (Class<?> toClass : toClasses)
+        for (val toClass : toClasses)
             if (ClassUtils.isAssignable(fromClass, toClass)) return true;
 
         return false;

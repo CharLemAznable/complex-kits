@@ -1,5 +1,6 @@
 package com.github.charlemaznable.lang.pool;
 
+import lombok.val;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
 import static org.apache.commons.pool2.impl.GenericObjectPoolConfig.DEFAULT_MAX_IDLE;
@@ -28,7 +29,7 @@ public class PoolProxyConfigBuilder {
     }
 
     public <T> GenericObjectPoolConfig<T> build() {
-        GenericObjectPoolConfig<T> config = new GenericObjectPoolConfig<>();
+        val config = new GenericObjectPoolConfig<T>();
         config.setMaxTotal(this.maxTotal);
         config.setMaxIdle(this.maxIdle);
         config.setMinIdle(this.minIdle);

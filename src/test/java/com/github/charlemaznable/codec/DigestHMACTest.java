@@ -1,8 +1,8 @@
 package com.github.charlemaznable.codec;
 
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
-import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import static com.github.charlemaznable.codec.Base64.base64;
@@ -19,47 +19,47 @@ public class DigestHMACTest {
 
     @Test
     public void testDigestMACHex() throws Exception {
-        String key = "192006250b4c09247ec02edce69f6a2d";
+        val key = "192006250b4c09247ec02edce69f6a2d";
 
-        String hashMD5Hex = MD5.digestHex("可以提供有状态的Hasher", key);
+        val hashMD5Hex = MD5.digestHex("可以提供有状态的Hasher", key);
         assertEquals(hashMD5Hex, MD5.digestHex("可以提供有状态的Hasher", key));
-        Mac HmacMD5 = getInstance("HmacMD5");
-        HmacMD5.init(new SecretKeySpec(bytes(key), "HmacMD5"));
-        assertEquals(hashMD5Hex, hex(HmacMD5.doFinal(bytes("可以提供有状态的Hasher"))));
+        val hmacMD5 = getInstance("HmacMD5");
+        hmacMD5.init(new SecretKeySpec(bytes(key), "HmacMD5"));
+        assertEquals(hashMD5Hex, hex(hmacMD5.doFinal(bytes("可以提供有状态的Hasher"))));
 
-        String hashSHA1Hex = SHA1.digestHex("可以提供有状态的Hasher", key);
+        val hashSHA1Hex = SHA1.digestHex("可以提供有状态的Hasher", key);
         assertEquals(hashSHA1Hex, SHA1.digestHex("可以提供有状态的Hasher", key));
-        Mac HmacSHA1 = getInstance("HmacSHA1");
-        HmacSHA1.init(new SecretKeySpec(bytes(key), "HmacSHA1"));
-        assertEquals(hashSHA1Hex, hex(HmacSHA1.doFinal(bytes("可以提供有状态的Hasher"))));
+        val hmacSHA1 = getInstance("HmacSHA1");
+        hmacSHA1.init(new SecretKeySpec(bytes(key), "HmacSHA1"));
+        assertEquals(hashSHA1Hex, hex(hmacSHA1.doFinal(bytes("可以提供有状态的Hasher"))));
 
-        String hashSHA256Hex = SHA256.digestHex("可以提供有状态的Hasher", key);
+        val hashSHA256Hex = SHA256.digestHex("可以提供有状态的Hasher", key);
         assertEquals(hashSHA256Hex, SHA256.digestHex("可以提供有状态的Hasher", key));
 
-        String hashSHA512Hex = SHA512.digestHex("可以提供有状态的Hasher", key);
+        val hashSHA512Hex = SHA512.digestHex("可以提供有状态的Hasher", key);
         assertEquals(hashSHA512Hex, SHA512.digestHex("可以提供有状态的Hasher", key));
     }
 
     @Test
     public void testDigestMACBase64() throws Exception {
-        String key = "192006250b4c09247ec02edce69f6a2d";
+        val key = "192006250b4c09247ec02edce69f6a2d";
 
-        String hashMD5Base64 = MD5.digestBase64("可以提供有状态的Hasher", key);
+        val hashMD5Base64 = MD5.digestBase64("可以提供有状态的Hasher", key);
         assertEquals(hashMD5Base64, MD5.digestBase64("可以提供有状态的Hasher", key));
-        Mac HmacMD5 = getInstance("HmacMD5");
-        HmacMD5.init(new SecretKeySpec(bytes(key), "HmacMD5"));
-        assertEquals(hashMD5Base64, base64(HmacMD5.doFinal(bytes("可以提供有状态的Hasher"))));
+        val hmacMD5 = getInstance("HmacMD5");
+        hmacMD5.init(new SecretKeySpec(bytes(key), "HmacMD5"));
+        assertEquals(hashMD5Base64, base64(hmacMD5.doFinal(bytes("可以提供有状态的Hasher"))));
 
-        String hashSHA1Base64 = SHA1.digestBase64("可以提供有状态的Hasher", key);
+        val hashSHA1Base64 = SHA1.digestBase64("可以提供有状态的Hasher", key);
         assertEquals(hashSHA1Base64, SHA1.digestBase64("可以提供有状态的Hasher", key));
-        Mac HmacSHA1 = getInstance("HmacSHA1");
-        HmacSHA1.init(new SecretKeySpec(bytes(key), "HmacSHA1"));
-        assertEquals(hashSHA1Base64, base64(HmacSHA1.doFinal(bytes("可以提供有状态的Hasher"))));
+        val hmacSHA1 = getInstance("HmacSHA1");
+        hmacSHA1.init(new SecretKeySpec(bytes(key), "HmacSHA1"));
+        assertEquals(hashSHA1Base64, base64(hmacSHA1.doFinal(bytes("可以提供有状态的Hasher"))));
 
-        String hashSHA256Base64 = SHA256.digestBase64("可以提供有状态的Hasher", key);
+        val hashSHA256Base64 = SHA256.digestBase64("可以提供有状态的Hasher", key);
         assertEquals(hashSHA256Base64, SHA256.digestBase64("可以提供有状态的Hasher", key));
 
-        String hashSHA512Base64 = SHA512.digestBase64("可以提供有状态的Hasher", key);
+        val hashSHA512Base64 = SHA512.digestBase64("可以提供有状态的Hasher", key);
         assertEquals(hashSHA512Base64, SHA512.digestBase64("可以提供有状态的Hasher", key));
     }
 }

@@ -2,15 +2,14 @@ package com.github.charlemaznable.net;
 
 import lombok.Cleanup;
 import lombok.SneakyThrows;
+import lombok.val;
+import lombok.var;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.Enumeration;
-import java.util.List;
 import java.util.Map;
 
 import static com.github.charlemaznable.lang.Str.isNotEmpty;
@@ -40,7 +39,7 @@ public class Http {
 
         rsp.setHeader("Content-Type", contentType + "; charset=" + characterEncoding);
         rsp.setCharacterEncoding(characterEncoding);
-        PrintWriter writer = rsp.getWriter();
+        val writer = rsp.getWriter();
         writer.write(content);
         writer.flush();
         writer.close();
@@ -48,9 +47,9 @@ public class Http {
 
     public static Map<String, String> fetchParameterMap(HttpServletRequest request) {
         Map<String, String> parameterMap = newHashMap();
-        Enumeration<String> parameterNames = request.getParameterNames();
+        val parameterNames = request.getParameterNames();
         while (parameterNames.hasMoreElements()) {
-            String parameterName = parameterNames.nextElement();
+            val parameterName = parameterNames.nextElement();
             parameterMap.put(parameterName, request.getParameter(parameterName));
         }
         return parameterMap;
@@ -59,16 +58,16 @@ public class Http {
     @SuppressWarnings("unchecked")
     public static Map<String, String> fetchPathVariableMap(HttpServletRequest request) {
         Map<String, String> pathVariableMap = newHashMap();
-        Object pathVariables = request.getAttribute(URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        val pathVariables = request.getAttribute(URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         if (pathVariables != null) pathVariableMap.putAll((Map) pathVariables);
         return pathVariableMap;
     }
 
     public static String fetchRemoteAddr(HttpServletRequest request) {
-        String xForwardedFor = request.getHeader("x-forwarded-for");
+        val xForwardedFor = request.getHeader("x-forwarded-for");
         if (isNotEmpty(xForwardedFor)) {
-            List<String> forwardedAddrList = on(",").trimResults().splitToList(xForwardedFor);
-            for (String forwardedAddr : forwardedAddrList) {
+            val forwardedAddrList = on(",").trimResults().splitToList(xForwardedFor);
+            for (val forwardedAddr : forwardedAddrList) {
                 if (isNotEmpty(forwardedAddr) &&
                         !"unknown".equalsIgnoreCase(forwardedAddr)) {
                     return forwardedAddr;
@@ -76,13 +75,13 @@ public class Http {
             }
         }
 
-        String proxyClientIP = request.getHeader("Proxy-Client-IP");
+        val proxyClientIP = request.getHeader("Proxy-Client-IP");
         if (isNotEmpty(proxyClientIP) &&
                 !"unknown".equalsIgnoreCase(proxyClientIP)) {
             return proxyClientIP;
         }
 
-        String wlProxyClientIP = request.getHeader("WL-Proxy-Client-IP");
+        val wlProxyClientIP = request.getHeader("WL-Proxy-Client-IP");
         if (isNotEmpty(wlProxyClientIP) &&
                 !"unknown".equalsIgnoreCase(wlProxyClientIP)) {
             return wlProxyClientIP;
@@ -94,11 +93,11 @@ public class Http {
     @SneakyThrows
     public static Map<String, String> dealReqParams(Map<String, String[]> requestParams) {
         Map<String, String> params = newHashMap();
-        for (String key : requestParams.keySet()) {
-            String[] values = requestParams.get(key);
+        for (val key : requestParams.keySet()) {
+            val values = requestParams.get(key);
 
-            String valueStr = "";
-            for (int i = 0; i < values.length; i++) {
+            var valueStr = "";
+            for (var i = 0; i < values.length; i++) {
                 valueStr = (i == values.length - 1) ? valueStr + values[i] : valueStr + values[i] + ",";
             }
             valueStr = new String(valueStr.getBytes(ISO_8859_1), "gbk");
@@ -109,12 +108,12 @@ public class Http {
 
     @SneakyThrows
     public static String dealRequestBody(HttpServletRequest req, String charsetName) {
-        @Cleanup DataInputStream dis = new DataInputStream(req.getInputStream());
-        int formDataLength = req.getContentLength();
-        byte buff[] = new byte[formDataLength];
-        int totalBytes = 0;
+        @Cleanup val dis = new DataInputStream(req.getInputStream());
+        val formDataLength = req.getContentLength();
+        val buff = new byte[formDataLength];
+        var totalBytes = 0;
         while (totalBytes < formDataLength) {
-            int bytes = dis.read(buff, totalBytes, formDataLength);
+            val bytes = dis.read(buff, totalBytes, formDataLength);
             totalBytes += bytes;
         }
         return new String(buff, charsetName);
@@ -122,9 +121,9 @@ public class Http {
 
     @SneakyThrows
     public static String dealRequestBodyStream(HttpServletRequest req, String charsetName) {
-        @Cleanup InputStreamReader isr = new InputStreamReader(req.getInputStream(), charsetName);
-        BufferedReader bufferedReader = new BufferedReader(isr);
-        StringBuilder stringBuilder = new StringBuilder();
+        @Cleanup val isr = new InputStreamReader(req.getInputStream(), charsetName);
+        val bufferedReader = new BufferedReader(isr);
+        val stringBuilder = new StringBuilder();
         String line;
         while ((line = bufferedReader.readLine()) != null) {
             stringBuilder.append(line);
@@ -138,7 +137,7 @@ public class Http {
 
     public static void error(HttpServletResponse response, int statusCode, Throwable ex) {
         response.setStatus(statusCode);
-        String message = ex.getMessage();
+        val message = ex.getMessage();
         responseText(response, message != null ? message : ex.toString());
     }
 

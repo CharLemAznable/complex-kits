@@ -1,5 +1,7 @@
 package com.github.charlemaznable.config.impl;
 
+import lombok.val;
+
 import java.util.List;
 
 import static com.github.charlemaznable.lang.Listt.newArrayList;
@@ -23,7 +25,7 @@ public class ConfigTable {
 
     public ConfigRow getRow(String rowKey) {
         ConfigRow ret = null;
-        for (ConfigRow row : rows) {
+        for (val row : rows) {
             if (rowKey.equals(row.getRowKey())) {
                 ret = row;
                 break;

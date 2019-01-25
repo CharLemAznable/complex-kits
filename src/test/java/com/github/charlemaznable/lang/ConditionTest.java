@@ -1,7 +1,8 @@
 package com.github.charlemaznable.lang;
 
-import com.github.charlemaznable.lang.ex.EmptyObjectException;
 import com.github.charlemaznable.lang.ex.BlankStringException;
+import com.github.charlemaznable.lang.ex.EmptyObjectException;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import static com.github.charlemaznable.lang.Condition.*;
@@ -17,9 +18,9 @@ public class ConditionTest {
         new Condition();
 
         String strnull = null;
-        String strempty = "";
-        String strblank = "  ";
-        String string = "string";
+        val strempty = "";
+        val strblank = "  ";
+        val string = "string";
 
         assertNull(nonNull(strnull));
         assertEquals(strempty, nonNull(strnull, strempty, strblank, string));
@@ -53,9 +54,9 @@ public class ConditionTest {
     @Test
     public void testConditionCheck() {
         String strnull = null;
-        String strempty = "";
-        String strblank = "  ";
-        String string = "string";
+        val strempty = "";
+        val strblank = "  ";
+        val string = "string";
 
         assertThrows(NullPointerException.class, () -> checkNotNull(strnull));
         assertThrows(NullPointerException.class, () -> checkNotNull(strnull, "strnull is Null"));

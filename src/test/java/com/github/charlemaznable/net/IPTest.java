@@ -1,5 +1,6 @@
 package com.github.charlemaznable.net;
 
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import static com.github.charlemaznable.net.IP.netIP;
@@ -9,7 +10,7 @@ public class IPTest {
 
     @Test
     public void testIP() {
-        String ip = netIP();
+        val ip = netIP();
         assertNotEquals("127.0.0.1", ip);
     }
 }

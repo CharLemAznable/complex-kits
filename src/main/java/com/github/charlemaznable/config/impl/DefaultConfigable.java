@@ -1,8 +1,9 @@
 package com.github.charlemaznable.config.impl;
 
 import com.github.charlemaznable.config.Configable;
+import lombok.val;
+import lombok.var;
 
-import java.util.Map;
 import java.util.Properties;
 
 import static com.github.charlemaznable.codec.Base64.unBase64;
@@ -41,7 +42,7 @@ public class DefaultConfigable extends BaseConfigable {
 
     @Override
     public String getStr(String key) {
-        String property = properties.getProperty(key);
+        var property = properties.getProperty(key);
         if (property == null) return null;
 
         // ${key}会在properties中定义了key时进行替换，否则保持原样
@@ -58,16 +59,16 @@ public class DefaultConfigable extends BaseConfigable {
     public Configable subset(String prefix) {
         if (isEmpty(prefix)) return new DefaultConfigable(new Properties());
 
-        String prefixMatch = prefix.charAt(prefix.length() - 1) != '.' ? prefix + '.' : prefix;
-        Properties subProps = subProperties(properties, prefixMatch);
+        val prefixMatch = prefix.charAt(prefix.length() - 1) != '.' ? prefix + '.' : prefix;
+        val subProps = subProperties(properties, prefixMatch);
 
         return new DefaultConfigable(subProps);
     }
 
     protected Properties subProperties(Properties properties, String prefixMatch) {
-        Properties subProps = new Properties();
-        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-            String key = (String) entry.getKey();
+        val subProps = new Properties();
+        for (val entry : properties.entrySet()) {
+            val key = (String) entry.getKey();
             if (!key.startsWith(prefixMatch)) continue;
 
             subProps.put(key.substring(prefixMatch.length()), entry.getValue());
