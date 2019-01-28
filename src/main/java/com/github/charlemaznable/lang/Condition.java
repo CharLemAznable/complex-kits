@@ -129,4 +129,34 @@ public class Condition {
         }
         return string;
     }
+
+    @CanIgnoreReturnValue
+    public static <T> T checkCondition(Supplier<Boolean> condition, Supplier<T> action) {
+        if (!condition.get()) throw new RuntimeException();
+        return action.get();
+    }
+
+    @CanIgnoreReturnValue
+    public static <T> T checkCondition(Supplier<Boolean> condition, Supplier<T> action, @NonNull Object errorMessage) {
+        if (!condition.get()) throw new RuntimeException(String.valueOf(errorMessage));
+        return action.get();
+    }
+
+    @CanIgnoreReturnValue
+    public static <T> T checkCondition(Supplier<Boolean> condition, Supplier<T> action, @NonNull RuntimeException errorException) {
+        if (!condition.get()) throw nullThen(errorException, RuntimeException::new);
+        return action.get();
+    }
+
+    public static void checkCondition(Supplier<Boolean> condition) {
+        if (!condition.get()) throw new RuntimeException();
+    }
+
+    public static void checkCondition(Supplier<Boolean> condition, @NonNull Object errorMessage) {
+        if (!condition.get()) throw new RuntimeException(String.valueOf(errorMessage));
+    }
+
+    public static void checkCondition(Supplier<Boolean> condition, @NonNull RuntimeException errorException) {
+        if (!condition.get()) throw nullThen(errorException, RuntimeException::new);
+    }
 }
