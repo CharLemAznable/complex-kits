@@ -6,6 +6,7 @@ import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import static com.github.charlemaznable.lang.Condition.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -81,6 +82,28 @@ public class ConditionTest {
         assertEquals(string, checkNotBlank(string));
         assertEquals(string, checkNotBlank(string, "string is Blank"));
         assertEquals(string, checkNotBlank(string, new ConditionTestException()));
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Test
+    public void testConditionCheckCondition() {
+        String strnull = null;
+
+        assertThrows(RuntimeException.class, () -> checkCondition(() -> null != strnull));
+        assertThrows(RuntimeException.class, () -> checkCondition(() -> null != strnull, "strnull is Null"));
+        assertThrows(ConditionTestException.class, () -> checkCondition(() -> null != strnull, new ConditionTestException()));
+
+        assertDoesNotThrow(() -> checkCondition(() -> null == strnull));
+        assertDoesNotThrow(() -> checkCondition(() -> null == strnull, "strnull is Null"));
+        assertDoesNotThrow(() -> checkCondition(() -> null == strnull, new ConditionTestException()));
+
+        assertThrows(RuntimeException.class, () -> checkCondition(() -> null != strnull, () -> "result"));
+        assertThrows(RuntimeException.class, () -> checkCondition(() -> null != strnull, () -> "result", "strnull is Null"));
+        assertThrows(ConditionTestException.class, () -> checkCondition(() -> null != strnull, () -> "result", new ConditionTestException()));
+
+        assertEquals("result", checkCondition(() -> null == strnull, () -> "result"));
+        assertEquals("result", checkCondition(() -> null == strnull, () -> "result", "strnull is Null"));
+        assertEquals("result", checkCondition(() -> null == strnull, () -> "result", new ConditionTestException()));
     }
 
     public static class ConditionTestException extends RuntimeException {
