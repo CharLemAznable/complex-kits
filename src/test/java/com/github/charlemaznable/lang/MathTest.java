@@ -14,4 +14,12 @@ public class MathTest {
         assertEquals(7, gcd(98, 63));
         assertEquals(42, gcd(756, 504, 630, 2226));
     }
+
+    @Test
+    public void testGCDLong() {
+        assertEquals(12L, gcd(24L, 60L));
+        assertEquals(29L, gcd(319L, 377L));
+        assertEquals(7L, gcd(98L, 63L));
+        assertEquals(42L, gcd(756L, 504L, 630L, 2226L));
+    }
 }

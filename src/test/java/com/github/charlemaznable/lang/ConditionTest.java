@@ -2,6 +2,7 @@ package com.github.charlemaznable.lang;
 
 import com.github.charlemaznable.lang.ex.BlankStringException;
 import com.github.charlemaznable.lang.ex.EmptyObjectException;
+import lombok.Data;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -97,6 +98,21 @@ public class ConditionTest {
         assertDoesNotThrow(() -> checkCondition(() -> null == strnull, "strnull is Null"));
         assertDoesNotThrow(() -> checkCondition(() -> null == strnull, new ConditionTestException()));
 
+        val testBean = new ConditionTestBean();
+        assertThrows(RuntimeException.class, () -> checkCondition(() -> null != strnull, () -> testBean.setValue("true")));
+        assertNull(testBean.getValue());
+        assertThrows(RuntimeException.class, () -> checkCondition(() -> null != strnull, () -> testBean.setValue("true"), "strnull is Null"));
+        assertNull(testBean.getValue());
+        assertThrows(ConditionTestException.class, () -> checkCondition(() -> null != strnull, () -> testBean.setValue("true"), new ConditionTestException()));
+        assertNull(testBean.getValue());
+
+        assertDoesNotThrow(() -> checkCondition(() -> null == strnull, () -> testBean.setValue("1")));
+        assertEquals("1", testBean.getValue());
+        assertDoesNotThrow(() -> checkCondition(() -> null == strnull, () -> testBean.setValue("2"), "strnull is Null"));
+        assertEquals("2", testBean.getValue());
+        assertDoesNotThrow(() -> checkCondition(() -> null == strnull, () -> testBean.setValue("3"), new ConditionTestException()));
+        assertEquals("3", testBean.getValue());
+
         assertThrows(RuntimeException.class, () -> checkCondition(() -> null != strnull, () -> "result"));
         assertThrows(RuntimeException.class, () -> checkCondition(() -> null != strnull, () -> "result", "strnull is Null"));
         assertThrows(ConditionTestException.class, () -> checkCondition(() -> null != strnull, () -> "result", new ConditionTestException()));
@@ -106,8 +122,14 @@ public class ConditionTest {
         assertEquals("result", checkCondition(() -> null == strnull, () -> "result", new ConditionTestException()));
     }
 
-    public static class ConditionTestException extends RuntimeException {
+    static class ConditionTestException extends RuntimeException {
 
         private static final long serialVersionUID = -4697342496228582709L;
+    }
+
+    @Data
+    static class ConditionTestBean {
+
+        private String value;
     }
 }

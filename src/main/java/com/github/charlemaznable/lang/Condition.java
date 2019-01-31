@@ -130,6 +130,33 @@ public class Condition {
         return string;
     }
 
+    public static void checkCondition(Supplier<Boolean> condition) {
+        if (!condition.get()) throw new RuntimeException();
+    }
+
+    public static void checkCondition(Supplier<Boolean> condition, @NonNull Object errorMessage) {
+        if (!condition.get()) throw new RuntimeException(String.valueOf(errorMessage));
+    }
+
+    public static void checkCondition(Supplier<Boolean> condition, @NonNull RuntimeException errorException) {
+        if (!condition.get()) throw nullThen(errorException, RuntimeException::new);
+    }
+
+    public static void checkCondition(Supplier<Boolean> condition, Executable executable) {
+        if (!condition.get()) throw new RuntimeException();
+        executable.execute();
+    }
+
+    public static void checkCondition(Supplier<Boolean> condition, Executable executable, @NonNull Object errorMessage) {
+        if (!condition.get()) throw new RuntimeException(String.valueOf(errorMessage));
+        executable.execute();
+    }
+
+    public static void checkCondition(Supplier<Boolean> condition, Executable executable, @NonNull RuntimeException errorException) {
+        if (!condition.get()) throw nullThen(errorException, RuntimeException::new);
+        executable.execute();
+    }
+
     @CanIgnoreReturnValue
     public static <T> T checkCondition(Supplier<Boolean> condition, Supplier<T> action) {
         if (!condition.get()) throw new RuntimeException();
@@ -146,17 +173,5 @@ public class Condition {
     public static <T> T checkCondition(Supplier<Boolean> condition, Supplier<T> action, @NonNull RuntimeException errorException) {
         if (!condition.get()) throw nullThen(errorException, RuntimeException::new);
         return action.get();
-    }
-
-    public static void checkCondition(Supplier<Boolean> condition) {
-        if (!condition.get()) throw new RuntimeException();
-    }
-
-    public static void checkCondition(Supplier<Boolean> condition, @NonNull Object errorMessage) {
-        if (!condition.get()) throw new RuntimeException(String.valueOf(errorMessage));
-    }
-
-    public static void checkCondition(Supplier<Boolean> condition, @NonNull RuntimeException errorException) {
-        if (!condition.get()) throw nullThen(errorException, RuntimeException::new);
     }
 }

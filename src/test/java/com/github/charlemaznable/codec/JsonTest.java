@@ -26,13 +26,13 @@ public class JsonTest {
     }
 
     @Data
-    public static class BeanType1 {
+    static class BeanType1 {
         private String value1;
         private String value2;
     }
 
     @Data
-    public static class BeanType2 {
+    static class BeanType2 {
         private String value2;
         private String value3;
     }

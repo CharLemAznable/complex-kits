@@ -20,7 +20,7 @@ public class TextableTest {
 
     @Data
     @EqualsAndHashCode(callSuper = true)
-    public static class TestTextable extends Textable {
+    static class TestTextable extends Textable {
 
         private int key1;
         private String key2;

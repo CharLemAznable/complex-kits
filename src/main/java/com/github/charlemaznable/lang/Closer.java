@@ -9,9 +9,6 @@ import static com.github.charlemaznable.lang.Clz.invokeQuietly;
 
 public class Closer {
 
-    private Closer() {
-    }
-
     /**
      * 关闭对象, 屏蔽所有异常。
      * 调用对象的close方法（如果对象有该方法的话）。
@@ -35,8 +32,7 @@ public class Closer {
         if (obj instanceof Closeable) {
             try {
                 ((Closeable) obj).close();
-            } catch (Throwable e) {
-                // Quietly
+            } catch (Throwable ignored) {
             }
             return;
         }

@@ -10,6 +10,7 @@ public class PoolProxyTest {
 
     @Test
     public void testPoolProxy() {
+        new PoolProxy();
         val testPoolProxyObject = PoolProxy.create(
                 new PooledObjectCreator<TestPoolProxyObject>() {
 
@@ -17,8 +18,7 @@ public class PoolProxyTest {
                     public TestPoolProxyObject create() {
                         return new TestPoolProxyObject();
                     }
-                }, new PoolProxyConfigBuilder().maxTotal(1000).maxIdle(10).minIdle(0).build()
-        );
+                });
         assertEquals("proxy invoked", testPoolProxyObject.invoke());
     }
 

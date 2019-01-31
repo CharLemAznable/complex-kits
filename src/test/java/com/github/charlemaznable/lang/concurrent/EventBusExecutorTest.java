@@ -2,7 +2,7 @@ package com.github.charlemaznable.lang.concurrent;
 
 import com.google.common.eventbus.Subscribe;
 import lombok.SneakyThrows;
-import lombok.val;
+import lombok.var;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
@@ -14,7 +14,18 @@ public class EventBusExecutorTest {
     @SneakyThrows
     @Test
     public void testEventBusCachedExecutor() {
-        val testEventBusCachedExecutor = new TestEventBusCachedExecutor();
+        var testEventBusCachedExecutor = new TestEventBusCachedExecutor();
+        testEventBusCachedExecutor.post("test");
+        Thread.sleep(100);
+        assertEquals("test", testEventBusCachedExecutor.message);
+
+        testEventBusCachedExecutor.post("delay", 1, TimeUnit.SECONDS);
+        Thread.sleep(100);
+        assertEquals("test", testEventBusCachedExecutor.message);
+        Thread.sleep(2000);
+        assertEquals("delay", testEventBusCachedExecutor.message);
+
+        testEventBusCachedExecutor = new TestEventBusCachedExecutor(null);
         testEventBusCachedExecutor.post("test");
         Thread.sleep(100);
         assertEquals("test", testEventBusCachedExecutor.message);
@@ -29,20 +40,30 @@ public class EventBusExecutorTest {
     @SneakyThrows
     @Test
     public void testEventBusFixedExecutor() {
-        val testEventBusFixedSubscriber = new TestEventBusFixedSubscriber();
-        val testEventBusFixedExecutor = new TestEventBusFixedExecutor(testEventBusFixedSubscriber);
+        var testEventBusFixedExecutor = new TestEventBusFixedExecutor();
         testEventBusFixedExecutor.post("test");
         Thread.sleep(100);
-        assertEquals("test", testEventBusFixedSubscriber.message);
+        assertEquals("test", testEventBusFixedExecutor.message);
 
         testEventBusFixedExecutor.post("delay", 1, TimeUnit.SECONDS);
         Thread.sleep(100);
-        assertEquals("test", testEventBusFixedSubscriber.message);
+        assertEquals("test", testEventBusFixedExecutor.message);
         Thread.sleep(2000);
-        assertEquals("delay", testEventBusFixedSubscriber.message);
+        assertEquals("delay", testEventBusFixedExecutor.message);
+
+        testEventBusFixedExecutor = new TestEventBusFixedExecutor(null);
+        testEventBusFixedExecutor.post("test");
+        Thread.sleep(100);
+        assertEquals("test", testEventBusFixedExecutor.message);
+
+        testEventBusFixedExecutor.post("delay", 1, TimeUnit.SECONDS);
+        Thread.sleep(100);
+        assertEquals("test", testEventBusFixedExecutor.message);
+        Thread.sleep(2000);
+        assertEquals("delay", testEventBusFixedExecutor.message);
     }
 
-    public static class TestEventBusCachedExecutor extends EventBusCachedExecutor {
+    static class TestEventBusCachedExecutor extends EventBusCachedExecutor {
 
         private String message;
 
@@ -60,7 +81,9 @@ public class EventBusExecutorTest {
         }
     }
 
-    public static class TestEventBusFixedExecutor extends EventBusFixedExecutor {
+    static class TestEventBusFixedExecutor extends EventBusFixedExecutor {
+
+        private String message;
 
         public TestEventBusFixedExecutor() {
             super();
@@ -69,11 +92,6 @@ public class EventBusExecutorTest {
         public TestEventBusFixedExecutor(Object subscriber) {
             super(subscriber);
         }
-    }
-
-    public static class TestEventBusFixedSubscriber {
-
-        private String message;
 
         @Subscribe
         public void testMethod(String message) {
