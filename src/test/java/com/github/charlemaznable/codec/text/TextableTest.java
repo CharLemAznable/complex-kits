@@ -5,6 +5,9 @@ import lombok.EqualsAndHashCode;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
+import static com.github.charlemaznable.lang.Listt.newArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TextableTest {
@@ -24,5 +27,11 @@ public class TextableTest {
 
         private int key1;
         private String key2;
+        private String key3;
+
+        @Override
+        protected List<String> excludedKeys() {
+            return newArrayList("key3");
+        }
     }
 }

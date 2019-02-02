@@ -21,11 +21,11 @@ public class Base64 {
     }
 
     public static String padding(String s) {
-        return Str.padding(s, '=', (4 - s.length() % 4) % 4).toString();
+        return Str.padding(s, '=', (4 - s.length() % 4) % 4);
     }
 
     public static String purify(String s) {
-        return removeLastLetters(s, '=').toString();
+        return removeLastLetters(s, '=');
     }
 
     public static String base64(String s) {

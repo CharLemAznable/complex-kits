@@ -39,21 +39,21 @@ public class Str {
         return isNotEmpty(str) && !str.trim().isEmpty();
     }
 
-    public static StringBuilder padding(String s, char letter, int repeats) {
+    public static String padding(String s, char letter, int repeats) {
         val sb = new StringBuilder(s);
         while (repeats-- > 0) {
             sb.append(letter);
         }
 
-        return sb;
+        return sb.toString();
     }
 
-    public static StringBuilder removeLastLetters(String s, char letter) {
+    public static String removeLastLetters(String s, char letter) {
         val sb = new StringBuilder(s);
         while (sb.charAt(sb.length() - 1) == letter)
             sb.deleteCharAt(sb.length() - 1);
 
-        return sb;
+        return sb.toString();
     }
 
     // return true if 'left' and 'right' are matching parens/brackets/braces
