@@ -1,12 +1,13 @@
 package com.github.charlemaznable.codec;
 
-import com.github.charlemaznable.lang.Mapp;
 import lombok.Data;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Map;
 
+import static com.github.charlemaznable.codec.Json.descFlat;
 import static com.github.charlemaznable.codec.Json.jsonOf;
 import static com.github.charlemaznable.codec.Json.jsonWithType;
 import static com.github.charlemaznable.codec.Json.spec;
@@ -14,6 +15,8 @@ import static com.github.charlemaznable.codec.Json.trans;
 import static com.github.charlemaznable.codec.Json.unJson;
 import static com.github.charlemaznable.codec.Json.unJsonArray;
 import static com.github.charlemaznable.codec.Json.unJsonWithType;
+import static com.github.charlemaznable.lang.Listt.newArrayList;
+import static com.github.charlemaznable.lang.Mapp.of;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -38,7 +41,7 @@ public class JsonTest {
         val jsonOf = jsonOf("key", "value");
         assertEquals("{\"key\":\"value\"}", jsonOf);
         Map<String, Object> unJsonMap = unJson(jsonOf);
-        assertEquals(Mapp.of("key", "value"), unJsonMap);
+        assertEquals(of("key", "value"), unJsonMap);
 
         val listJson = "[{\"value1\":\"value1\",\"value2\":\"value2\"}]";
         val list1 = unJsonArray(listJson);
@@ -48,7 +51,7 @@ public class JsonTest {
         assertEquals(1, list2.size());
         assertNotNull(list2.get(0));
 
-        val specMap = Mapp.of("value1", "value1", "value2", "value2");
+        val specMap = of("value1", "value1", "value2", "value2");
         BeanType1 specBean = spec(specMap, BeanType1.class);
         assertEquals("value1", specBean.getValue1());
         assertEquals("value2", specBean.getValue2());
@@ -69,6 +72,49 @@ public class JsonTest {
         assertEquals("value2", beanType12.getValue2());
     }
 
+    @Test
+    public void testDescFlat() {
+        val mapStr = of("cc", "dd");
+        assertEquals(of("cc", "dd"), descFlat(mapStr));
+
+        val bean11 = new BeanType1();
+        bean11.setValue1("v11");
+        bean11.setValue2("v12");
+        val bean12 = new BeanType1();
+        bean12.setValue1("v21");
+        bean12.setValue2("v22");
+
+        val mapBean = of("ee", bean11, "ff", bean12);
+        assertEquals(of("ee.value1", "v11", "ee.value2", "v12",
+                "ff.value1", "v21", "ff.value2", "v22"), descFlat(mapBean));
+
+        val bean2 = new BeanType2();
+        bean2.setValue2("v2");
+        bean2.setValue3("v3");
+        assertEquals(of("value2", "v2", "value3", "v3"), descFlat(bean2));
+
+        val complex = new ComplexType();
+        complex.setName("name");
+        complex.setListStr(newArrayList("aa", "bb"));
+        complex.setListBean(newArrayList(bean11, bean12));
+        complex.setMapStr(mapStr);
+        complex.setMapBean(mapBean);
+        complex.setBean2(bean2);
+        val expected = of("name", "name",
+                "listStr[0]", "aa", "listStr[1]", "bb",
+                "listBean[0].value1", "v11",
+                "listBean[0].value2", "v12",
+                "listBean[1].value1", "v21",
+                "listBean[1].value2", "v22",
+                "mapStr.cc", "dd",
+                "mapBean.ee.value1", "v11",
+                "mapBean.ee.value2", "v12",
+                "mapBean.ff.value1", "v21",
+                "mapBean.ff.value2", "v22",
+                "bean2.value2", "v2", "bean2.value3", "v3");
+        assertEquals(expected, descFlat(complex));
+    }
+
     @Data
     static class BeanType1 {
         private String value1;
@@ -79,5 +125,16 @@ public class JsonTest {
     static class BeanType2 {
         private String value2;
         private String value3;
+    }
+
+    @Data
+    static class ComplexType {
+
+        private String name;
+        private List<String> listStr;
+        private List<BeanType1> listBean;
+        private Map<String, String> mapStr;
+        private Map<String, BeanType1> mapBean;
+        private BeanType2 bean2;
     }
 }
