@@ -1,10 +1,11 @@
 package com.github.charlemaznable.lang.pool;
 
+import com.github.charlemaznable.lang.Enhancerr;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
-import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import org.apache.commons.pool2.BasePooledObjectFactory;
@@ -15,34 +16,75 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
 import java.lang.reflect.Method;
 
+import static com.github.charlemaznable.lang.Clz.getConstructorParameterTypes;
+import static com.github.charlemaznable.lang.Condition.nullThen;
+
 /**
  * 对象池代理工具
- * cglib实现代理需要池对象包含默认构造函数.
  */
 public class PoolProxy {
 
-    @SneakyThrows
-    @SuppressWarnings("unchecked")
-    public static <T> T create(@NonNull ObjectPool<T> pool) {
-        T poolObject = null;
-        try {
-            poolObject = pool.borrowObject();
-            return (T) Enhancer.create(poolObject.getClass(),
-                    new Class[]{}, new ObjectPoolProxy<>(pool));
-        } finally {
-            if (poolObject != null) pool.returnObject(poolObject);
+    public static <T> ObjectPoolBuilder<T> builder(@NonNull ObjectPool<T> pool) {
+        return new ObjectPoolBuilder<>(pool);
+    }
+
+    public static <T> PooledObjectCreatorBuilder<T> builder(@NonNull PooledObjectCreator<T> creator) {
+        return new PooledObjectCreatorBuilder<>(creator);
+    }
+
+    @RequiredArgsConstructor
+    public static class ObjectPoolBuilder<T> {
+
+        @NonNull
+        private ObjectPool<T> pool;
+        private Object[] args = new Object[]{};
+
+        public ObjectPoolBuilder<T> args(Object... args) {
+            this.args = args;
+            return this;
+        }
+
+        @SneakyThrows
+        @SuppressWarnings("unchecked")
+        public T build() {
+            T poolObject = null;
+            try {
+                poolObject = pool.borrowObject();
+                val poolObjectClass = poolObject.getClass();
+                val argTypes = getConstructorParameterTypes(poolObjectClass, args);
+                if (null == argTypes) throw new IllegalArgumentException("Illegal Constructor arguments");
+
+                return (T) Enhancerr.create(poolObjectClass,
+                        new ObjectPoolProxy<>(pool), argTypes, args);
+            } finally {
+                if (poolObject != null) pool.returnObject(poolObject);
+            }
         }
     }
 
-    public static <T> T create(@NonNull PooledObjectCreator<T> creator) {
-        return create(creator, null);
-    }
+    @RequiredArgsConstructor
+    public static class PooledObjectCreatorBuilder<T> {
 
-    public static <T> T create(@NonNull PooledObjectCreator<T> creator,
-                               GenericObjectPoolConfig<T> config) {
-        val factory = new PoolProxyPooledObjectFactory<T>(creator);
-        return create(config == null ? new GenericObjectPool<>(factory)
-                : new GenericObjectPool<>(factory, config));
+        @NonNull
+        private PooledObjectCreator<T> creator;
+        private GenericObjectPoolConfig<T> config;
+        private Object[] args = new Object[]{};
+
+        public PooledObjectCreatorBuilder<T> config(GenericObjectPoolConfig<T> config) {
+            this.config = config;
+            return this;
+        }
+
+        public PooledObjectCreatorBuilder<T> args(Object... args) {
+            this.args = args;
+            return this;
+        }
+
+        public T build() {
+            val factory = new PoolProxyPooledObjectFactory<T>(creator, args);
+            return new ObjectPoolBuilder<T>(new GenericObjectPool<>(factory,
+                    nullThen(config, GenericObjectPoolConfig::new))).args(args).build();
+        }
     }
 
     /**
@@ -78,10 +120,11 @@ public class PoolProxy {
     private static class PoolProxyPooledObjectFactory<T> extends BasePooledObjectFactory<T> {
 
         private PooledObjectCreator<T> pooledObjectCreator;
+        private Object[] createArguments;
 
         @Override
         public T create() throws Exception {
-            return pooledObjectCreator.create();
+            return pooledObjectCreator.create(createArguments);
         }
 
         @Override

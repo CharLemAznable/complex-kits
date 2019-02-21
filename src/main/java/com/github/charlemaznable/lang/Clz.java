@@ -54,4 +54,21 @@ public class Clz {
 
         return null;
     }
+
+    public static Class<?>[] getConstructorParameterTypes(Class<?> clazz, Object... arguments) {
+        val constructors = clazz.getConstructors();
+        for (val constructor : constructors) {
+            val parameterTypes = constructor.getParameterTypes();
+            if (parameterTypes.length != arguments.length) continue;
+
+            int i = 0;
+            for (; i < arguments.length; i++) {
+                if (!isAssignable(arguments[i].getClass(), parameterTypes[i])) break;
+            }
+            if (i == arguments.length) {
+                return parameterTypes;
+            }
+        }
+        return null;
+    }
 }

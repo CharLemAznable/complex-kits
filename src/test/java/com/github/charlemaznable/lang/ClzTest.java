@@ -1,11 +1,17 @@
 package com.github.charlemaznable.lang;
 
+import lombok.val;
+import lombok.var;
 import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
 
+import static com.github.charlemaznable.lang.Clz.getConstructorParameterTypes;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -15,6 +21,11 @@ public class ClzTest {
     public void testAssignable() {
         assertFalse(Clz.isAssignable(Integer.class, String.class));
         assertTrue(Clz.isAssignable(Integer.class, Number.class));
+        assertTrue(Clz.isAssignable(Integer.class, Integer.class));
+
+        Object[] objects = {1};
+        assertTrue(Clz.isAssignable(objects[0].getClass(), Integer.class));
+        assertTrue(Clz.isAssignable(objects[0].getClass(), int.class));
     }
 
     @Test
@@ -28,5 +39,45 @@ public class ClzTest {
     public void testGetMethod() {
         assertThrows(NoSuchMethodException.class, () -> Clz.getMethod(Integer.class, "nonExistsMethod"));
         assertDoesNotThrow(() -> Clz.getMethod(Integer.class, "toString"));
+    }
+
+    @Test
+    public void testGetConstructorParameterTypes() {
+        val testTypeClass = TestType.class;
+
+        var types = getConstructorParameterTypes(testTypeClass);
+        assertNotNull(types);
+        assertEquals(0, types.length);
+
+        types = getConstructorParameterTypes(testTypeClass, 1);
+        assertNotNull(types);
+        assertEquals(1, types.length);
+        assertEquals(int.class, types[0]);
+
+        types = getConstructorParameterTypes(testTypeClass, new SubParamType());
+        assertNotNull(types);
+        assertEquals(1, types.length);
+        assertEquals(ParamType.class, types[0]);
+
+        types = getConstructorParameterTypes(testTypeClass, "abc");
+        assertNull(types);
+    }
+
+    static class TestType {
+
+        public TestType() {
+        }
+
+        public TestType(int i) {
+        }
+
+        public TestType(ParamType p) {
+        }
+    }
+
+    static class ParamType {
+    }
+
+    static class SubParamType extends ParamType {
     }
 }
