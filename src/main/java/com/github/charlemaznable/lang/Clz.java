@@ -63,7 +63,8 @@ public class Clz {
 
             int i = 0;
             for (; i < arguments.length; i++) {
-                if (!isAssignable(arguments[i].getClass(), parameterTypes[i])) break;
+                if (arguments[i] != null && !isAssignable(
+                        arguments[i].getClass(), parameterTypes[i])) break;
             }
             if (i == arguments.length) {
                 return parameterTypes;

@@ -59,6 +59,12 @@ public class ClzTest {
         assertEquals(1, types.length);
         assertEquals(ParamType.class, types[0]);
 
+        types = getConstructorParameterTypes(testTypeClass, null, null);
+        assertNotNull(types);
+        assertEquals(2, types.length);
+        assertEquals(ParamType.class, types[0]);
+        assertEquals(ParamType.class, types[1]);
+
         types = getConstructorParameterTypes(testTypeClass, "abc");
         assertNull(types);
     }
@@ -72,6 +78,9 @@ public class ClzTest {
         }
 
         public TestType(ParamType p) {
+        }
+
+        public TestType(ParamType p1, ParamType p2) {
         }
     }
 
