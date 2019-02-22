@@ -41,27 +41,39 @@ public class Condition {
     }
 
     public static <T, R> R notNullThen(T object, Function<? super T, R> action) {
-        return null == object ? null : action.apply(object);
+        return checkNull(object, () -> null, action);
     }
 
     public static <T, R> R notEmptyThen(T object, Function<? super T, R> action) {
-        return isEmpty(object) ? null : action.apply(object);
+        return checkEmpty(object, () -> null, action);
     }
 
     public static <R> R notBlankThen(String string, Function<? super String, R> action) {
-        return isBlank(string) ? null : action.apply(string);
+        return checkBlank(string, () -> null, action);
     }
 
     public static <T> T nullThen(T object, Supplier<T> action) {
-        return null == object ? action.get() : object;
+        return checkNull(object, action, t -> t);
     }
 
     public static <T> T emptyThen(T object, Supplier<T> action) {
-        return isEmpty(object) ? action.get() : object;
+        return checkEmpty(object, action, t -> t);
     }
 
     public static String blankThen(String string, Supplier<String> action) {
-        return isBlank(string) ? action.get() : string;
+        return checkBlank(string, action, s -> s);
+    }
+
+    public static <T, R> R checkNull(T object, Supplier<R> nullAction, Function<? super T, R> notNullAction) {
+        return null == object ? nullAction.get() : notNullAction.apply(object);
+    }
+
+    public static <T, R> R checkEmpty(T object, Supplier<R> emptyAction, Function<? super T, R> notEmptyAction) {
+        return isEmpty(object) ? emptyAction.get() : notEmptyAction.apply(object);
+    }
+
+    public static <R> R checkBlank(String string, Supplier<R> blankAction, Function<? super String, R> notBlankAction) {
+        return isBlank(string) ? blankAction.get() : notBlankAction.apply(string);
     }
 
     @CanIgnoreReturnValue

@@ -10,39 +10,49 @@ public class Typee {
 
     public static Class<?> getActualTypeArgument(
             Class<?> subClass,
-            Class<?> genericInterface) {
-        return getActualTypeArgument(subClass, genericInterface, 0);
+            Class<?> genericType) {
+        return getActualTypeArgument(subClass, genericType, 0);
     }
 
     public static Class<?> getActualTypeArgument(
             Class<?> subClass,
-            Class<?> genericInterface,
+            Class<?> genericType,
             int argumentOrder) {
-        for (val generic : subClass.getGenericInterfaces()) {
-            if (!(generic instanceof ParameterizedType)) continue;
+        val genericSuperclass = subClass.getGenericSuperclass();
+        if (genericSuperclass instanceof ParameterizedType) {
+            val pt = (ParameterizedType) genericSuperclass;
+            val rawType = pt.getRawType();
 
-            val pt = (ParameterizedType) generic;
-            if (pt.getRawType() != genericInterface) continue;
+            if (rawType == genericType || isAssignable(
+                    (Class<?>) rawType, genericType)) {
+                val type = pt.getActualTypeArguments()[argumentOrder];
+                return (Class<?>) type;
+            }
+        }
 
-            val type = pt.getActualTypeArguments()[argumentOrder];
-            return (Class<?>) type;
+        for (val genericInterface : subClass.getGenericInterfaces()) {
+            if (!(genericInterface instanceof ParameterizedType)) continue;
+
+            val pt = (ParameterizedType) genericInterface;
+            val rawType = pt.getRawType();
+
+            if (rawType == genericType || isAssignable(
+                    (Class<?>) rawType, genericType)) {
+                val type = pt.getActualTypeArguments()[argumentOrder];
+                return (Class<?>) type;
+            }
         }
 
         val interfaces = subClass.getInterfaces();
         for (val impInterface : interfaces) {
-            if (isAssignable(impInterface, genericInterface)) {
-                return getActualTypeArgument(
-                        impInterface,
-                        genericInterface,
-                        argumentOrder);
+            if (isAssignable(impInterface, genericType)) {
+                return getActualTypeArgument(impInterface, genericType, argumentOrder);
             }
         }
 
         Class<?> superClz = subClass.getSuperclass();
         if (superClz == Object.class) return null;
 
-        return getActualTypeArgument(superClz,
-                genericInterface,
-                argumentOrder);
+        return getActualTypeArgument(superClz, genericType, argumentOrder);
     }
 }

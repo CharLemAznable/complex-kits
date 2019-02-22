@@ -16,7 +16,6 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
 import java.lang.reflect.Method;
 
-import static com.github.charlemaznable.lang.Clz.getConstructorParameterTypes;
 import static com.github.charlemaznable.lang.Condition.nullThen;
 
 /**
@@ -51,11 +50,8 @@ public class PoolProxy {
             try {
                 poolObject = pool.borrowObject();
                 val poolObjectClass = poolObject.getClass();
-                val argTypes = getConstructorParameterTypes(poolObjectClass, args);
-                if (null == argTypes) throw new IllegalArgumentException("Illegal Constructor arguments");
-
                 return (T) Enhancerr.create(poolObjectClass,
-                        new ObjectPoolProxy<>(pool), argTypes, args);
+                        new ObjectPoolProxy<>(pool), args);
             } finally {
                 if (poolObject != null) pool.returnObject(poolObject);
             }

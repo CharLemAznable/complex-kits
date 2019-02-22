@@ -4,10 +4,13 @@ import lombok.SneakyThrows;
 import lombok.val;
 import org.apache.commons.lang3.ClassUtils;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import static com.github.charlemaznable.lang.Condition.checkNull;
 import static java.lang.reflect.Modifier.isAbstract;
+import static org.joor.Reflect.wrapper;
 
 public class Clz {
 
@@ -55,21 +58,38 @@ public class Clz {
         return null;
     }
 
-    public static Class<?>[] getConstructorParameterTypes(Class<?> clazz, Object... arguments) {
-        val constructors = clazz.getConstructors();
-        for (val constructor : constructors) {
-            val parameterTypes = constructor.getParameterTypes();
-            if (parameterTypes.length != arguments.length) continue;
+    public static Class<?>[] types(Object... values) {
+        if (values == null) return new Class[0];
 
-            int i = 0;
-            for (; i < arguments.length; i++) {
-                if (arguments[i] != null && !isAssignable(
-                        arguments[i].getClass(), parameterTypes[i])) break;
+        Class<?>[] result = new Class[values.length];
+        for (int i = 0; i < values.length; i++) {
+            result[i] = checkNull(values[i], () -> NULL.class, Object::getClass);
+        }
+        return result;
+    }
+
+    public static boolean match(Class<?>[] declaredTypes, Class<?>[] actualTypes) {
+        if (declaredTypes.length == actualTypes.length) {
+            for (int i = 0; i < actualTypes.length; i++) {
+                if (actualTypes[i] == NULL.class) continue;
+                if (wrapper(declaredTypes[i]).isAssignableFrom(
+                        wrapper(actualTypes[i]))) continue;
+                return false;
             }
-            if (i == arguments.length) {
-                return parameterTypes;
-            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static Class<?>[] getConstructorParameterTypes(Class<?> clazz, Object... arguments) {
+        Class<?>[] types = types(arguments);
+        for (Constructor<?> constructor : clazz.getDeclaredConstructors()) {
+            Class<?>[] parameterTypes = constructor.getParameterTypes();
+            if (match(parameterTypes, types)) return parameterTypes;
         }
         return null;
     }
+
+    private static class NULL {}
 }
