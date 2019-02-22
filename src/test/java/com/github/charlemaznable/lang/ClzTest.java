@@ -19,6 +19,8 @@ public class ClzTest {
 
     @Test
     public void testAssignable() {
+        new Clz();
+
         assertFalse(Clz.isAssignable(Integer.class, String.class));
         assertTrue(Clz.isAssignable(Integer.class, Number.class));
         assertTrue(Clz.isAssignable(Integer.class, Integer.class));

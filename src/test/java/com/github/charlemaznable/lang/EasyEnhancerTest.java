@@ -11,42 +11,44 @@ import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class EnhancerrTest {
+public class EasyEnhancerTest {
 
     @Test
     public void testEnhancerrCreate() {
-        var actual = (ActualClass) Enhancerr.create(
-                ActualClass.class, new Interceptor(), new Object[]{});
+        new EasyEnhancer();
+
+        var actual = (ActualClass) EasyEnhancer.create(
+                ActualClass.class, new Interceptor());
         actual.method();
         assertEquals(1, Interceptor.count);
 
-        actual = (ActualClass) Enhancerr.create(
+        actual = (ActualClass) EasyEnhancer.create(
                 ActualClass.class, new Class[]{},
-                new Interceptor(), new Object[]{});
+                new Interceptor());
         actual.method();
         assertEquals(2, Interceptor.count);
 
-        actual = (ActualClass) Enhancerr.create(
-                ActualClass.class, new Class[]{}, null,
-                new Callback[]{new Interceptor()}, new Object[]{});
+        actual = (ActualClass) EasyEnhancer.create(
+                ActualClass.class, new Class[]{}, method -> 0,
+                new Callback[]{new Interceptor()});
         actual.method();
         assertEquals(3, Interceptor.count);
 
         val params = new Object[]{new ActualParamType()};
 
-        actual = (ActualClass) Enhancerr.create(
+        actual = (ActualClass) EasyEnhancer.create(
                 ActualClass.class, new Interceptor(), params);
         actual.method();
         assertEquals(4, Interceptor.count);
 
-        actual = (ActualClass) Enhancerr.create(
+        actual = (ActualClass) EasyEnhancer.create(
                 ActualClass.class, new Class[]{},
                 new Interceptor(), params);
         actual.method();
         assertEquals(5, Interceptor.count);
 
-        actual = (ActualClass) Enhancerr.create(
-                ActualClass.class, new Class[]{}, null,
+        actual = (ActualClass) EasyEnhancer.create(
+                ActualClass.class, new Class[]{}, method -> 0,
                 new Callback[]{new Interceptor()}, params);
         actual.method();
         assertEquals(6, Interceptor.count);
@@ -54,7 +56,7 @@ public class EnhancerrTest {
 
     static class ActualClass {
 
-        public ActualClass() {
+        protected ActualClass() {
         }
 
         public ActualClass(ParamType init) {

@@ -1,5 +1,6 @@
 package com.github.charlemaznable.lang.pool;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.val;
@@ -43,12 +44,11 @@ public class PoolProxyTest {
             }
         });
 
-
         assertThrows(ReflectException.class, () -> PoolProxy.builder(
                 new PooledObjectCreator<TestPoolProxyObject>() {}).args("ARGUMENT", "ILLEGAL").build());
     }
 
-    @NoArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
     static class TestPoolProxyObject {
 

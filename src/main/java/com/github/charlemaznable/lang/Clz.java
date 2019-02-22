@@ -61,7 +61,7 @@ public class Clz {
     public static Class<?>[] types(Object... values) {
         if (values == null) return new Class[0];
 
-        Class<?>[] result = new Class[values.length];
+        val result = new Class[values.length];
         for (int i = 0; i < values.length; i++) {
             result[i] = checkNull(values[i], () -> NULL.class, Object::getClass);
         }
@@ -71,15 +71,14 @@ public class Clz {
     public static boolean match(Class<?>[] declaredTypes, Class<?>[] actualTypes) {
         if (declaredTypes.length == actualTypes.length) {
             for (int i = 0; i < actualTypes.length; i++) {
-                if (actualTypes[i] == NULL.class) continue;
+                val actualType = actualTypes[i];
+                if (actualType == NULL.class) continue;
                 if (wrapper(declaredTypes[i]).isAssignableFrom(
-                        wrapper(actualTypes[i]))) continue;
+                        wrapper(actualType))) continue;
                 return false;
             }
             return true;
-        } else {
-            return false;
-        }
+        } else return false;
     }
 
     public static Class<?>[] getConstructorParameterTypes(Class<?> clazz, Object... arguments) {

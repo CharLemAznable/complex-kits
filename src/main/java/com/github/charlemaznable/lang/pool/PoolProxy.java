@@ -1,6 +1,6 @@
 package com.github.charlemaznable.lang.pool;
 
-import com.github.charlemaznable.lang.Enhancerr;
+import com.github.charlemaznable.lang.EasyEnhancer;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +50,7 @@ public class PoolProxy {
             try {
                 poolObject = pool.borrowObject();
                 val poolObjectClass = poolObject.getClass();
-                return (T) Enhancerr.create(poolObjectClass,
+                return (T) EasyEnhancer.create(poolObjectClass,
                         new ObjectPoolProxy<>(pool), args);
             } finally {
                 if (poolObject != null) pool.returnObject(poolObject);
