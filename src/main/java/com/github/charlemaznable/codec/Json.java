@@ -28,6 +28,10 @@ public class Json {
         return (T) parse(json);
     }
 
+    public static String jsonPretty(Object obj) {
+        return toJSONString(obj, SerializerFeature.PrettyFormat);
+    }
+
     public static String json(Object obj) {
         return toJSONString(obj);
     }

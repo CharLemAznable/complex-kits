@@ -1,5 +1,6 @@
 package com.github.charlemaznable.codec;
 
+import com.alibaba.fastjson.parser.ParserConfig;
 import lombok.Data;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import java.util.Map;
 
 import static com.github.charlemaznable.codec.Json.descFlat;
 import static com.github.charlemaznable.codec.Json.jsonOf;
+import static com.github.charlemaznable.codec.Json.jsonPretty;
 import static com.github.charlemaznable.codec.Json.jsonWithType;
 import static com.github.charlemaznable.codec.Json.spec;
 import static com.github.charlemaznable.codec.Json.trans;
@@ -35,8 +37,14 @@ public class JsonTest {
         String jsonWithType = jsonWithType(beanType11);
         assertTrue(jsonWithType.contains("\"@type\":\"com.github.charlemaznable.codec.JsonTest$BeanType1\""));
 
+        ParserConfig.getGlobalInstance().addAccept("com.github.charlemaznable.codec.");
         val unJsonWithType = unJsonWithType(jsonWithType);
         assertTrue(unJsonWithType instanceof BeanType1);
+
+        assertEquals("{\n" +
+                "\t\"value1\":\"value1\",\n" +
+                "\t\"value2\":\"value2\"\n" +
+                "}", jsonPretty(beanType11));
 
         val jsonOf = jsonOf("key", "value");
         assertEquals("{\"key\":\"value\"}", jsonOf);
