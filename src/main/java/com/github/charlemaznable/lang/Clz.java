@@ -4,7 +4,6 @@ import lombok.SneakyThrows;
 import lombok.val;
 import org.apache.commons.lang3.ClassUtils;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -82,12 +81,17 @@ public class Clz {
     }
 
     public static Class<?>[] getConstructorParameterTypes(Class<?> clazz, Object... arguments) {
-        Class<?>[] types = types(arguments);
-        for (Constructor<?> constructor : clazz.getDeclaredConstructors()) {
-            Class<?>[] parameterTypes = constructor.getParameterTypes();
-            if (match(parameterTypes, types)) return parameterTypes;
+        val types = types(arguments);
+
+        try {
+            return clazz.getDeclaredConstructor(types).getParameterTypes();
+        } catch (NoSuchMethodException e) {
+            for (val constructor : clazz.getDeclaredConstructors()) {
+                val parameterTypes = constructor.getParameterTypes();
+                if (match(parameterTypes, types)) return parameterTypes;
+            }
+            return null;
         }
-        return null;
     }
 
     private static class NULL {}
