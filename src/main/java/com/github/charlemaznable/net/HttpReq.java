@@ -228,8 +228,10 @@ public class HttpReq {
         val out = new DataOutputStream(http.getOutputStream());
         // The URL-encoded contend 正文，正文内容其实跟get的URL中 '? '后的参数字符串一致
         // DataOutputStream.writeBytes将字符串中的16位的unicode字符以8位的字符形式写到流里面
+        // out.writeBytes(postData);
         val postData = params.toString();
-        out.writeBytes(postData);
+        // 按UTF-8编码写入, 保证服务端不会乱码
+        out.write(postData.getBytes("UTF-8"));
         out.flush();
         out.close();
     }
