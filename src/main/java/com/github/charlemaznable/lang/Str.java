@@ -133,4 +133,76 @@ public class Str {
         if (len >= width) return cs.toString();
         return repeat(c, width - len) + cs;
     }
+
+    public static Integer intOf(String str) {
+        return intOf(str, 0);
+    }
+
+    public static Integer intOf(String str, Integer defaultValue) {
+        return intOf(str, 10, defaultValue);
+    }
+
+    public static Integer intOf(String str, int radix, Integer defaultValue) {
+        try {
+            return Integer.parseInt(str, radix);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    public static Long longOf(String str) {
+        return longOf(str, 0L);
+    }
+
+    public static Long longOf(String str, Long defaultValue) {
+        return longOf(str, 10, 0L);
+    }
+
+    public static Long longOf(String str, int radix, Long defaultValue) {
+        try {
+            return Long.parseLong(str, radix);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    public static Short shortOf(String str) {
+        return shortOf(str, (short) 0);
+    }
+
+    public static Short shortOf(String str, Short defaultValue) {
+        return shortOf(str, 10, (short) 0);
+    }
+
+    public static Short shortOf(String str, int radix, Short defaultValue) {
+        try {
+            return Short.parseShort(str, radix);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    public static Float floatOf(String str) {
+        return floatOf(str, 0F);
+    }
+
+    public static Float floatOf(String str, Float defaultValue) {
+        try {
+            return Float.parseFloat(str);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    public static Double doubleOf(String str) {
+        return doubleOf(str, 0D);
+    }
+
+    public static Double doubleOf(String str, Double defaultValue) {
+        try {
+            return Double.parseDouble(str);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
 }
