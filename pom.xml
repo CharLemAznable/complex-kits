@@ -6,7 +6,7 @@
 
     <groupId>com.github.charlemaznable</groupId>
     <artifactId>complex-kits</artifactId>
-    <version>0.1.12</version>
+    <version>0.2.0.RELEASE</version>
     <packaging>jar</packaging>
 
     <name>Complex Kits</name>
@@ -55,14 +55,15 @@
         <joor-java-8.version>0.9.10</joor-java-8.version>
         <commons-lang3.version>3.8.1</commons-lang3.version>
         <commons-text.version>1.6</commons-text.version>
-        <commons-pool2.version>2.6.0</commons-pool2.version>
-        <guava.version>27.0.1-jre</guava.version>
-        <slf4j-api.version>1.7.25</slf4j-api.version>
+        <commons-pool2.version>2.6.1</commons-pool2.version>
+        <guava.version>27.1-jre</guava.version>
+        <slf4j-api.version>1.7.26</slf4j-api.version>
         <fastjson.version>1.2.56</fastjson.version>
         <dom4j.version>2.1.1</dom4j.version>
 
-        <lombok.version>1.18.4</lombok.version>
+        <lombok.version>1.18.6</lombok.version>
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
+        <spring.version>5.1.5.RELEASE</spring.version>
 
         <junit-jupiter.version>5.4.0</junit-jupiter.version>
 
@@ -71,7 +72,7 @@
         <maven-surefire-plugin.version>2.22.1</maven-surefire-plugin.version>
         <jacoco-maven-plugin.version>0.8.3</jacoco-maven-plugin.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
-        <maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
+        <maven-javadoc-plugin.version>3.1.0</maven-javadoc-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
     </properties>
 
@@ -137,7 +138,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>RELEASE</version>
+            <version>${spring.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -156,7 +157,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
-            <version>RELEASE</version>
+            <version>${spring.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
