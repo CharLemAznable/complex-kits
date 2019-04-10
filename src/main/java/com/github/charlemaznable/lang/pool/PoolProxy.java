@@ -14,6 +14,7 @@ import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import static com.github.charlemaznable.lang.Condition.nullThen;
@@ -102,6 +103,8 @@ public class PoolProxy {
             try {
                 poolObject = pool.borrowObject();
                 return method.invoke(poolObject, args);
+            } catch (InvocationTargetException e) {
+                throw e.getCause();
             } finally {
                 if (poolObject != null)
                     pool.returnObject(poolObject);
