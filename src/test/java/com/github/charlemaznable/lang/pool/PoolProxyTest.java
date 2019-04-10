@@ -28,6 +28,10 @@ public class PoolProxyTest {
                 new PooledObjectCreator<TestPoolProxyObject>() {}).config(poolConfig).args("ARGUMENT").build();
         assertEquals("proxy invoked: ARGUMENT", testPoolProxyObject.invokeArgument());
 
+        val errPoolProxyObject = PoolProxy.builder(
+                new PooledObjectCreator<TestPoolProxyObject>() {}).build();
+        assertThrows(RuntimeException.class, errPoolProxyObject::invokeThrows);
+
         assertThrows(IllegalArgumentException.class, () -> {
             try {
                 PoolProxy.builder(
@@ -60,6 +64,10 @@ public class PoolProxyTest {
 
         public Object invokeArgument(Object... args) {
             return "proxy invoked: " + argument;
+        }
+
+        public void invokeThrows() {
+            throw new RuntimeException("Custom Message");
         }
     }
 }
