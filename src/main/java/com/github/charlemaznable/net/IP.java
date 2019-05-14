@@ -37,7 +37,7 @@ public enum IP {
                 if (ip.isSiteLocalAddress() &&
                         !isReservedAddress(ip) &&
                         checkInetAddress(ip)) {
-                    return ip.getHostAddress();
+                    return filterAdapterName(ip.getHostAddress());
                 }
             }
         }
@@ -55,7 +55,7 @@ public enum IP {
                 if (!ip.isSiteLocalAddress() &&
                         !isReservedAddress(ip) &&
                         checkInetAddress(ip)) {
-                    return ip.getHostAddress();
+                    return filterAdapterName(ip.getHostAddress());
                 }
             }
         }
@@ -66,5 +66,11 @@ public enum IP {
         return (inetAddress.isLinkLocalAddress() ||
                 inetAddress.isLoopbackAddress() ||
                 inetAddress.isAnyLocalAddress());
+    }
+
+    private String filterAdapterName(String hostAddress) {
+        val index = hostAddress.indexOf('%');
+        if (index > 0) hostAddress = hostAddress.substring(0, index);
+        return hostAddress;
     }
 }
