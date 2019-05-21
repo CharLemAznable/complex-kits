@@ -43,7 +43,7 @@ public class PoolProxyTest {
                             }
                         }).args("ARGUMENT", "ILLEGAL").build();
             } catch (Exception e) {
-                assertEquals("Constructor with such arguments Not Found", e.getMessage());
+                assertEquals(TestPoolProxyObject.class + "'s Constructor with such arguments Not Found", e.getMessage());
                 throw e;
             }
         });
