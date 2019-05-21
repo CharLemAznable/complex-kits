@@ -15,7 +15,7 @@ import java.util.Random;
 import static com.github.charlemaznable.lang.Mapp.of;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.System.currentTimeMillis;
-import static org.joor.Reflect.on;
+import static org.joor.Reflect.onClass;
 
 public class Listt {
 
@@ -69,7 +69,7 @@ public class Listt {
     public static <E> ArrayList<E> newArrayListOfType(int count, Class<? extends E> itemType) {
         ArrayList<E> list = Lists.newArrayList();
         for (var i = 0; i < count; ++i) {
-            list.add(on(itemType).create().get());
+            list.add(onClass(itemType).create().get());
         }
         return list;
     }

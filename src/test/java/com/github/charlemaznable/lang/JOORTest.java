@@ -3,7 +3,7 @@ package com.github.charlemaznable.lang;
 
 import org.junit.jupiter.api.Test;
 
-import static org.joor.Reflect.on;
+import static org.joor.Reflect.onClass;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class JOORTest {
@@ -14,6 +14,6 @@ public class JOORTest {
 
     @Test
     public void testJOORInvokePrivateMethod() {
-        assertEquals("PrivateMethod", on(JOORTest.class).call("privateMethod").get());
+        assertEquals("PrivateMethod", onClass(JOORTest.class).call("privateMethod").get());
     }
 }

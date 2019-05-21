@@ -37,7 +37,7 @@ public class ParamsApplyUtils {
             val group = matcher.group().trim();
             val posBrace = group.indexOf('(');
             val functor = posBrace < 0 ? group : group.substring(0, posBrace);
-            val obj = Reflect.on(trim(functor)).create().get();
+            val obj = Reflect.onClass(trim(functor)).create().get();
             if (!cls.isInstance(obj)) {
                 log.warn("{} can not instantized to {}", functor, cls.getName());
                 continue;

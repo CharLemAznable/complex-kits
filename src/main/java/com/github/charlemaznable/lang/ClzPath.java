@@ -38,6 +38,7 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.Collections.emptySet;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.joor.Reflect.on;
+import static org.joor.Reflect.onClass;
 
 public class ClzPath {
 
@@ -303,7 +304,7 @@ public class ClzPath {
         private static URL resolveRootDirResource(URL original) {
             if (equinoxResolveMethodExists &&
                     original.getProtocol().startsWith("bundle"))
-                return on("org.eclipse.core.runtime.FileLocator")
+                return onClass("org.eclipse.core.runtime.FileLocator")
                         .call("resolve", original).get();
 
             return original;
@@ -457,7 +458,7 @@ public class ClzPath {
         }
 
         public static Object getRoot(URL url) {
-            return on(VFS3_PKG + "VFS").call("getChild", url).get();
+            return onClass(VFS3_PKG + "VFS").call("getChild", url).get();
         }
 
         public static URL getURL(Object vfsResource) {
@@ -473,7 +474,7 @@ public class ClzPath {
         }
 
         public static Object getVisitorAttribute() {
-            return on(VFS3_PKG + "VisitorAttributes").field("RECURSE").get();
+            return onClass(VFS3_PKG + "VisitorAttributes").field("RECURSE").get();
         }
 
         public static void visit(Object resource, InvocationHandler visitor) {
@@ -482,7 +483,7 @@ public class ClzPath {
         }
 
         private static Class<?> getVirtualFileVisitor() {
-            return on(VFS3_PKG + "VirtualFileVisitor").get();
+            return onClass(VFS3_PKG + "VirtualFileVisitor").get();
         }
     }
 
