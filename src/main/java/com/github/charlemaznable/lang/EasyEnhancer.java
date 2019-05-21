@@ -73,6 +73,6 @@ public class EasyEnhancer extends Enhancer {
 
     private static Class<?>[] constructorParameterTypes(Class<?> clazz, Object... arguments) {
         return checkNotNull(getConstructorParameterTypes(clazz, arguments),
-                new IllegalArgumentException("Constructor with such arguments Not Found"));
+                new IllegalArgumentException(clazz + "'s Constructor with such arguments Not Found"));
     }
 }
