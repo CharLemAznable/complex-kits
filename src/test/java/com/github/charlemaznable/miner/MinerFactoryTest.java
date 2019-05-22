@@ -1,17 +1,22 @@
 package com.github.charlemaznable.miner;
 
+import lombok.Data;
+import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.n3r.diamond.client.Minerable;
+import org.n3r.diamond.client.cache.ParamsAppliable;
 import org.n3r.diamond.client.impl.MockDiamondServer;
 
+import java.util.List;
+
 import static com.github.charlemaznable.miner.MinerFactory.getMiner;
-import static com.github.charlemaznable.miner.MinerFactory.getStone;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MinerFactoryTest {
 
@@ -26,63 +31,91 @@ public class MinerFactoryTest {
     }
 
     @MinerConfig
-    interface StoneDefault {}
+    interface StoneDefault {
 
-    @MinerConfig("stone.data")
-    interface StoneDefaultGroup {}
+        @MinerConfig("stone.data")
+        String abc();
 
-    @MinerConfig(group = "stone.group", dataId = "stone.data")
-    interface StoneDefaultNone {}
+        @MinerConfig(group = "stone.group", dataId = "stone.data")
+        String xyz();
+    }
 
     @Test
     public void testStone() {
-        MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA", "defaultData");
-        MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "stone.data", "defaultGroup");
-        MockDiamondServer.setConfigInfo("stone.group", "stone.data", "abc");
+        MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "stone.data", "abc");
+        MockDiamondServer.setConfigInfo("stone.group", "stone.data", "xyz");
 
-        val stoneDefault = getStone(StoneDefault.class);
-        assertEquals("defaultData", stoneDefault);
-
-        val stoneDefaultGroup = getStone(StoneDefaultGroup.class);
-        assertEquals("defaultGroup", stoneDefaultGroup);
-
-        val stoneDefaultNone = getStone(StoneDefaultNone.class);
-        assertEquals("abc", stoneDefaultNone);
+        val stoneDefault = getMiner(StoneDefault.class);
+        assertEquals("abc", stoneDefault.abc());
+        assertEquals("xyz", stoneDefault.xyz());
     }
 
-    @MinerConfig
+    @Data
+    public static class MinerContentBean implements ParamsAppliable {
+
+        private String name;
+
+        @Override
+        public void applyParams(String[] strings) {
+            if (strings.length > 0) this.name = strings[0];
+        }
+    }
+
+    @MinerConfig("DEFAULT_DATA")
     public interface MinerDefault {
 
         String name();
 
         String full();
 
-        @MinerProperty("long")
+        @MinerConfig("long")
         String longName();
 
-        @MinerProperty(defaultValue = "abc")
         String abc(String defaultValue);
 
-        String xyz(String defaultValue);
+        boolean testMode();
+
+        Boolean testMode2();
+
+        MinerContentBean content();
+
+        List<MinerContentBean> list();
     }
 
+    @SneakyThrows
     @Test
     public void testMiner() {
         MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA",
-                "name=John\nfull=${this.name} Doe\nlong=${this.full} Richard");
+                "name=John\nfull=${this.name} Doe\nlong=${this.full} Richard\n" +
+                        "testMode=yes\ntestMode2=TRUE\n" +
+                        "content=@com.github.charlemaznable.miner.MinerFactoryTest$MinerContentBean(${this.long})\n" +
+                        "list=@com.github.charlemaznable.miner.MinerFactoryTest$MinerContentBean(${this.name}) " +
+                        "@com.github.charlemaznable.miner.MinerFactoryTest$MinerContentBean(${this.full}) " +
+                        "@com.github.charlemaznable.miner.MinerFactoryTest$MinerContentBean(${this.long})");
 
         val minerDefault = getMiner(MinerDefault.class);
         assertNotNull(minerDefault);
         assertEquals("John", minerDefault.name());
         assertEquals("John Doe", minerDefault.full());
         assertEquals("John Doe Richard", minerDefault.longName());
-        assertEquals("abc", minerDefault.abc(null));
         assertEquals("xyz", minerDefault.abc("xyz"));
-        assertEquals("abc", minerDefault.xyz("abc"));
-        assertThrows(NullPointerException.class, () -> minerDefault.xyz(null));
+        assertNull(minerDefault.abc(null));
+        assertTrue(minerDefault.testMode());
+        assertEquals(Boolean.TRUE, minerDefault.testMode2());
+        assertEquals("John Doe Richard", minerDefault.content().getName());
+        assertEquals(3, minerDefault.list().size());
+        assertEquals("John", minerDefault.list().get(0).getName());
+        assertEquals("John Doe", minerDefault.list().get(1).getName());
+        assertEquals("John Doe Richard", minerDefault.list().get(2).getName());
+
+        val minerableDefault = (Minerable) minerDefault;
+        assertNotNull(minerableDefault);
+        assertEquals("John", minerableDefault.getString("name"));
+        assertEquals("John Doe", minerableDefault.getString("full"));
+        assertEquals("John Doe Richard", minerableDefault.getString("long"));
     }
 
-    @MinerConfig
+    @MinerConfig("DEFAULT_DATA")
     public interface MinerableDefault extends Minerable {}
 
     @Test

@@ -2,6 +2,7 @@ package com.github.charlemaznable.lang;
 
 import lombok.val;
 import lombok.var;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.regex.Pattern;
 
@@ -204,5 +205,13 @@ public class Str {
         } catch (NumberFormatException e) {
             return defaultValue;
         }
+    }
+
+    public static boolean anyOfIgnoreCase(String s, String... anys) {
+        for (val any : anys) {
+            if (StringUtils.equalsIgnoreCase(s, any)) return true;
+        }
+
+        return false;
     }
 }

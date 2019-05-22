@@ -11,17 +11,15 @@ import java.lang.annotation.Target;
 
 @Documented
 @Inherited
-@Target(ElementType.TYPE)
+@Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MinerConfig {
 
-    String group() default "DEFAULT_GROUP";
+    String group() default "";
 
     @AliasFor("value")
-    String dataId() default "DEFAULT_DATA";
+    String dataId() default "";
 
     @AliasFor("dataId")
-    String value() default "DEFAULT_DATA";
-
-    boolean createClassFileForDiagnose() default false;
+    String value() default "";
 }
