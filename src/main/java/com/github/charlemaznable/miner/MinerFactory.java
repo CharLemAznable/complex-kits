@@ -76,11 +76,14 @@ public class MinerFactory {
             val minerConfig = findAnnotation(method, MinerConfig.class);
             val group = null != minerConfig ? minerConfig.group() : "";
             val dataId = null != minerConfig ? minerConfig.dataId() : "";
-            var defaultValue = args.length > 0 ? args[0] : null;
+            var defaultValue = null != minerConfig ? minerConfig.defaultValue() : null;
+            var defaultArgument = args.length > 0 ? args[0] : null;
 
             val stone = minerable.getStone(group, blankThen(dataId, method::getName));
-            if (null == stone) return defaultValue;
-            return convertType(stone, method);
+            if (null != stone) return convertType(stone, method);
+            if (null != defaultArgument) return defaultArgument;
+            if (null != defaultValue) return convertType(defaultValue, method);
+            return null;
         }
 
         private static Object convertType(String value, Method method) {

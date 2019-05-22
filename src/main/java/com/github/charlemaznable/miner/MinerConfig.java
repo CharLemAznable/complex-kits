@@ -15,6 +15,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MinerConfig {
 
+    /**
+     * default "DEFAULT_GROUP"  when annotated on ElementType.TYPE
+     * default ""               when annotated on ElementType.METHOD
+     */
     String group() default "";
 
     @AliasFor("value")
@@ -22,4 +26,9 @@ public @interface MinerConfig {
 
     @AliasFor("dataId")
     String value() default "";
+
+    /**
+     * effective when annotated on ElementType.METHOD
+     */
+    String defaultValue() default "";
 }

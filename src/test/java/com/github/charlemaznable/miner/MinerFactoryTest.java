@@ -15,7 +15,6 @@ import java.util.List;
 import static com.github.charlemaznable.miner.MinerFactory.getMiner;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MinerFactoryTest {
@@ -71,7 +70,13 @@ public class MinerFactoryTest {
         @MinerConfig("long")
         String longName();
 
+        @MinerConfig(defaultValue = "abc")
         String abc(String defaultValue);
+
+        int count(Integer defaultValue);
+
+        @MinerConfig(defaultValue = "1")
+        int count1();
 
         boolean testMode();
 
@@ -99,7 +104,10 @@ public class MinerFactoryTest {
         assertEquals("John Doe", minerDefault.full());
         assertEquals("John Doe Richard", minerDefault.longName());
         assertEquals("xyz", minerDefault.abc("xyz"));
-        assertNull(minerDefault.abc(null));
+        assertEquals("abc", minerDefault.abc(null));
+        assertEquals(3, minerDefault.count(3));
+        assertEquals(0, minerDefault.count(null));
+        assertEquals(1, minerDefault.count1());
         assertTrue(minerDefault.testMode());
         assertEquals(Boolean.TRUE, minerDefault.testMode2());
         assertEquals("John Doe Richard", minerDefault.content().getName());
