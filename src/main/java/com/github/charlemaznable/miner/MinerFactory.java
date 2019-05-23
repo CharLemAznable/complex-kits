@@ -6,7 +6,10 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.primitives.Primitives;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.ToString;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import lombok.var;
@@ -59,13 +62,18 @@ public class MinerFactory {
         val minerProxy = new MinerProxy(isNotBlank(dataId)
                 ? minerable.getMiner(dataId) : minerable);
 
-        return EasyEnhancer.create(Object.class,
+        return EasyEnhancer.create(MinerObject.class,
                 new Class[]{minerClass, Minerable.class},
                 method -> {
                     if (method.isDefault()) return 1;
                     return 0;
                 }, new Callback[]{minerProxy, NoOp.INSTANCE}, null);
     }
+
+    @NoArgsConstructor
+    @EqualsAndHashCode
+    @ToString
+    private static class MinerObject {}
 
     @AllArgsConstructor
     private static class MinerProxy implements MethodInterceptor {
