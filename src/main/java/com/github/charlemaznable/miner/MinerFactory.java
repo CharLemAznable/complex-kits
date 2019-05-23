@@ -10,8 +10,10 @@ import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import lombok.var;
+import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
+import net.sf.cglib.proxy.NoOp;
 import org.n3r.diamond.client.Miner;
 import org.n3r.diamond.client.Minerable;
 import org.n3r.diamond.client.impl.DiamondUtils;
@@ -58,7 +60,11 @@ public class MinerFactory {
                 ? minerable.getMiner(dataId) : minerable);
 
         return EasyEnhancer.create(Object.class,
-                new Class[]{minerClass, Minerable.class}, minerProxy, null);
+                new Class[]{minerClass, Minerable.class},
+                method -> {
+                    if (method.isDefault()) return 1;
+                    return 0;
+                }, new Callback[]{minerProxy, NoOp.INSTANCE}, null);
     }
 
     @AllArgsConstructor

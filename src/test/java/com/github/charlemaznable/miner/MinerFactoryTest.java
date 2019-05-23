@@ -1,5 +1,6 @@
 package com.github.charlemaznable.miner;
 
+import com.google.common.base.Splitter;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -70,6 +71,11 @@ public class MinerFactoryTest {
         @MinerConfig("long")
         String longName();
 
+        default List<String> longSplit() {
+            return Splitter.on(" ").omitEmptyStrings()
+                    .trimResults().splitToList(longName());
+        }
+
         @MinerConfig(defaultValue = "abc")
         String abc(String defaultValue);
 
@@ -100,17 +106,28 @@ public class MinerFactoryTest {
 
         val minerDefault = getMiner(MinerDefault.class);
         assertNotNull(minerDefault);
+
         assertEquals("John", minerDefault.name());
         assertEquals("John Doe", minerDefault.full());
         assertEquals("John Doe Richard", minerDefault.longName());
+
+        assertEquals(3, minerDefault.longSplit().size());
+        assertEquals("John", minerDefault.longSplit().get(0));
+        assertEquals("Doe", minerDefault.longSplit().get(1));
+        assertEquals("Richard", minerDefault.longSplit().get(2));
+
         assertEquals("xyz", minerDefault.abc("xyz"));
         assertEquals("abc", minerDefault.abc(null));
+
         assertEquals(3, minerDefault.count(3));
         assertEquals(0, minerDefault.count(null));
         assertEquals(1, minerDefault.count1());
+
         assertTrue(minerDefault.testMode());
         assertEquals(Boolean.TRUE, minerDefault.testMode2());
+
         assertEquals("John Doe Richard", minerDefault.content().getName());
+
         assertEquals(3, minerDefault.list().size());
         assertEquals("John", minerDefault.list().get(0).getName());
         assertEquals("John Doe", minerDefault.list().get(1).getName());
