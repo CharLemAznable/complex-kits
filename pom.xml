@@ -6,7 +6,7 @@
 
     <groupId>com.github.charlemaznable</groupId>
     <artifactId>complex-kits</artifactId>
-    <version>0.4.0</version>
+    <version>0.4.1</version>
     <packaging>jar</packaging>
 
     <name>Complex Kits</name>
@@ -54,9 +54,9 @@
         <cglib-nodep.version>3.2.12</cglib-nodep.version>
         <joor-java-8.version>0.9.11</joor-java-8.version>
         <commons-lang3.version>3.9</commons-lang3.version>
-        <commons-text.version>1.6</commons-text.version>
+        <commons-text.version>1.7</commons-text.version>
         <commons-pool2.version>2.6.2</commons-pool2.version>
-        <guava.version>27.1-jre</guava.version>
+        <guava.version>28.0-jre</guava.version>
         <slf4j-api.version>1.7.26</slf4j-api.version>
         <fastjson.version>1.2.58</fastjson.version>
         <dom4j.version>2.1.1</dom4j.version>
@@ -64,15 +64,15 @@
 
         <lombok.version>1.18.8</lombok.version>
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
-        <spring.version>5.1.7.RELEASE</spring.version>
+        <spring.version>5.1.8.RELEASE</spring.version>
 
-        <junit-jupiter.version>5.4.2</junit-jupiter.version>
+        <junit-jupiter.version>5.5.0</junit-jupiter.version>
 
         <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <jacoco-maven-plugin.version>0.8.4</jacoco-maven-plugin.version>
-        <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
+        <maven-source-plugin.version>3.1.0</maven-source-plugin.version>
         <maven-javadoc-plugin.version>3.1.0</maven-javadoc-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
     </properties>
