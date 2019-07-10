@@ -7,29 +7,32 @@ import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
+import org.springframework.core.type.ClassMetadata;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.function.Function;
 
 public class SpringClassPathScanner extends ClassPathBeanDefinitionScanner {
 
     private final Class factoryBeanClass;
+    private final Function<ClassMetadata, Boolean> isCandidateClass;
     private final Class<? extends Annotation>[] annotationClasses;
 
     @SafeVarargs
     public SpringClassPathScanner(BeanDefinitionRegistry registry,
                                   Class factoryBeanClass,
+                                  Function<ClassMetadata, Boolean> isCandidateClass,
                                   Class<? extends Annotation>... annotationClasses) {
         super(registry, false);
         this.factoryBeanClass = factoryBeanClass;
+        this.isCandidateClass = isCandidateClass;
         this.annotationClasses = annotationClasses;
     }
 
     public void registerFilters() {
-        addExcludeFilter((metadataReader, metadataReaderFactory) ->
-                !metadataReader.getClassMetadata().isInterface());
         for (val annotationClass : annotationClasses) {
             addIncludeFilter(new AnnotationTypeFilter(annotationClass));
         }
@@ -64,7 +67,7 @@ public class SpringClassPathScanner extends ClassPathBeanDefinitionScanner {
 
     @Override
     protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
-        return (beanDefinition.getMetadata().isInterface() && beanDefinition.getMetadata().isIndependent());
+        return null == isCandidateClass ? true : isCandidateClass.apply(beanDefinition.getMetadata());
     }
 
     @SuppressWarnings("NullableProblems")

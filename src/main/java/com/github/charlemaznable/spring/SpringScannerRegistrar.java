@@ -9,6 +9,7 @@ import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.core.type.ClassMetadata;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
@@ -32,7 +33,7 @@ public class SpringScannerRegistrar implements ImportBeanDefinitionRegistrar, Re
     @SuppressWarnings({"NullableProblems", "ConstantConditions"})
     public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
         val annoAttrs = AnnotationAttributes.fromMap(importingClassMetadata.getAnnotationAttributes(scanAnnotationClass.getName()));
-        val scanner = new SpringClassPathScanner(registry, factoryBeanClass, annotationClass);
+        val scanner = new SpringClassPathScanner(registry, factoryBeanClass, this::isCandidateClass, annotationClass);
 
         if (resourceLoader != null) { // this check is needed in Spring 3.1
             scanner.setResourceLoader(resourceLoader);
@@ -70,5 +71,9 @@ public class SpringScannerRegistrar implements ImportBeanDefinitionRegistrar, Re
     @SuppressWarnings("NullableProblems")
     public void setResourceLoader(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
+    }
+
+    protected boolean isCandidateClass(ClassMetadata classMetadata) {
+        return true;
     }
 }
