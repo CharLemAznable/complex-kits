@@ -3,6 +3,7 @@ package com.github.charlemaznable.spring;
 import com.google.common.collect.Iterators;
 import lombok.Cleanup;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -46,7 +47,8 @@ public class HttpServletRequestConvenientFilter extends OncePerRequestFilter {
 
         private Map<String, String[]> params;
         @Getter
-        private final String body;
+        @Setter
+        private String body;
 
         @SneakyThrows
         public HttpServletRequestConvenientWrapper(HttpServletRequest request, String charsetName) {
@@ -66,7 +68,7 @@ public class HttpServletRequestConvenientFilter extends OncePerRequestFilter {
         @SneakyThrows
         @Override
         public ServletInputStream getInputStream() {
-            val byteArrayInputStream = new ByteArrayInputStream(body.getBytes());
+            val byteArrayInputStream = new ByteArrayInputStream(this.body.getBytes());
             return new ServletInputStream() {
                 @Override
                 public boolean isFinished() {
@@ -95,7 +97,7 @@ public class HttpServletRequestConvenientFilter extends OncePerRequestFilter {
 
         @Override
         public String getParameter(String name) {
-            val values = params.get(name);
+            val values = this.params.get(name);
             if (values == null || values.length == 0) {
                 return null;
             }
@@ -120,11 +122,11 @@ public class HttpServletRequestConvenientFilter extends OncePerRequestFilter {
         public void setParameter(String name, Object value) {
             if (value != null) {
                 if (value instanceof String[]) {
-                    params.put(name, (String[]) value);
+                    this.params.put(name, (String[]) value);
                 } else if (value instanceof String) {
-                    params.put(name, new String[]{(String) value});
+                    this.params.put(name, new String[]{(String) value});
                 } else {
-                    params.put(name, new String[]{String.valueOf(value)});
+                    this.params.put(name, new String[]{String.valueOf(value)});
                 }
             }
         }

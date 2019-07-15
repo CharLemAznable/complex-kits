@@ -23,6 +23,12 @@ public class HttpServletRequestConvenientUtils {
         return null;
     }
 
+    public void setBody(HttpServletRequest request, String body) {
+        val convenientWrapper = convenientWrapper(request);
+        if (null == convenientWrapper) return;
+        convenientWrapper.setBody(body);
+    }
+
     public void setParameter(HttpServletRequest request, String name, Object value) {
         val convenientWrapper = convenientWrapper(request);
         if (null == convenientWrapper) return;
