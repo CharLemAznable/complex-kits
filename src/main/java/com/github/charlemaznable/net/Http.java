@@ -42,7 +42,6 @@ public class Http {
         val writer = rsp.getWriter();
         writer.write(content);
         writer.flush();
-        writer.close();
     }
 
     public static Map<String, String> fetchParameterMap(HttpServletRequest request) {

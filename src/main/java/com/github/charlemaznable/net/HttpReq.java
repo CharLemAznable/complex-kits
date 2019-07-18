@@ -2,6 +2,7 @@ package com.github.charlemaznable.net;
 
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.net.ssl.HostnameVerifier;
@@ -14,6 +15,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +33,8 @@ public class HttpReq {
     private final String baseUrl;
 
     private String req;
+
+    private Charset charset = Charsets.UTF_8;
 
     private StringBuilder params = new StringBuilder();
 
@@ -56,12 +60,11 @@ public class HttpReq {
         return new HttpReq(baseUrlTemplate, baseUrlArgs).get();
     }
 
-    private static String readResponseBody(HttpURLConnection http, String charset) throws IOException {
-        val inputStream = http.getInputStream();
-        return toString(charset, inputStream);
+    private static String readResponseBody(HttpURLConnection http, Charset charset) throws IOException {
+        return toString(http.getInputStream(), charset);
     }
 
-    private static String toString(String charset, InputStream inputStream) throws IOException {
+    private static String toString(InputStream inputStream, Charset charset) throws IOException {
         val baos = new ByteArrayOutputStream();
         val buffer = new byte[1024];
 
@@ -73,18 +76,19 @@ public class HttpReq {
         return new String(baos.toByteArray(), charset);
     }
 
-    private static String getCharset(String contentType) {
-        if (contentType == null) return "UTF-8";
+    private Charset parseCharset(String contentType) {
+        if (contentType == null) return this.charset;
 
-        String charset = null;
+        String charsetName = null;
         for (val param : contentType.replace(" ", "").split(";")) {
             if (param.startsWith("charset=")) {
-                charset = param.split("=", 2)[1];
+                charsetName = param.split("=", 2)[1];
                 break;
             }
         }
 
-        return charset == null ? "UTF-8" : charset;
+        return charsetName == null ?
+                this.charset : Charset.forName(charsetName);
     }
 
     public HttpReq req(String req) {
@@ -103,6 +107,7 @@ public class HttpReq {
         return this;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public HttpReq param(String name, String value) {
         if (params.length() > 0) params.append('&');
         params.append(name).append('=').append(encode(value));
@@ -110,6 +115,7 @@ public class HttpReq {
         return this;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public HttpReq params(Map<String, String> params) {
         for (val paramEntry : params.entrySet()) {
             val key = paramEntry.getKey();
@@ -216,7 +222,7 @@ public class HttpReq {
     private HttpURLConnection commonSettings(String url) throws IOException {
         setFollowRedirects(true);
         val http = (HttpURLConnection) new URL(url).openConnection();
-        http.setRequestProperty("Accept-Charset", "UTF-8");
+        http.setRequestProperty("Accept-Charset", this.charset.name());
         http.setConnectTimeout(60 * 1000);
         http.setReadTimeout(60 * 1000);
         return http;
@@ -230,15 +236,14 @@ public class HttpReq {
         // DataOutputStream.writeBytes将字符串中的16位的unicode字符以8位的字符形式写到流里面
         // out.writeBytes(postData);
         val postData = params.toString();
-        // 按UTF-8编码写入, 保证服务端不会乱码
-        out.write(postData.getBytes("UTF-8"));
+        out.write(postData.getBytes(this.charset));
         out.flush();
         out.close();
     }
 
     private String parseResponse(HttpURLConnection http, String url) throws IOException {
         val status = http.getResponseCode();
-        val charset = getCharset(http.getHeaderField("Content-Type"));
+        val charset = parseCharset(http.getHeaderField("Content-Type"));
 
         if (status == 200) return readResponseBody(http, charset);
 
@@ -246,10 +251,10 @@ public class HttpReq {
         return null;
     }
 
-    private String readErrorResponseBody(String url, HttpURLConnection http, int status, String charset) throws IOException {
+    private String readErrorResponseBody(String url, HttpURLConnection http, int status, Charset charset) throws IOException {
         val errorStream = http.getErrorStream();
         if (errorStream != null) {
-            val error = toString(charset, errorStream);
+            val error = toString(errorStream, charset);
             return (url + ", STATUS CODE =" + status + ", headers=" + json(http.getHeaderFields()) + "\n\n" + error);
         } else {
             return (url + ", STATUS CODE =" + status + ", headers=" + json(http.getHeaderFields()));

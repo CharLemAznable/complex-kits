@@ -1,5 +1,6 @@
 package com.github.charlemaznable.spring;
 
+import lombok.AllArgsConstructor;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -11,35 +12,40 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Map;
 
+import static com.github.charlemaznable.codec.Bytes.bytes;
 import static com.github.charlemaznable.lang.Mapp.newHashMap;
+import static com.google.common.base.Charsets.UTF_8;
 
 public class MutableHttpServletRequest extends HttpServletRequestWrapper {
 
     private Map<String, String[]> params;
-    private String body;
+    private String content;
+    private Charset charset;
 
     public MutableHttpServletRequest(HttpServletRequest request) {
-        this(request, "UTF-8");
+        this(request, UTF_8);
     }
 
     @SneakyThrows
-    public MutableHttpServletRequest(HttpServletRequest request, String charsetName) {
+    public MutableHttpServletRequest(HttpServletRequest request, Charset charset) {
         super(request);
 
         this.params = newHashMap(request.getParameterMap());
 
         @Cleanup val bufferedReader = new BufferedReader(
-                new InputStreamReader(request.getInputStream(), charsetName));
+                new InputStreamReader(request.getInputStream(), charset));
         val stringBuilder = new StringBuilder();
         String line;
         while ((line = bufferedReader.readLine()) != null) {
             stringBuilder.append(line);
         }
-        this.body = stringBuilder.toString();
+        this.content = stringBuilder.toString();
+        this.charset = charset;
     }
 
     @Override
@@ -84,29 +90,10 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper {
         }
     }
 
-    @SneakyThrows
     @Override
     public ServletInputStream getInputStream() {
-        val byteArrayInputStream = new ByteArrayInputStream(this.body.getBytes());
-        return new ServletInputStream() {
-            @Override
-            public boolean isFinished() {
-                return false;
-            }
-
-            @Override
-            public boolean isReady() {
-                return false;
-            }
-
-            @Override
-            public void setReadListener(ReadListener readListener) {
-            }
-
-            public int read() {
-                return byteArrayInputStream.read();
-            }
-        };
+        return new MutableServletInputStream(
+                new ByteArrayInputStream(bytes(this.content, this.charset)));
     }
 
     @Override
@@ -115,10 +102,34 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper {
     }
 
     public String getRequestBody() {
-        return this.body;
+        return this.content;
     }
 
     public void setRequestBody(String requestBody) {
-        this.body = requestBody;
+        this.content = requestBody;
+    }
+
+    @AllArgsConstructor
+    static class MutableServletInputStream extends ServletInputStream {
+
+        private ByteArrayInputStream byteArrayInputStream;
+
+        public int read() {
+            return this.byteArrayInputStream.read();
+        }
+
+        @Override
+        public boolean isFinished() {
+            return false;
+        }
+
+        @Override
+        public boolean isReady() {
+            return false;
+        }
+
+        @Override
+        public void setReadListener(ReadListener readListener) {
+        }
     }
 }

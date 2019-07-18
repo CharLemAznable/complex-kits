@@ -31,7 +31,7 @@ public class MutableHttpServletRequestTest {
         assertEquals(body1, body13);
 
         val body2 = "你好world";
-        MutableHttpServletRequestUtils.setRequestBody(mutableRequest, body2);
+        MutableHttpServletUtils.setRequestBody(mutableRequest, body2);
         val body21 = mutableRequest.getRequestBody();
         assertEquals(body2, body21);
         val body22 = Http.dealRequestBodyStream(mutableRequest, "UTF-8");
@@ -56,15 +56,15 @@ public class MutableHttpServletRequestTest {
 
         val key2 = "key2";
         val value2 = "value2";
-        MutableHttpServletRequestUtils.setParameter(mutableRequest, key2, value2);
+        MutableHttpServletUtils.setParameter(mutableRequest, key2, value2);
         val value21 = mutableRequest.getParameter(key2);
         assertEquals(value2, value21);
         val value22 = Http.fetchParameterMap(mutableRequest).get(key2);
         assertEquals(value2, value22);
 
         val value3 = "value3";
-        MutableHttpServletRequestUtils.setParameterMap(mutableRequest, of(key2, value3));
-        val value31 = mutableRequest.getParameter(key2);
+        MutableHttpServletUtils.setParameterMap(mutableRequest, of(key2, value3));
+        val value31 = mutableRequest.getParameterMap().get(key2)[0];
         assertEquals(value3, value31);
         val value32 = Http.fetchParameterMap(mutableRequest).get(key2);
         assertEquals(value3, value32);
@@ -74,10 +74,10 @@ public class MutableHttpServletRequestTest {
     public void testWrapper() {
         val mockRequest = new MockHttpServletRequest();
         val mockWrapper = new HttpServletRequestWrapper(mockRequest);
-        assertNull(MutableHttpServletRequestUtils.mutable(mockWrapper));
+        assertNull(MutableHttpServletUtils.mutableRequest(mockWrapper));
 
         val mutableRequest = new MutableHttpServletRequest(mockRequest);
         val mutableWrapper = new HttpServletRequestWrapper(mutableRequest);
-        assertNotNull(MutableHttpServletRequestUtils.mutable(mutableWrapper));
+        assertNotNull(MutableHttpServletUtils.mutableRequest(mutableWrapper));
     }
 }
