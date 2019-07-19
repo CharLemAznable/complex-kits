@@ -56,14 +56,14 @@ public class MutableHttpServletRequestTest {
 
         val key2 = "key2";
         val value2 = "value2";
-        MutableHttpServletUtils.setParameter(mutableRequest, key2, value2);
+        MutableHttpServletUtils.setRequestParameter(mutableRequest, key2, value2);
         val value21 = mutableRequest.getParameter(key2);
         assertEquals(value2, value21);
         val value22 = Http.fetchParameterMap(mutableRequest).get(key2);
         assertEquals(value2, value22);
 
         val value3 = "value3";
-        MutableHttpServletUtils.setParameterMap(mutableRequest, of(key2, value3));
+        MutableHttpServletUtils.setRequestParameterMap(mutableRequest, of(key2, value3));
         val value31 = mutableRequest.getParameterMap().get(key2)[0];
         assertEquals(value3, value31);
         val value32 = Http.fetchParameterMap(mutableRequest).get(key2);

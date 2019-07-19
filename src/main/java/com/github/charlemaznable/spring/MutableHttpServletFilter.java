@@ -7,14 +7,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Slf4j
 @Component
-@WebFilter(filterName = "MutableHttpServletFilter", urlPatterns = "/*")
 public class MutableHttpServletFilter extends OncePerRequestFilter {
 
     @SuppressWarnings("NullableProblems")

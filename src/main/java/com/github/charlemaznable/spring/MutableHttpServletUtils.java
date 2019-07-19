@@ -42,13 +42,13 @@ public class MutableHttpServletUtils {
         mutableRequest.setRequestBody(body);
     }
 
-    public void setParameter(HttpServletRequest request, String name, Object value) {
+    public void setRequestParameter(HttpServletRequest request, String name, Object value) {
         val mutableRequest = mutableRequest(request);
         if (null == mutableRequest) return;
         mutableRequest.setParameter(name, value);
     }
 
-    public void setParameterMap(HttpServletRequest request, Map<String, Object> params) {
+    public void setRequestParameterMap(HttpServletRequest request, Map<String, Object> params) {
         val mutableRequest = mutableRequest(request);
         if (null == mutableRequest) return;
         mutableRequest.setParameterMap(params);
