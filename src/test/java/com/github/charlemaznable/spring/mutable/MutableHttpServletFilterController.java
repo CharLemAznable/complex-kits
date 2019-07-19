@@ -1,4 +1,4 @@
-package com.github.charlemaznable.spring.testClass;
+package com.github.charlemaznable.spring.mutable;
 
 import com.github.charlemaznable.net.Http;
 import org.springframework.stereotype.Controller;

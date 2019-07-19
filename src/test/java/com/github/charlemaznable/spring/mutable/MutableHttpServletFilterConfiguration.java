@@ -1,4 +1,4 @@
-package com.github.charlemaznable.spring.testClass;
+package com.github.charlemaznable.spring.mutable;
 
 import org.springframework.context.annotation.ComponentScan;
 

@@ -1,8 +1,8 @@
 package com.github.charlemaznable.spring;
 
-import com.github.charlemaznable.spring.testClass.MutableHttpServletFilterConfiguration;
-import com.github.charlemaznable.spring.testClass.MutableHttpServletFilterController;
-import com.github.charlemaznable.spring.testClass.MutableHttpServletFilterInterceptor;
+import com.github.charlemaznable.spring.mutable.MutableHttpServletFilterConfiguration;
+import com.github.charlemaznable.spring.mutable.MutableHttpServletFilterController;
+import com.github.charlemaznable.spring.mutable.MutableHttpServletFilterInterceptor;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
