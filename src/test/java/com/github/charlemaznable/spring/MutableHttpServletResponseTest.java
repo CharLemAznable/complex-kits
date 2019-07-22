@@ -97,8 +97,20 @@ public class MutableHttpServletResponseTest {
         val mockWrapper = new HttpServletResponseWrapper(mockResponse);
         assertNull(MutableHttpServletUtils.mutableResponse(mockWrapper));
 
+        mockWrapper.setStatus(404);
+        MutableHttpServletUtils.mutateResponse(mockWrapper, response -> response.setStatus(500));
+        assertEquals(404, mockWrapper.getStatus());
+
         val mutableResponse = new MutableHttpServletResponse(mockResponse);
         val mutableWrapper = new HttpServletResponseWrapper(mutableResponse);
         assertNotNull(MutableHttpServletUtils.mutableResponse(mutableWrapper));
+
+        mutableWrapper.setStatus(404);
+        MutableHttpServletUtils.mutateResponse(mutableWrapper, response -> {
+            response.setStatus(500);
+            response.setContentByString("mockWrapper");
+        });
+        assertEquals(500, mutableWrapper.getStatus());
+        assertEquals("mockWrapper", MutableHttpServletUtils.getResponseContentAsString(mutableWrapper));
     }
 }

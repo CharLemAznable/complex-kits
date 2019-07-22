@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 import java.nio.charset.Charset;
 import java.util.Map;
+import java.util.function.Consumer;
 
 @UtilityClass
 public class MutableHttpServletUtils {
@@ -106,6 +107,13 @@ public class MutableHttpServletUtils {
         val mutableResponse = mutableResponse(response);
         if (null == mutableResponse) return;
         mutableResponse.appendContentByString(content, charset);
+    }
+
+    public void mutateResponse(HttpServletResponse response, Consumer<MutableHttpServletResponse> mutator) {
+        if (null == mutator) return;
+        val mutableResponse = mutableResponse(response);
+        if (null == mutableResponse) return;
+        mutator.accept(mutableResponse);
     }
 
     private HttpServletRequest internalRequest(HttpServletRequestWrapper requestWrapper) {
