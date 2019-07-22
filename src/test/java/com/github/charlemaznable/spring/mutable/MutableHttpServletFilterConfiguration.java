@@ -1,10 +1,9 @@
 package com.github.charlemaznable.spring.mutable;
 
-import com.github.charlemaznable.spring.ComplexComponentScan;
+import com.github.charlemaznable.spring.ComplexImport;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Import;
 
 @ComponentScan
-@Import(ComplexComponentScan.class)
+@ComplexImport
 public class MutableHttpServletFilterConfiguration {
 }
