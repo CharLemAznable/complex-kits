@@ -32,7 +32,7 @@ public class AESTest {
         assertEquals(hex(encrypt("中文", key)), hex(encrypt("中文", key)));
 
         val key2 = key + key;
-        assertEquals(hex(encrypt("The quick brown fox jumps over the lazy dog", key2)),
+        assertEquals(hex(encrypt("The quick brown fox jumps over the lazy dog", key)),
                 hex(encrypt("The quick brown fox jumps over the lazy dog", key2)));
     }
 
