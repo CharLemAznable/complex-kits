@@ -40,12 +40,13 @@ public class Clz {
      * 安静的调用对象的方法。
      *
      * @param target 对象
-     * @param m      方法
+     * @param method 方法
+     * @param args   参数
      * @return 方法返回
      */
-    public static Object invokeQuietly(Object target, Method m) {
+    public static Object invokeQuietly(Object target, Method method, Object... args) {
         try {
-            return m.invoke(target);
+            return method.invoke(target, args);
         } catch (IllegalArgumentException | IllegalAccessException ignored) {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
