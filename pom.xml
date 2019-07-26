@@ -6,7 +6,7 @@
 
     <groupId>com.github.charlemaznable</groupId>
     <artifactId>complex-kits</artifactId>
-    <version>0.6.2</version>
+    <version>0.6.3</version>
     <packaging>jar</packaging>
 
     <name>Complex Kits</name>
@@ -53,7 +53,6 @@
 
         <cglib-nodep.version>3.2.12</cglib-nodep.version>
         <joor-java-8.version>0.9.12</joor-java-8.version>
-        <commons-lang3.version>3.9</commons-lang3.version>
         <commons-text.version>1.7</commons-text.version>
         <commons-pool2.version>2.6.2</commons-pool2.version>
         <guava.version>28.0-jre</guava.version>
@@ -66,7 +65,7 @@
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
         <spring.version>5.1.8.RELEASE</spring.version>
 
-        <junit-jupiter.version>5.5.0</junit-jupiter.version>
+        <junit-jupiter-engine.version>5.5.0</junit-jupiter-engine.version>
 
         <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
@@ -87,11 +86,6 @@
             <groupId>org.jooq</groupId>
             <artifactId>joor-java-8</artifactId>
             <version>${joor-java-8.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>${commons-lang3.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -150,14 +144,8 @@
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit-jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit-jupiter.version}</version>
+            <version>${junit-jupiter-engine.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
