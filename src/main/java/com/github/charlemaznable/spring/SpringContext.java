@@ -7,7 +7,9 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
+import java.util.function.Supplier;
 
+import static com.github.charlemaznable.lang.Condition.notNullThen;
 import static com.github.charlemaznable.lang.Str.isEmpty;
 
 @Component
@@ -16,35 +18,45 @@ public class SpringContext implements ApplicationContextAware {
     private static ApplicationContext applicationContext;
 
     public static <T> T getBean(String beanName) {
-        return getBean(beanName, null);
+        return getBean(beanName, (T) null);
     }
 
     @SuppressWarnings("unchecked")
     public static <T> T getBean(String beanName, T defaultValue) {
-        if (applicationContext == null) return defaultValue;
-        if (isEmpty(beanName)) return defaultValue;
+        return getBean(beanName, () -> defaultValue);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T getBean(String beanName, Supplier<T> defaultSupplier) {
+        if (applicationContext == null) return notNullThen(defaultSupplier, Supplier::get);
+        if (isEmpty(beanName)) return notNullThen(defaultSupplier, Supplier::get);
 
         try {
             return (T) applicationContext.getBean(beanName);
         } catch (NoSuchBeanDefinitionException ignored) {
         }
-        return defaultValue;
+        return notNullThen(defaultSupplier, Supplier::get);
     }
 
     public static <T> T getBean(Class<T> clazz) {
-        return getBean(clazz, null);
+        return getBean(clazz, (T) null);
     }
 
     @SuppressWarnings("unchecked")
     public static <T> T getBean(Class<T> clazz, T defaultValue) {
-        if (applicationContext == null) return defaultValue;
-        if (clazz == null) return defaultValue;
+        return getBean(clazz, (Supplier<T>) () -> defaultValue);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T getBean(Class<T> clazz, Supplier<T> defaultSupplier) {
+        if (applicationContext == null) return notNullThen(defaultSupplier, Supplier::get);
+        if (clazz == null) return notNullThen(defaultSupplier, Supplier::get);
 
         try {
             return applicationContext.getBean(clazz);
         } catch (NoSuchBeanDefinitionException ignored) {
         }
-        return defaultValue;
+        return notNullThen(defaultSupplier, Supplier::get);
     }
 
     @Override
