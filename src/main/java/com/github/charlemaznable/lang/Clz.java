@@ -49,7 +49,6 @@ public class Clz {
             return method.invoke(target, args);
         } catch (IllegalArgumentException | IllegalAccessException ignored) {
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
             if (e.getTargetException() instanceof RuntimeException) {
                 throw (RuntimeException) e.getTargetException();
             }
