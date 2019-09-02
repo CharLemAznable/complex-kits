@@ -4,6 +4,7 @@
 [![codecov](https://codecov.io/gh/CharLemAznable/complex-kits/branch/master/graph/badge.svg)](https://codecov.io/gh/CharLemAznable/complex-kits)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.charlemaznable/complex-kits/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.charlemaznable/complex-kits/)
 [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)
+![GitHub code size](https://img.shields.io/github/languages/code-size/CharLemAznable/AGXToolkit)
 
 JAVA常用工具包.
 
@@ -13,6 +14,6 @@ JAVA常用工具包.
 <dependency>
   <groupId>com.github.charlemaznable</groupId>
   <artifactId>complex-kits</artifactId>
-  <version>0.7.1</version>
+  <version>0.7.2</version>
 </dependency>
 ```
