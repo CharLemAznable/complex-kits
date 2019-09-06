@@ -1,0 +1,20 @@
+package com.github.charlemaznable.core.lang;
+
+import com.github.charlemaznable.core.lang.Empty;
+import lombok.val;
+import org.junit.jupiter.api.Test;
+
+import static com.github.charlemaznable.core.lang.Listt.newArrayList;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class EmptyTest {
+
+    @Test
+    public void testEmptyCollection() {
+        val list = newArrayList();
+        assertTrue(Empty.isEmpty(list));
+        list.add("test");
+        assertFalse(Empty.isEmpty(list));
+    }
+}

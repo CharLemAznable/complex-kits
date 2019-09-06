@@ -6,7 +6,7 @@
 
     <groupId>com.github.charlemaznable</groupId>
     <artifactId>complex-kits</artifactId>
-    <version>0.7.2</version>
+    <version>0.8.0</version>
     <packaging>jar</packaging>
 
     <name>Complex Kits</name>
@@ -53,11 +53,11 @@
 
         <cglib-nodep.version>3.3.0</cglib-nodep.version>
         <joor-java-8.version>0.9.12</joor-java-8.version>
-        <commons-text.version>1.7</commons-text.version>
+        <commons-text.version>1.8</commons-text.version>
         <commons-pool2.version>2.7.0</commons-pool2.version>
         <guava.version>28.1-jre</guava.version>
         <slf4j-api.version>1.7.28</slf4j-api.version>
-        <fastjson.version>1.2.59</fastjson.version>
+        <fastjson.version>1.2.60</fastjson.version>
         <dom4j.version>2.1.1</dom4j.version>
         <diamond-client.version>0.0.21</diamond-client.version>
 
