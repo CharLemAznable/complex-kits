@@ -125,12 +125,14 @@ public class JsonTest {
 
     @Data
     static class BeanType1 {
+
         private String value1;
         private String value2;
     }
 
     @Data
     static class BeanType2 {
+
         private String value2;
         private String value3;
     }

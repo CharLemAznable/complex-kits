@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.spring;
 
-import com.github.charlemaznable.core.spring.AnnotationElf;
 import org.joor.ReflectException;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.ComponentScan;

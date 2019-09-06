@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.codec.text;
 
-import com.github.charlemaznable.core.codec.text.Textable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.val;

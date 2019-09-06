@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.lang;
 
-
 import org.junit.jupiter.api.Test;
 
 import static org.joor.Reflect.onClass;

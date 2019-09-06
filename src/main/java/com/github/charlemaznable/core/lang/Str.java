@@ -100,7 +100,6 @@ public class Str {
         val maxValue = "" + Integer.MAX_VALUE;
         return number.length() <= maxValue.length() &&
                 alignRight(number, maxValue.length(), '0').compareTo(maxValue) <= 0;
-
     }
 
     /**
@@ -117,7 +116,6 @@ public class Str {
         val maxValue = "" + Long.MAX_VALUE;
         return number.length() <= maxValue.length() &&
                 alignRight(number, maxValue.length(), '0').compareTo(maxValue) <= 0;
-
     }
 
     /**

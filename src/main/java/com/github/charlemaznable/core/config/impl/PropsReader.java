@@ -25,7 +25,7 @@ public class PropsReader extends LineNumberReader {
      * The regular expression to parse the key and the value of a property.
      */
     private static final Pattern PROPERTY_PATTERN = compile("(([\\S&&[^\\\\" + new String(SEPARATORS)
-                    + "]]|\\\\.)*)(\\s*(\\s+|[" + new String(SEPARATORS) + "])\\s*)(.*)");
+            + "]]|\\\\.)*)(\\s*(\\s+|[" + new String(SEPARATORS) + "])\\s*)(.*)");
     /**
      * Constant for the radix of hex numbers.
      */
@@ -66,7 +66,7 @@ public class PropsReader extends LineNumberReader {
     private static String[] doParseProperty(String line) {
         val matcher = PROPERTY_PATTERN.matcher(line);
 
-        val result = new String[] {"", "", ""};
+        val result = new String[]{"", "", ""};
 
         if (matcher.matches()) {
             result[0] = matcher.group(IDX_KEY).trim();

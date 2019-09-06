@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.crypto;
 
-import com.github.charlemaznable.core.crypto.AES;
 import com.github.charlemaznable.core.lang.Rand;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -17,6 +16,8 @@ import static java.lang.System.currentTimeMillis;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AESTest {
+
+    public final int TIMES = 10000;
 
     @Test
     public void testAES() {
@@ -48,8 +49,6 @@ public class AESTest {
             assertEquals(src, dec);
         }
     }
-
-    public final int TIMES = 10000;
 
     @SneakyThrows
     public void routineRun(int threads) {

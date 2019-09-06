@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.lang;
 
-import com.github.charlemaznable.core.lang.Typee;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,55 +26,53 @@ public class TypeeTest {
     }
 
     interface TestInterface<T> {
+
         String getName(T instance);
     }
 
+    interface TestActualInterface extends TestInterface<String> {}
+
+    interface TestMiddleInterface<T> extends TestInterface<T> {}
+
     static class TestActual implements TestInterface<String> {
+
         @Override
         public String getName(String instance) {
             return "\"" + instance + "\'";
         }
     }
 
-    static class TestActualSub extends TestActual {
-    }
-
-    interface TestActualInterface extends TestInterface<String> {
-    }
+    static class TestActualSub extends TestActual {}
 
     static class TestActualInterfaceSub implements TestActualInterface {
+
         @Override
         public String getName(String instance) {
             return "\"" + instance + "\'";
         }
     }
 
-    static class TestActualInterfaceSubSub extends TestActualInterfaceSub {
-    }
+    static class TestActualInterfaceSubSub extends TestActualInterfaceSub {}
 
-    static abstract class TestBase<T> implements TestInterface<T> {
-    }
+    static abstract class TestBase<T> implements TestInterface<T> {}
 
     static class TestSub extends TestBase<String> {
+
         @Override
         public String getName(String instance) {
             return "\"" + instance + "\'";
         }
     }
 
-    static class TestSubSub extends TestSub {
-    }
-
-    interface TestMiddleInterface<T> extends TestInterface<T> {
-    }
+    static class TestSubSub extends TestSub {}
 
     static class TestMiddleSub implements TestMiddleInterface<String> {
+
         @Override
         public String getName(String instance) {
             return "\"" + instance + "\'";
         }
     }
 
-    static class TestMiddleSubSub extends TestMiddleSub {
-    }
+    static class TestMiddleSubSub extends TestMiddleSub {}
 }

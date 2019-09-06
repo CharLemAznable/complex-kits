@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.config;
 
-import com.github.charlemaznable.core.config.Config;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

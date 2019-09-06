@@ -24,7 +24,6 @@ public class ClzResolver {
     public static List<Class<?>> getClasses(String basePackage, Predicate<Class<?>> classPredicate) {
         val resolver = new PathMatchingResourcePatternResolver();
         val metaFactory = new CachingMetadataReaderFactory(resolver);
-
         val resources = resolver.getResources(CLASSPATH_ALL_URL_PREFIX
                 + resolveBasePackage(basePackage) + PATTERN);
 

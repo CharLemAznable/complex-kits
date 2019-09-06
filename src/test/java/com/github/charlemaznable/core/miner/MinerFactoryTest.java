@@ -30,16 +30,6 @@ public class MinerFactoryTest {
         MockDiamondServer.tearDownMockServer();
     }
 
-    @MinerConfig
-    interface StoneDefault {
-
-        @MinerConfig("stone.data")
-        String abc();
-
-        @MinerConfig(group = "stone.group", dataId = "stone.data")
-        String xyz();
-    }
-
     @Test
     public void testStone() {
         MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "stone.data", "abc");
@@ -48,49 +38,6 @@ public class MinerFactoryTest {
         val stoneDefault = getMiner(StoneDefault.class);
         assertEquals("abc", stoneDefault.abc());
         assertEquals("xyz", stoneDefault.xyz());
-    }
-
-    @Data
-    public static class MinerContentBean implements ParamsAppliable {
-
-        private String name;
-
-        @Override
-        public void applyParams(String[] strings) {
-            if (strings.length > 0) this.name = strings[0];
-        }
-    }
-
-    @MinerConfig("DEFAULT_DATA")
-    public interface MinerDefault {
-
-        String name();
-
-        String full();
-
-        @MinerConfig("long")
-        String longName();
-
-        default List<String> longSplit() {
-            return Splitter.on(" ").omitEmptyStrings()
-                    .trimResults().splitToList(longName());
-        }
-
-        @MinerConfig(defaultValue = "abc")
-        String abc(String defaultValue);
-
-        int count(Integer defaultValue);
-
-        @MinerConfig(defaultValue = "1")
-        int count1();
-
-        boolean testMode();
-
-        Boolean testMode2();
-
-        MinerContentBean content();
-
-        List<MinerContentBean> list();
     }
 
     @SneakyThrows
@@ -140,9 +87,6 @@ public class MinerFactoryTest {
         assertEquals("John Doe Richard", minerableDefault.getString("long"));
     }
 
-    @MinerConfig("DEFAULT_DATA")
-    public interface MinerableDefault extends Minerable {}
-
     @Test
     public void testMinerable() {
         MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA",
@@ -153,5 +97,61 @@ public class MinerFactoryTest {
         assertEquals("John", minerableDefault.getString("name"));
         assertEquals("John Doe", minerableDefault.getString("full"));
         assertEquals("John Doe Richard", minerableDefault.getString("long"));
+    }
+
+    @MinerConfig
+    interface StoneDefault {
+
+        @MinerConfig("stone.data")
+        String abc();
+
+        @MinerConfig(group = "stone.group", dataId = "stone.data")
+        String xyz();
+    }
+
+    @MinerConfig("DEFAULT_DATA")
+    public interface MinerDefault {
+
+        String name();
+
+        String full();
+
+        @MinerConfig("long")
+        String longName();
+
+        default List<String> longSplit() {
+            return Splitter.on(" ").omitEmptyStrings()
+                    .trimResults().splitToList(longName());
+        }
+
+        @MinerConfig(defaultValue = "abc")
+        String abc(String defaultValue);
+
+        int count(Integer defaultValue);
+
+        @MinerConfig(defaultValue = "1")
+        int count1();
+
+        boolean testMode();
+
+        Boolean testMode2();
+
+        MinerContentBean content();
+
+        List<MinerContentBean> list();
+    }
+
+    @MinerConfig("DEFAULT_DATA")
+    public interface MinerableDefault extends Minerable {}
+
+    @Data
+    public static class MinerContentBean implements ParamsAppliable {
+
+        private String name;
+
+        @Override
+        public void applyParams(String[] strings) {
+            if (strings.length > 0) this.name = strings[0];
+        }
     }
 }

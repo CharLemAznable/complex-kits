@@ -1,7 +1,5 @@
 package com.github.charlemaznable.core.codec;
 
-
-import com.github.charlemaznable.core.codec.BaseX;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 

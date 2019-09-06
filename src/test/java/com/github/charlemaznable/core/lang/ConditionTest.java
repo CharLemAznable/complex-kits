@@ -1,13 +1,24 @@
 package com.github.charlemaznable.core.lang;
 
-import com.github.charlemaznable.core.lang.Condition;
 import com.github.charlemaznable.core.lang.ex.BlankStringException;
 import com.github.charlemaznable.core.lang.ex.EmptyObjectException;
 import lombok.Data;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
-import static com.github.charlemaznable.core.lang.Condition.*;
+import static com.github.charlemaznable.core.lang.Condition.blankThen;
+import static com.github.charlemaznable.core.lang.Condition.checkCondition;
+import static com.github.charlemaznable.core.lang.Condition.checkNotBlank;
+import static com.github.charlemaznable.core.lang.Condition.checkNotEmpty;
+import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
+import static com.github.charlemaznable.core.lang.Condition.emptyThen;
+import static com.github.charlemaznable.core.lang.Condition.nonBlank;
+import static com.github.charlemaznable.core.lang.Condition.nonEmpty;
+import static com.github.charlemaznable.core.lang.Condition.nonNull;
+import static com.github.charlemaznable.core.lang.Condition.notBlankThen;
+import static com.github.charlemaznable.core.lang.Condition.notEmptyThen;
+import static com.github.charlemaznable.core.lang.Condition.notNullThen;
+import static com.github.charlemaznable.core.lang.Condition.nullThen;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;

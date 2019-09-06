@@ -75,7 +75,6 @@ public class Xml {
         public static Document xmlString2Document(String text, XmlParseFeature feature) {
             val reader = new SAXReader();
             feature.setSAXReaderFeatures(reader);
-
             val encoding = getEncoding(text);
             val source = new InputSource(new StringReader(text));
             source.setEncoding(encoding);
@@ -83,7 +82,6 @@ public class Xml {
             if (result.getXMLEncoding() == null) {
                 result.setXMLEncoding(encoding);
             }
-
             return result;
         }
 

@@ -100,7 +100,7 @@ public class MinerFactory {
             return null;
         }
 
-        private static Object convertType(String value, Method method) {
+        private Object convertType(String value, Method method) {
             var rt = Primitives.unwrap(method.getReturnType());
             if (rt == String.class) return value;
             if (rt.isPrimitive()) return parsePrimitive(rt, value);
@@ -115,7 +115,7 @@ public class MinerFactory {
 
         }
 
-        private static Object parsePrimitive(Class<?> rt, String value) {
+        private Object parsePrimitive(Class<?> rt, String value) {
             if (rt == boolean.class) return Str.anyOfIgnoreCase(value, "yes", "true", "on");
             if (rt == short.class) return Short.parseShort(value);
             if (rt == int.class) return Integer.parseInt(value);
@@ -126,11 +126,11 @@ public class MinerFactory {
             return null;
         }
 
-        private static Object parseObject(Class<?> rt, String value) {
+        private Object parseObject(Class<?> rt, String value) {
             return DiamondUtils.parseObject(value, rt);
         }
 
-        private static Object parseObjects(Class<?> rt, String value) {
+        private Object parseObjects(Class<?> rt, String value) {
             return DiamondUtils.parseObjects(value, rt);
         }
     }

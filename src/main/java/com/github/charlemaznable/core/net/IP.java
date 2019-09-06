@@ -11,13 +11,13 @@ import static java.net.NetworkInterface.getNetworkInterfaces;
 
 public enum IP {
 
-    V4{
+    V4 {
         @Override
         protected boolean checkInetAddress(InetAddress inetAddress) {
             return inetAddress instanceof Inet4Address;
         }
     },
-    V6{
+    V6 {
         @Override
         protected boolean checkInetAddress(InetAddress inetAddress) {
             return inetAddress instanceof Inet6Address;

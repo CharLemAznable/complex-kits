@@ -94,7 +94,6 @@ public class Base64 {
             val useChunking = lineLength > 0 && chunkSeparatorLength > 0;
             this.lineLength = useChunking ? (lineLength / encodedBlockSize) * encodedBlockSize : 0;
             this.chunkSeparatorLength = chunkSeparatorLength;
-
             this.pad = pad;
         }
 
@@ -273,8 +272,7 @@ public class Base64 {
 
             int modulus;
 
-            Context() {
-            }
+            Context() {}
 
             @SuppressWarnings("boxing") // OK to ignore boxing here
             @Override
@@ -285,7 +283,6 @@ public class Base64 {
             }
         }
     }
-
 
     private static class ApacheBase64 extends ApacheBaseNCodec {
 
@@ -505,6 +502,7 @@ public class Base64 {
                 switch (context.modulus) { // 0-2
                     case 0: // nothing to do here
                         break;
+
                     case 1: // 8 bits = 6 + 2
                         // top 6 bits:
                         buffer[context.pos++] = encodeTable[(context.ibitWorkArea >> 2) & MASK_6BITS];
@@ -526,6 +524,7 @@ public class Base64 {
                             buffer[context.pos++] = pad;
                         }
                         break;
+
                     default:
                         throw new IllegalStateException("Impossible modulus " + context.modulus);
                 }

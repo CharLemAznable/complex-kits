@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.lang;
 
-import com.github.charlemaznable.core.lang.EasyEnhancer;
 import lombok.val;
 import lombok.var;
 import net.sf.cglib.proxy.Callback;
@@ -67,11 +66,9 @@ public class EasyEnhancerTest {
         }
     }
 
-    static class ParamType {
-    }
+    static class ParamType {}
 
-    static class ActualParamType extends ParamType {
-    }
+    static class ActualParamType extends ParamType {}
 
     static class Interceptor implements MethodInterceptor {
 

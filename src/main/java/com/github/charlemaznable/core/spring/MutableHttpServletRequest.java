@@ -62,6 +62,12 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper {
         return this.params;
     }
 
+    public void setParameterMap(Map<String, Object> params) {
+        for (val param : params.entrySet()) {
+            setParameter(param.getKey(), param.getValue());
+        }
+    }
+
     @Override
     public Enumeration<String> getParameterNames() {
         return Collections.enumeration(this.params.keySet());
@@ -81,12 +87,6 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper {
             } else {
                 this.params.put(name, new String[]{String.valueOf(value)});
             }
-        }
-    }
-
-    public void setParameterMap(Map<String, Object> params) {
-        for (val param : params.entrySet()) {
-            setParameter(param.getKey(), param.getValue());
         }
     }
 

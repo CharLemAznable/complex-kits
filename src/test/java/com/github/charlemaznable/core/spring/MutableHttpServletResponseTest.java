@@ -1,7 +1,5 @@
 package com.github.charlemaznable.core.spring;
 
-import com.github.charlemaznable.core.spring.MutableHttpServletResponse;
-import com.github.charlemaznable.core.spring.MutableHttpServletUtils;
 import com.google.common.base.Charsets;
 import lombok.SneakyThrows;
 import lombok.val;

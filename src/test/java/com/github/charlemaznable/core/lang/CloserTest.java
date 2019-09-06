@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.lang;
 
-import com.github.charlemaznable.core.lang.Closer;
 import lombok.Getter;
 import lombok.val;
 import org.junit.jupiter.api.Test;

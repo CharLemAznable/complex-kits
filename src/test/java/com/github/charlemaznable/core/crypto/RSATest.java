@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.crypto;
 
-
 import com.github.charlemaznable.core.lang.Rand;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -9,11 +8,23 @@ import org.junit.jupiter.api.Test;
 
 import static com.github.charlemaznable.core.codec.Hex.hex;
 import static com.github.charlemaznable.core.codec.Hex.unHex;
-import static com.github.charlemaznable.core.crypto.RSA.*;
+import static com.github.charlemaznable.core.crypto.RSA.generateKeyPair;
+import static com.github.charlemaznable.core.crypto.RSA.getPrivateKey;
+import static com.github.charlemaznable.core.crypto.RSA.getPrivateKeyString;
+import static com.github.charlemaznable.core.crypto.RSA.getPublicKey;
+import static com.github.charlemaznable.core.crypto.RSA.getPublicKeyString;
+import static com.github.charlemaznable.core.crypto.RSA.privateKey;
+import static com.github.charlemaznable.core.crypto.RSA.prvDecrypt;
+import static com.github.charlemaznable.core.crypto.RSA.prvEncrypt;
+import static com.github.charlemaznable.core.crypto.RSA.pubDecrypt;
+import static com.github.charlemaznable.core.crypto.RSA.pubEncrypt;
+import static com.github.charlemaznable.core.crypto.RSA.publicKey;
 import static java.lang.Runtime.getRuntime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RSATest {
+
+    public final int TIMES = 10000;
 
     @Test
     public void testRSA() {
@@ -61,8 +72,6 @@ public class RSATest {
             assertEquals(plainText, dec2);
         }
     }
-
-    public final int TIMES = 10000;
 
     @SneakyThrows
     public void routineRun(int threads) {

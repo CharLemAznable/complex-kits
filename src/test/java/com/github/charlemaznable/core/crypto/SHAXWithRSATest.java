@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.crypto;
 
-import com.github.charlemaznable.core.crypto.SHAXWithRSA;
 import com.github.charlemaznable.core.lang.Rand;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -16,6 +15,8 @@ import static java.lang.Runtime.getRuntime;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SHAXWithRSATest {
+
+    public final int TIMES = 10000;
 
     @Test
     public void testSHA1WithRSA() {
@@ -69,8 +70,6 @@ public class SHAXWithRSATest {
             assertTrue(shax.verifyBase64(plainText, signBase64, publicKeyString));
         }
     }
-
-    public final int TIMES = 10000;
 
     @SneakyThrows
     public void routineRun(SHAXWithRSA shax, int threads) {

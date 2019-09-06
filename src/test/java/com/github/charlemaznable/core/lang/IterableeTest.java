@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.lang;
 
-import com.github.charlemaznable.core.lang.Iterablee;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

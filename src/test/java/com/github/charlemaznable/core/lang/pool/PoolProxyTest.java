@@ -1,8 +1,5 @@
 package com.github.charlemaznable.core.lang.pool;
 
-import com.github.charlemaznable.core.lang.pool.PoolProxy;
-import com.github.charlemaznable.core.lang.pool.PoolProxyConfigBuilder;
-import com.github.charlemaznable.core.lang.pool.PooledObjectCreator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;

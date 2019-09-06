@@ -98,7 +98,6 @@ public class HttpReq {
 
     public HttpReq cookie(String value) {
         if (value == null) return this;
-
         return prop("Cookie", value);
     }
 
@@ -111,7 +110,6 @@ public class HttpReq {
     public HttpReq param(String name, String value) {
         if (params.length() > 0) params.append('&');
         params.append(name).append('=').append(encode(value));
-
         return this;
     }
 
@@ -131,7 +129,6 @@ public class HttpReq {
             if (params.length() > 0) params.append('&');
             params.append(requestBody);
         }
-
         return this;
     }
 

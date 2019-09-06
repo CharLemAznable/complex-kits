@@ -1,8 +1,6 @@
 package com.github.charlemaznable.core.spring;
 
 import com.github.charlemaznable.core.net.Http;
-import com.github.charlemaznable.core.spring.MutableHttpServletRequest;
-import com.github.charlemaznable.core.spring.MutableHttpServletUtils;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;

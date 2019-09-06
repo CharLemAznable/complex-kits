@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.codec;
 
-import com.github.charlemaznable.core.codec.Base64;
 import org.junit.jupiter.api.Test;
 
 import static com.github.charlemaznable.core.codec.Base64.Format.Purified;

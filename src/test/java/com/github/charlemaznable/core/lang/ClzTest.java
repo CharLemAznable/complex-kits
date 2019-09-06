@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.lang;
 
-import com.github.charlemaznable.core.lang.Clz;
 import lombok.val;
 import lombok.var;
 import org.junit.jupiter.api.Test;
@@ -87,9 +86,7 @@ public class ClzTest {
         }
     }
 
-    static class ParamType {
-    }
+    static class ParamType {}
 
-    static class SubParamType extends ParamType {
-    }
+    static class SubParamType extends ParamType {}
 }

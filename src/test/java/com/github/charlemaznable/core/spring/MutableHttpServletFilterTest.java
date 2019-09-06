@@ -31,14 +31,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestInstance(Lifecycle.PER_CLASS)
 public class MutableHttpServletFilterTest {
 
+    private static MockMvc mockMvc;
     @Autowired
     private MutableHttpServletFilterController mutableHttpServletFilterController;
     @Autowired
     private MutableHttpServletFilterInterceptor mutableHttpServletFilterInterceptor;
     @Autowired
     private MutableHttpServletFilter mutableHttpServletFilter;
-
-    private static MockMvc mockMvc;
 
     @BeforeAll
     public void setup() {

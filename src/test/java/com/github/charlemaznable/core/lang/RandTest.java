@@ -1,7 +1,5 @@
 package com.github.charlemaznable.core.lang;
 
-
-import com.github.charlemaznable.core.lang.Rand;
 import lombok.val;
 import lombok.var;
 import org.junit.jupiter.api.Test;
