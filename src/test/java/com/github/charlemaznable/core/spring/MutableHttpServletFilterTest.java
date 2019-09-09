@@ -18,8 +18,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Map;
-
 import static com.github.charlemaznable.core.codec.Json.unJson;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -54,8 +52,8 @@ public class MutableHttpServletFilterTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
-        String responseContent = response.getContentAsString();
-        Map<String, Object> responseMap = unJson(responseContent);
+        val responseContent = response.getContentAsString();
+        val responseMap = unJson(responseContent);
         assertEquals("TRUE", responseMap.get("IN_REQUEST"));
         assertEquals("TRUE", responseMap.get("IN_PREHANDLE"));
         assertEquals("TRUE", responseMap.get("IN_CONTROLLER"));

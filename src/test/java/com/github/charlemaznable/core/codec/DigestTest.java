@@ -23,20 +23,25 @@ public class DigestTest {
     public void testDigestHex() throws NoSuchAlgorithmException {
         val hashMD5Hex = MD5.digestHex("可以提供有状态的Hasher");
         assertEquals(hashMD5Hex, MD5.digestHex("可以提供有状态的Hasher"));
+        assertEquals(hashMD5Hex, hex(MD5.digest("可以提供有状态的Hasher")));
         assertEquals(hashMD5Hex, hex(getInstance("MD5").digest(bytes("可以提供有状态的Hasher"))));
 
         val hashSHA1Hex = SHA1.digestHex("可以提供有状态的Hasher");
         assertEquals(hashSHA1Hex, SHA1.digestHex("可以提供有状态的Hasher"));
+        assertEquals(hashSHA1Hex, hex(SHA1.digest("可以提供有状态的Hasher")));
         assertEquals(hashSHA1Hex, hex(getInstance("SHA1").digest(bytes("可以提供有状态的Hasher"))));
 
         val hashSHA256Hex = SHA256.digestHex("可以提供有状态的Hasher");
         assertEquals(hashSHA256Hex, SHA256.digestHex("可以提供有状态的Hasher"));
+        assertEquals(hashSHA256Hex, hex(SHA256.digest("可以提供有状态的Hasher")));
 
         val hashSHA384Hex = SHA384.digestHex("可以提供有状态的Hasher");
         assertEquals(hashSHA384Hex, SHA384.digestHex("可以提供有状态的Hasher"));
+        assertEquals(hashSHA384Hex, hex(SHA384.digest("可以提供有状态的Hasher")));
 
         val hashSHA512Hex = SHA512.digestHex("可以提供有状态的Hasher");
         assertEquals(hashSHA512Hex, SHA512.digestHex("可以提供有状态的Hasher"));
+        assertEquals(hashSHA512Hex, hex(SHA512.digest("可以提供有状态的Hasher")));
     }
 
     @Test
@@ -44,20 +49,25 @@ public class DigestTest {
     public void testDigestSaltHex() throws NoSuchAlgorithmException {
         val hashMD5Hex = MD5.digestHex("可以提供有状态的Hasher", "salt");
         assertEquals(hashMD5Hex, MD5.digestHex("可以提供有状态的Hasher", "salt"));
+        assertEquals(hashMD5Hex, hex(MD5.digest("可以提供有状态的Hasher", "salt")));
         assertEquals(hashMD5Hex, hex(getInstance("MD5").digest(bytes("salt可以提供有状态的Hashersalt"))));
 
         val hashSHA1Hex = SHA1.digestHex("可以提供有状态的Hasher", "salt");
         assertEquals(hashSHA1Hex, SHA1.digestHex("可以提供有状态的Hasher", "salt"));
+        assertEquals(hashSHA1Hex, hex(SHA1.digest("可以提供有状态的Hasher", "salt")));
         assertEquals(hashSHA1Hex, hex(getInstance("SHA1").digest(bytes("salt可以提供有状态的Hashersalt"))));
 
         val hashSHA256Hex = SHA256.digestHex("可以提供有状态的Hasher", "salt");
         assertEquals(hashSHA256Hex, SHA256.digestHex("可以提供有状态的Hasher", "salt"));
+        assertEquals(hashSHA256Hex, hex(SHA256.digest("可以提供有状态的Hasher", "salt")));
 
         val hashSHA384Hex = SHA384.digestHex("可以提供有状态的Hasher", "salt");
         assertEquals(hashSHA384Hex, SHA384.digestHex("可以提供有状态的Hasher", "salt"));
+        assertEquals(hashSHA384Hex, hex(SHA384.digest("可以提供有状态的Hasher", "salt")));
 
         val hashSHA512Hex = SHA512.digestHex("可以提供有状态的Hasher", "salt");
         assertEquals(hashSHA512Hex, SHA512.digestHex("可以提供有状态的Hasher", "salt"));
+        assertEquals(hashSHA512Hex, hex(SHA512.digest("可以提供有状态的Hasher", "salt")));
     }
 
     @Test

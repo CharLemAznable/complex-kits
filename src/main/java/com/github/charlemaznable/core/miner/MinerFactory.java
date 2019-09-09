@@ -10,7 +10,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.ToString;
-import lombok.experimental.UtilityClass;
 import lombok.val;
 import lombok.var;
 import net.sf.cglib.proxy.Callback;
@@ -31,31 +30,30 @@ import static com.github.charlemaznable.core.lang.Str.isNotBlank;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 
 @SuppressWarnings("unchecked")
-@UtilityClass
 public class MinerFactory {
 
-    private Cache<Class, Object> minerCache = CacheBuilder.newBuilder().build();
+    private static Cache<Class, Object> minerCache = CacheBuilder.newBuilder().build();
 
     @SneakyThrows
-    public <T> T getMiner(final Class<T> minerClass) {
+    public static <T> T getMiner(final Class<T> minerClass) {
         ensureClassIsAnInterface(minerClass);
         val minerConfig = checkMinerConfig(minerClass);
         return (T) minerCache.get(minerClass, () -> loadMiner(minerClass, minerConfig));
     }
 
-    private <T> void ensureClassIsAnInterface(Class<T> clazz) {
+    private static <T> void ensureClassIsAnInterface(Class<T> clazz) {
         if (clazz.isInterface()) return;
 
         throw new MinerConfigException(clazz + " is not An Interface");
     }
 
-    private <T> MinerConfig checkMinerConfig(Class<T> clazz) {
+    private static <T> MinerConfig checkMinerConfig(Class<T> clazz) {
         return checkNotNull(findAnnotation(clazz, MinerConfig.class),
                 new MinerConfigException(clazz + " has no MinerConfig"));
     }
 
     @SneakyThrows
-    private Object loadMiner(Class minerClass, MinerConfig minerConfig) {
+    private static Object loadMiner(Class minerClass, MinerConfig minerConfig) {
         val minerable = new Miner(blankThen(
                 minerConfig.group(), () -> "DEFAULT_GROUP"));
         val dataId = minerConfig.dataId();

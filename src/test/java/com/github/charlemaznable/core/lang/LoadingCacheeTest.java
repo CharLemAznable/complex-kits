@@ -51,15 +51,15 @@ public class LoadingCacheeTest {
             public String load(@Nonnull String s) {
                 return s + toStr(currentTimeMillis());
             }
-        }, Duration.ofMillis(100));
+        }, Duration.ofMillis(200));
 
         val cachedValue = get(accessCache, "abc");
         assertEquals(cachedValue, get(accessCache, "abc"));
 
-        Thread.sleep(50);
+        Thread.sleep(100);
         assertEquals(cachedValue, get(accessCache, "abc"));
 
-        Thread.sleep(150);
+        Thread.sleep(300);
         assertNotEquals(cachedValue, get(accessCache, "abc"));
     }
 

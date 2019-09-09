@@ -10,6 +10,14 @@ import javax.servlet.http.HttpServletResponseWrapper;
 
 import static com.github.charlemaznable.core.codec.Bytes.bytes;
 import static com.github.charlemaznable.core.codec.Bytes.string;
+import static com.github.charlemaznable.core.spring.MutableHttpServletUtils.appendResponseContent;
+import static com.github.charlemaznable.core.spring.MutableHttpServletUtils.appendResponseContentByString;
+import static com.github.charlemaznable.core.spring.MutableHttpServletUtils.getResponseContent;
+import static com.github.charlemaznable.core.spring.MutableHttpServletUtils.getResponseContentAsString;
+import static com.github.charlemaznable.core.spring.MutableHttpServletUtils.mutableResponse;
+import static com.github.charlemaznable.core.spring.MutableHttpServletUtils.mutateResponse;
+import static com.github.charlemaznable.core.spring.MutableHttpServletUtils.setResponseContent;
+import static com.github.charlemaznable.core.spring.MutableHttpServletUtils.setResponseContentByString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -19,7 +27,7 @@ public class MutableHttpServletResponseTest {
     @SneakyThrows
     @Test
     public void testContent() {
-        String content = "Hello世界";
+        val content = "Hello世界";
 
         val mockResponse = new MockHttpServletResponse();
         val mutableResponse = new MutableHttpServletResponse(mockResponse);
@@ -27,25 +35,25 @@ public class MutableHttpServletResponseTest {
         val outputStream = mutableResponse.getOutputStream();
         outputStream.write(bytes(content));
         outputStream.flush();
-        byte[] content1 = mutableResponse.getContent();
+        val content1 = mutableResponse.getContent();
         assertEquals(content, string(content1));
 
-        MutableHttpServletUtils.setResponseContent(mutableResponse, bytes(content + content));
-        byte[] content2 = MutableHttpServletUtils.getResponseContent(mutableResponse);
+        setResponseContent(mutableResponse, bytes(content + content));
+        val content2 = getResponseContent(mutableResponse);
         assertEquals(content + content, string(content2));
 
-        MutableHttpServletUtils.appendResponseContent(mutableResponse, bytes(content));
-        byte[] content3 = MutableHttpServletUtils.getResponseContent(mutableResponse);
+        appendResponseContent(mutableResponse, bytes(content));
+        val content3 = getResponseContent(mutableResponse);
         assertEquals(content + content + content, string(content3));
 
-        byte[] mockContent = mockResponse.getContentAsByteArray();
+        val mockContent = mockResponse.getContentAsByteArray();
         assertEquals(0, mockContent.length);
     }
 
     @SneakyThrows
     @Test
     public void testContentAsString() {
-        String content = "Hello世界";
+        val content = "Hello世界";
 
         val mockResponse = new MockHttpServletResponse();
         val mutableResponse = new MutableHttpServletResponse(mockResponse);
@@ -53,25 +61,25 @@ public class MutableHttpServletResponseTest {
         val writer = mutableResponse.getWriter();
         writer.write(content);
         writer.flush();
-        String content1 = mutableResponse.getContentAsString();
+        val content1 = mutableResponse.getContentAsString();
         assertEquals(content, content1);
 
-        MutableHttpServletUtils.setResponseContentByString(mutableResponse, content + content);
-        String content2 = MutableHttpServletUtils.getResponseContentAsString(mutableResponse);
+        setResponseContentByString(mutableResponse, content + content);
+        val content2 = getResponseContentAsString(mutableResponse);
         assertEquals(content + content, content2);
 
-        MutableHttpServletUtils.appendResponseContentByString(mutableResponse, content);
-        String content3 = MutableHttpServletUtils.getResponseContentAsString(mutableResponse);
+        appendResponseContentByString(mutableResponse, content);
+        val content3 = getResponseContentAsString(mutableResponse);
         assertEquals(content + content + content, content3);
 
-        String mockContent = mockResponse.getContentAsString();
+        val mockContent = mockResponse.getContentAsString();
         assertEquals("", mockContent);
     }
 
     @SneakyThrows
     @Test
     public void testContentAsStringWithCharset() {
-        String content = string(bytes("Hello世界"), Charsets.ISO_8859_1);
+        val content = string(bytes("Hello世界"), Charsets.ISO_8859_1);
 
         val mockResponse = new MockHttpServletResponse();
         val mutableResponse = new MutableHttpServletResponse(mockResponse);
@@ -79,15 +87,15 @@ public class MutableHttpServletResponseTest {
         val outputStream = mutableResponse.getOutputStream();
         outputStream.write(bytes(content, Charsets.ISO_8859_1));
         outputStream.flush();
-        String content1 = mutableResponse.getContentAsString(Charsets.ISO_8859_1);
+        val content1 = mutableResponse.getContentAsString(Charsets.ISO_8859_1);
         assertEquals(content, content1);
 
-        MutableHttpServletUtils.setResponseContentByString(mutableResponse, content + content, Charsets.ISO_8859_1);
-        String content2 = MutableHttpServletUtils.getResponseContentAsString(mutableResponse, Charsets.ISO_8859_1);
+        setResponseContentByString(mutableResponse, content + content, Charsets.ISO_8859_1);
+        val content2 = getResponseContentAsString(mutableResponse, Charsets.ISO_8859_1);
         assertEquals(content + content, content2);
 
-        MutableHttpServletUtils.appendResponseContentByString(mutableResponse, content, Charsets.ISO_8859_1);
-        String content3 = MutableHttpServletUtils.getResponseContentAsString(mutableResponse, Charsets.ISO_8859_1);
+        appendResponseContentByString(mutableResponse, content, Charsets.ISO_8859_1);
+        val content3 = getResponseContentAsString(mutableResponse, Charsets.ISO_8859_1);
         assertEquals(content + content + content, content3);
     }
 
@@ -95,22 +103,22 @@ public class MutableHttpServletResponseTest {
     public void testWrapper() {
         val mockResponse = new MockHttpServletResponse();
         val mockWrapper = new HttpServletResponseWrapper(mockResponse);
-        assertNull(MutableHttpServletUtils.mutableResponse(mockWrapper));
+        assertNull(mutableResponse(mockWrapper));
 
         mockWrapper.setStatus(404);
-        MutableHttpServletUtils.mutateResponse(mockWrapper, response -> response.setStatus(500));
+        mutateResponse(mockWrapper, response -> response.setStatus(500));
         assertEquals(404, mockWrapper.getStatus());
 
         val mutableResponse = new MutableHttpServletResponse(mockResponse);
         val mutableWrapper = new HttpServletResponseWrapper(mutableResponse);
-        assertNotNull(MutableHttpServletUtils.mutableResponse(mutableWrapper));
+        assertNotNull(mutableResponse(mutableWrapper));
 
         mutableWrapper.setStatus(404);
-        MutableHttpServletUtils.mutateResponse(mutableWrapper, response -> {
+        mutateResponse(mutableWrapper, response -> {
             response.setStatus(500);
             response.setContentByString("mockWrapper");
         });
         assertEquals(500, mutableWrapper.getStatus());
-        assertEquals("mockWrapper", MutableHttpServletUtils.getResponseContentAsString(mutableWrapper));
+        assertEquals("mockWrapper", getResponseContentAsString(mutableWrapper));
     }
 }

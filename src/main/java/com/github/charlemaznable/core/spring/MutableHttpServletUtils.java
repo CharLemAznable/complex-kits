@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.spring;
 
-import lombok.experimental.UtilityClass;
 import lombok.val;
 import lombok.var;
 
@@ -12,10 +11,9 @@ import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.function.Consumer;
 
-@UtilityClass
 public class MutableHttpServletUtils {
 
-    public MutableHttpServletRequest mutableRequest(HttpServletRequest request) {
+    public static MutableHttpServletRequest mutableRequest(HttpServletRequest request) {
         var internalRequest = request;
         while (internalRequest instanceof HttpServletRequestWrapper) {
             if (internalRequest instanceof MutableHttpServletRequest) {
@@ -26,7 +24,7 @@ public class MutableHttpServletUtils {
         return null;
     }
 
-    public MutableHttpServletResponse mutableResponse(HttpServletResponse response) {
+    public static MutableHttpServletResponse mutableResponse(HttpServletResponse response) {
         var internalResponse = response;
         while (internalResponse instanceof HttpServletResponseWrapper) {
             if (internalResponse instanceof MutableHttpServletResponse) {
@@ -37,90 +35,90 @@ public class MutableHttpServletUtils {
         return null;
     }
 
-    public void setRequestBody(HttpServletRequest request, String body) {
+    public static void setRequestBody(HttpServletRequest request, String body) {
         val mutableRequest = mutableRequest(request);
         if (null == mutableRequest) return;
         mutableRequest.setRequestBody(body);
     }
 
-    public void setRequestParameter(HttpServletRequest request, String name, Object value) {
+    public static void setRequestParameter(HttpServletRequest request, String name, Object value) {
         val mutableRequest = mutableRequest(request);
         if (null == mutableRequest) return;
         mutableRequest.setParameter(name, value);
     }
 
-    public void setRequestParameterMap(HttpServletRequest request, Map<String, Object> params) {
+    public static void setRequestParameterMap(HttpServletRequest request, Map<String, Object> params) {
         val mutableRequest = mutableRequest(request);
         if (null == mutableRequest) return;
         mutableRequest.setParameterMap(params);
     }
 
-    public byte[] getResponseContent(HttpServletResponse response) {
+    public static byte[] getResponseContent(HttpServletResponse response) {
         val mutableResponse = mutableResponse(response);
         if (null == mutableResponse) return null;
         return mutableResponse.getContent();
     }
 
-    public void setResponseContent(HttpServletResponse response, byte[] content) {
+    public static void setResponseContent(HttpServletResponse response, byte[] content) {
         val mutableResponse = mutableResponse(response);
         if (null == mutableResponse) return;
         mutableResponse.setContent(content);
     }
 
-    public void appendResponseContent(HttpServletResponse response, byte[] content) {
+    public static void appendResponseContent(HttpServletResponse response, byte[] content) {
         val mutableResponse = mutableResponse(response);
         if (null == mutableResponse) return;
         mutableResponse.appendContent(content);
     }
 
-    public String getResponseContentAsString(HttpServletResponse response) {
+    public static String getResponseContentAsString(HttpServletResponse response) {
         val mutableResponse = mutableResponse(response);
         if (null == mutableResponse) return null;
         return mutableResponse.getContentAsString();
     }
 
-    public void setResponseContentByString(HttpServletResponse response, String content) {
+    public static void setResponseContentByString(HttpServletResponse response, String content) {
         val mutableResponse = mutableResponse(response);
         if (null == mutableResponse) return;
         mutableResponse.setContentByString(content);
     }
 
-    public void appendResponseContentByString(HttpServletResponse response, String content) {
+    public static void appendResponseContentByString(HttpServletResponse response, String content) {
         val mutableResponse = mutableResponse(response);
         if (null == mutableResponse) return;
         mutableResponse.appendContentByString(content);
     }
 
-    public String getResponseContentAsString(HttpServletResponse response, Charset charset) {
+    public static String getResponseContentAsString(HttpServletResponse response, Charset charset) {
         val mutableResponse = mutableResponse(response);
         if (null == mutableResponse) return null;
         return mutableResponse.getContentAsString(charset);
     }
 
-    public void setResponseContentByString(HttpServletResponse response, String content, Charset charset) {
+    public static void setResponseContentByString(HttpServletResponse response, String content, Charset charset) {
         val mutableResponse = mutableResponse(response);
         if (null == mutableResponse) return;
         mutableResponse.setContentByString(content, charset);
     }
 
-    public void appendResponseContentByString(HttpServletResponse response, String content, Charset charset) {
+    public static void appendResponseContentByString(HttpServletResponse response, String content, Charset charset) {
         val mutableResponse = mutableResponse(response);
         if (null == mutableResponse) return;
         mutableResponse.appendContentByString(content, charset);
     }
 
-    public void mutateResponse(HttpServletResponse response, Consumer<MutableHttpServletResponse> mutator) {
+    public static void mutateResponse(HttpServletResponse response, Consumer<MutableHttpServletResponse> mutator) {
         if (null == mutator) return;
         val mutableResponse = mutableResponse(response);
         if (null == mutableResponse) return;
         mutator.accept(mutableResponse);
     }
 
-    private HttpServletRequest internalRequest(HttpServletRequestWrapper requestWrapper) {
+    private static HttpServletRequest internalRequest(HttpServletRequestWrapper requestWrapper) {
         return (HttpServletRequest) requestWrapper.getRequest();
     }
 
-    private HttpServletResponse internalResponse(HttpServletResponseWrapper responseWrapper) {
+    private static HttpServletResponse internalResponse(HttpServletResponseWrapper responseWrapper) {
         return (HttpServletResponse) responseWrapper.getResponse();
     }
 }

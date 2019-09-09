@@ -23,21 +23,25 @@ public class DigestHMACTest {
 
         val hashMD5Hex = MD5.digestHex("可以提供有状态的Hasher", key);
         assertEquals(hashMD5Hex, MD5.digestHex("可以提供有状态的Hasher", key));
+        assertEquals(hashMD5Hex, hex(MD5.digest("可以提供有状态的Hasher", key)));
         val hmacMD5 = getInstance("HmacMD5");
         hmacMD5.init(new SecretKeySpec(bytes(key), "HmacMD5"));
         assertEquals(hashMD5Hex, hex(hmacMD5.doFinal(bytes("可以提供有状态的Hasher"))));
 
         val hashSHA1Hex = SHA1.digestHex("可以提供有状态的Hasher", key);
         assertEquals(hashSHA1Hex, SHA1.digestHex("可以提供有状态的Hasher", key));
+        assertEquals(hashSHA1Hex, hex(SHA1.digest("可以提供有状态的Hasher", key)));
         val hmacSHA1 = getInstance("HmacSHA1");
         hmacSHA1.init(new SecretKeySpec(bytes(key), "HmacSHA1"));
         assertEquals(hashSHA1Hex, hex(hmacSHA1.doFinal(bytes("可以提供有状态的Hasher"))));
 
         val hashSHA256Hex = SHA256.digestHex("可以提供有状态的Hasher", key);
         assertEquals(hashSHA256Hex, SHA256.digestHex("可以提供有状态的Hasher", key));
+        assertEquals(hashSHA256Hex, hex(SHA256.digest("可以提供有状态的Hasher", key)));
 
         val hashSHA512Hex = SHA512.digestHex("可以提供有状态的Hasher", key);
         assertEquals(hashSHA512Hex, SHA512.digestHex("可以提供有状态的Hasher", key));
+        assertEquals(hashSHA512Hex, hex(SHA512.digest("可以提供有状态的Hasher", key)));
     }
 
     @Test

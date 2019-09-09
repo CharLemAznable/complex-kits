@@ -16,6 +16,8 @@ public class XmlTest {
 
     @Test
     public void testXml() {
+        new Xml();
+
         Map<String, Object> map = newHashMap();
         var xml = xml(map);
         assertEquals(map, unXml(xml));

@@ -12,6 +12,8 @@ public class Base92Test {
 
     @Test
     public void testBase92() {
+        new Base92();
+
         assertEquals("ASDFGHJ", string(unBase92(base92(bytes("ASDFGHJ")))));
     }
 }
