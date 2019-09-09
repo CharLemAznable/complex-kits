@@ -9,6 +9,8 @@ public class MathTest {
 
     @Test
     public void testGCD() {
+        new Math();
+
         assertEquals(12, gcd(24, 60));
         assertEquals(29, gcd(319, 377));
         assertEquals(7, gcd(98, 63));

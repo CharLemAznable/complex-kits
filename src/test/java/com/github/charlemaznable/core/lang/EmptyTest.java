@@ -11,6 +11,9 @@ public class EmptyTest {
 
     @Test
     public void testEmptyCollection() {
+        new Empty();
+
+        assertTrue(Empty.isEmpty(null));
         val list = newArrayList();
         assertTrue(Empty.isEmpty(list));
         list.add("test");

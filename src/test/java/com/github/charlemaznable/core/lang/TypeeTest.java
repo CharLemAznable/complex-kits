@@ -8,6 +8,8 @@ public class TypeeTest {
 
     @Test
     public void testTypee() {
+        new Typee();
+
         assertEquals(String.class, Typee.getActualTypeArgument(TestActual.class, TestInterface.class));
         assertEquals(String.class, Typee.getActualTypeArgument(TestActualSub.class, TestInterface.class));
 

@@ -40,7 +40,7 @@ public class EventBusExecutorTest {
     @SneakyThrows
     @Test
     public void testEventBusFixedExecutor() {
-        var testEventBusFixedExecutor = new TestEventBusFixedExecutor();
+        var testEventBusFixedExecutor = new TestEventBusFixedExecutor(null);
         testEventBusFixedExecutor.post("test");
         Thread.sleep(100);
         assertEquals("test", testEventBusFixedExecutor.message);

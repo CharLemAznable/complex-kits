@@ -11,6 +11,8 @@ public class NowTest {
 
     @Test
     public void testNow() {
+        new Now();
+
         assertEquals(19, now().length());
         assertEquals(23, millis().length());
 

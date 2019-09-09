@@ -12,6 +12,8 @@ public class ClzPathTest {
 
     @Test
     public void testClassExists() {
+        new ClzPath();
+
         assertFalse(ClzPath.classExists("com.github.charlemaznable.core.lang.ClzPathNon"));
         assertTrue(ClzPath.classExists("com.github.charlemaznable.core.lang.ClzPath"));
     }
