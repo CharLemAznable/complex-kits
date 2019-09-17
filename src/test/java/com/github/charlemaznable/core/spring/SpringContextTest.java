@@ -35,6 +35,16 @@ public class SpringContextTest {
         var multiBean = TestSpringContext.getBean(TestMultiClass.class);
         assertNull(multiBean);
 
+        multiBean = TestSpringContext.getBean("", (Class<TestMultiClass>) null);
+        assertNull(multiBean);
+
+        multiBean = TestSpringContext.getBean("", TestMultiClass.class);
+        assertNull(multiBean);
+
+        multiBean = TestSpringContext.getBean("TestMultiClassA", (Class<TestMultiClass>) null);
+        assertNotNull(multiBean);
+        assertEquals("AAA", multiBean.getName());
+
         multiBean = TestSpringContext.getBean("TestMultiClassA", TestMultiClass.class);
         assertNotNull(multiBean);
         assertEquals("AAA", multiBean.getName());
@@ -42,5 +52,8 @@ public class SpringContextTest {
         multiBean = TestSpringContext.getBean("TestMultiClassB", TestMultiClass.class);
         assertNotNull(multiBean);
         assertEquals("BBB", multiBean.getName());
+
+        multiBean = TestSpringContext.getBean("TestMultiClassC", TestMultiClass.class);
+        assertNull(multiBean);
     }
 }
