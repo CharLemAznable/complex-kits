@@ -20,9 +20,12 @@ public class ClzResolverTest {
         val basePackage = "com.github.charlemaznable.core.spring.testClass";
 
         val classes = getClasses(basePackage);
-        assertEquals(3, classes.size());
-        val testClass = classes.get(0);
-        assertEquals(TestClass.class, testClass);
+        int countTestClass = 0;
+        for (Class<?> clazz : classes) {
+            if (TestClass.class == clazz)
+                countTestClass++;
+        }
+        assertEquals(1, countTestClass);
 
         val subClasses = getSubClasses(basePackage, SpringContext.class);
         assertEquals(1, subClasses.size());

@@ -59,6 +59,29 @@ public class SpringContext implements ApplicationContextAware {
         return notNullThen(defaultSupplier, Supplier::get);
     }
 
+    public static <T> T getBean(String beanName, Class<T> clazz) {
+        return getBean(beanName, clazz, (T) null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T getBean(String beanName, Class<T> clazz, T defaultValue) {
+        return getBean(beanName, clazz, (Supplier<T>) () -> defaultValue);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T getBean(String beanName, Class<T> clazz, Supplier<T> defaultSupplier) {
+        if (applicationContext == null) return notNullThen(defaultSupplier, Supplier::get);
+        if (isEmpty(beanName) && clazz == null) return notNullThen(defaultSupplier, Supplier::get);
+        if (isEmpty(beanName)) return getBean(clazz, defaultSupplier);
+        if (clazz == null) return getBean(beanName, defaultSupplier);
+
+        try {
+            return applicationContext.getBean(beanName, clazz);
+        } catch (NoSuchBeanDefinitionException ignored) {
+        }
+        return notNullThen(defaultSupplier, Supplier::get);
+    }
+
     @Override
     public void setApplicationContext(@Nonnull ApplicationContext context) throws BeansException {
         applicationContext = context;
