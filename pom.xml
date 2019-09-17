@@ -6,7 +6,7 @@
 
     <groupId>com.github.charlemaznable</groupId>
     <artifactId>complex-kits</artifactId>
-    <version>0.9.0</version>
+    <version>0.9.1</version>
     <packaging>jar</packaging>
 
     <name>Complex Kits</name>
@@ -61,11 +61,11 @@
         <dom4j.version>2.1.1</dom4j.version>
         <diamond-client.version>0.0.21</diamond-client.version>
 
-        <lombok.version>1.18.8</lombok.version>
+        <lombok.version>1.18.10</lombok.version>
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
         <spring.version>5.1.9.RELEASE</spring.version>
 
-        <junit-jupiter-engine.version>5.5.1</junit-jupiter-engine.version>
+        <junit-jupiter-engine.version>5.5.2</junit-jupiter-engine.version>
 
         <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
