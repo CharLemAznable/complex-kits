@@ -1,11 +1,10 @@
 package com.github.charlemaznable.core.spring.testClass;
 
-import com.github.charlemaznable.core.spring.ComplexBeanNameGenerator;
+import com.github.charlemaznable.core.spring.ComplexComponentScan;
 import lombok.val;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 
-@ComponentScan(nameGenerator = ComplexBeanNameGenerator.class)
+@ComplexComponentScan
 public class TestConfiguration {
 
     @Bean("TestClass")
