@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
+import java.lang.annotation.Annotation;
 import java.util.function.Supplier;
 
 import static com.github.charlemaznable.core.lang.Condition.notNullThen;
@@ -80,6 +81,18 @@ public class SpringContext implements ApplicationContextAware {
         } catch (NoSuchBeanDefinitionException ignored) {
         }
         return notNullThen(defaultSupplier, Supplier::get);
+    }
+
+    public static String[] getBeanNamesForType(Class<?> clazz) {
+        if (applicationContext == null) return new String[0];
+        if (clazz == null) return new String[0];
+        return applicationContext.getBeanNamesForType(clazz);
+    }
+
+    public static String[] getBeanNamesForAnnotation(Class<? extends Annotation> annotation) {
+        if (applicationContext == null) return new String[0];
+        if (annotation == null) return new String[0];
+        return applicationContext.getBeanNamesForAnnotation(annotation);
     }
 
     @Override

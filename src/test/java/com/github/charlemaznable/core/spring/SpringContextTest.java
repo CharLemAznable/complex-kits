@@ -10,6 +10,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -55,5 +57,16 @@ public class SpringContextTest {
 
         multiBean = TestSpringContext.getBean("TestMultiClassC", TestMultiClass.class);
         assertNull(multiBean);
+
+        var multiBeanNames = TestSpringContext.getBeanNamesForType(null);
+        assertEquals(0, multiBeanNames.length);
+        multiBeanNames = TestSpringContext.getBeanNamesForType(TestClass.class);
+        assertEquals(1, multiBeanNames.length);
+        assertEquals("TestClass", multiBeanNames[0]);
+        multiBeanNames = TestSpringContext.getBeanNamesForType(TestMultiClass.class);
+        assertEquals(2, multiBeanNames.length);
+        Arrays.sort(multiBeanNames);
+        assertEquals("TestMultiClassA", multiBeanNames[0]);
+        assertEquals("TestMultiClassB", multiBeanNames[1]);
     }
 }

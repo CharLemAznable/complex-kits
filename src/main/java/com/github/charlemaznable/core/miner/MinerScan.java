@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.miner;
 
+import com.github.charlemaznable.core.spring.ComplexBeanNameGenerator;
 import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.context.annotation.Import;
 
@@ -21,5 +22,5 @@ public @interface MinerScan {
 
     Class<?>[] basePackageClasses() default {};
 
-    Class<? extends BeanNameGenerator> nameGenerator() default BeanNameGenerator.class;
+    Class<? extends BeanNameGenerator> nameGenerator() default ComplexBeanNameGenerator.class;
 }
