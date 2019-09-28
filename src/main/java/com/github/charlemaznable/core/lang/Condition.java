@@ -40,6 +40,48 @@ public class Condition {
         return null;
     }
 
+    public static short nonEquals(short base, short... numbers) {
+        for (val number : numbers) {
+            if (base != number) return number;
+        }
+        return base;
+    }
+
+    public static int nonEquals(int base, int... numbers) {
+        for (val number : numbers) {
+            if (base != number) return number;
+        }
+        return base;
+    }
+
+    public static long nonEquals(long base, long... numbers) {
+        for (val number : numbers) {
+            if (base != number) return number;
+        }
+        return base;
+    }
+
+    public static float nonEquals(float base, float... numbers) {
+        for (val number : numbers) {
+            if (base != number) return number;
+        }
+        return base;
+    }
+
+    public static double nonEquals(double base, double... numbers) {
+        for (val number : numbers) {
+            if (base != number) return number;
+        }
+        return base;
+    }
+
+    public static byte nonEquals(byte base, byte... bytes) {
+        for (val b : bytes) {
+            if (base != b) return b;
+        }
+        return base;
+    }
+
     public static <T, R> R notNullThen(T object, Function<? super T, R> action) {
         return checkNull(object, () -> null, action);
     }

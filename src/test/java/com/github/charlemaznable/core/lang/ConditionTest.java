@@ -14,6 +14,7 @@ import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static com.github.charlemaznable.core.lang.Condition.emptyThen;
 import static com.github.charlemaznable.core.lang.Condition.nonBlank;
 import static com.github.charlemaznable.core.lang.Condition.nonEmpty;
+import static com.github.charlemaznable.core.lang.Condition.nonEquals;
 import static com.github.charlemaznable.core.lang.Condition.nonNull;
 import static com.github.charlemaznable.core.lang.Condition.notBlankThen;
 import static com.github.charlemaznable.core.lang.Condition.notEmptyThen;
@@ -62,6 +63,22 @@ public class ConditionTest {
 
         assertEquals("nonNull", blankThen(strblank, () -> "nonNull"));
         assertEquals(string, blankThen(string, () -> "nonNull"));
+    }
+
+    @Test
+    public void testNonEquals() {
+        assertEquals((short) 10, nonEquals((short) 0, (short) 10, (short) 20));
+        assertEquals((short) 0, nonEquals((short) 0, (short) 0, (short) 0));
+        assertEquals(10, nonEquals(0, 10, 20));
+        assertEquals(0, nonEquals(0, 0, 0));
+        assertEquals(10L, nonEquals(0L, 10L, 20L));
+        assertEquals(0L, nonEquals(0L, 0L, 0L));
+        assertEquals(10F, nonEquals(0F, 10F, 20F));
+        assertEquals(0F, nonEquals(0F, 0F, 0F));
+        assertEquals(10D, nonEquals(0D, 10D, 20D));
+        assertEquals(0D, nonEquals(0D, 0D, 0D));
+        assertEquals((byte) 10, nonEquals((byte) 0, (byte) 10, (byte) 20));
+        assertEquals((byte) 0, nonEquals((byte) 0, (byte) 0, (byte) 0));
     }
 
     @SuppressWarnings("ConstantConditions")
