@@ -60,7 +60,7 @@ public class YCombinatorTest {
         assertEquals(10, facOrder.size());
         facOrder.clear();
         assertEquals(3628800, fac.apply(10));
-        assertEquals(1, facOrder.size());
+        assertEquals(0, facOrder.size());
 
         List<Integer> fibOrder = newArrayList();
         val fib = YCombinator.of(new CacheableFunction<Integer, Integer>() {
@@ -77,6 +77,6 @@ public class YCombinatorTest {
         assertEquals(10, fibOrder.size());
         fibOrder.clear();
         assertEquals(55, fib.apply(10));
-        assertEquals(1, fibOrder.size());
+        assertEquals(0, fibOrder.size());
     }
 }

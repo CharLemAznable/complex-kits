@@ -27,12 +27,14 @@ import java.util.Collection;
 import static com.github.charlemaznable.core.lang.Condition.blankThen;
 import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static com.github.charlemaznable.core.lang.Str.isNotBlank;
+import static java.time.Duration.ofMinutes;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 
 @SuppressWarnings("unchecked")
 public class MinerFactory {
 
-    private static Cache<Class, Object> minerCache = CacheBuilder.newBuilder().build();
+    private static Cache<Class, Object> minerCache =
+            CacheBuilder.newBuilder().expireAfterWrite(ofMinutes(10)).build();
 
     @SneakyThrows
     public static <T> T getMiner(final Class<T> minerClass) {

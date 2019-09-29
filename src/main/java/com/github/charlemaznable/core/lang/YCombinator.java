@@ -2,33 +2,19 @@ package com.github.charlemaznable.core.lang;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import lombok.val;
 
 import java.util.function.Function;
 
+import static com.github.charlemaznable.core.lang.Condition.nullThen;
+
 public class YCombinator {
 
-    public static <T, R> Function<T, R> of(Function<Function<T, R>, Function<T, R>> b) {
-        Function<Function, Function<T, R>> r = p -> {
-            @SuppressWarnings("unchecked")
-            val w = (Function<Function, Function<T, R>>) p;
-            return b.apply(param -> w.apply(w).apply(param));
-        };
-        return r.apply(r);
+    public static <T, R> Function<T, R> of(Function<Function<T, R>, Function<T, R>> f) {
+        return n -> f.apply(of(f)).apply(n);
     }
 
-    public static <T, R> Function<T, R> of(CacheableFunction<T, R> c) {
-        Function<Function, Function<T, R>> r = p -> {
-            @SuppressWarnings("unchecked")
-            val w = (Function<Function, Function<T, R>>) p;
-            return c.apply(param -> {
-                R present = c.getIfPresent(param);
-                if (null != present) return present;
-                R result = w.apply(w).apply(param);
-                return c.put(param, result);
-            });
-        };
-        return r.apply(r);
+    public static <T, R> Function<T, R> of(CacheableFunction<T, R> f) {
+        return n -> nullThen(f.getIfPresent(n), () -> f.put(n, f.apply(of(f)).apply(n)));
     }
 
     public static abstract class CacheableFunction<T, R>
