@@ -15,7 +15,7 @@ import java.nio.charset.Charset;
 import java.util.Map;
 
 import static com.github.charlemaznable.core.lang.Listt.newArrayList;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 public class FastJsonHttpMessageConverterBuilder {
 
@@ -72,7 +72,7 @@ public class FastJsonHttpMessageConverterBuilder {
     }
 
     public FastJsonHttpMessageConverter build() {
-        return build(APPLICATION_JSON_UTF8);
+        return build(APPLICATION_JSON);
     }
 
     public FastJsonHttpMessageConverter build(MediaType... mediaTypes) {

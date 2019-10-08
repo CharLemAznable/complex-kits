@@ -11,7 +11,6 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -20,6 +19,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static com.github.charlemaznable.core.codec.Json.unJson;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -49,7 +49,7 @@ public class MutableHttpServletFilterTest {
     public void testSample() {
         val response = mockMvc.perform(get("/mutable-filter")
                 .param("IN_REQUEST", "TRUE")
-                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         val responseContent = response.getContentAsString();

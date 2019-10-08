@@ -14,6 +14,6 @@ JAVA常用工具包.
 <dependency>
   <groupId>com.github.charlemaznable</groupId>
   <artifactId>complex-kits</artifactId>
-  <version>0.9.4</version>
+  <version>0.10.0</version>
 </dependency>
 ```
