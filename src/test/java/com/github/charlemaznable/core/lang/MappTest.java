@@ -64,7 +64,7 @@ public class MappTest {
         val map2 = Mapp.of("a", "AA", "b", "BB");
         val map3 = Mapp.of("a", "AAA", "b", "BBB", "c", "CCC");
 
-        val result = Mapp.combineMaps(map1, map2, map3);
+        val result = Mapp.combineMaps(null, map1, null, map2, null, map3, null);
         assertEquals("A", Mapp.getStr(result, "a"));
         assertEquals("BB", Mapp.getStr(result, "b"));
         assertEquals("CCC", Mapp.getStr(result, "c"));
