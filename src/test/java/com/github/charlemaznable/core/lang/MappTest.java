@@ -57,4 +57,17 @@ public class MappTest {
         assertNull(Mapp.getLong(map, "1"));
         assertEquals(Long.valueOf(3), Mapp.getLong(map, "3"));
     }
+
+    @Test
+    public void testCombine() {
+        val map1 = Mapp.of("a", "A");
+        val map2 = Mapp.of("a", "AA", "b", "BB");
+        val map3 = Mapp.of("a", "AAA", "b", "BBB", "c", "CCC");
+
+        val result = Mapp.combineMaps(map1, map2, map3);
+        assertEquals("A", Mapp.getStr(result, "a"));
+        assertEquals("BB", Mapp.getStr(result, "b"));
+        assertEquals("CCC", Mapp.getStr(result, "c"));
+
+    }
 }

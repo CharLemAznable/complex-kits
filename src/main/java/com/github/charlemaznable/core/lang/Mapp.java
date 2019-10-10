@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import lombok.SneakyThrows;
 import lombok.val;
 import lombok.var;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.NumberFormat;
@@ -158,5 +159,15 @@ public class Mapp {
 
     public static <K, V> HashMap<K, V> newHashMap(Map<? extends K, ? extends V> map) {
         return null == map ? Maps.newHashMap() : Maps.newHashMap(map);
+    }
+
+    @SafeVarargs
+    public static <K, V> Map<K, V> combineMaps(Map<? extends K, ? extends V>... maps) {
+        Map<K, V> result = Maps.newHashMap();
+        ArrayUtils.reverse(maps);
+        for (val map : maps) {
+            if (null != map) result.putAll(map);
+        }
+        return result;
     }
 }
