@@ -2,7 +2,7 @@ package com.github.charlemaznable.core.codec;
 
 import com.google.common.hash.Hasher;
 
-import static com.github.charlemaznable.core.codec.Base64.Format.Standard;
+import static com.github.charlemaznable.core.codec.Base64.Format.STANDARD;
 import static com.github.charlemaznable.core.codec.Base64.base64;
 import static com.github.charlemaznable.core.codec.Bytes.bytes;
 import static com.github.charlemaznable.core.codec.Hex.hex;
@@ -75,7 +75,7 @@ public enum Digest {
     }
 
     public String digestBase64(byte[] info) {
-        return base64(digest(info), Standard);
+        return base64(digest(info), STANDARD);
     }
 
     public String digestBase64(String info) {
@@ -83,7 +83,7 @@ public enum Digest {
     }
 
     public String digestBase64(byte[] info, byte[] salt) {
-        return base64(digest(info, salt), Standard);
+        return base64(digest(info, salt), STANDARD);
     }
 
     public String digestBase64(byte[] info, String salt) {
@@ -136,12 +136,12 @@ public enum Digest {
 
     @Deprecated
     public String digestBase64Deprecated(String info) {
-        return base64(digestDeprecated(info), Standard);
+        return base64(digestDeprecated(info), STANDARD);
     }
 
     @Deprecated
     public String digestBase64Deprecated(String info, String salt) {
-        return base64(digestDeprecated(info, salt), Standard);
+        return base64(digestDeprecated(info, salt), STANDARD);
     }
 
     @Deprecated

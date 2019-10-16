@@ -10,8 +10,6 @@ public class Base16Test {
 
     @Test
     public void testBase16() {
-        new Base16();
-
         assertEquals("6162636465666768", base16FromString("abcdefgh"));
     }
 

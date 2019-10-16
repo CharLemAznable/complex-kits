@@ -4,7 +4,7 @@ import com.google.common.hash.Hasher;
 
 import java.security.Key;
 
-import static com.github.charlemaznable.core.codec.Base64.Format.Standard;
+import static com.github.charlemaznable.core.codec.Base64.Format.STANDARD;
 import static com.github.charlemaznable.core.codec.Base64.base64;
 import static com.github.charlemaznable.core.codec.Bytes.bytes;
 import static com.github.charlemaznable.core.codec.Hex.hex;
@@ -93,15 +93,15 @@ public enum DigestHMAC {
     }
 
     public String digestBase64(byte[] info, Key key) {
-        return base64(digest(info, key), Standard);
+        return base64(digest(info, key), STANDARD);
     }
 
     public String digestBase64(byte[] info, byte[] key) {
-        return base64(digest(info, key), Standard);
+        return base64(digest(info, key), STANDARD);
     }
 
     public String digestBase64(byte[] info, String key) {
-        return base64(digest(info, key), Standard);
+        return base64(digest(info, key), STANDARD);
     }
 
     public String digestBase64(String info, Key key) {

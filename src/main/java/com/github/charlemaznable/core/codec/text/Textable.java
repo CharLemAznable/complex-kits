@@ -5,16 +5,20 @@ import lombok.val;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import static com.github.charlemaznable.core.codec.Json.desc;
 import static com.github.charlemaznable.core.lang.Listt.isNotEmpty;
 import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
+import static com.github.charlemaznable.core.lang.Str.isNull;
 import static com.github.charlemaznable.core.lang.Str.toStr;
-import static com.google.common.base.Joiner.on;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public abstract class Textable {
+
+    public static final String DEFAULT_ENTRY_SEPARATOR = "&";
+    public static final String DEFAULT_KEY_VALUE_SEPARATOR = "=";
 
     public String toText() {
         return this.toText(defaultProcessor());
@@ -24,18 +28,21 @@ public abstract class Textable {
         Map<String, String> result = newHashMap();
 
         Map<String, Object> describe = desc(this);
-        for (val key : describe.keySet()) {
-            if (isNotEmpty(excludedKeys()) &&
-                    excludedKeys().contains(key)) continue;
+        for (val entry : describe.entrySet()) {
+            val key = entry.getKey();
+            val value = toStr(entry.getValue());
+            if (isNull(key) ||
+                    (isNotEmpty(excludedKeys()) &&
+                            excludedKeys().contains(key)) ||
+                    isEmpty(value)) continue;
 
-            val value = toStr(describe.get(key));
-            if (isEmpty(value)) continue;
             result.put(key, processor == null ?
                     value : processor.process(value));
         }
 
-        return on(entrySeparator()).withKeyValueSeparator(
-                keyValueSeparator()).join(new TreeMap<>(result));
+        return new TreeMap<>(result).entrySet().stream()
+                .map(e -> e.getKey() + keyValueSeparator() + e.getValue())
+                .collect(Collectors.joining(entrySeparator()));
     }
 
     protected List<String> excludedKeys() {
@@ -43,11 +50,11 @@ public abstract class Textable {
     }
 
     protected String entrySeparator() {
-        return "&";
+        return DEFAULT_ENTRY_SEPARATOR;
     }
 
     protected String keyValueSeparator() {
-        return "=";
+        return DEFAULT_KEY_VALUE_SEPARATOR;
     }
 
     protected Processor defaultProcessor() {

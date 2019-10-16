@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.codec;
 
+import com.github.charlemaznable.core.codec.ex.CodecRuntimeException;
 import lombok.val;
 import lombok.var;
 
@@ -58,7 +59,7 @@ public class BaseX {
         var digitpos = 0;
         for (var i = 0; i < value.length(); i++) {
             var b = (int) this.bytes[value.charAt(i)];
-            if (b == 0) throw new RuntimeException("Illegal character!");
+            if (b == 0) throw new CodecRuntimeException("Illegal character!");
             b -= 1;
             for (var j = 0; j <= digitpos; j++) {
                 b += digits[j] * this.base;
@@ -74,10 +75,10 @@ public class BaseX {
             if (value.charAt(k) != this.leader) break;
             digits[++digitpos] = 0;
         }
-        val bytes = new byte[digitpos + 1];
+        val result = new byte[digitpos + 1];
         for (var i = digitpos; i >= 0; i--) {
-            bytes[digitpos - i] = (byte) digits[i];
+            result[digitpos - i] = (byte) digits[i];
         }
-        return bytes;
+        return result;
     }
 }

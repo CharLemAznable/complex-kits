@@ -14,8 +14,6 @@ public class Base62Test {
 
     @Test
     public void testBase64() {
-        new Base62();
-
         assertEquals("MTIzNDU2Nzg5MA", base64(bytes("1234567890")));
     }
 

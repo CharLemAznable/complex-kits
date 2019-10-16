@@ -9,6 +9,8 @@ import static java.lang.Integer.parseInt;
 
 public class Base16 {
 
+    private Base16() {}
+
     public static String base16(byte[] bytes) {
         val sb = new StringBuilder(bytes.length * 2);
         for (val aByte : bytes) {

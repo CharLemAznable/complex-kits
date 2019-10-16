@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.codec;
 
+import com.github.charlemaznable.core.codec.ex.CodecRuntimeException;
 import com.github.charlemaznable.core.lang.Str;
 import lombok.val;
 import lombok.var;
@@ -16,8 +17,10 @@ import static java.lang.System.arraycopy;
 
 public class Base64 {
 
+    private Base64() {}
+
     public static String base64(byte[] bytes) {
-        return base64(bytes, Format.Standard);
+        return base64(bytes, Format.STANDARD);
     }
 
     public static String padding(String s) {
@@ -29,7 +32,7 @@ public class Base64 {
     }
 
     public static String base64(String s) {
-        return base64(s, Format.Standard);
+        return base64(s, Format.STANDARD);
     }
 
     public static String base64(String s, Format format) {
@@ -38,11 +41,11 @@ public class Base64 {
 
     public static String base64(byte[] bytes, Format format) {
         switch (format) {
-            case Standard:
+            case STANDARD:
                 return ApacheBase64.encodeBase64String(bytes);
-            case UrlSafe:
+            case URL_SAFE:
                 return purify(ApacheBase64.encodeBase64URLSafeString(bytes));
-            case Purified:
+            case PURIFIED:
                 return purify(ApacheBase64.encodeBase64String(bytes));
         }
         return null;
@@ -57,15 +60,15 @@ public class Base64 {
     }
 
     public enum Format {
-        Standard,
+        STANDARD,
         // URL安全(将Base64中的URL非法字符'+'和'/'转为'-'和'_', 见RFC3548)
-        UrlSafe,
+        URL_SAFE,
         // 去除末尾=号
-        Purified
+        PURIFIED
     }
 
     @SuppressWarnings("SameParameterValue")
-    private static abstract class ApacheBaseNCodec {
+    private abstract static class ApacheBaseNCodec {
 
         public static final int MIME_CHUNK_SIZE = 76;
         protected static final int MASK_8BITS = 0xff;
@@ -73,9 +76,7 @@ public class Base64 {
         static final int EOF = -1;
         private static final int DEFAULT_BUFFER_RESIZE_FACTOR = 2;
         private static final int DEFAULT_BUFFER_SIZE = 8192;
-        @Deprecated
-        protected final byte PAD = PAD_DEFAULT; // instance variable just in case it needs to vary later
-        protected final byte pad; // instance variable just in case it needs to vary later
+        protected byte pad = PAD_DEFAULT; // instance variable just in case it needs to vary later
         protected final int lineLength;
         private final int unencodedBlockSize;
 
@@ -158,7 +159,7 @@ public class Base64 {
 
         public Object encode(final Object obj) {
             if (!(obj instanceof byte[])) {
-                throw new RuntimeException("Parameter supplied to Base-N encode is not a byte[]");
+                throw new CodecRuntimeException("Parameter supplied to Base-N encode is not a byte[]");
             }
             return encode((byte[]) obj);
         }
@@ -177,7 +178,7 @@ public class Base64 {
             } else if (obj instanceof String) {
                 return decode((String) obj);
             } else {
-                throw new RuntimeException("Parameter supplied to Base-N decode is not a byte[] or a String");
+                throw new CodecRuntimeException("Parameter supplied to Base-N decode is not a byte[] or a String");
             }
         }
 
@@ -369,11 +370,6 @@ public class Base64 {
             this.encodeTable = urlSafe ? URL_SAFE_ENCODE_TABLE : STANDARD_ENCODE_TABLE;
         }
 
-        @Deprecated
-        public static boolean isArrayByteBase64(final byte[] arrayOctet) {
-            return isBase64(arrayOctet);
-        }
-
         public static boolean isBase64(final byte octet) {
             return octet == PAD_DEFAULT || (octet >= 0 && octet < DECODE_TABLE.length && DECODE_TABLE[octet] != -1);
         }
@@ -493,47 +489,7 @@ public class Base64 {
             // inAvail < 0 is how we're informed of EOF in the underlying data we're
             // encoding.
             if (inAvail < 0) {
-                context.eof = true;
-                if (0 == context.modulus && lineLength == 0) {
-                    return; // no leftovers to process and not using chunking
-                }
-                val buffer = ensureBufferSize(encodeSize, context);
-                val savedPos = context.pos;
-                switch (context.modulus) { // 0-2
-                    case 0: // nothing to do here
-                        break;
-
-                    case 1: // 8 bits = 6 + 2
-                        // top 6 bits:
-                        buffer[context.pos++] = encodeTable[(context.ibitWorkArea >> 2) & MASK_6BITS];
-                        // remaining 2:
-                        buffer[context.pos++] = encodeTable[(context.ibitWorkArea << 4) & MASK_6BITS];
-                        // URL-SAFE skips the padding to further reduce size.
-                        if (encodeTable == STANDARD_ENCODE_TABLE) {
-                            buffer[context.pos++] = pad;
-                            buffer[context.pos++] = pad;
-                        }
-                        break;
-
-                    case 2: // 16 bits = 6 + 6 + 4
-                        buffer[context.pos++] = encodeTable[(context.ibitWorkArea >> 10) & MASK_6BITS];
-                        buffer[context.pos++] = encodeTable[(context.ibitWorkArea >> 4) & MASK_6BITS];
-                        buffer[context.pos++] = encodeTable[(context.ibitWorkArea << 2) & MASK_6BITS];
-                        // URL-SAFE skips the padding to further reduce size.
-                        if (encodeTable == STANDARD_ENCODE_TABLE) {
-                            buffer[context.pos++] = pad;
-                        }
-                        break;
-
-                    default:
-                        throw new IllegalStateException("Impossible modulus " + context.modulus);
-                }
-                context.currentLinePos += context.pos - savedPos; // keep track of current line position
-                // if currentPos == 0 we are at the start of a line, so don't add CRLF
-                if (lineLength > 0 && context.currentLinePos > 0) {
-                    arraycopy(lineSeparator, 0, buffer, context.pos, lineSeparator.length);
-                    context.pos += lineSeparator.length;
-                }
+                encodeInAvailLessThen0(context);
             } else {
                 for (var i = 0; i < inAvail; i++) {
                     val buffer = ensureBufferSize(encodeSize, context);
@@ -543,19 +499,74 @@ public class Base64 {
                         b += 256;
                     }
                     context.ibitWorkArea = (context.ibitWorkArea << 8) + b; //  BITS_PER_BYTE
-                    if (0 == context.modulus) { // 3 bytes = 24 bits = 4 * 6 bits to extract
-                        buffer[context.pos++] = encodeTable[(context.ibitWorkArea >> 18) & MASK_6BITS];
-                        buffer[context.pos++] = encodeTable[(context.ibitWorkArea >> 12) & MASK_6BITS];
-                        buffer[context.pos++] = encodeTable[(context.ibitWorkArea >> 6) & MASK_6BITS];
-                        buffer[context.pos++] = encodeTable[context.ibitWorkArea & MASK_6BITS];
-                        context.currentLinePos += BYTES_PER_ENCODED_BLOCK;
-                        if (lineLength > 0 && lineLength <= context.currentLinePos) {
-                            arraycopy(lineSeparator, 0, buffer, context.pos, lineSeparator.length);
-                            context.pos += lineSeparator.length;
-                            context.currentLinePos = 0;
-                        }
-                    }
+                    // 3 bytes = 24 bits = 4 * 6 bits to extract
+                    if (0 == context.modulus) encodeContextModulus0(context, buffer);
                 }
+            }
+        }
+
+        private void encodeInAvailLessThen0(final Context context) {
+            context.eof = true;
+            if (0 == context.modulus && lineLength == 0) {
+                return; // no leftovers to process and not using chunking
+            }
+            val buffer = ensureBufferSize(encodeSize, context);
+            val savedPos = context.pos;
+            switch (context.modulus) { // 0-2
+                case 0: // nothing to do here
+                    break;
+
+                case 1: // 8 bits = 6 + 2
+                    encodeContextModulus1(context, buffer);
+                    break;
+
+                case 2: // 16 bits = 6 + 6 + 4
+                    encodeContextModulus2(context, buffer);
+                    break;
+
+                default:
+                    throw new IllegalStateException("Impossible modulus " + context.modulus);
+            }
+            context.currentLinePos += context.pos - savedPos; // keep track of current line position
+            // if currentPos == 0 we are at the start of a line, so don't add CRLF
+            if (lineLength > 0 && context.currentLinePos > 0) {
+                arraycopy(lineSeparator, 0, buffer, context.pos, lineSeparator.length);
+                context.pos += lineSeparator.length;
+            }
+        }
+
+        private void encodeContextModulus1(final Context context, byte[] buffer) {
+            // top 6 bits:
+            buffer[context.pos++] = encodeTable[(context.ibitWorkArea >> 2) & MASK_6BITS];
+            // remaining 2:
+            buffer[context.pos++] = encodeTable[(context.ibitWorkArea << 4) & MASK_6BITS];
+            // URL-SAFE skips the padding to further reduce size.
+            if (encodeTable == STANDARD_ENCODE_TABLE) {
+                buffer[context.pos++] = pad;
+                buffer[context.pos++] = pad;
+            }
+        }
+
+        private void encodeContextModulus2(final Context context, byte[] buffer) {
+            buffer[context.pos++] = encodeTable[(context.ibitWorkArea >> 10) & MASK_6BITS];
+            buffer[context.pos++] = encodeTable[(context.ibitWorkArea >> 4) & MASK_6BITS];
+            buffer[context.pos++] = encodeTable[(context.ibitWorkArea << 2) & MASK_6BITS];
+            // URL-SAFE skips the padding to further reduce size.
+            if (encodeTable == STANDARD_ENCODE_TABLE) {
+                buffer[context.pos++] = pad;
+            }
+        }
+
+        private void encodeContextModulus0(final Context context, byte[] buffer) {
+            buffer[context.pos++] = encodeTable[(context.ibitWorkArea >> 18) & MASK_6BITS];
+            buffer[context.pos++] = encodeTable[(context.ibitWorkArea >> 12) & MASK_6BITS];
+            buffer[context.pos++] = encodeTable[(context.ibitWorkArea >> 6) & MASK_6BITS];
+            buffer[context.pos++] = encodeTable[context.ibitWorkArea & MASK_6BITS];
+            context.currentLinePos += BYTES_PER_ENCODED_BLOCK;
+            if (lineLength > 0 && lineLength <= context.currentLinePos) {
+                arraycopy(lineSeparator, 0, buffer, context.pos, lineSeparator.length);
+                context.pos += lineSeparator.length;
+                context.currentLinePos = 0;
             }
         }
 
@@ -575,18 +586,7 @@ public class Base64 {
                     context.eof = true;
                     break;
                 } else {
-                    if (b >= 0 && b < DECODE_TABLE.length) {
-                        val result = (int) DECODE_TABLE[b];
-                        if (result >= 0) {
-                            context.modulus = (context.modulus + 1) % BYTES_PER_ENCODED_BLOCK;
-                            context.ibitWorkArea = (context.ibitWorkArea << BITS_PER_ENCODED_BYTE) + result;
-                            if (context.modulus == 0) {
-                                buffer[context.pos++] = (byte) ((context.ibitWorkArea >> 16) & MASK_8BITS);
-                                buffer[context.pos++] = (byte) ((context.ibitWorkArea >> 8) & MASK_8BITS);
-                                buffer[context.pos++] = (byte) (context.ibitWorkArea & MASK_8BITS);
-                            }
-                        }
-                    }
+                    decodeNotDone(context, buffer, b);
                 }
             }
 
@@ -613,6 +613,21 @@ public class Base64 {
                         break;
                     default:
                         throw new IllegalStateException("Impossible modulus " + context.modulus);
+                }
+            }
+        }
+
+        private void decodeNotDone(Context context, byte[] buffer, byte b) {
+            if (b >= 0 && b < DECODE_TABLE.length) {
+                val result = (int) DECODE_TABLE[b];
+                if (result >= 0) {
+                    context.modulus = (context.modulus + 1) % BYTES_PER_ENCODED_BLOCK;
+                    context.ibitWorkArea = (context.ibitWorkArea << BITS_PER_ENCODED_BYTE) + result;
+                    if (context.modulus == 0) {
+                        buffer[context.pos++] = (byte) ((context.ibitWorkArea >> 16) & MASK_8BITS);
+                        buffer[context.pos++] = (byte) ((context.ibitWorkArea >> 8) & MASK_8BITS);
+                        buffer[context.pos++] = (byte) (context.ibitWorkArea & MASK_8BITS);
+                    }
                 }
             }
         }

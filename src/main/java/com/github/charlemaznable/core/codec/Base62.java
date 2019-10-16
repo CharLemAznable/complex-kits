@@ -17,6 +17,8 @@ public class Base62 {
         }
     }
 
+    private Base62() {}
+
     public static String base64(byte[] data) {
         val sb = new StringBuilder(data.length * 2);
         var pos = 0;
@@ -25,7 +27,8 @@ public class Base62 {
             val = (val << 8) | (b & 0xFF);
             pos += 8;
             while (pos > 5) {
-                sb.append(encodes[val >> (pos -= 6)]);
+                pos -= 6;
+                sb.append(encodes[val >> pos]);
                 val &= ((1 << pos) - 1);
             }
         }
@@ -44,7 +47,8 @@ public class Base62 {
             val = (val << 6) | (decodes[c] & 0xff);
             pos += 6;
             while (pos > 7) {
-                baos.write(val >> (pos -= 8));
+                pos -= 8;
+                baos.write(val >> pos);
                 val &= ((1 << pos) - 1);
             }
         }
@@ -59,22 +63,23 @@ public class Base62 {
             val = (val << 8) | (b & 0xFF);
             pos += 8;
             while (pos > 5) {
-                val c = encodes[val >> (pos -= 6)];
-                sb.append(
-                        /**/c == 'i' ? "ia" :
-                                /**/c == '+' ? "ib" :
-                                /**/c == '/' ? "ic" : String.valueOf(c));
+                pos -= 6;
+                val c = encodes[val >> pos];
+                sb.append(translate(c));
                 val &= ((1 << pos) - 1);
             }
         }
         if (pos > 0) {
             val c = encodes[val << (6 - pos)];
-            sb.append(
-                    /**/c == 'i' ? "ia" :
-                            /**/c == '+' ? "ib" :
-                            /**/c == '/' ? "ic" : String.valueOf(c));
+            sb.append(translate(c));
         }
         return sb.toString();
+    }
+
+    private static String translate(char c) {
+        if (c == 'i') return "ia";
+        if (c == '+') return "ib";
+        return c == '/' ? "ic" : String.valueOf(c);
     }
 
     public static byte[] unBase62(String dataStr) {
@@ -85,16 +90,16 @@ public class Base62 {
         for (var i = 0; i < data.length; i++) {
             var c = data[i];
             if (c == 'i') {
-                c = data[++i];
-                c =
-                        /**/c == 'a' ? 'i' :
-                        /**/c == 'b' ? '+' :
-                        /**/c == 'c' ? '/' : data[--i];
+                c = data[i + 1];
+                if (c == 'a') c = 'i';
+                if (c == 'b') c = '+';
+                c = c == 'c' ? '/' : data[i];
             }
             val = (val << 6) | (decodes[c] & 0xff);
             pos += 6;
             while (pos > 7) {
-                baos.write(val >> (pos -= 8));
+                pos -= 8;
+                baos.write(val >> pos);
                 val &= ((1 << pos) - 1);
             }
         }

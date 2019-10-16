@@ -77,7 +77,7 @@ public class RSA {
     }
 
     public static String publicKeyString(PublicKey publicKey) {
-        return base64(publicKey.getEncoded(), Base64.Format.Standard);
+        return base64(publicKey.getEncoded(), Base64.Format.STANDARD);
     }
 
     @SneakyThrows
@@ -87,7 +87,7 @@ public class RSA {
     }
 
     public static String privateKeyString(PrivateKey privateKey) {
-        return base64(privateKey.getEncoded(), Base64.Format.Standard);
+        return base64(privateKey.getEncoded(), Base64.Format.STANDARD);
     }
 
     /////////// public/private key size ///////////
