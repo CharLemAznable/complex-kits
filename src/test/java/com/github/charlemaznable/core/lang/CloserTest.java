@@ -15,8 +15,6 @@ public class CloserTest {
     @SuppressWarnings("ConstantConditions")
     @Test
     public void testCloser() {
-        new Closer();
-
         Object obj1 = null;
         val obj2 = new TestCloseable();
         val obj3 = new TestCloser();
