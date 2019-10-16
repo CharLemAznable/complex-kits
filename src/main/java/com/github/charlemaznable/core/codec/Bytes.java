@@ -2,9 +2,11 @@ package com.github.charlemaznable.core.codec;
 
 import java.nio.charset.Charset;
 
-import static com.google.common.base.Charsets.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class Bytes {
+
+    private Bytes() {}
 
     /**
      * default UTF-8

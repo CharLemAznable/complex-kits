@@ -122,11 +122,17 @@ public enum Digest {
         return digestHex(bytes(info), bytes(salt));
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public byte[] digestDeprecated(String info) {
         return digestHasher().putUnencodedChars(info).hash().asBytes();
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public byte[] digestDeprecated(String info, String salt) {
         return digestHasher().putUnencodedChars(salt)
@@ -134,21 +140,33 @@ public enum Digest {
                 .putUnencodedChars(salt).hash().asBytes();
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public String digestBase64Deprecated(String info) {
         return base64(digestDeprecated(info), STANDARD);
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public String digestBase64Deprecated(String info, String salt) {
         return base64(digestDeprecated(info, salt), STANDARD);
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public String digestHexDeprecated(String info) {
         return hex(digestDeprecated(info));
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public String digestHexDeprecated(String info, String salt) {
         return hex(digestDeprecated(info, salt));

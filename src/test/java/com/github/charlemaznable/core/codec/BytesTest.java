@@ -9,8 +9,6 @@ public class BytesTest {
 
     @Test
     public void testBytes() {
-        new Bytes();
-
         assertNull(bytes(null));
     }
 }

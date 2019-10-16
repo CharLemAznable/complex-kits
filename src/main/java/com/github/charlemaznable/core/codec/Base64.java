@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.codec;
 
-import com.github.charlemaznable.core.codec.ex.CodecRuntimeException;
 import com.github.charlemaznable.core.lang.Str;
 import lombok.val;
 import lombok.var;
@@ -159,7 +158,7 @@ public class Base64 {
 
         public Object encode(final Object obj) {
             if (!(obj instanceof byte[])) {
-                throw new CodecRuntimeException("Parameter supplied to Base-N encode is not a byte[]");
+                throw new IllegalArgumentException("Parameter supplied to Base-N encode is not a byte[]");
             }
             return encode((byte[]) obj);
         }
@@ -178,7 +177,7 @@ public class Base64 {
             } else if (obj instanceof String) {
                 return decode((String) obj);
             } else {
-                throw new CodecRuntimeException("Parameter supplied to Base-N decode is not a byte[] or a String");
+                throw new IllegalArgumentException("Parameter supplied to Base-N decode is not a byte[] or a String");
             }
         }
 
