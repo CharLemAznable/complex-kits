@@ -2,7 +2,10 @@ dist: trusty
 language: java
 jdk:
   - oraclejdk8
+addons:
+  sonarcloud:
+    organization: "charlemaznable"
 script:
-  - mvn clean test
+  - mvn clean test sonar:sonar -Dsonar.projectKey=CharLemAznable_complex-kits
 after_success:
   - bash <(curl -s https://codecov.io/bash)
