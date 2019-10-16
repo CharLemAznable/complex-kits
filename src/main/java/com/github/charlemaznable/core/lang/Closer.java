@@ -1,13 +1,18 @@
 package com.github.charlemaznable.core.lang;
 
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 import java.io.Closeable;
+import java.io.IOException;
 
 import static com.github.charlemaznable.core.lang.Clz.getMethod;
 import static com.github.charlemaznable.core.lang.Clz.invokeQuietly;
 
+@Slf4j
 public class Closer {
+
+    private Closer() {}
 
     /**
      * 关闭对象, 屏蔽所有异常。
@@ -32,7 +37,8 @@ public class Closer {
         if (obj instanceof Closeable) {
             try {
                 ((Closeable) obj).close();
-            } catch (Throwable ignored) {
+            } catch (IOException e) {
+                log.warn("Ignore Exception: ", e);
             }
             return;
         }

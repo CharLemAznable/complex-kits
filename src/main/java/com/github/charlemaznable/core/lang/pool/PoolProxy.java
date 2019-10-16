@@ -24,6 +24,8 @@ import static com.github.charlemaznable.core.lang.Condition.nullThen;
  */
 public class PoolProxy {
 
+    private PoolProxy() {}
+
     public static <T> ObjectPoolBuilder<T> builder(@NonNull ObjectPool<T> pool) {
         return new ObjectPoolBuilder<>(pool);
     }

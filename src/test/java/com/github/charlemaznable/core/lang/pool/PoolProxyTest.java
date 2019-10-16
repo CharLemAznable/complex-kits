@@ -15,8 +15,6 @@ public class PoolProxyTest {
 
     @Test
     public void testPoolProxy() {
-        new PoolProxy();
-
         val poolConfig = new PoolProxyConfigBuilder()
                 .maxTotal(8).maxIdle(8).minIdle(0).<TestPoolProxyObject>build();
 

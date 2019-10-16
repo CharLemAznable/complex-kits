@@ -7,6 +7,8 @@ import static java.util.Calendar.getInstance;
 
 public class Now {
 
+    private Now() {}
+
     public static String now() {
         return now("yyyy-MM-dd HH:mm:ss");
     }
