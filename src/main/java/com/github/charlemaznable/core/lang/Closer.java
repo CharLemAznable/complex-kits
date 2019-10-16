@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 import java.io.Closeable;
-import java.io.IOException;
 
 import static com.github.charlemaznable.core.lang.Clz.getMethod;
 import static com.github.charlemaznable.core.lang.Clz.invokeQuietly;
@@ -37,7 +36,7 @@ public class Closer {
         if (obj instanceof Closeable) {
             try {
                 ((Closeable) obj).close();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.warn("Ignore Exception: ", e);
             }
             return;
