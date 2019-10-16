@@ -11,4 +11,8 @@ public class ActiveProfilesThreadLocal {
     public static String[] get() {
         return local.get();
     }
+
+    public void unload() {
+        local.remove();
+    }
 }

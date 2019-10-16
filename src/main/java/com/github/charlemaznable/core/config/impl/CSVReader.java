@@ -138,7 +138,7 @@ public class CSVReader {
     private String getNextLine() throws IOException {
         if (!linesSkiped) {
             for (var i = 0; i < skipLines; i++) {
-                br.readLine();
+                val skipLine = br.readLine();
             }
             linesSkiped = true;
         }

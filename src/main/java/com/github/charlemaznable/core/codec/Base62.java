@@ -41,7 +41,7 @@ public class Base62 {
         var pos = 0;
         var val = 0;
         for (val c : data) {
-            val = (val << 6) | decodes[c];
+            val = (val << 6) | (decodes[c] & 0xff);
             pos += 6;
             while (pos > 7) {
                 baos.write(val >> (pos -= 8));
@@ -91,7 +91,7 @@ public class Base62 {
                         /**/c == 'b' ? '+' :
                         /**/c == 'c' ? '/' : data[--i];
             }
-            val = (val << 6) | decodes[c];
+            val = (val << 6) | (decodes[c] & 0xff);
             pos += 6;
             while (pos > 7) {
                 baos.write(val >> (pos -= 8));

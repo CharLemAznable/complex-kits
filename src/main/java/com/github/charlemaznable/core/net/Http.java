@@ -121,13 +121,14 @@ public class Http {
     @SneakyThrows
     public static String dealRequestBodyStream(HttpServletRequest req, String charsetName) {
         @Cleanup val isr = new InputStreamReader(req.getInputStream(), charsetName);
-        val bufferedReader = new BufferedReader(isr);
-        val stringBuilder = new StringBuilder();
-        String line;
-        while ((line = bufferedReader.readLine()) != null) {
-            stringBuilder.append(line);
+        try (val bufferedReader = new BufferedReader(isr)) {
+            val stringBuilder = new StringBuilder();
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            return stringBuilder.toString();
         }
-        return stringBuilder.toString();
     }
 
     public static boolean isAjax(HttpServletRequest request) {
