@@ -2,65 +2,79 @@ package com.github.charlemaznable.core.lang.concurrent;
 
 import com.google.common.eventbus.Subscribe;
 import lombok.SneakyThrows;
-import lombok.var;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 public class EventBusExecutorTest {
 
     @SneakyThrows
     @Test
     public void testEventBusCachedExecutor() {
-        var testEventBusCachedExecutor = new TestEventBusCachedExecutor();
+        val testEventBusCachedExecutor = new TestEventBusCachedExecutor();
         testEventBusCachedExecutor.post("test");
-        Thread.sleep(100);
-        assertEquals("test", testEventBusCachedExecutor.message);
+        assertDoesNotThrow(() ->
+                await().pollDelay(Duration.ofMillis(100)).until(() ->
+                        "test".equals(testEventBusCachedExecutor.message)));
 
         testEventBusCachedExecutor.post("delay", 1, TimeUnit.SECONDS);
-        Thread.sleep(100);
-        assertEquals("test", testEventBusCachedExecutor.message);
-        Thread.sleep(2000);
-        assertEquals("delay", testEventBusCachedExecutor.message);
+        assertDoesNotThrow(() ->
+                await().pollDelay(Duration.ofMillis(100)).until(() ->
+                        "test".equals(testEventBusCachedExecutor.message)));
+        assertDoesNotThrow(() ->
+                await().pollDelay(Duration.ofMillis(2000)).until(() ->
+                        "delay".equals(testEventBusCachedExecutor.message)));
 
-        testEventBusCachedExecutor = new TestEventBusCachedExecutor(null);
-        testEventBusCachedExecutor.post("test");
-        Thread.sleep(100);
-        assertEquals("test", testEventBusCachedExecutor.message);
+        val testEventBusCachedExecutor2 = new TestEventBusCachedExecutor(null);
+        testEventBusCachedExecutor2.post("test");
+        assertDoesNotThrow(() ->
+                await().pollDelay(Duration.ofMillis(100)).until(() ->
+                        "test".equals(testEventBusCachedExecutor2.message)));
 
-        testEventBusCachedExecutor.post("delay", 1, TimeUnit.SECONDS);
-        Thread.sleep(100);
-        assertEquals("test", testEventBusCachedExecutor.message);
-        Thread.sleep(2000);
-        assertEquals("delay", testEventBusCachedExecutor.message);
+        testEventBusCachedExecutor2.post("delay", 1, TimeUnit.SECONDS);
+        assertDoesNotThrow(() ->
+                await().pollDelay(Duration.ofMillis(100)).until(() ->
+                        "test".equals(testEventBusCachedExecutor2.message)));
+        assertDoesNotThrow(() ->
+                await().pollDelay(Duration.ofMillis(2000)).until(() ->
+                        "delay".equals(testEventBusCachedExecutor2.message)));
     }
 
     @SneakyThrows
     @Test
     public void testEventBusFixedExecutor() {
-        var testEventBusFixedExecutor = new TestEventBusFixedExecutor(null);
+        val testEventBusFixedExecutor = new TestEventBusFixedExecutor(null);
         testEventBusFixedExecutor.post("test");
-        Thread.sleep(100);
-        assertEquals("test", testEventBusFixedExecutor.message);
+        assertDoesNotThrow(() ->
+                await().pollDelay(Duration.ofMillis(100)).until(() ->
+                        "test".equals(testEventBusFixedExecutor.message)));
 
         testEventBusFixedExecutor.post("delay", 1, TimeUnit.SECONDS);
-        Thread.sleep(100);
-        assertEquals("test", testEventBusFixedExecutor.message);
-        Thread.sleep(2000);
-        assertEquals("delay", testEventBusFixedExecutor.message);
+        assertDoesNotThrow(() ->
+                await().pollDelay(Duration.ofMillis(100)).until(() ->
+                        "test".equals(testEventBusFixedExecutor.message)));
+        assertDoesNotThrow(() ->
+                await().pollDelay(Duration.ofMillis(2000)).until(() ->
+                        "delay".equals(testEventBusFixedExecutor.message)));
 
-        testEventBusFixedExecutor = new TestEventBusFixedExecutor(null);
-        testEventBusFixedExecutor.post("test");
-        Thread.sleep(100);
-        assertEquals("test", testEventBusFixedExecutor.message);
+        val testEventBusFixedExecutor2 = new TestEventBusFixedExecutor(null);
+        testEventBusFixedExecutor2.post("test");
+        assertDoesNotThrow(() ->
+                await().pollDelay(Duration.ofMillis(100)).until(() ->
+                        "test".equals(testEventBusFixedExecutor2.message)));
 
-        testEventBusFixedExecutor.post("delay", 1, TimeUnit.SECONDS);
-        Thread.sleep(100);
-        assertEquals("test", testEventBusFixedExecutor.message);
-        Thread.sleep(2000);
-        assertEquals("delay", testEventBusFixedExecutor.message);
+        testEventBusFixedExecutor2.post("delay", 1, TimeUnit.SECONDS);
+        assertDoesNotThrow(() ->
+                await().pollDelay(Duration.ofMillis(100)).until(() ->
+                        "test".equals(testEventBusFixedExecutor2.message)));
+        assertDoesNotThrow(() ->
+                await().pollDelay(Duration.ofMillis(2000)).until(() ->
+                        "delay".equals(testEventBusFixedExecutor2.message)));
     }
 
     static class TestEventBusCachedExecutor extends EventBusCachedExecutor {

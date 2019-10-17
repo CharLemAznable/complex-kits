@@ -17,8 +17,9 @@ import static com.github.charlemaznable.core.lang.LoadingCachee.simpleCache;
 import static com.github.charlemaznable.core.lang.LoadingCachee.writeCache;
 import static com.github.charlemaznable.core.lang.Str.toStr;
 import static java.lang.System.currentTimeMillis;
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class LoadingCacheeTest {
@@ -56,11 +57,13 @@ public class LoadingCacheeTest {
         val cachedValue = get(accessCache, "abc");
         assertEquals(cachedValue, get(accessCache, "abc"));
 
-        Thread.sleep(100);
-        assertEquals(cachedValue, get(accessCache, "abc"));
+        assertDoesNotThrow(() ->
+                await().pollDelay(Duration.ofMillis(100)).until(() ->
+                        cachedValue.equals(get(accessCache, "abc"))));
 
-        Thread.sleep(300);
-        assertNotEquals(cachedValue, get(accessCache, "abc"));
+        assertDoesNotThrow(() ->
+                await().pollDelay(Duration.ofMillis(300)).until(() ->
+                        !cachedValue.equals(get(accessCache, "abc"))));
     }
 
     @SneakyThrows
@@ -76,10 +79,12 @@ public class LoadingCacheeTest {
         val cachedValue = get(writeCache, "abc");
         assertEquals(cachedValue, get(writeCache, "abc"));
 
-        Thread.sleep(50);
-        assertEquals(cachedValue, get(writeCache, "abc"));
+        assertDoesNotThrow(() ->
+                await().pollDelay(Duration.ofMillis(50)).until(() ->
+                        cachedValue.equals(get(writeCache, "abc"))));
 
-        Thread.sleep(150);
-        assertNotEquals(cachedValue, get(writeCache, "abc"));
+        assertDoesNotThrow(() ->
+                await().pollDelay(Duration.ofMillis(150)).until(() ->
+                        !cachedValue.equals(get(writeCache, "abc"))));
     }
 }
