@@ -61,7 +61,7 @@ public final class Unsigned {
      *                               parsable <code>unsigned byte</code>.
      * @see UByte#UByte(String)
      */
-    public static UByte ubyte(String value) throws NumberFormatException {
+    public static UByte ubyte(String value) {
         return value == null ? null : new UByte(value);
     }
 
@@ -82,7 +82,7 @@ public final class Unsigned {
      *                               of an <code>unsigned byte</code>
      * @see UByte#UByte(short)
      */
-    public static UByte ubyte(short value) throws NumberFormatException {
+    public static UByte ubyte(short value) {
         return new UByte(value);
     }
 
@@ -93,7 +93,7 @@ public final class Unsigned {
      *                               parsable <code>unsigned short</code>.
      * @see UShort#UShort(String)
      */
-    public static UShort ushort(String value) throws NumberFormatException {
+    public static UShort ushort(String value) {
         return value == null ? null : new UShort(value);
     }
 
@@ -115,7 +115,7 @@ public final class Unsigned {
      *                               of an <code>unsigned short</code>
      * @see UShort#UShort(int)
      */
-    public static UShort ushort(int value) throws NumberFormatException {
+    public static UShort ushort(int value) {
         return new UShort(value);
     }
 
@@ -126,7 +126,7 @@ public final class Unsigned {
      *                               parsable <code>unsigned int</code>.
      * @see UInteger#UInteger(String)
      */
-    public static UInteger uint(String value) throws NumberFormatException {
+    public static UInteger uint(String value) {
         return value == null ? null : new UInteger(value);
     }
 
@@ -148,7 +148,7 @@ public final class Unsigned {
      *                               of an <code>unsigned int</code>
      * @see UInteger#UInteger(long)
      */
-    public static UInteger uint(long value) throws NumberFormatException {
+    public static UInteger uint(long value) {
         return new UInteger(value);
     }
 
@@ -159,7 +159,7 @@ public final class Unsigned {
      *                               parsable <code>unsigned long</code>.
      * @see ULong#ULong(String)
      */
-    public static ULong ulong(String value) throws NumberFormatException {
+    public static ULong ulong(String value) {
         return value == null ? null : new ULong(value);
     }
 
@@ -181,7 +181,7 @@ public final class Unsigned {
      *                               of an <code>unsigned long</code>
      * @see ULong#ULong(BigInteger)
      */
-    public static ULong ulong(BigInteger value) throws NumberFormatException {
+    public static ULong ulong(BigInteger value) {
         return new ULong(value);
     }
 }

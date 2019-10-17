@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -19,8 +18,6 @@ public class ClzTest {
 
     @Test
     public void testAssignable() {
-        new Clz();
-
         assertFalse(Clz.isAssignable(Integer.class, String.class));
         assertTrue(Clz.isAssignable(Integer.class, Number.class));
         assertTrue(Clz.isAssignable(Integer.class, Integer.class));
@@ -67,8 +64,8 @@ public class ClzTest {
         assertEquals(ParamType.class, types[0]);
         assertEquals(ParamType.class, types[1]);
 
-        types = getConstructorParameterTypes(testTypeClass, "abc");
-        assertNull(types);
+        assertThrows(IllegalArgumentException.class,
+                () -> getConstructorParameterTypes(testTypeClass, "abc"));
     }
 
     static class TestType {

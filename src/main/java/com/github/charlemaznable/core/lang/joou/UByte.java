@@ -68,7 +68,7 @@ public final class UByte extends UNumber implements Comparable<UByte> {
      *                               of an <code>unsigned byte</code>
      * @see com.github.charlemaznable.core.lang.joou.UByte#UByte(short)
      */
-    public UByte(short value) throws NumberFormatException {
+    public UByte(short value) {
         this.value = value;
         rangeCheck();
     }
@@ -87,7 +87,7 @@ public final class UByte extends UNumber implements Comparable<UByte> {
      * @throws NumberFormatException If <code>value</code> does not contain a
      *                               parsable <code>unsigned byte</code>.
      */
-    public UByte(String value) throws NumberFormatException {
+    public UByte(String value) {
         this.value = Short.parseShort(value);
         rangeCheck();
     }
@@ -99,7 +99,7 @@ public final class UByte extends UNumber implements Comparable<UByte> {
      *                               parsable <code>unsigned byte</code>.
      * @see com.github.charlemaznable.core.lang.joou.UByte#UByte(String)
      */
-    public static UByte valueOf(String value) throws NumberFormatException {
+    public static UByte valueOf(String value) {
         return new UByte(value);
     }
 
@@ -113,7 +113,7 @@ public final class UByte extends UNumber implements Comparable<UByte> {
         return new UByte(value);
     }
 
-    private void rangeCheck() throws NumberFormatException {
+    private void rangeCheck() {
         if (value < MIN_VALUE || value > MAX_VALUE) {
             throw new NumberFormatException("Value is out of range : " + value);
         }
@@ -151,7 +151,7 @@ public final class UByte extends UNumber implements Comparable<UByte> {
 
     @Override
     public String toString() {
-        return Short.valueOf(value).toString();
+        return Short.toString(value);
     }
 
     @Override

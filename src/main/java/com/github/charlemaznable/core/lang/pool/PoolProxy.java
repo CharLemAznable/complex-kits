@@ -124,7 +124,7 @@ public class PoolProxy {
         private Object[] createArguments;
 
         @Override
-        public T create() throws Exception {
+        public T create() {
             return pooledObjectCreator.create(createArguments);
         }
 

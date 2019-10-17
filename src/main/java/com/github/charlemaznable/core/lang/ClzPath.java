@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.lang;
 
-import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -14,6 +13,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.JarURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -23,7 +23,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 
+import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 import static com.github.charlemaznable.core.lang.Str.isEmpty;
 import static com.github.charlemaznable.core.lang.Str.toStr;
 import static com.google.common.collect.Sets.newLinkedHashSet;
@@ -35,6 +37,7 @@ import static java.lang.Thread.currentThread;
 import static java.lang.reflect.Proxy.newProxyInstance;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptySet;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.joor.Reflect.on;
@@ -42,11 +45,13 @@ import static org.joor.Reflect.onClass;
 
 public class ClzPath {
 
+    private ClzPath() {}
+
     public static boolean classExists(String className) {
         try {
             forName(className, false, getClassLoader());
             return true;
-        } catch (Throwable e) { // including ClassNotFoundException
+        } catch (Exception ignored) { // including ClassNotFoundException
             return false;
         }
     }
@@ -56,9 +61,9 @@ public class ClzPath {
 
         try {
             return forName(className, false, getClassLoader());
-        } catch (ClassNotFoundException ignore) {
+        } catch (ClassNotFoundException ignored) {
+            return null;
         }
-        return null;
     }
 
     /*
@@ -70,9 +75,9 @@ public class ClzPath {
 
         try {
             return (Class<T>) getClassLoader().loadClass(className);
-        } catch (ClassNotFoundException ignore) {
+        } catch (ClassNotFoundException ignored) {
+            return null;
         }
-        return null;
     }
 
     /**
@@ -115,7 +120,7 @@ public class ClzPath {
 
     public static String urlAsString(URL url) {
         try {
-            return url != null ? Resources.toString(url, Charsets.UTF_8) : null;
+            return url != null ? Resources.toString(url, UTF_8) : null;
         } catch (IOException e) {
             return null;
         }
@@ -123,9 +128,9 @@ public class ClzPath {
 
     public static List<String> urlAsLines(URL url) {
         try {
-            return url != null ? readLines(url, Charsets.UTF_8) : null;
+            return url != null ? readLines(url, UTF_8) : newArrayList();
         } catch (IOException e) {
-            return null;
+            return newArrayList();
         }
     }
 
@@ -133,6 +138,8 @@ public class ClzPath {
     public static URL[] classResources(String basePath, String extension) {
         return ExtensionMatchClzResources.classResources(basePath, extension);
     }
+
+    private static final String SLASH = "/";
 
     private static class ExtensionMatchClzResources {
 
@@ -168,7 +175,7 @@ public class ClzPath {
                     result.addAll(findExtMatchingFileResources(rootDirResource, extn));
                 }
             }
-            return result.toArray(new URL[result.size()]);
+            return result.toArray(new URL[0]);
         }
 
         public static boolean isReadable(URL url) {
@@ -189,8 +196,8 @@ public class ClzPath {
 
         private static String resolveBasePath(String basePath) {
             if (isEmpty(basePath)) return toStr(basePath);
-            if (basePath.startsWith("/")) basePath = basePath.substring(1);
-            if (!basePath.endsWith("/")) basePath = basePath + "/";
+            if (basePath.startsWith(SLASH)) basePath = basePath.substring(1);
+            if (!basePath.endsWith(SLASH)) basePath = basePath + SLASH;
             return basePath;
         }
 
@@ -213,7 +220,7 @@ public class ClzPath {
                 // We need to have pointers to each of the jar files on the classpath as well...
                 addAllClassLoaderJarRoots(classLoader, result);
             }
-            return result.toArray(new URL[result.size()]);
+            return result.toArray(new URL[0]);
         }
 
         private static void addAllClassLoaderJarRoots(ClassLoader classLoader, Set<URL> result) {
@@ -228,12 +235,14 @@ public class ClzPath {
                         }
                     }
                 } catch (Exception ignored) {
+                    // ignored
                 }
             }
             if (classLoader != null) {
                 try {
                     addAllClassLoaderJarRoots(classLoader.getParent(), result);
                 } catch (Exception ignored) {
+                    // ignored
                 }
             }
         }
@@ -324,7 +333,7 @@ public class ClzPath {
 
             if (con instanceof JarURLConnection) {
                 // Should usually be the case for traditional JAR files.
-                val jarCon = (JarURLConnection) con;
+                JarURLConnection jarCon = (JarURLConnection) con;
                 useCachesIfNecessary(jarCon);
                 jarFile = jarCon.getJarFile();
                 val jarEntry = jarCon.getJarEntry();
@@ -347,10 +356,10 @@ public class ClzPath {
             }
 
             try {
-                if (!"".equals(rootEntryPath) && !rootEntryPath.endsWith("/")) {
+                if (!"".equals(rootEntryPath) && !rootEntryPath.endsWith(SLASH)) {
                     // Root entry path must end with slash to allow for proper matching.
                     // The Sun JRE does not return a slash here, but BEA JRockit does.
-                    rootEntryPath = rootEntryPath + "/";
+                    rootEntryPath = rootEntryPath + SLASH;
                 }
                 val result = new LinkedHashSet<URL>(8);
                 for (var entries = jarFile.entries(); entries.hasMoreElements(); ) {
@@ -359,7 +368,7 @@ public class ClzPath {
                     if (entryPath.startsWith(rootEntryPath) &&
                             entryPath.endsWith(extension)) {
                         var relativePath = entryPath.substring(rootEntryPath.length());
-                        if (relativePath.startsWith("/")) relativePath = relativePath.substring(1);
+                        relativePath = removePrefixSlash(relativePath);
                         result.add(new URL(rootDirResource, relativePath));
                     }
                 }
@@ -369,6 +378,10 @@ public class ClzPath {
                 // not from JarURLConnection, which might cache the file reference.
                 if (newJarFile) jarFile.close();
             }
+        }
+
+        private static String removePrefixSlash(String path) {
+            return path.startsWith(SLASH) ? path.substring(1) : path;
         }
 
         private static JarFile getJarFile(String jarFileUrl) throws IOException {
@@ -438,7 +451,7 @@ public class ClzPath {
 
             val abnormalPattern = File.separator + extension;
             for (val content : dirContents) {
-                val currPath = replace(content.getAbsolutePath(), File.separator, "/");
+                val currPath = replace(content.getAbsolutePath(), File.separator, SLASH);
                 if (content.isDirectory() && content.canRead()) {
                     doRetrieveMatchingFiles(extension, content, result);
                 } else if (currPath.endsWith(extension) &&
@@ -503,11 +516,11 @@ public class ClzPath {
 
         private final String rootPath;
 
-        private final Set<URL> resources = newLinkedHashSet();
+        private final Set<URI> resources = newLinkedHashSet();
 
         public ExtensionMatchVFVisitor(String rootPath, String extension) {
             this.extension = extension;
-            this.rootPath = (rootPath.length() == 0 || rootPath.endsWith("/") ? rootPath : rootPath + "/");
+            this.rootPath = (rootPath.length() == 0 || rootPath.endsWith(SLASH) ? rootPath : rootPath + SLASH);
         }
 
         @Override
@@ -537,9 +550,10 @@ public class ClzPath {
                 if (VfsFileDelegate.getPath(vfsResource)
                         .substring(this.rootPath.length())
                         .endsWith(this.extension))
-                    this.resources.add(VfsFileDelegate.getURL(vfsResource));
-            } catch (Exception ex) {
-                throw new RuntimeException("Failed to obtain URL for file " + vfsResource, ex);
+                    this.resources.add(VfsFileDelegate
+                            .getURL(vfsResource).toURI());
+            } catch (URISyntaxException ignored) {
+                // ignored
             }
         }
 
@@ -548,7 +562,13 @@ public class ClzPath {
         }
 
         public Set<URL> getResources() {
-            return this.resources;
+            return this.resources.stream().map(uri -> {
+                try {
+                    return uri.toURL();
+                } catch (MalformedURLException ignored) {
+                    return null;
+                }
+            }).collect(Collectors.toSet());
         }
 
         public int size() {

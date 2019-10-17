@@ -67,7 +67,7 @@ public final class UShort extends UNumber implements Comparable<UShort> {
      * @throws NumberFormatException If <code>value</code> is not in the range
      *                               of an <code>unsigned short</code>
      */
-    public UShort(int value) throws NumberFormatException {
+    public UShort(int value) {
         this.value = value;
         rangeCheck();
     }
@@ -87,7 +87,7 @@ public final class UShort extends UNumber implements Comparable<UShort> {
      * @throws NumberFormatException If <code>value</code> does not contain a
      *                               parsable <code>unsigned short</code>.
      */
-    public UShort(String value) throws NumberFormatException {
+    public UShort(String value) {
         this.value = Integer.parseInt(value);
         rangeCheck();
     }
@@ -99,7 +99,7 @@ public final class UShort extends UNumber implements Comparable<UShort> {
      *                               parsable <code>unsigned short</code>.
      * @see com.github.charlemaznable.core.lang.joou.UShort#UShort(String)
      */
-    public static UShort valueOf(String value) throws NumberFormatException {
+    public static UShort valueOf(String value) {
         return new UShort(value);
     }
 
@@ -114,7 +114,7 @@ public final class UShort extends UNumber implements Comparable<UShort> {
         return new UShort(value);
     }
 
-    private void rangeCheck() throws NumberFormatException {
+    private void rangeCheck() {
         if (value < MIN_VALUE || value > MAX_VALUE) {
             throw new NumberFormatException("Value is out of range : " + value);
         }
@@ -152,7 +152,7 @@ public final class UShort extends UNumber implements Comparable<UShort> {
 
     @Override
     public String toString() {
-        return Integer.valueOf(value).toString();
+        return Integer.toString(value);
     }
 
     @Override

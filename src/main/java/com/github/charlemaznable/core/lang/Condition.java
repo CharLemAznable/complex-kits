@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.lang;
 
+import com.github.charlemaznable.core.lang.ex.BadConditionException;
 import com.github.charlemaznable.core.lang.ex.BlankStringException;
 import com.github.charlemaznable.core.lang.ex.EmptyObjectException;
 import com.google.common.base.Preconditions;
@@ -8,6 +9,7 @@ import lombok.val;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -16,6 +18,8 @@ import static com.github.charlemaznable.core.lang.Str.isBlank;
 import static com.github.charlemaznable.core.lang.Str.isNotBlank;
 
 public class Condition {
+
+    private Condition() {}
 
     @SafeVarargs
     public static <T> T nonNull(T... objects) {
@@ -184,48 +188,48 @@ public class Condition {
         return string;
     }
 
-    public static void checkCondition(Supplier<Boolean> condition) {
-        if (!condition.get()) throw new RuntimeException();
+    public static void checkCondition(BooleanSupplier condition) {
+        if (!condition.getAsBoolean()) throw new BadConditionException();
     }
 
-    public static void checkCondition(Supplier<Boolean> condition, @NonNull Object errorMessage) {
-        if (!condition.get()) throw new RuntimeException(String.valueOf(errorMessage));
+    public static void checkCondition(BooleanSupplier condition, @NonNull Object errorMessage) {
+        if (!condition.getAsBoolean()) throw new BadConditionException(String.valueOf(errorMessage));
     }
 
-    public static void checkCondition(Supplier<Boolean> condition, @NonNull RuntimeException errorException) {
-        if (!condition.get()) throw nullThen(errorException, RuntimeException::new);
+    public static void checkCondition(BooleanSupplier condition, @NonNull RuntimeException errorException) {
+        if (!condition.getAsBoolean()) throw nullThen(errorException, BadConditionException::new);
     }
 
-    public static void checkCondition(Supplier<Boolean> condition, Executable executable) {
-        if (!condition.get()) throw new RuntimeException();
+    public static void checkCondition(BooleanSupplier condition, Executable executable) {
+        if (!condition.getAsBoolean()) throw new BadConditionException();
         executable.execute();
     }
 
-    public static void checkCondition(Supplier<Boolean> condition, Executable executable, @NonNull Object errorMessage) {
-        if (!condition.get()) throw new RuntimeException(String.valueOf(errorMessage));
+    public static void checkCondition(BooleanSupplier condition, Executable executable, @NonNull Object errorMessage) {
+        if (!condition.getAsBoolean()) throw new BadConditionException(String.valueOf(errorMessage));
         executable.execute();
     }
 
-    public static void checkCondition(Supplier<Boolean> condition, Executable executable, @NonNull RuntimeException errorException) {
-        if (!condition.get()) throw nullThen(errorException, RuntimeException::new);
+    public static void checkCondition(BooleanSupplier condition, Executable executable, @NonNull RuntimeException errorException) {
+        if (!condition.getAsBoolean()) throw nullThen(errorException, BadConditionException::new);
         executable.execute();
     }
 
     @CanIgnoreReturnValue
-    public static <T> T checkCondition(Supplier<Boolean> condition, Supplier<T> action) {
-        if (!condition.get()) throw new RuntimeException();
+    public static <T> T checkCondition(BooleanSupplier condition, Supplier<T> action) {
+        if (!condition.getAsBoolean()) throw new BadConditionException();
         return action.get();
     }
 
     @CanIgnoreReturnValue
-    public static <T> T checkCondition(Supplier<Boolean> condition, Supplier<T> action, @NonNull Object errorMessage) {
-        if (!condition.get()) throw new RuntimeException(String.valueOf(errorMessage));
+    public static <T> T checkCondition(BooleanSupplier condition, Supplier<T> action, @NonNull Object errorMessage) {
+        if (!condition.getAsBoolean()) throw new BadConditionException(String.valueOf(errorMessage));
         return action.get();
     }
 
     @CanIgnoreReturnValue
-    public static <T> T checkCondition(Supplier<Boolean> condition, Supplier<T> action, @NonNull RuntimeException errorException) {
-        if (!condition.get()) throw nullThen(errorException, RuntimeException::new);
+    public static <T> T checkCondition(BooleanSupplier condition, Supplier<T> action, @NonNull RuntimeException errorException) {
+        if (!condition.getAsBoolean()) throw nullThen(errorException, BadConditionException::new);
         return action.get();
     }
 }

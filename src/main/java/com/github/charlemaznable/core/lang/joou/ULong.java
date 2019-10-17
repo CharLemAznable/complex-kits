@@ -74,7 +74,7 @@ public final class ULong extends UNumber implements Comparable<ULong> {
      * @throws NumberFormatException If <code>value</code> is not in the range
      *                               of an <code>unsigned long</code>
      */
-    public ULong(BigInteger value) throws NumberFormatException {
+    public ULong(BigInteger value) {
         this.value = value;
         rangeCheck();
     }
@@ -98,7 +98,7 @@ public final class ULong extends UNumber implements Comparable<ULong> {
      * @throws NumberFormatException If <code>value</code> does not contain a
      *                               parsable <code>unsigned long</code>.
      */
-    public ULong(String value) throws NumberFormatException {
+    public ULong(String value) {
         this.value = new BigInteger(value);
         rangeCheck();
     }
@@ -110,7 +110,7 @@ public final class ULong extends UNumber implements Comparable<ULong> {
      *                               parsable <code>unsigned long</code>.
      * @see com.github.charlemaznable.core.lang.joou.ULong#ULong(String)
      */
-    public static ULong valueOf(String value) throws NumberFormatException {
+    public static ULong valueOf(String value) {
         return new ULong(value);
     }
 
@@ -125,7 +125,7 @@ public final class ULong extends UNumber implements Comparable<ULong> {
         return new ULong(value);
     }
 
-    private void rangeCheck() throws NumberFormatException {
+    private void rangeCheck() {
         if (value.compareTo(MIN_VALUE) < 0 || value.compareTo(MAX_VALUE) > 0) {
             throw new NumberFormatException("Value is out of range : " + value);
         }

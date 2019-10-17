@@ -13,6 +13,8 @@ import static org.joor.Reflect.wrapper;
 
 public class Clz {
 
+    private Clz() {}
+
     public static boolean isAssignable(Class<?> fromClass, Class<?>... toClasses) {
         for (val toClass : toClasses)
             if (ClassUtils.isAssignable(fromClass, toClass)) return true;
@@ -48,6 +50,7 @@ public class Clz {
         try {
             return method.invoke(target, args);
         } catch (IllegalArgumentException | IllegalAccessException ignored) {
+            // ignored
         } catch (InvocationTargetException e) {
             if (e.getTargetException() instanceof RuntimeException) {
                 throw (RuntimeException) e.getTargetException();
@@ -71,9 +74,9 @@ public class Clz {
         if (declaredTypes.length == actualTypes.length) {
             for (int i = 0; i < actualTypes.length; i++) {
                 val actualType = actualTypes[i];
-                if (actualType == NULL.class) continue;
-                if (wrapper(declaredTypes[i]).isAssignableFrom(
-                        wrapper(actualType))) continue;
+                if (actualType == NULL.class ||
+                        wrapper(declaredTypes[i]).isAssignableFrom(
+                                wrapper(actualType))) continue;
                 return false;
             }
             return true;
@@ -90,9 +93,10 @@ public class Clz {
                 val parameterTypes = constructor.getParameterTypes();
                 if (match(parameterTypes, types)) return parameterTypes;
             }
-            return null;
+            throw new IllegalArgumentException(clazz
+                    + "'s Constructor with such arguments Not Found");
         }
     }
 
-    private static class NULL {}
+    private interface NULL {}
 }

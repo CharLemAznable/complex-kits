@@ -67,7 +67,7 @@ public final class UInteger extends UNumber implements Comparable<UInteger> {
      * @throws NumberFormatException If <code>value</code> is not in the range
      *                               of an <code>unsigned int</code>
      */
-    public UInteger(long value) throws NumberFormatException {
+    public UInteger(long value) {
         this.value = value;
         rangeCheck();
     }
@@ -87,7 +87,7 @@ public final class UInteger extends UNumber implements Comparable<UInteger> {
      * @throws NumberFormatException If <code>value</code> does not contain a
      *                               parsable <code>unsigned int</code>.
      */
-    public UInteger(String value) throws NumberFormatException {
+    public UInteger(String value) {
         this.value = Long.parseLong(value);
         rangeCheck();
     }
@@ -99,7 +99,7 @@ public final class UInteger extends UNumber implements Comparable<UInteger> {
      *                               parsable <code>unsigned int</code>.
      * @see com.github.charlemaznable.core.lang.joou.UInteger#UInteger(String)
      */
-    public static UInteger valueOf(String value) throws NumberFormatException {
+    public static UInteger valueOf(String value) {
         return new UInteger(value);
     }
 
@@ -114,7 +114,7 @@ public final class UInteger extends UNumber implements Comparable<UInteger> {
         return new UInteger(value);
     }
 
-    private void rangeCheck() throws NumberFormatException {
+    private void rangeCheck() {
         if (value < MIN_VALUE || value > MAX_VALUE) {
             throw new NumberFormatException("Value is out of range : " + value);
         }
@@ -152,7 +152,7 @@ public final class UInteger extends UNumber implements Comparable<UInteger> {
 
     @Override
     public String toString() {
-        return Long.valueOf(value).toString();
+        return Long.toString(value);
     }
 
     @Override

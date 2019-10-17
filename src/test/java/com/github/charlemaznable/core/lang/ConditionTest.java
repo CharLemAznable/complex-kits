@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.lang;
 
+import com.github.charlemaznable.core.lang.ex.BadConditionException;
 import com.github.charlemaznable.core.lang.ex.BlankStringException;
 import com.github.charlemaznable.core.lang.ex.EmptyObjectException;
 import lombok.Data;
@@ -30,8 +31,6 @@ public class ConditionTest {
     @SuppressWarnings("ConstantConditions")
     @Test
     public void testCondition() {
-        new Condition();
-
         String strnull = null;
         val strempty = "";
         val strblank = "  ";
@@ -119,8 +118,8 @@ public class ConditionTest {
     public void testConditionCheckCondition() {
         String strnull = null;
 
-        assertThrows(RuntimeException.class, () -> checkCondition(() -> null != strnull));
-        assertThrows(RuntimeException.class, () -> checkCondition(() -> null != strnull, "strnull is Null"));
+        assertThrows(BadConditionException.class, () -> checkCondition(() -> null != strnull));
+        assertThrows(BadConditionException.class, () -> checkCondition(() -> null != strnull, "strnull is Null"));
         assertThrows(ConditionTestException.class, () -> checkCondition(() -> null != strnull, new ConditionTestException()));
 
         assertDoesNotThrow(() -> checkCondition(() -> null == strnull));
@@ -128,9 +127,9 @@ public class ConditionTest {
         assertDoesNotThrow(() -> checkCondition(() -> null == strnull, new ConditionTestException()));
 
         val testBean = new ConditionTestBean();
-        assertThrows(RuntimeException.class, () -> checkCondition(() -> null != strnull, () -> testBean.setValue("true")));
+        assertThrows(BadConditionException.class, () -> checkCondition(() -> null != strnull, () -> testBean.setValue("true")));
         assertNull(testBean.getValue());
-        assertThrows(RuntimeException.class, () -> checkCondition(() -> null != strnull, () -> testBean.setValue("true"), "strnull is Null"));
+        assertThrows(BadConditionException.class, () -> checkCondition(() -> null != strnull, () -> testBean.setValue("true"), "strnull is Null"));
         assertNull(testBean.getValue());
         assertThrows(ConditionTestException.class, () -> checkCondition(() -> null != strnull, () -> testBean.setValue("true"), new ConditionTestException()));
         assertNull(testBean.getValue());
@@ -142,8 +141,8 @@ public class ConditionTest {
         assertDoesNotThrow(() -> checkCondition(() -> null == strnull, () -> testBean.setValue("3"), new ConditionTestException()));
         assertEquals("3", testBean.getValue());
 
-        assertThrows(RuntimeException.class, () -> checkCondition(() -> null != strnull, () -> "result"));
-        assertThrows(RuntimeException.class, () -> checkCondition(() -> null != strnull, () -> "result", "strnull is Null"));
+        assertThrows(BadConditionException.class, () -> checkCondition(() -> null != strnull, () -> "result"));
+        assertThrows(BadConditionException.class, () -> checkCondition(() -> null != strnull, () -> "result", "strnull is Null"));
         assertThrows(ConditionTestException.class, () -> checkCondition(() -> null != strnull, () -> "result", new ConditionTestException()));
 
         assertEquals("result", checkCondition(() -> null == strnull, () -> "result"));
