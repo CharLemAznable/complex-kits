@@ -14,6 +14,7 @@ import static com.github.charlemaznable.core.spring.MutableHttpServletUtils.muta
 import static com.github.charlemaznable.core.spring.MutableHttpServletUtils.setRequestBody;
 import static com.github.charlemaznable.core.spring.MutableHttpServletUtils.setRequestParameter;
 import static com.github.charlemaznable.core.spring.MutableHttpServletUtils.setRequestParameterMap;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -43,6 +44,8 @@ public class MutableHttpServletRequestTest {
         assertEquals(body2, body22);
         val body23 = dealRequestBodyStream(mutableRequest, "UTF-8");
         assertEquals(body2, body23);
+
+        assertDoesNotThrow(() -> setRequestBody(null, body2));
     }
 
     @Test
@@ -67,12 +70,16 @@ public class MutableHttpServletRequestTest {
         val value22 = fetchParameterMap(mutableRequest).get(key2);
         assertEquals(value2, value22);
 
-        val value3 = "value3";
+        assertDoesNotThrow(() -> setRequestParameter(null, key2, value2));
+
+                val value3 = "value3";
         setRequestParameterMap(mutableRequest, of(key2, value3));
         val value31 = mutableRequest.getParameterMap().get(key2)[0];
         assertEquals(value3, value31);
         val value32 = fetchParameterMap(mutableRequest).get(key2);
         assertEquals(value3, value32);
+
+        assertDoesNotThrow(() -> setRequestParameterMap(null, of(key2, value3)));
     }
 
     @Test

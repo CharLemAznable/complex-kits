@@ -30,25 +30,26 @@ public class EventBusExecutorTest {
                 await().pollDelay(Duration.ofMillis(2000)).until(() ->
                         "delay".equals(testEventBusCachedExecutor.message)));
 
-        val testEventBusCachedExecutor2 = new TestEventBusCachedExecutor(null);
+        val testEventBusCachedSubscriber = new TestEventBusCachedSubscriber();
+        val testEventBusCachedExecutor2 = new EventBusCachedExecutor(testEventBusCachedSubscriber) {};
         testEventBusCachedExecutor2.post("test");
         assertDoesNotThrow(() ->
                 await().pollDelay(Duration.ofMillis(100)).until(() ->
-                        "test".equals(testEventBusCachedExecutor2.message)));
+                        "test".equals(testEventBusCachedSubscriber.message)));
 
         testEventBusCachedExecutor2.post("delay", 1, TimeUnit.SECONDS);
         assertDoesNotThrow(() ->
                 await().pollDelay(Duration.ofMillis(100)).until(() ->
-                        "test".equals(testEventBusCachedExecutor2.message)));
+                        "test".equals(testEventBusCachedSubscriber.message)));
         assertDoesNotThrow(() ->
                 await().pollDelay(Duration.ofMillis(2000)).until(() ->
-                        "delay".equals(testEventBusCachedExecutor2.message)));
+                        "delay".equals(testEventBusCachedSubscriber.message)));
     }
 
     @SneakyThrows
     @Test
     public void testEventBusFixedExecutor() {
-        val testEventBusFixedExecutor = new TestEventBusFixedExecutor(null);
+        val testEventBusFixedExecutor = new TestEventBusFixedExecutor();
         testEventBusFixedExecutor.post("test");
         assertDoesNotThrow(() ->
                 await().pollDelay(Duration.ofMillis(100)).until(() ->
@@ -62,19 +63,20 @@ public class EventBusExecutorTest {
                 await().pollDelay(Duration.ofMillis(2000)).until(() ->
                         "delay".equals(testEventBusFixedExecutor.message)));
 
-        val testEventBusFixedExecutor2 = new TestEventBusFixedExecutor(null);
+        val testEventBusFixedSubscriber = new TestEventBusFixedSubscriber();
+        val testEventBusFixedExecutor2 = new EventBusFixedExecutor(testEventBusFixedSubscriber) {};
         testEventBusFixedExecutor2.post("test");
         assertDoesNotThrow(() ->
                 await().pollDelay(Duration.ofMillis(100)).until(() ->
-                        "test".equals(testEventBusFixedExecutor2.message)));
+                        "test".equals(testEventBusFixedSubscriber.message)));
 
         testEventBusFixedExecutor2.post("delay", 1, TimeUnit.SECONDS);
         assertDoesNotThrow(() ->
                 await().pollDelay(Duration.ofMillis(100)).until(() ->
-                        "test".equals(testEventBusFixedExecutor2.message)));
+                        "test".equals(testEventBusFixedSubscriber.message)));
         assertDoesNotThrow(() ->
                 await().pollDelay(Duration.ofMillis(2000)).until(() ->
-                        "delay".equals(testEventBusFixedExecutor2.message)));
+                        "delay".equals(testEventBusFixedSubscriber.message)));
     }
 
     static class TestEventBusCachedExecutor extends EventBusCachedExecutor {
@@ -95,6 +97,16 @@ public class EventBusExecutorTest {
         }
     }
 
+    static class TestEventBusCachedSubscriber {
+
+        private String message;
+
+        @Subscribe
+        public void testMethod(String message) {
+            this.message = message;
+        }
+    }
+
     static class TestEventBusFixedExecutor extends EventBusFixedExecutor {
 
         private String message;
@@ -106,6 +118,16 @@ public class EventBusExecutorTest {
         public TestEventBusFixedExecutor(Object subscriber) {
             super(subscriber);
         }
+
+        @Subscribe
+        public void testMethod(String message) {
+            this.message = message;
+        }
+    }
+
+    static class TestEventBusFixedSubscriber {
+
+        private String message;
 
         @Subscribe
         public void testMethod(String message) {

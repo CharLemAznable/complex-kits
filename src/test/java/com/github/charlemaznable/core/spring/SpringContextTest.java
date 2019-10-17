@@ -20,12 +20,19 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @ContextConfiguration(classes = TestConfiguration.class)
 public class SpringContextTest {
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testSpringContext() {
         var testClassBean = TestSpringContext.getBean(TestClass.class);
         assertNotNull(testClassBean);
 
+        testClassBean = TestSpringContext.getBean((Class) null, new TestClass());
+        assertNotNull(testClassBean);
+
         testClassBean = TestSpringContext.getBean("TestClass");
+        assertNotNull(testClassBean);
+
+        testClassBean = TestSpringContext.getBean("", new TestClass());
         assertNotNull(testClassBean);
 
         var clzResolverBean = TestSpringContext.getBean(ClzResolver.class);

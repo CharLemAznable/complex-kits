@@ -18,6 +18,7 @@ import static com.github.charlemaznable.core.spring.MutableHttpServletUtils.muta
 import static com.github.charlemaznable.core.spring.MutableHttpServletUtils.mutateResponse;
 import static com.github.charlemaznable.core.spring.MutableHttpServletUtils.setResponseContent;
 import static com.github.charlemaznable.core.spring.MutableHttpServletUtils.setResponseContentByString;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -42,12 +43,19 @@ public class MutableHttpServletResponseTest {
         val content2 = getResponseContent(mutableResponse);
         assertEquals(content + content, string(content2));
 
+        assertDoesNotThrow(() -> setResponseContent(null, bytes(content + content)));
+
         appendResponseContent(mutableResponse, bytes(content));
         val content3 = getResponseContent(mutableResponse);
         assertEquals(content + content + content, string(content3));
 
+        assertDoesNotThrow(() -> appendResponseContent(null, bytes(content)));
+
         val mockContent = mockResponse.getContentAsByteArray();
         assertEquals(0, mockContent.length);
+
+        val emptyContent = getResponseContent(null);
+        assertEquals(0, emptyContent.length);
     }
 
     @SneakyThrows
@@ -68,12 +76,18 @@ public class MutableHttpServletResponseTest {
         val content2 = getResponseContentAsString(mutableResponse);
         assertEquals(content + content, content2);
 
+        assertDoesNotThrow(() -> setResponseContentByString(null, content + content));
+
         appendResponseContentByString(mutableResponse, content);
         val content3 = getResponseContentAsString(mutableResponse);
         assertEquals(content + content + content, content3);
 
+        assertDoesNotThrow(() -> appendResponseContentByString(null, content));
+
         val mockContent = mockResponse.getContentAsString();
         assertEquals("", mockContent);
+
+        assertDoesNotThrow(() -> getResponseContentAsString(null));
     }
 
     @SneakyThrows
@@ -94,9 +108,15 @@ public class MutableHttpServletResponseTest {
         val content2 = getResponseContentAsString(mutableResponse, Charsets.ISO_8859_1);
         assertEquals(content + content, content2);
 
+        assertDoesNotThrow(() -> setResponseContentByString(null, content + content, Charsets.ISO_8859_1));
+
         appendResponseContentByString(mutableResponse, content, Charsets.ISO_8859_1);
         val content3 = getResponseContentAsString(mutableResponse, Charsets.ISO_8859_1);
         assertEquals(content + content + content, content3);
+
+        assertDoesNotThrow(() -> appendResponseContentByString(null, content, Charsets.ISO_8859_1));
+
+        assertDoesNotThrow(() -> getResponseContentAsString(null, Charsets.ISO_8859_1));
     }
 
     @Test
@@ -120,5 +140,7 @@ public class MutableHttpServletResponseTest {
         });
         assertEquals(500, mutableWrapper.getStatus());
         assertEquals("mockWrapper", getResponseContentAsString(mutableWrapper));
+
+        assertDoesNotThrow(() -> mutateResponse(mutableWrapper, null));
     }
 }
