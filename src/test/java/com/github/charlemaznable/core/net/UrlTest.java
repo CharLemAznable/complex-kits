@@ -8,8 +8,6 @@ public class UrlTest {
 
     @Test
     public void testUrl() {
-        new Url();
-
         assertEquals("%E6%B1%89%E5%AD%97", Url.encode("汉字"));
         assertEquals("汉字", Url.decode("%E6%B1%89%E5%AD%97"));
 

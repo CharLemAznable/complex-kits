@@ -231,7 +231,7 @@ public class HttpReq {
         val out = new DataOutputStream(http.getOutputStream());
         // The URL-encoded contend 正文，正文内容其实跟get的URL中 '? '后的参数字符串一致
         // DataOutputStream.writeBytes将字符串中的16位的unicode字符以8位的字符形式写到流里面
-        // out.writeBytes(postData);
+        // 错误用法: out.writeBytes(postData)
         val postData = params.toString();
         out.write(postData.getBytes(this.charset));
         out.flush();
@@ -240,11 +240,11 @@ public class HttpReq {
 
     private String parseResponse(HttpURLConnection http, String url) throws IOException {
         val status = http.getResponseCode();
-        val charset = parseCharset(http.getHeaderField("Content-Type"));
+        val rspCharset = parseCharset(http.getHeaderField("Content-Type"));
 
-        if (status == 200) return readResponseBody(http, charset);
+        if (status == 200) return readResponseBody(http, rspCharset);
 
-        log.warn("non 200 response :" + readErrorResponseBody(url, http, status, charset));
+        log.warn("non 200 response :" + readErrorResponseBody(url, http, status, rspCharset));
         return null;
     }
 

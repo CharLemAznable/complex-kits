@@ -20,6 +20,8 @@ public class AES {
 
     private static final String CIPHER_ALGORITHM = "AES/ECB/PKCS5Padding";
 
+    private AES() {}
+
     @SneakyThrows
     public static byte[] encrypt(String value, Key key) {
         val cipher = getInstance(CIPHER_ALGORITHM);

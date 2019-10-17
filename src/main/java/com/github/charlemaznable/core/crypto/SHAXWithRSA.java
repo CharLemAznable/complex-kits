@@ -17,13 +17,13 @@ import static java.security.Signature.getInstance;
 
 public enum SHAXWithRSA {
 
-    SHA1WithRSA {
+    SHA1_WITH_RSA {
         @Override
         protected String signAlgorithms() {
             return "SHA1WithRSA";
         }
     },
-    SHA256WithRSA {
+    SHA256_WITH_RSA {
         @Override
         protected String signAlgorithms() {
             return "SHA256WithRSA";

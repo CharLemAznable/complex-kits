@@ -5,20 +5,21 @@ import lombok.SneakyThrows;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.StringUtils.replace;
 
 public class Url {
 
-    public static final String UTF_8 = "UTF-8";
+    private Url() {}
 
     @SneakyThrows
     public static String encode(String s) {
-        return URLEncoder.encode(s, UTF_8);
+        return URLEncoder.encode(s, UTF_8.name());
     }
 
     @SneakyThrows
     public static String decode(String s) {
-        return URLDecoder.decode(s, UTF_8);
+        return URLDecoder.decode(s, UTF_8.name());
     }
 
     public static String encodeDotAndColon(String s) {

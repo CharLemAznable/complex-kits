@@ -35,9 +35,11 @@ public class RSA {
 
     private static final String RSAKEY = "RSA";
 
-    private static final String RSA = "RSA/ECB/PKCS1Padding";
+    private static final String RSA_ALGORITHM = "RSA/ECB/PKCS1Padding";
 
     private static final int DEFAULT_KEY_SIZE = 1024;
+
+    private RSA() {}
 
     /////////// key generate ///////////
 
@@ -147,7 +149,7 @@ public class RSA {
     private static byte[] cryptByBlock(int mode, Key key, int keySize, byte[] data) throws
             NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
             IllegalBlockSizeException, BadPaddingException, IOException {
-        val cipher = Cipher.getInstance(RSA);
+        val cipher = Cipher.getInstance(RSA_ALGORITHM);
         cipher.init(mode, key);
         val maxBlock = keySize / 8 - (ENCRYPT_MODE == mode ? 11 : 0);
         val inputLen = data.length;

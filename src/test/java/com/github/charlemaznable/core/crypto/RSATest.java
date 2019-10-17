@@ -28,8 +28,6 @@ public class RSATest {
 
     @Test
     public void testRSA() {
-        new RSA();
-
         val plainText = "{ mac=\"MAC Address\", appId=\"16位字符串\", signature=SHA1(\"appId=xxx&mac=yyy\") }";
         val keyPair = generateKeyPair();
         val publicKeyString = getPublicKeyString(keyPair);

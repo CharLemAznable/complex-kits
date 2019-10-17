@@ -13,23 +13,26 @@ import java.io.InputStreamReader;
 import java.util.Map;
 
 import static com.github.charlemaznable.core.lang.Str.isNotEmpty;
-import static com.google.common.base.Charsets.ISO_8859_1;
 import static com.google.common.base.Splitter.on;
 import static com.google.common.collect.Maps.newHashMap;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.springframework.web.servlet.HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE;
 
 public class Http {
 
+    private Http() {}
+
     public static void responseJson(HttpServletResponse rsp, String json) {
-        responseContent(rsp, json, "application/json", "UTF-8");
+        responseContent(rsp, json, "application/json", UTF_8.name());
     }
 
     public static void responseText(HttpServletResponse rsp, String text) {
-        responseContent(rsp, text, "text/plain", "UTF-8");
+        responseContent(rsp, text, "text/plain", UTF_8.name());
     }
 
     public static void responseHtml(HttpServletResponse rsp, String html) {
-        responseContent(rsp, html, "text/html", "UTF-8");
+        responseContent(rsp, html, "text/html", UTF_8.name());
     }
 
     @SneakyThrows
@@ -62,13 +65,15 @@ public class Http {
         return pathVariableMap;
     }
 
+    private static final String UNKNOWN = "unknown";
+
     public static String fetchRemoteAddr(HttpServletRequest request) {
         val xForwardedFor = request.getHeader("x-forwarded-for");
         if (isNotEmpty(xForwardedFor)) {
             val forwardedAddrList = on(",").trimResults().splitToList(xForwardedFor);
             for (val forwardedAddr : forwardedAddrList) {
                 if (isNotEmpty(forwardedAddr) &&
-                        !"unknown".equalsIgnoreCase(forwardedAddr)) {
+                        !UNKNOWN.equalsIgnoreCase(forwardedAddr)) {
                     return forwardedAddr;
                 }
             }
@@ -76,13 +81,13 @@ public class Http {
 
         val proxyClientIP = request.getHeader("Proxy-Client-IP");
         if (isNotEmpty(proxyClientIP) &&
-                !"unknown".equalsIgnoreCase(proxyClientIP)) {
+                !UNKNOWN.equalsIgnoreCase(proxyClientIP)) {
             return proxyClientIP;
         }
 
         val wlProxyClientIP = request.getHeader("WL-Proxy-Client-IP");
         if (isNotEmpty(wlProxyClientIP) &&
-                !"unknown".equalsIgnoreCase(wlProxyClientIP)) {
+                !UNKNOWN.equalsIgnoreCase(wlProxyClientIP)) {
             return wlProxyClientIP;
         }
 
@@ -92,8 +97,9 @@ public class Http {
     @SneakyThrows
     public static Map<String, String> dealReqParams(Map<String, String[]> requestParams) {
         Map<String, String> params = newHashMap();
-        for (val key : requestParams.keySet()) {
-            val values = requestParams.get(key);
+        for (val entry : requestParams.entrySet()) {
+            val key = entry.getKey();
+            val values = entry.getValue();
 
             var valueStr = "";
             for (var i = 0; i < values.length; i++) {

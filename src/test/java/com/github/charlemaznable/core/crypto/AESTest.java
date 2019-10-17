@@ -21,7 +21,6 @@ public class AESTest {
 
     @Test
     public void testAES() {
-        new AES();
         var key = String.valueOf(currentTimeMillis());
         assertEquals("123456", decrypt(encrypt("123456", key), key));
 
