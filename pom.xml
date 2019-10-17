@@ -275,4 +275,12 @@
         </profile>
     </profiles>
 
+    <pluginRepositories>
+        <pluginRepository>
+            <id>central</id>
+            <name>central repository</name>
+            <url>http://repo1.maven.org/maven2/</url>
+        </pluginRepository>
+    </pluginRepositories>
+
 </project>
