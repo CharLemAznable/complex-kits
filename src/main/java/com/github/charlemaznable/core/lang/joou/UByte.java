@@ -121,22 +121,22 @@ public final class UByte extends UNumber implements Comparable<UByte> {
 
     @Override
     public int intValue() {
-        return value;
+        return (int) value;
     }
 
     @Override
     public long longValue() {
-        return value;
+        return (long) value;
     }
 
     @Override
     public float floatValue() {
-        return value;
+        return (float) value;
     }
 
     @Override
     public double doubleValue() {
-        return value;
+        return (double) value;
     }
 
     @Override

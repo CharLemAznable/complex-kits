@@ -127,17 +127,17 @@ public final class UShort extends UNumber implements Comparable<UShort> {
 
     @Override
     public long longValue() {
-        return value;
+        return (long) value;
     }
 
     @Override
     public float floatValue() {
-        return value;
+        return (float) value;
     }
 
     @Override
     public double doubleValue() {
-        return value;
+        return (double) value;
     }
 
     @Override

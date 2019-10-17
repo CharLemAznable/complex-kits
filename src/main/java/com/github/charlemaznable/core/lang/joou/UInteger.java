@@ -132,12 +132,12 @@ public final class UInteger extends UNumber implements Comparable<UInteger> {
 
     @Override
     public float floatValue() {
-        return value;
+        return (float) value;
     }
 
     @Override
     public double doubleValue() {
-        return value;
+        return (double) value;
     }
 
     @Override
