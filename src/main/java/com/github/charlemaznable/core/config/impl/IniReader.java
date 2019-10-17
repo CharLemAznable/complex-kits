@@ -177,9 +177,7 @@ public class IniReader {
         for (var i = 0; i < separators.length(); i++) {
             val sep = separators.charAt(i);
             val pos = line.indexOf(sep);
-            if (pos >= 0) {
-                if (index < 0 || pos < index) index = pos;
-            }
+            if (pos >= 0 && (index < 0 || pos < index)) index = pos;
         }
 
         return index;

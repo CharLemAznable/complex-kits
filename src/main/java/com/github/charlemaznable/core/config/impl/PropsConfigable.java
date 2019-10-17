@@ -9,8 +9,7 @@ import java.net.URL;
 import java.util.Properties;
 
 import static com.github.charlemaznable.core.lang.ClzPath.urlAsInputStream;
-import static com.google.common.base.Charsets.UTF_8;
-import static com.google.common.io.Closeables.closeQuietly;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
 
 public class PropsConfigable extends DefaultConfigable {
@@ -20,11 +19,9 @@ public class PropsConfigable extends DefaultConfigable {
     }
 
     private static Properties buildProperties(URL url) {
-        PropsReader reader = null;
         val props = new Properties();
-        try {
-            reader = new PropsReader(new InputStreamReader(
-                    requireNonNull(urlAsInputStream(url)), UTF_8));
+        try (PropsReader reader = new PropsReader(new InputStreamReader(
+                requireNonNull(urlAsInputStream(url)), UTF_8))) {
             while (reader.nextProperty()) {
                 val propertyName = reader.getPropertyName();
                 if (props.containsKey(propertyName)) {
@@ -37,8 +34,6 @@ public class PropsConfigable extends DefaultConfigable {
 
         } catch (IOException ex) {
             throw new ConfigException("read props file error: ", ex);
-        } finally {
-            closeQuietly(reader);
         }
     }
 }

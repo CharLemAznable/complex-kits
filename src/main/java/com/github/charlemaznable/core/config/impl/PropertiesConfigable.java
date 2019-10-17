@@ -22,7 +22,8 @@ public class PropertiesConfigable extends DefaultConfigable {
         try {
             inputStream = urlAsInputStream(url);
             properties.load(inputStream);
-        } catch (IOException ignore) {
+        } catch (IOException ignored) {
+            // ignored
         } finally {
             closeQuietly(inputStream);
         }

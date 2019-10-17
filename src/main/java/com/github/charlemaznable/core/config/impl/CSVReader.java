@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.config.impl;
 
 import lombok.val;
 import lombok.var;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -120,7 +121,7 @@ public class CSVReader {
      */
     public String[] readNext() throws IOException {
         val nextLine = getNextLine();
-        if (nextLine == null) return null;
+        if (nextLine == null) return new String[0];
 
         if (!startsWith(trim(nextLine), "#")) {
             return hasNext ? parseLine(nextLine) : null;
@@ -155,11 +156,11 @@ public class CSVReader {
      * @return the comma-tokenized list of elements, or null if nextLine is null
      * @throws IOException if bad things happen during the read
      */
-    @SuppressWarnings("Duplicates")
     private String[] parseLine(String nextLine) throws IOException {
         List<String> tokensOnThisLine = newArrayList();
         var sb = new StringBuilder();
         var inQuotes = false;
+        var skipNext = false;
         do {
             if (inQuotes) {
                 // continuing a quoted section, reappend newline
@@ -170,54 +171,15 @@ public class CSVReader {
                 }
             }
             for (var i = 0; i < nextLine.length(); i++) {
+                if (skipNext) {
+                    skipNext = false;
+                    continue;
+                }
                 val c = nextLine.charAt(i);
                 if (c == quotechar) {
-                    // this gets complex... the quote may end a quoted block, or
-                    // escape another quote.
-                    // do a 1-char lookahead:
-                    if (inQuotes // we are in quotes, therefore there can be
-                            // escaped quotes in here.
-                            && nextLine.length() > i + 1 // there is indeed
-                            // another character
-                            // to check.
-                            && nextLine.charAt(i + 1) == quotechar) { // ..and
-                        // that
-                        // char.
-                        // is a
-                        // quote
-                        // also.
-                        // we have two quote chars in a row == one quote char,
-                        // so consume them both and
-                        // put one on the token. we do *not* exit the quoted
-                        // text.
-                        sb.append(nextLine.charAt(i + 1));
-                        i++;
-                    } else {
-                        inQuotes = !inQuotes;
-                        // the tricky case of an embedded quote in the middle:
-                        // a,bc"d"ef,g
-                        if (i > 2 // not on the begining of the line
-                                && nextLine.charAt(i - 1) != separator // not
-                                // at
-                                // the
-                                // begining
-                                // of
-                                // an
-                                // escape
-                                // sequence
-                                && nextLine.length() > i + 1
-                                && nextLine.charAt(i + 1) != separator // not
-                            // at
-                            // the
-                            // end
-                            // of
-                            // an
-                            // escape
-                            // sequence
-                                ) {
-                            sb.append(c);
-                        }
-                    }
+                    val res = parseInQuotes(inQuotes, nextLine, i, sb);
+                    inQuotes = res.getLeft();
+                    skipNext = res.getRight();
                 } else if (c == separator && !inQuotes) {
                     tokensOnThisLine.add(sb.toString());
                     sb = new StringBuilder(); // start work on next token
@@ -228,7 +190,7 @@ public class CSVReader {
         }
         while (inQuotes);
         tokensOnThisLine.add(sb.toString());
-        return tokensOnThisLine.toArray(new String[tokensOnThisLine.size()]);
+        return tokensOnThisLine.toArray(new String[0]);
     }
 
     /**
@@ -238,5 +200,56 @@ public class CSVReader {
      */
     public void close() throws IOException {
         br.close();
+    }
+
+    @SuppressWarnings("Duplicates")
+    private Pair<Boolean/* inQuotes */, Boolean/* skipNext */> parseInQuotes(
+            boolean inQuotes, String nextLine, int i, StringBuilder sb) {
+        // this gets complex... the quote may end a quoted block, or
+        // escape another quote.
+        // do a 1-char lookahead:
+        if (inQuotes // we are in quotes, therefore there can be
+                // escaped quotes in here.
+                && nextLine.length() > i + 1 // there is indeed
+                // another character
+                // to check.
+                && nextLine.charAt(i + 1) == quotechar) { // ..and
+            // that
+            // char.
+            // is a
+            // quote
+            // also.
+            // we have two quote chars in a row == one quote char,
+            // so consume them both and
+            // put one on the token. we do *not* exit the quoted
+            // text.
+            sb.append(nextLine.charAt(i + 1));
+            return Pair.of(true, true);
+        } else {
+            // the tricky case of an embedded quote in the middle:
+            // a,bc"d"ef,g
+            if (i > 2 // not on the begining of the line
+                    && nextLine.charAt(i - 1) != separator // not
+                    // at
+                    // the
+                    // begining
+                    // of
+                    // an
+                    // escape
+                    // sequence
+                    && nextLine.length() > i + 1
+                    && nextLine.charAt(i + 1) != separator // not
+                // at
+                // the
+                // end
+                // of
+                // an
+                // escape
+                // sequence
+                    ) {
+                sb.append(quotechar);
+            }
+            return Pair.of(!inQuotes, false);
+        }
     }
 }

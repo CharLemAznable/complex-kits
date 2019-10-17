@@ -21,14 +21,18 @@ public abstract class BaseConfigable implements Configable {
     private static Pattern numberPattern = Pattern
             .compile("(-?[0-9]+\\.[0-9]*|[0-9]*\\.[0-9]+|-?[0-9]+).*");
 
+    private static final String CONFIG_NOT_FOUND = " not found in config system";
+    private static final String CONFIG_FORMAT_PREFIX = "'s value [";
+
     @Override
     public int getInt(String key) {
         val str = getStr(key);
-        if (isEmpty(str)) throw new ConfigNotFoundException(key + " not found in config system");
+        if (isEmpty(str)) throw new ConfigNotFoundException(key + CONFIG_NOT_FOUND);
 
         val matcher = numberPattern.matcher(str);
         if (!matcher.matches())
-            throw new ConfigValueFormatException(key + "'s value [" + str + "] is not an int");
+            throw new ConfigValueFormatException(key
+                    + CONFIG_FORMAT_PREFIX + str + "] is not an int");
 
         val intStr = substringBefore(matcher.group(1), ".");
         if (isEmpty(intStr)) return 0;
@@ -40,11 +44,12 @@ public abstract class BaseConfigable implements Configable {
     public long getLong(String key) {
         val str = getStr(key);
         if (isEmpty(str))
-            throw new ConfigNotFoundException(key + " not found in config system");
+            throw new ConfigNotFoundException(key + CONFIG_NOT_FOUND);
 
         val matcher = numberPattern.matcher(str);
         if (!matcher.matches())
-            throw new ConfigValueFormatException(key + "'s value [" + str + "] is not a long");
+            throw new ConfigValueFormatException(key
+                    + CONFIG_FORMAT_PREFIX + str + "] is not a long");
 
         val intStr = substringBefore(matcher.group(1), ".");
         if (isEmpty(intStr)) return 0;
@@ -56,7 +61,7 @@ public abstract class BaseConfigable implements Configable {
     public boolean getBool(String key) {
         val str = getStr(key);
         if (isEmpty(str))
-            throw new ConfigNotFoundException(key + " not found in config system");
+            throw new ConfigNotFoundException(key + CONFIG_NOT_FOUND);
 
         return toBool(str);
     }
@@ -65,11 +70,12 @@ public abstract class BaseConfigable implements Configable {
     public float getFloat(String key) {
         val str = getStr(key);
         if (isEmpty(str))
-            throw new ConfigNotFoundException(key + " not found in config system");
+            throw new ConfigNotFoundException(key + CONFIG_NOT_FOUND);
 
         val matcher = numberPattern.matcher(str);
         if (!matcher.matches())
-            throw new ConfigValueFormatException(key + "'s value [" + str + "] is not a float");
+            throw new ConfigValueFormatException(key
+                    + CONFIG_FORMAT_PREFIX + str + "] is not a float");
 
         return Float.valueOf(matcher.group(1));
     }
@@ -78,11 +84,12 @@ public abstract class BaseConfigable implements Configable {
     public double getDouble(String key) {
         val str = getStr(key);
         if (isEmpty(str))
-            throw new ConfigNotFoundException(key + " not found in config system");
+            throw new ConfigNotFoundException(key + CONFIG_NOT_FOUND);
 
         val matcher = numberPattern.matcher(str);
         if (!matcher.matches())
-            throw new ConfigValueFormatException(key + "'s value [" + str + "] is not a double");
+            throw new ConfigValueFormatException(key
+                    + CONFIG_FORMAT_PREFIX + str + "] is not a double");
 
         return Double.valueOf(matcher.group(1));
     }
@@ -159,8 +166,8 @@ public abstract class BaseConfigable implements Configable {
     public List<String> getKeyPrefixes() {
         List<String> keyPrefixes = newArrayList();
 
-        for (val key : getProperties().keySet()) {
-            val strKey = (String) key;
+        for (Object key : getProperties().keySet()) {
+            String strKey = (String) key;
 
             val keyPrefix = substringBefore(strKey, ".");
             if (!keyPrefixes.contains(keyPrefix)) keyPrefixes.add(keyPrefix);

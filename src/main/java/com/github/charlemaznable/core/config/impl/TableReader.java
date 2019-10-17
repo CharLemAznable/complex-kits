@@ -61,21 +61,25 @@ public class TableReader {
     private void dealEachLine(BufferedReader bufferedReader) throws IOException {
         for (var line = bufferedReader.readLine(); line != null; line = bufferedReader
                 .readLine()) {
-            if (isEmpty(line) || isCommentLine(line)) continue;
-
-            line = trim(line);
-            if (isTableName(line)) {
-                doWhenIsTableName(line);
-                continue;
-            }
-
-            if (isRowCols(line)) {
-                doWhenIsRowCols(line);
-                continue;
-            }
-
-            doWhenIsData(line);
+            dealLine(line);
         }
+    }
+
+    private void dealLine(String line) {
+        if (isEmpty(line) || isCommentLine(line)) return;
+
+        val trimedLine = trim(line);
+        if (isTableName(trimedLine)) {
+            doWhenIsTableName(trimedLine);
+            return;
+        }
+
+        if (isRowCols(trimedLine)) {
+            doWhenIsRowCols(trimedLine);
+            return;
+        }
+
+        doWhenIsData(trimedLine);
     }
 
     private void doWhenIsData(String line) {

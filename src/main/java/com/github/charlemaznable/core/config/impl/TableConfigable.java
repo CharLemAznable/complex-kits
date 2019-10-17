@@ -10,8 +10,7 @@ import java.net.URL;
 import java.util.Properties;
 
 import static com.github.charlemaznable.core.lang.ClzPath.urlAsInputStream;
-import static com.google.common.base.Charsets.UTF_8;
-import static com.google.common.io.Closeables.closeQuietly;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
 
 public class TableConfigable extends DefaultConfigable {
@@ -23,10 +22,8 @@ public class TableConfigable extends DefaultConfigable {
     private static Properties buildProperties(URL url) {
         val props = new Properties();
 
-        Reader reader = null;
-        try {
-            reader = new InputStreamReader(
-                    requireNonNull(urlAsInputStream(url)), UTF_8);
+        try (Reader reader = new InputStreamReader(
+                requireNonNull(urlAsInputStream(url)), UTF_8)) {
             val tableReader = new TableReader(reader);
             val tables = tableReader.getTables();
             for (val table : tables) {
@@ -38,8 +35,7 @@ public class TableConfigable extends DefaultConfigable {
                 props.put(tableName, table);
             }
         } catch (IOException ignored) {
-        } finally {
-            closeQuietly(reader);
+            // ignored
         }
         return props;
     }

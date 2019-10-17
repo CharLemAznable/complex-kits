@@ -10,8 +10,7 @@ import java.net.URL;
 import java.util.Properties;
 
 import static com.github.charlemaznable.core.lang.ClzPath.urlAsInputStream;
-import static com.google.common.base.Charsets.UTF_8;
-import static com.google.common.io.Closeables.closeQuietly;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
 
 public class IniConfigable extends DefaultConfigable {
@@ -21,10 +20,9 @@ public class IniConfigable extends DefaultConfigable {
     }
 
     private static Properties buildProperties(URL url) {
-        Reader reader = null;
         val props = new Properties();
-        try {
-            reader = new InputStreamReader(requireNonNull(urlAsInputStream(url)), UTF_8);
+        try (Reader reader = new InputStreamReader(
+                requireNonNull(urlAsInputStream(url)), UTF_8)) {
             val iniReader = new IniReader(reader);
             for (val section : iniReader.getSections()) {
                 val sectionProps = iniReader.getSection(section);
@@ -45,8 +43,6 @@ public class IniConfigable extends DefaultConfigable {
             }
         } catch (IOException ex) {
             throw new ConfigException("read ini file error " + url, ex);
-        } finally {
-            closeQuietly(reader);
         }
         return props;
     }
