@@ -42,12 +42,18 @@ import java.math.BigInteger;
  *
  * @author Lukas Eder
  */
-public abstract class UNumber extends Number {
+public abstract class UNumber<T extends Number> extends Number {
 
     /**
      * Generated UID
      */
     private static final long serialVersionUID = -7666221938815339843L;
+
+    protected final T value;
+
+    public UNumber(T value) {
+        this.value = value;
+    }
 
     /**
      * Get this number as a {@link BigInteger}. This is a convenience method for
@@ -55,5 +61,25 @@ public abstract class UNumber extends Number {
      */
     public BigInteger toBigInteger() {
         return new BigInteger(toString());
+    }
+
+    @Override
+    public int intValue() {
+        return value.intValue();
+    }
+
+    @Override
+    public long longValue() {
+        return value.longValue();
+    }
+
+    @Override
+    public float floatValue() {
+        return value.floatValue();
+    }
+
+    @Override
+    public double doubleValue() {
+        return value.doubleValue();
     }
 }

@@ -40,7 +40,7 @@ package com.github.charlemaznable.core.lang.joou;
  *
  * @author Lukas Eder
  */
-public final class UInteger extends UNumber implements Comparable<UInteger> {
+public final class UInteger extends UNumber<Long> implements Comparable<UInteger> {
 
     /**
      * A constant holding the minimum value an <code>unsigned int</code> can
@@ -56,10 +56,6 @@ public final class UInteger extends UNumber implements Comparable<UInteger> {
      * Generated UID
      */
     private static final long serialVersionUID = -6821055240959745390L;
-    /**
-     * The value modelling the content of this <code>unsigned int</code>
-     */
-    private final long value;
 
     /**
      * Create an <code>unsigned int</code>
@@ -68,7 +64,7 @@ public final class UInteger extends UNumber implements Comparable<UInteger> {
      *                               of an <code>unsigned int</code>
      */
     public UInteger(long value) {
-        this.value = value;
+        super(value);
         rangeCheck();
     }
 
@@ -78,7 +74,7 @@ public final class UInteger extends UNumber implements Comparable<UInteger> {
      * <code>(uint) 4294967295</code>
      */
     public UInteger(int value) {
-        this.value = value & MAX_VALUE;
+        super(value & MAX_VALUE);
     }
 
     /**
@@ -88,7 +84,7 @@ public final class UInteger extends UNumber implements Comparable<UInteger> {
      *                               parsable <code>unsigned int</code>.
      */
     public UInteger(String value) {
-        this.value = Long.parseLong(value);
+        super(Long.parseLong(value));
         rangeCheck();
     }
 
@@ -121,33 +117,14 @@ public final class UInteger extends UNumber implements Comparable<UInteger> {
     }
 
     @Override
-    public int intValue() {
-        return (int) value;
-    }
-
-    @Override
-    public long longValue() {
-        return value;
-    }
-
-    @Override
-    public float floatValue() {
-        return (float) value;
-    }
-
-    @Override
-    public double doubleValue() {
-        return (double) value;
-    }
-
-    @Override
     public int hashCode() {
-        return Long.valueOf(value).hashCode();
+        return value.hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof UInteger && value == ((UInteger) obj).value;
+        return obj instanceof UInteger &&
+                value.longValue() == ((UInteger) obj).value.longValue();
     }
 
     @Override

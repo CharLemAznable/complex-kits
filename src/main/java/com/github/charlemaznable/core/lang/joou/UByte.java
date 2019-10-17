@@ -40,7 +40,7 @@ package com.github.charlemaznable.core.lang.joou;
  *
  * @author Lukas Eder
  */
-public final class UByte extends UNumber implements Comparable<UByte> {
+public final class UByte extends UNumber<Short> implements Comparable<UByte> {
 
     /**
      * A constant holding the minimum value an <code>unsigned byte</code> can
@@ -56,10 +56,6 @@ public final class UByte extends UNumber implements Comparable<UByte> {
      * Generated UID
      */
     private static final long serialVersionUID = -6821055240959745390L;
-    /**
-     * The value modelling the content of this <code>unsigned byte</code>
-     */
-    private final short value;
 
     /**
      * Create an <code>unsigned byte</code>
@@ -69,7 +65,7 @@ public final class UByte extends UNumber implements Comparable<UByte> {
      * @see com.github.charlemaznable.core.lang.joou.UByte#UByte(short)
      */
     public UByte(short value) {
-        this.value = value;
+        super(value);
         rangeCheck();
     }
 
@@ -78,7 +74,7 @@ public final class UByte extends UNumber implements Comparable<UByte> {
      * i.e. <code>(byte) -1</code> becomes <code>(ubyte) 255</code>
      */
     public UByte(byte value) {
-        this.value = (short) (value & MAX_VALUE);
+        super((short) (value & MAX_VALUE));
     }
 
     /**
@@ -88,7 +84,7 @@ public final class UByte extends UNumber implements Comparable<UByte> {
      *                               parsable <code>unsigned byte</code>.
      */
     public UByte(String value) {
-        this.value = Short.parseShort(value);
+        super(Short.parseShort(value));
         rangeCheck();
     }
 
@@ -120,33 +116,14 @@ public final class UByte extends UNumber implements Comparable<UByte> {
     }
 
     @Override
-    public int intValue() {
-        return (int) value;
-    }
-
-    @Override
-    public long longValue() {
-        return (long) value;
-    }
-
-    @Override
-    public float floatValue() {
-        return (float) value;
-    }
-
-    @Override
-    public double doubleValue() {
-        return (double) value;
-    }
-
-    @Override
     public int hashCode() {
-        return Short.valueOf(value).hashCode();
+        return value.hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof UByte && value == ((UByte) obj).value;
+        return obj instanceof UByte &&
+                value.shortValue() == ((UByte) obj).value.shortValue();
     }
 
     @Override

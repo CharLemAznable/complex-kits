@@ -40,7 +40,7 @@ package com.github.charlemaznable.core.lang.joou;
  *
  * @author Lukas Eder
  */
-public final class UShort extends UNumber implements Comparable<UShort> {
+public final class UShort extends UNumber<Integer> implements Comparable<UShort> {
 
     /**
      * A constant holding the minimum value an <code>unsigned short</code> can
@@ -56,10 +56,6 @@ public final class UShort extends UNumber implements Comparable<UShort> {
      * Generated UID
      */
     private static final long serialVersionUID = -6821055240959745390L;
-    /**
-     * The value modelling the content of this <code>unsigned short</code>
-     */
-    private final int value;
 
     /**
      * Create an <code>unsigned short</code>
@@ -68,7 +64,7 @@ public final class UShort extends UNumber implements Comparable<UShort> {
      *                               of an <code>unsigned short</code>
      */
     public UShort(int value) {
-        this.value = value;
+        super(value);
         rangeCheck();
     }
 
@@ -78,7 +74,7 @@ public final class UShort extends UNumber implements Comparable<UShort> {
      * <code>(ushort) 65535</code>
      */
     public UShort(short value) {
-        this.value = value & MAX_VALUE;
+        super(value & MAX_VALUE);
     }
 
     /**
@@ -88,7 +84,7 @@ public final class UShort extends UNumber implements Comparable<UShort> {
      *                               parsable <code>unsigned short</code>.
      */
     public UShort(String value) {
-        this.value = Integer.parseInt(value);
+        super(Integer.parseInt(value));
         rangeCheck();
     }
 
@@ -121,33 +117,14 @@ public final class UShort extends UNumber implements Comparable<UShort> {
     }
 
     @Override
-    public int intValue() {
-        return value;
-    }
-
-    @Override
-    public long longValue() {
-        return (long) value;
-    }
-
-    @Override
-    public float floatValue() {
-        return (float) value;
-    }
-
-    @Override
-    public double doubleValue() {
-        return (double) value;
-    }
-
-    @Override
     public int hashCode() {
-        return Integer.valueOf(value).hashCode();
+        return value.hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof UShort && value == ((UShort) obj).value;
+        return obj instanceof UShort &&
+                value.intValue() == ((UShort) obj).value.intValue();
     }
 
     @Override

@@ -9,8 +9,10 @@ import org.apache.commons.text.StringEscapeUtils;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.Reader;
+import java.util.Map;
 import java.util.regex.Pattern;
 
+import static com.github.charlemaznable.core.lang.Mapp.of;
 import static java.util.regex.Pattern.compile;
 
 public class PropsReader extends LineNumberReader {
@@ -147,15 +149,19 @@ public class PropsReader extends LineNumberReader {
         return Pair.of(true, hadSlash);
     }
 
+    private static final Map<Character, Character> UNESCAPE_SLASH_MAP = of(
+            '\\', '\\',
+            '\'', '\'',
+            '\"', '"',
+            'r', '\r',
+            'f', '\f',
+            't', '\t',
+            'n', '\n',
+            'b', '\b'
+    );
+
     private static void unescapeSlash(char ch, StringBuilder out, char delimiter) {
-        if (ch == '\\') out.append('\\');
-        else if (ch == '\'') out.append('\'');
-        else if (ch == '\"') out.append('"');
-        else if (ch == 'r') out.append('\r');
-        else if (ch == 'f') out.append('\f');
-        else if (ch == 't') out.append('\t');
-        else if (ch == 'n') out.append('\n');
-        else if (ch == 'b') out.append('\b');
+        if (null != UNESCAPE_SLASH_MAP.get(ch)) out.append(UNESCAPE_SLASH_MAP.get(ch));
         else if (ch == delimiter) out.append('\\').append(delimiter);
         else out.append(ch);
     }

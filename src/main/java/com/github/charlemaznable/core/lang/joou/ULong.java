@@ -42,7 +42,7 @@ import java.math.BigInteger;
  *
  * @author Lukas Eder
  */
-public final class ULong extends UNumber implements Comparable<ULong> {
+public final class ULong extends UNumber<BigInteger> implements Comparable<ULong> {
 
     /**
      * A constant holding the minimum value an <code>unsigned long</code> can
@@ -63,10 +63,6 @@ public final class ULong extends UNumber implements Comparable<ULong> {
      * Generated UID
      */
     private static final long serialVersionUID = -6821055240959745390L;
-    /**
-     * The value modelling the content of this <code>unsigned long</code>
-     */
-    private final BigInteger value;
 
     /**
      * Create an <code>unsigned long</code>
@@ -75,7 +71,7 @@ public final class ULong extends UNumber implements Comparable<ULong> {
      *                               of an <code>unsigned long</code>
      */
     public ULong(BigInteger value) {
-        this.value = value;
+        super(value);
         rangeCheck();
     }
 
@@ -85,11 +81,8 @@ public final class ULong extends UNumber implements Comparable<ULong> {
      * <code>(uint) 18446744073709551615</code>
      */
     public ULong(long value) {
-        if (value >= 0) {
-            this.value = BigInteger.valueOf(value);
-        } else {
-            this.value = BigInteger.valueOf(value & Long.MAX_VALUE).add(MAX_VALUE_LONG);
-        }
+        super(value >= 0 ? BigInteger.valueOf(value) :
+                BigInteger.valueOf(value & Long.MAX_VALUE).add(MAX_VALUE_LONG));
     }
 
     /**
@@ -99,7 +92,7 @@ public final class ULong extends UNumber implements Comparable<ULong> {
      *                               parsable <code>unsigned long</code>.
      */
     public ULong(String value) {
-        this.value = new BigInteger(value);
+        super(new BigInteger(value));
         rangeCheck();
     }
 
@@ -129,26 +122,6 @@ public final class ULong extends UNumber implements Comparable<ULong> {
         if (value.compareTo(MIN_VALUE) < 0 || value.compareTo(MAX_VALUE) > 0) {
             throw new NumberFormatException("Value is out of range : " + value);
         }
-    }
-
-    @Override
-    public int intValue() {
-        return value.intValue();
-    }
-
-    @Override
-    public long longValue() {
-        return value.longValue();
-    }
-
-    @Override
-    public float floatValue() {
-        return value.floatValue();
-    }
-
-    @Override
-    public double doubleValue() {
-        return value.doubleValue();
     }
 
     @Override
