@@ -6,6 +6,6 @@ addons:
   sonarcloud:
     organization: "charlemaznable"
 script:
-  - mvn clean test sonar:sonar -Dsonar.projectKey=CharLemAznable_complex-kits
+  - mvn clean verify sonar:sonar -Dsonar.projectKey=CharLemAznable_complex-kits
 after_success:
   - bash <(curl -s https://codecov.io/bash)
