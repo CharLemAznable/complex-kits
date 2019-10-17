@@ -3,6 +3,7 @@ package com.github.charlemaznable.core.config.impl;
 import com.github.charlemaznable.core.config.ex.ConfigException;
 import lombok.val;
 import lombok.var;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.IOException;
@@ -103,47 +104,18 @@ public class PropsReader extends LineNumberReader {
         for (var i = 0; i < sz; i++) {
             val ch = str.charAt(i);
             if (inUnicode) {
-                // if in unicode, then we're reading unicode
-                // values in somehow
-                unicode.append(ch);
-                if (unicode.length() == UNICODE_LEN) {
-                    // unicode now contains the four hex digits
-                    // which represents our unicode character
-                    try {
-                        val value = Integer.parseInt(unicode.toString(), HEX_RADIX);
-                        out.append((char) value);
-                        unicode.setLength(0);
-                        inUnicode = false;
-                        hadSlash = false;
-                    } catch (NumberFormatException nfe) {
-                        throw new ConfigException("Unable to parse unicode value: " + unicode, nfe);
-                    }
-                }
-                continue;
-            }
-
-            if (hadSlash) {
+                val res = unescapeUnicode(ch, hadSlash, out, unicode);
+                inUnicode = res.getLeft();
+                hadSlash = res.getRight();
+            } else if (hadSlash) {
                 // handle an escaped value
                 hadSlash = false;
+                if (ch == 'u') inUnicode = true; // uh-oh, we're in unicode country....
+                else unescapeSlash(ch, out, delimiter);
 
-                if (ch == '\\') out.append('\\');
-                else if (ch == '\'') out.append('\'');
-                else if (ch == '\"') out.append('"');
-                else if (ch == 'r') out.append('\r');
-                else if (ch == 'f') out.append('\f');
-                else if (ch == 't') out.append('\t');
-                else if (ch == 'n') out.append('\n');
-                else if (ch == 'b') out.append('\b');
-                else if (ch == delimiter) out.append('\\').append(delimiter);
-                else if (ch == 'u') inUnicode = true; // uh-oh, we're in unicode country....
-                else out.append(ch);
-
-                continue;
             } else if (ch == '\\') {
                 hadSlash = true;
-                continue;
-            }
-            out.append(ch);
+            } else out.append(ch);
         }
 
         if (hadSlash) {
@@ -155,6 +127,39 @@ public class PropsReader extends LineNumberReader {
         return out.toString();
     }
 
+    private static Pair<Boolean/* inUnicode */, Boolean/* hadSlash */> unescapeUnicode(
+            char ch, boolean hadSlash, StringBuilder out, StringBuilder unicode) {
+        // if in unicode, then we're reading unicode
+        // values in somehow
+        unicode.append(ch);
+        if (unicode.length() == UNICODE_LEN) {
+            // unicode now contains the four hex digits
+            // which represents our unicode character
+            try {
+                val value = Integer.parseInt(unicode.toString(), HEX_RADIX);
+                out.append((char) value);
+                unicode.setLength(0);
+                return Pair.of(false, false);
+            } catch (NumberFormatException nfe) {
+                throw new ConfigException("Unable to parse unicode value: " + unicode, nfe);
+            }
+        }
+        return Pair.of(true, hadSlash);
+    }
+
+    private static void unescapeSlash(char ch, StringBuilder out, char delimiter) {
+        if (ch == '\\') out.append('\\');
+        else if (ch == '\'') out.append('\'');
+        else if (ch == '\"') out.append('"');
+        else if (ch == 'r') out.append('\r');
+        else if (ch == 'f') out.append('\f');
+        else if (ch == 't') out.append('\t');
+        else if (ch == 'n') out.append('\n');
+        else if (ch == 'b') out.append('\b');
+        else if (ch == delimiter) out.append('\\').append(delimiter);
+        else out.append(ch);
+    }
+
     public String readProperty() throws IOException {
         val buffer = new StringBuilder();
 
@@ -162,20 +167,25 @@ public class PropsReader extends LineNumberReader {
             var line = readLine();
             if (line == null) return null; // EOF
 
-            if (isCommentLine(line)) continue;
-
-            line = line.trim();
-
-            if (checkCombineLines(line)) {
-                line = line.substring(0, line.length() - 1);
-                buffer.append(line);
-            } else {
-                buffer.append(line);
-                break;
-            }
+            if (!readPropertyLine(line, buffer)) break;
         }
 
         return buffer.toString();
+    }
+
+    private boolean readPropertyLine(String line, StringBuilder buffer) {
+        if (isCommentLine(line)) return true;
+
+        line = line.trim();
+
+        if (checkCombineLines(line)) {
+            line = line.substring(0, line.length() - 1);
+            buffer.append(line);
+            return true;
+        } else {
+            buffer.append(line);
+            return false;
+        }
     }
 
     public boolean nextProperty() throws IOException {

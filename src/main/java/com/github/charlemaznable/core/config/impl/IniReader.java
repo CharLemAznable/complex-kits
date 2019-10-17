@@ -2,6 +2,8 @@ package com.github.charlemaznable.core.config.impl;
 
 import lombok.val;
 import lombok.var;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -43,12 +45,8 @@ public class IniReader {
         for (; line != null; line = bufferedReader.readLine()) {
             ++lineNumber;
             line = line.trim();
-            if (isCommentLine(line)) continue;
-            if (isSectionLine(line)) {
-                val section = line.substring(1, line.length() - 1).trim();
-                if (!sections.contains(section)) sections.add(section);
-                continue;
-            }
+            if (!checkLine(line)) continue;
+
             String key;
             var value = "";
             val index = findSeparator(line);
@@ -67,6 +65,16 @@ public class IniReader {
         }
     }
 
+    private boolean checkLine(String line) {
+        if (isCommentLine(line)) return false;
+        if (isSectionLine(line)) {
+            val section = line.substring(1, line.length() - 1).trim();
+            if (!sections.contains(section)) sections.add(section);
+            return false;
+        }
+        return true;
+    }
+
     private static String parseValue(String val, BufferedReader reader) throws IOException {
         val propertyValue = new StringBuilder();
         boolean lineContinues;
@@ -74,40 +82,11 @@ public class IniReader {
 
         do {
             val quoted = value.startsWith("\"") || value.startsWith("'");
-            var stop = false;
-            var escape = false;
-
             val quote = quoted ? value.charAt(0) : 0;
-
             var i = quoted ? 1 : 0;
 
             val result = new StringBuilder();
-            var lastChar = 0;
-            while (i < value.length() && !stop) {
-                val c = value.charAt(i);
-
-                if (quoted) {
-                    if ('\\' == c && !escape) escape = true;
-                    else if (!escape && quote == c) stop = true;
-                    else if (escape && quote == c) {
-                        escape = false;
-                        result.append(c);
-                    } else {
-                        if (escape) {
-                            escape = false;
-                            result.append('\\');
-                        }
-
-                        result.append(c);
-                    }
-                } else {
-                    if (isCommentChar(c) && isWhitespace(lastChar)) stop = true;
-                    else result.append(c);
-                }
-
-                i++;
-                lastChar = c;
-            }
+            i = parseValueByChars(quoted, quote, i, value, result);
 
             var v = result.toString();
             if (!quoted) {
@@ -127,6 +106,47 @@ public class IniReader {
         } while (lineContinues && value != null);
 
         return propertyValue.toString();
+    }
+
+    private static int parseValueByChars(boolean quoted, int quote, int i, String value, StringBuilder result) {
+        var stop = false;
+        var escape = false;
+        var lastChar = 0;
+        while (i < value.length() && !stop) {
+            val c = value.charAt(i);
+
+            if (quoted) {
+                val res = parseValueQuoted(quote, c, result, escape);
+                escape = res.getLeft();
+                stop = res.getRight();
+            } else {
+                if (isCommentChar(c) && isWhitespace(lastChar)) stop = true;
+                else result.append(c);
+            }
+
+            i++;
+            lastChar = c;
+        }
+        return i;
+    }
+
+    private static Pair<Boolean/* escape */, Boolean/* stop */> parseValueQuoted(
+            int quote, char c, StringBuilder result, boolean escape) {
+        val res = MutablePair.of(escape, false);
+        if ('\\' == c && !escape) res.setLeft(true);
+        else if (!escape && quote == c) res.setRight(true);
+        else if (escape && quote == c) {
+            res.setLeft(false);
+            result.append(c);
+        } else {
+            if (escape) {
+                res.setLeft(false);
+                result.append('\\');
+            }
+
+            result.append(c);
+        }
+        return res;
     }
 
     private static boolean lineContinues(String line) {

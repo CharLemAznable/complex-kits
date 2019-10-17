@@ -160,7 +160,7 @@ public class CSVReader {
         List<String> tokensOnThisLine = newArrayList();
         var sb = new StringBuilder();
         var inQuotes = false;
-        var skipNext = false;
+        var nextStep = 1;
         do {
             if (inQuotes) {
                 // continuing a quoted section, reappend newline
@@ -170,16 +170,12 @@ public class CSVReader {
                     break;
                 }
             }
-            for (var i = 0; i < nextLine.length(); i++) {
-                if (skipNext) {
-                    skipNext = false;
-                    continue;
-                }
+            for (var i = 0; i < nextLine.length(); i += nextStep, nextStep = 1) {
                 val c = nextLine.charAt(i);
                 if (c == quotechar) {
                     val res = parseInQuotes(inQuotes, nextLine, i, sb);
                     inQuotes = res.getLeft();
-                    skipNext = res.getRight();
+                    nextStep = res.getRight();
                 } else if (c == separator && !inQuotes) {
                     tokensOnThisLine.add(sb.toString());
                     sb = new StringBuilder(); // start work on next token
@@ -203,7 +199,7 @@ public class CSVReader {
     }
 
     @SuppressWarnings("Duplicates")
-    private Pair<Boolean/* inQuotes */, Boolean/* skipNext */> parseInQuotes(
+    private Pair<Boolean/* inQuotes */, Integer/* nextStep */> parseInQuotes(
             boolean inQuotes, String nextLine, int i, StringBuilder sb) {
         // this gets complex... the quote may end a quoted block, or
         // escape another quote.
@@ -224,7 +220,7 @@ public class CSVReader {
             // put one on the token. we do *not* exit the quoted
             // text.
             sb.append(nextLine.charAt(i + 1));
-            return Pair.of(true, true);
+            return Pair.of(true, 2);
         } else {
             // the tricky case of an embedded quote in the middle:
             // a,bc"d"ef,g
@@ -249,7 +245,7 @@ public class CSVReader {
                     ) {
                 sb.append(quotechar);
             }
-            return Pair.of(!inQuotes, false);
+            return Pair.of(!inQuotes, 1);
         }
     }
 }
