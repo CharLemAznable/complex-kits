@@ -4,6 +4,8 @@ import java.util.List;
 
 public class RefreshConfig {
 
+    private RefreshConfig() {}
+
     public static boolean exists(String key) {
         Config.refreshConfigSet(key);
         return Config.exists(key);

@@ -25,6 +25,8 @@ public class Config {
         loadConfigImplementation();
     }
 
+    private Config() {}
+
     private static void loadConfigImplementation() {
         val defConfig = createConfigable("defconfigdir", "defconfig", null);
         val bizConfig = createConfigable("bizconfigdir", "bizconfig", defConfig);
@@ -40,13 +42,13 @@ public class Config {
             return;
         }
 
-        impl = loadImpl(configImplementation, bizConfig);
+        impl = loadImpl(configImplementation);
         if (impl instanceof DefConfigSetter) { // 设置缺省配置读取对象
             ((DefConfigSetter) impl).setDefConfig(defConfig);
         }
     }
 
-    private static Configable loadImpl(String configImplementation, Configable defConfig) {
+    private static Configable loadImpl(String configImplementation) {
         return createObject(configImplementation, Configable.class);
     }
 

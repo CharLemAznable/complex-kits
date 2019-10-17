@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.config.utils;
 
+import com.github.charlemaznable.core.lang.Listt;
 import com.google.common.base.Splitter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -20,6 +21,8 @@ public class ParamsApplyUtils {
 
     private static final Pattern paramParams = compile(
             "\\w+([.$]\\w+)*\\s*(\\(\\s*[.\\w]+\\s*(,\\s*[.\\w]+\\s*)*\\))?");
+
+    private ParamsApplyUtils() {}
 
     /*
      * 根据形如com.ailk.xxx.yyy(a123,b23)的字符串，生成对象。
@@ -55,6 +58,6 @@ public class ParamsApplyUtils {
 
     public static <T> T createObject(String propertyValue, Class<? super T> cls) {
         List<T> objects = createObjects(propertyValue, cls);
-        return objects.size() > 0 ? objects.get(0) : null;
+        return Listt.isNotEmpty(objects) ? objects.get(0) : null;
     }
 }

@@ -20,6 +20,8 @@ public class ClzResolver {
 
     private static final String PATTERN = "/**/*.class";
 
+    private ClzResolver() {}
+
     @SneakyThrows
     public static List<Class<?>> getClasses(String basePackage, Predicate<Class<?>> classPredicate) {
         val resolver = new PathMatchingResourcePatternResolver();
@@ -33,8 +35,10 @@ public class ClzResolver {
 
             val clazz = findClass(metaFactory.getMetadataReader(res)
                     .getClassMetadata().getClassName());
-            if (null == clazz) continue;
-            if (null == classPredicate || classPredicate.test(clazz)) classes.add(clazz);
+            if (null != clazz &&
+                    (null == classPredicate ||
+                            classPredicate.test(clazz)))
+                classes.add(clazz);
         }
         return classes;
     }

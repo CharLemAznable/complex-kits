@@ -13,18 +13,18 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class SpringClassPathScanner extends ClassPathBeanDefinitionScanner {
 
     private final Class factoryBeanClass;
-    private final Function<ClassMetadata, Boolean> isCandidateClass;
+    private final Predicate<ClassMetadata> isCandidateClass;
     private final Class<? extends Annotation>[] annotationClasses;
 
     @SafeVarargs
     public SpringClassPathScanner(BeanDefinitionRegistry registry,
                                   Class factoryBeanClass,
-                                  Function<ClassMetadata, Boolean> isCandidateClass,
+                                  Predicate<ClassMetadata> isCandidateClass,
                                   Class<? extends Annotation>... annotationClasses) {
         super(registry, false);
         this.factoryBeanClass = factoryBeanClass;
@@ -67,12 +67,12 @@ public class SpringClassPathScanner extends ClassPathBeanDefinitionScanner {
 
     @Override
     protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
-        return null == isCandidateClass ? true : isCandidateClass.apply(beanDefinition.getMetadata());
+        return null == isCandidateClass || isCandidateClass.test(beanDefinition.getMetadata());
     }
 
     @SuppressWarnings("NullableProblems")
     @Override
-    protected boolean checkCandidate(String beanName, BeanDefinition beanDefinition) throws IllegalStateException {
+    protected boolean checkCandidate(String beanName, BeanDefinition beanDefinition) {
         if (super.checkCandidate(beanName, beanDefinition)) {
             return true;
         } else {

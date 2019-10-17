@@ -29,6 +29,10 @@ import static org.dom4j.io.OutputFormat.createPrettyPrint;
 
 public class Xml {
 
+    private static final String TEXT = "#text";
+
+    private Xml() {}
+
     public static String xml(Map<String, Object> map) {
         return xml(map, "xml", false);
     }
@@ -124,77 +128,86 @@ public class Xml {
                     List mapList = newArrayList();
 
                     if (elem.elements().size() > 0) {
-                        val m = element2Map(elem, parseAttr);
-                        if (map.get(elem.getName()) != null) {
-                            val obj = map.get(elem.getName());
-                            if (!(obj instanceof List)) {
-                                mapList = newArrayList();
-                                mapList.add(obj);
-                                mapList.add(m);
-                            }
-                            if (obj instanceof List) {
-                                mapList = (List) obj;
-                                mapList.add(m);
-                            }
-                            map.put(elem.getName(), mapList);
-                        } else map.put(elem.getName(), m);
+                        parseElementWithChildren(map, elem, mapList, parseAttr);
 
                     } else {
-                        var hasAttributes = false;
-                        Map<String, Object> attributesMap = null;
-                        if (parseAttr) {
-                            val attrs = elem.attributes(); // 当前节点的所有属性的list
-                            if (attrs.size() > 0) {
-                                hasAttributes = true;
-                                attributesMap = new LinkedHashMap<>();
-                                for (val attr : attrs) {
-                                    attributesMap.put("@" + attr.getName(), attr.getValue());
-                                }
-                            }
-                        }
-
-                        if (map.get(elem.getName()) != null) {
-                            val obj = map.get(elem.getName());
-                            if (!(obj instanceof List)) {
-                                mapList = newArrayList();
-                                mapList.add(obj);
-                                if (parseAttr && hasAttributes) {
-                                    attributesMap.put("#text", elem.getText());
-                                    mapList.add(attributesMap);
-                                } else {
-                                    mapList.add(elem.getText());
-                                }
-                            }
-                            if (obj instanceof List) {
-                                mapList = (List) obj;
-                                if (parseAttr && hasAttributes) {
-                                    attributesMap.put("#text", elem.getText());
-                                    mapList.add(attributesMap);
-                                } else {
-                                    mapList.add(elem.getText());
-                                }
-                            }
-                            map.put(elem.getName(), mapList);
-
-                        } else {
-                            if (parseAttr && hasAttributes) {
-                                attributesMap.put("#text", elem.getText());
-                                map.put(elem.getName(), attributesMap);
-                            } else {
-                                map.put(elem.getName(), elem.getText());
-                            }
-                        }
+                        parseElementWithoutChildren(map, elem, parseAttr);
                     }
                 }
             } else {
                 // 根节点的
-                if (isNotEmpty(attributes)) {
-                    map.put("#text", element.getText());
-                } else {
-                    map.put(element.getName(), element.getText());
-                }
+                parseRootElement(map, element, attributes);
             }
             return map;
+        }
+
+        @SuppressWarnings("unchecked")
+        private static void parseElementWithChildren(LinkedHashMap<String, Object> map, Element elem, List mapList, boolean parseAttr) {
+            val m = element2Map(elem, parseAttr);
+            if (map.get(elem.getName()) != null) {
+                val obj = map.get(elem.getName());
+                if (!(obj instanceof List)) {
+                    mapList = newArrayList();
+                    mapList.add(obj);
+                    mapList.add(m);
+                }
+                if (obj instanceof List) {
+                    mapList = (List) obj;
+                    mapList.add(m);
+                }
+                map.put(elem.getName(), mapList);
+            } else map.put(elem.getName(), m);
+        }
+
+        private static void parseElementWithoutChildren(LinkedHashMap<String, Object> map, Element elem, boolean parseAttr) {
+            List mapList;
+            var hasAttributes = false;
+            Map<String, Object> attributesMap = null;
+            if (parseAttr) {
+                val attrs = elem.attributes(); // 当前节点的所有属性的list
+                if (attrs.size() > 0) {
+                    hasAttributes = true;
+                    attributesMap = new LinkedHashMap<>();
+                    for (val attr : attrs) {
+                        attributesMap.put("@" + attr.getName(), attr.getValue());
+                    }
+                }
+            }
+
+            if (map.get(elem.getName()) != null) {
+                val obj = map.get(elem.getName());
+                mapList = obj instanceof List ?
+                        (List) obj : newArrayList(obj);
+                addListItem(mapList, elem,
+                        parseAttr, hasAttributes, attributesMap);
+                map.put(elem.getName(), mapList);
+
+            } else {
+                if (parseAttr && hasAttributes) {
+                    attributesMap.put(TEXT, elem.getText());
+                    map.put(elem.getName(), attributesMap);
+                } else {
+                    map.put(elem.getName(), elem.getText());
+                }
+            }
+        }
+
+        private static void parseRootElement(LinkedHashMap<String, Object> map, Element element, List<Attribute> attributes) {
+            if (isNotEmpty(attributes)) {
+                map.put(TEXT, element.getText());
+            } else {
+                map.put(element.getName(), element.getText());
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        private static void addListItem(List mapList, Element elem, boolean parseAttr, boolean hasAttributes, Map<String, Object> attributesMap) {
+            if (parseAttr && hasAttributes) {
+                attributesMap.put(TEXT, elem.getText());
+                mapList.add(attributesMap);
+            } else {
+                mapList.add(elem.getText());
+            }
         }
     }
 
@@ -217,20 +230,11 @@ public class Xml {
                 val value = entry.getValue();
                 if (key.startsWith("@")) { // 属性
                     body.addAttribute(key.substring(1, key.length()), value.toString());
-                } else if (key.equals("#text")) { // 有属性时的文本
+                } else if (key.equals(TEXT)) { // 有属性时的文本
                     body.addCDATA(value.toString());
                 } else {
                     if (value instanceof List) {
-                        val list = (List) value;
-                        for (val obj : list) {
-                            // list里是map或String，不会存在list里直接是list的，
-                            if (obj instanceof Map) {
-                                val subElement = body.addElement(key);
-                                map2Element((Map) obj, subElement);
-                            } else {
-                                body.addElement(key).addCDATA((String) obj);
-                            }
-                        }
+                        parseListElement(body, key, (List) value);
                     } else if (value instanceof Map) {
                         val subElement = body.addElement(key);
                         map2Element((Map) value, subElement);
@@ -240,18 +244,32 @@ public class Xml {
                 }
             }
         }
+
+        @SuppressWarnings("unchecked")
+        private static void parseListElement(Element body, String key, List list) {
+            for (val obj : list) {
+                // list里是map或String，不会存在list里直接是list的，
+                if (obj instanceof Map) {
+                    val subElement = body.addElement(key);
+                    map2Element((Map) obj, subElement);
+                } else {
+                    body.addElement(key).addCDATA((String) obj);
+                }
+            }
+        }
+
     }
 
     @Getter
     public static class XmlParseFeature {
 
-        private static final String disallowDoctypeDeclName
+        private static final String DISALLOW_DOCTYPE_DECL_NAME
                 = "http://apache.org/map2Element/features/disallow-doctype-decl";
-        private static final String loadExternalDTDName
+        private static final String LOAD_EXTERNAL_DTD_NAME
                 = "http://apache.org/map2Element/features/nonvalidating/load-external-dtd";
-        private static final String externalGeneralEntitiesName
+        private static final String EXTERNAL_GENERAL_ENTITIES_NAME
                 = "http://map2Element.org/sax/features/external-general-entities";
-        private static final String externalParameterEntitiesName
+        private static final String EXTERNAL_PARAMETER_ENTITIES_NAME
                 = "http://map2Element.org/sax/features/external-parameter-entities";
         private boolean disallowDoctypeDecl = true;
         private boolean loadExternalDTD = false;
@@ -260,11 +278,12 @@ public class Xml {
 
         public void setSAXReaderFeatures(SAXReader reader) {
             try {
-                reader.setFeature(disallowDoctypeDeclName, disallowDoctypeDecl);
-                reader.setFeature(loadExternalDTDName, loadExternalDTD);
-                reader.setFeature(externalGeneralEntitiesName, externalGeneralEntities);
-                reader.setFeature(externalParameterEntitiesName, externalParameterEntities);
+                reader.setFeature(DISALLOW_DOCTYPE_DECL_NAME, disallowDoctypeDecl);
+                reader.setFeature(LOAD_EXTERNAL_DTD_NAME, loadExternalDTD);
+                reader.setFeature(EXTERNAL_GENERAL_ENTITIES_NAME, externalGeneralEntities);
+                reader.setFeature(EXTERNAL_PARAMETER_ENTITIES_NAME, externalParameterEntities);
             } catch (SAXException ignored) {
+                // ignored
             }
         }
     }

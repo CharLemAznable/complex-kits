@@ -19,7 +19,7 @@ import java.util.Map;
 
 import static com.github.charlemaznable.core.codec.Bytes.bytes;
 import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
-import static com.google.common.base.Charsets.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class MutableHttpServletRequest extends HttpServletRequestWrapper {
 
@@ -130,6 +130,7 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper {
 
         @Override
         public void setReadListener(ReadListener readListener) {
+            // ignore ReadListener
         }
     }
 }

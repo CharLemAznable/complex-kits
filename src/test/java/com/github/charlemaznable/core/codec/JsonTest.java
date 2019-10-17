@@ -29,8 +29,6 @@ public class JsonTest {
 
     @Test
     public void testJson() {
-        new Json();
-
         val beanType11 = new BeanType1();
         beanType11.setValue1("value1");
         beanType11.setValue2("value2");

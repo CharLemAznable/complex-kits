@@ -19,6 +19,8 @@ import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 
 public class Json {
 
+    private Json() {}
+
     public static String jsonWithType(Object obj) {
         return toJSONString(obj, SerializerFeature.WriteClassName);
     }

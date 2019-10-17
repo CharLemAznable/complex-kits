@@ -13,6 +13,8 @@ import java.util.function.Consumer;
 
 public class MutableHttpServletUtils {
 
+    private MutableHttpServletUtils() {}
+
     public static MutableHttpServletRequest mutableRequest(HttpServletRequest request) {
         var internalRequest = request;
         while (internalRequest instanceof HttpServletRequestWrapper) {
@@ -55,7 +57,7 @@ public class MutableHttpServletUtils {
 
     public static byte[] getResponseContent(HttpServletResponse response) {
         val mutableResponse = mutableResponse(response);
-        if (null == mutableResponse) return null;
+        if (null == mutableResponse) return new byte[0];
         return mutableResponse.getContent();
     }
 

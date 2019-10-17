@@ -10,12 +10,15 @@ import static java.lang.String.format;
 
 public class Hex {
 
+    private Hex() {}
+
     public static String hex(byte[] array) {
         val bi = new BigInteger(1, array);
         val hex = bi.toString(16);
         val paddingLength = (array.length * 2) - hex.length();
         if (paddingLength > 0) {
-            return format("%0" + paddingLength + "d", 0) + hex;
+            val f = "%0" + paddingLength + "d";
+            return format(f, 0) + hex;
         } else {
             return hex;
         }

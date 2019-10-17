@@ -15,8 +15,6 @@ public class ClzResolverTest {
 
     @Test
     public void testClzResolver() {
-        new ClzResolver();
-
         val basePackage = "com.github.charlemaznable.core.spring.testClass";
 
         val classes = getClasses(basePackage);

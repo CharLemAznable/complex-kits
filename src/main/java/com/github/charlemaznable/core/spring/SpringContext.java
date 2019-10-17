@@ -1,6 +1,6 @@
 package com.github.charlemaznable.core.spring;
 
-import org.springframework.beans.BeansException;
+import lombok.Synchronized;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -35,6 +35,7 @@ public class SpringContext implements ApplicationContextAware {
         try {
             return (T) applicationContext.getBean(beanName);
         } catch (NoSuchBeanDefinitionException ignored) {
+            // ignored
         }
         return notNullThen(defaultSupplier, Supplier::get);
     }
@@ -56,6 +57,7 @@ public class SpringContext implements ApplicationContextAware {
         try {
             return applicationContext.getBean(clazz);
         } catch (NoSuchBeanDefinitionException ignored) {
+            // ignored
         }
         return notNullThen(defaultSupplier, Supplier::get);
     }
@@ -79,6 +81,7 @@ public class SpringContext implements ApplicationContextAware {
         try {
             return applicationContext.getBean(beanName, clazz);
         } catch (NoSuchBeanDefinitionException ignored) {
+            // ignored
         }
         return notNullThen(defaultSupplier, Supplier::get);
     }
@@ -96,7 +99,12 @@ public class SpringContext implements ApplicationContextAware {
     }
 
     @Override
-    public void setApplicationContext(@Nonnull ApplicationContext context) throws BeansException {
+    public void setApplicationContext(@Nonnull ApplicationContext context) {
+        updateApplicationContext(context);
+    }
+
+    @Synchronized
+    private static void updateApplicationContext(@Nonnull ApplicationContext context) {
         applicationContext = context;
     }
 }

@@ -102,6 +102,7 @@ public class MutableHttpServletResponse extends HttpServletResponseWrapper {
 
         @Override
         public void setWriteListener(WriteListener writeListener) {
+            // ignore WriteListener
         }
     }
 }
