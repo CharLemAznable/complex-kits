@@ -17,8 +17,6 @@ public class ListtTest {
 
     @Test
     public void testUnique() {
-        new Listt();
-
         val temp = newArrayList("aaa", "aaa", "aaa");
         val list = newArrayList(temp.iterator());
         val unique = Listt.unique(list);

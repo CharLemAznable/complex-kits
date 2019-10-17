@@ -20,6 +20,8 @@ public class Rand {
      */
     private static final SecureRandom RANDOM = new SecureRandom();
 
+    private Rand() {}
+
     public static boolean randBoolean() {
         return RANDOM.nextBoolean();
     }

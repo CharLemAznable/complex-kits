@@ -21,6 +21,8 @@ public class Listt {
 
     private static Random shuffleRandom = new Random(currentTimeMillis());
 
+    private Listt() {}
+
     public static <T> List<T> unique(Iterable<T> original) {
         return newArrayList(newHashSet(original));
     }
@@ -49,24 +51,24 @@ public class Listt {
         return result;
     }
 
-    public static <E> ArrayList<E> newArrayList() {
+    public static <E> List<E> newArrayList() {
         return Lists.newArrayList();
     }
 
     @SafeVarargs
-    public static <E> ArrayList<E> newArrayList(E... elements) {
+    public static <E> List<E> newArrayList(E... elements) {
         return null == elements ? Lists.newArrayList() : Lists.newArrayList(elements);
     }
 
-    public static <E> ArrayList<E> newArrayList(Iterable<? extends E> elements) {
+    public static <E> List<E> newArrayList(Iterable<? extends E> elements) {
         return null == elements ? Lists.newArrayList() : Lists.newArrayList(elements);
     }
 
-    public static <E> ArrayList<E> newArrayList(Iterator<? extends E> elements) {
+    public static <E> List<E> newArrayList(Iterator<? extends E> elements) {
         return null == elements ? Lists.newArrayList() : Lists.newArrayList(elements);
     }
 
-    public static <E> ArrayList<E> newArrayListOfType(int count, Class<? extends E> itemType) {
+    public static <E> List<E> newArrayListOfType(int count, Class<? extends E> itemType) {
         ArrayList<E> list = Lists.newArrayList();
         for (var i = 0; i < count; ++i) {
             list.add(onClass(itemType).create().get());

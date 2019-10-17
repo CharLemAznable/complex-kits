@@ -14,6 +14,8 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 public class LoadingCachee {
 
+    private LoadingCachee() {}
+
     public static <K, V> LoadingCache<K, V> simpleCache(CacheLoader<K, V> loader) {
         return newBuilder().build(loader);
     }

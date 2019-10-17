@@ -5,6 +5,8 @@ import java.util.Map;
 
 public class Empty {
 
+    private Empty() {}
+
     public static boolean isEmpty(Object obj) {
         if (obj instanceof CharSequence) {
             return ((CharSequence) obj).length() == 0;

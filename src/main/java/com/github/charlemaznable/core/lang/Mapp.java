@@ -8,11 +8,12 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.NumberFormat;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Mapp {
+
+    private Mapp() {}
 
     public static <K, V> Map<K, V> of(K k1, V v1) {
         Map<K, V> map = newHashMap();
@@ -31,27 +32,6 @@ public class Mapp {
     public static <K, V> Map<K, V> of(K k1, V v1, K k2, V v2, K k3, V v3) {
         Map<K, V> map = of(k1, v1, k2, v2);
         map.put(k3, v3);
-
-        return map;
-    }
-
-    public static <K, V> Map<K, V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
-        Map<K, V> map = of(k1, v1, k2, v2, k3, v3);
-        map.put(k4, v4);
-
-        return map;
-    }
-
-    public static <K, V> Map<K, V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
-        Map<K, V> map = of(k1, v1, k2, v2, k3, v3, k4, v4);
-        map.put(k5, v5);
-
-        return map;
-    }
-
-    public static <K, V> Map<K, V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6) {
-        Map<K, V> map = of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5);
-        map.put(k6, v6);
 
         return map;
     }
@@ -115,7 +95,7 @@ public class Mapp {
         if (value instanceof Boolean) return (Boolean) value;
         if (value instanceof Number) return ((Number) value).intValue() != 0;
         if (!(value instanceof String)) return defaultValue;
-        val valStr = (String) value;
+        String valStr = (String) value;
         return "true".equalsIgnoreCase(valStr)
                 || "yes".equalsIgnoreCase(valStr)
                 || "on".equalsIgnoreCase(valStr);
@@ -153,11 +133,11 @@ public class Mapp {
         return result;
     }
 
-    public static <K, V> HashMap<K, V> newHashMap() {
+    public static <K, V> Map<K, V> newHashMap() {
         return Maps.newHashMap();
     }
 
-    public static <K, V> HashMap<K, V> newHashMap(Map<? extends K, ? extends V> map) {
+    public static <K, V> Map<K, V> newHashMap(Map<? extends K, ? extends V> map) {
         return null == map ? Maps.newHashMap() : Maps.newHashMap(map);
     }
 

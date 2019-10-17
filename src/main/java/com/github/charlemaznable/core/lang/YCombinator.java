@@ -4,21 +4,27 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import static com.github.charlemaznable.core.lang.Condition.nullThen;
 
 public class YCombinator {
 
-    public static <T, R> Function<T, R> of(Function<Function<T, R>, Function<T, R>> f) {
+    private YCombinator() {}
+
+    public static <T, R> Function<T, R> of(UnaryFunction<Function<T, R>> f) {
         return n -> f.apply(of(f)).apply(n);
     }
 
-    public static <T, R> Function<T, R> of(CacheableFunction<T, R> f) {
+    public static <T, R> Function<T, R> of(CacheableUnaryFunction<T, R> f) {
         return n -> nullThen(f.getIfPresent(n), () -> f.put(n, f.apply(of(f)).apply(n)));
     }
 
-    public static abstract class CacheableFunction<T, R>
-            implements Function<Function<T, R>, Function<T, R>> {
+    @FunctionalInterface
+    public interface UnaryFunction<T> extends UnaryOperator<T> {}
+
+    public abstract static class CacheableUnaryFunction<T, R>
+            implements UnaryFunction<Function<T, R>> {
 
         private Cache<T, R> cache = CacheBuilder.newBuilder().build();
 

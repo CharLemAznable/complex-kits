@@ -15,8 +15,6 @@ public class EasyEnhancerTest {
 
     @Test
     public void testEnhancerrCreate() {
-        new EasyEnhancer();
-
         var actual = (ActualClass) EasyEnhancer.create(
                 ActualClass.class, new Interceptor());
         actual.method();

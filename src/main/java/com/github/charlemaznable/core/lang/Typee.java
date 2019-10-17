@@ -3,10 +3,13 @@ package com.github.charlemaznable.core.lang;
 import lombok.val;
 
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
 import static com.github.charlemaznable.core.lang.Clz.isAssignable;
 
 public class Typee {
+
+    private Typee() {}
 
     public static Class<?> getActualTypeArgument(
             Class<?> subClass,
@@ -20,7 +23,7 @@ public class Typee {
             int argumentOrder) {
         val genericSuperclass = subClass.getGenericSuperclass();
         if (genericSuperclass instanceof ParameterizedType) {
-            val pt = (ParameterizedType) genericSuperclass;
+            ParameterizedType pt = (ParameterizedType) genericSuperclass;
             val rawType = pt.getRawType();
 
             if (rawType == genericType || isAssignable(
@@ -30,10 +33,10 @@ public class Typee {
             }
         }
 
-        for (val genericInterface : subClass.getGenericInterfaces()) {
+        for (Type genericInterface : subClass.getGenericInterfaces()) {
             if (!(genericInterface instanceof ParameterizedType)) continue;
 
-            val pt = (ParameterizedType) genericInterface;
+            ParameterizedType pt = (ParameterizedType) genericInterface;
             val rawType = pt.getRawType();
 
             if (rawType == genericType || isAssignable(

@@ -25,8 +25,6 @@ public class LoadingCacheeTest {
 
     @Test
     public void testSimpleCache() {
-        new LoadingCachee();
-
         val simpleCache = simpleCache(new CacheLoader<String, String>() {
             @Override
             public String load(@Nonnull String s) {

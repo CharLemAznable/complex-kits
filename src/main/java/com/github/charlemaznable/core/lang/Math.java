@@ -6,9 +6,13 @@ import static java.lang.Math.min;
 
 public class Math {
 
+    private Math() {}
+
     public static int gcd(int p1, int p2) {
-        int a1 = abs(p1), a2 = abs(p2);
-        int m1 = max(a1, a2), m2 = min(a1, a2);
+        int a1 = abs(p1);
+        int a2 = abs(p2);
+        int m1 = max(a1, a2);
+        int m2 = min(a1, a2);
         while (m2 != 0) {
             int result = m1 % m2;
             m1 = m2;
@@ -26,8 +30,10 @@ public class Math {
     }
 
     public static long gcd(long p1, long p2) {
-        long a1 = abs(p1), a2 = abs(p2);
-        long m1 = max(a1, a2), m2 = min(a1, a2);
+        long a1 = abs(p1);
+        long a2 = abs(p2);
+        long m1 = max(a1, a2);
+        long m2 = min(a1, a2);
         while (m2 != 0) {
             long result = m1 % m2;
             m1 = m2;

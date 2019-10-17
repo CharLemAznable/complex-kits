@@ -17,7 +17,6 @@ public class MapListTest {
 
     @Test
     public void testMapList() {
-        new Mapp();
         List<Map<String, String>> list = newArrayList();
         list.add(of("key", "key1", "value", "value1"));
         list.add(of("key", "key2", "value", "value2"));

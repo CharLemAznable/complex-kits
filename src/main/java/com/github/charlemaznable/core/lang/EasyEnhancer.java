@@ -11,6 +11,10 @@ import static com.github.charlemaznable.core.lang.Condition.nullThen;
 
 public class EasyEnhancer extends Enhancer {
 
+    private EasyEnhancer() {
+        super();
+    }
+
     public static Object create
             (Class type, Callback callback,
              Object[] arguments) {

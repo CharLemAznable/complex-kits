@@ -10,8 +10,6 @@ public class StrTest {
 
     @Test
     public void testStr() {
-        new Str();
-
         assertEquals("aaabbbccc", Str.padding("aaabbb", 'c', 3));
         assertEquals("aaabbb", Str.removeLastLetters("aaabbbccc", 'c'));
 

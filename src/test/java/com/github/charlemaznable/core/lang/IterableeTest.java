@@ -15,7 +15,6 @@ public class IterableeTest {
 
     @Test
     public void testForEach() {
-        new Iterablee();
         Iterablee.forEach(list, (index, string) -> {
             if (index == 0) assertEquals("aaa", string);
             if (index == 1) assertEquals("bbb", string);

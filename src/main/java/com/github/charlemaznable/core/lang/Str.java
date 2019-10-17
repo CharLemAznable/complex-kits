@@ -16,6 +16,8 @@ public class Str {
      */
     public static final Pattern INTEGER_PATTERN = compile("[-+]?([0-9]+)$");
 
+    private Str() {}
+
     public static boolean isNull(String str) {
         return str == null;
     }
@@ -154,7 +156,7 @@ public class Str {
     }
 
     public static Long longOf(String str, Long defaultValue) {
-        return longOf(str, 10, 0L);
+        return longOf(str, 10, defaultValue);
     }
 
     public static Long longOf(String str, int radix, Long defaultValue) {
@@ -170,7 +172,7 @@ public class Str {
     }
 
     public static Short shortOf(String str, Short defaultValue) {
-        return shortOf(str, 10, (short) 0);
+        return shortOf(str, 10, defaultValue);
     }
 
     public static Short shortOf(String str, int radix, Short defaultValue) {
