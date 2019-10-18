@@ -2,6 +2,9 @@ package com.github.charlemaznable.core.spring;
 
 import com.github.charlemaznable.core.spring.testClass.TestClass;
 import com.github.charlemaznable.core.spring.testClass.TestConfiguration;
+import com.github.charlemaznable.core.spring.testClass.TestCreateClassA;
+import com.github.charlemaznable.core.spring.testClass.TestCreateClassB;
+import com.github.charlemaznable.core.spring.testClass.TestCreateClassC;
 import com.github.charlemaznable.core.spring.testClass.TestMultiClass;
 import com.github.charlemaznable.core.spring.testClass.TestSpringContext;
 import lombok.var;
@@ -75,5 +78,57 @@ public class SpringContextTest {
         Arrays.sort(multiBeanNames);
         assertEquals("TestMultiClassA", multiBeanNames[0]);
         assertEquals("TestMultiClassB", multiBeanNames[1]);
+    }
+
+    @Test
+    public void testSpringContextCreate() {
+        var createBeanA = TestSpringContext.getBean(TestCreateClassA.class);
+        assertNull(createBeanA);
+        createBeanA = TestSpringContext.getBeanOrReflect(TestCreateClassA.class);
+        assertNotNull(createBeanA);
+        createBeanA = TestSpringContext.getBean(TestCreateClassA.class);
+        assertNull(createBeanA);
+        createBeanA = TestSpringContext.getBeanOrCreate(TestCreateClassA.class);
+        assertNotNull(createBeanA);
+        createBeanA = TestSpringContext.getBean(TestCreateClassA.class);
+        assertNotNull(createBeanA);
+        createBeanA = TestSpringContext.getBean(TestCreateClassA.class.getName());
+        assertNotNull(createBeanA);
+        createBeanA = TestSpringContext.getBean(TestCreateClassA.class.getName(), TestCreateClassA.class);
+        assertNotNull(createBeanA);
+
+        var createBeanB = TestSpringContext.getBean("TestCreateClassB", TestCreateClassB.class);
+        assertNull(createBeanB);
+        createBeanB = TestSpringContext.getBeanOrReflect("TestCreateClassB", TestCreateClassB.class);
+        assertNotNull(createBeanB);
+        createBeanB = TestSpringContext.getBean("TestCreateClassB", TestCreateClassB.class);
+        assertNull(createBeanB);
+        createBeanB = TestSpringContext.getBeanOrCreate("TestCreateClassB", TestCreateClassB.class);
+        assertNotNull(createBeanB);
+        createBeanB = TestSpringContext.getBean(TestCreateClassB.class);
+        assertNotNull(createBeanB);
+        createBeanB = TestSpringContext.getBean("TestCreateClassB");
+        assertNotNull(createBeanB);
+        createBeanB = TestSpringContext.getBean("TestCreateClassB", TestCreateClassB.class);
+        assertNotNull(createBeanB);
+
+        var createBeanC = TestSpringContext.getBean(TestCreateClassC.class);
+        assertNull(createBeanC);
+        createBeanC = TestSpringContext.getBean(TestCreateClassC.class.getName());
+        assertNull(createBeanC);
+        createBeanC = TestSpringContext.getBean(TestCreateClassC.class.getName(), TestCreateClassC.class);
+        assertNull(createBeanC);
+
+        TestSpringContext.autowireBean(new TestCreateClassC());
+
+        createBeanC = TestSpringContext.getBean(TestCreateClassC.class);
+        assertNotNull(createBeanC);
+        createBeanC = TestSpringContext.getBean(TestCreateClassC.class.getName());
+        assertNotNull(createBeanC);
+        createBeanC = TestSpringContext.getBean(TestCreateClassC.class.getName(), TestCreateClassC.class);
+        assertNotNull(createBeanC);
+
+        assertNotNull(createBeanC.testClass);
+        assertEquals(TestClass.class, createBeanC.testClass.getClass());
     }
 }
