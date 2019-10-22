@@ -66,7 +66,9 @@ public class MutableHttpServletResponseTest {
         val mockResponse = new MockHttpServletResponse();
         val mutableResponse = new MutableHttpServletResponse(mockResponse);
 
+        val writer1 = mutableResponse.getWriter();
         val writer = mutableResponse.getWriter();
+        assertEquals(writer1, writer);
         writer.write(content);
         writer.flush();
         val content1 = mutableResponse.getContentAsString();
