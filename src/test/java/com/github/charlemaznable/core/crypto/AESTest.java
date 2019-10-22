@@ -37,6 +37,25 @@ public class AESTest {
                 hex(encrypt("The quick brown fox jumps over the lazy dog", key2)));
     }
 
+    @Test
+    public void testAESWithKeySize() {
+        var key = String.valueOf(currentTimeMillis());
+        int keySize = 256;
+        assertEquals("123456", decrypt(encrypt("123456", key, keySize), key, keySize));
+
+        key = randLetters(10);
+        assertEquals(10, key.length());
+        assertEquals(hex(encrypt("12345", key, keySize)), hex(encrypt("12345", key, keySize)));
+        assertEquals(hex(encrypt("123456", key, keySize)), hex(encrypt("123456", key, keySize)));
+        assertEquals(hex(encrypt("1234567", key, keySize)), hex(encrypt("1234567", key, keySize)));
+        assertEquals(hex(encrypt("汉", key, keySize)), hex(encrypt("汉", key, keySize)));
+        assertEquals(hex(encrypt("中文", key, keySize)), hex(encrypt("中文", key, keySize)));
+
+        val key2 = key + key;
+        assertEquals(hex(encrypt("The quick brown fox jumps over the lazy dog", key, keySize)),
+                hex(encrypt("The quick brown fox jumps over the lazy dog", key2, keySize)));
+    }
+
     public void batchRun(int times) {
         val rand = Rand.randAlphanumeric(100);
         val key = String.valueOf(currentTimeMillis());
