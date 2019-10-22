@@ -55,8 +55,12 @@ public class MutableHttpServletRequestTest {
 
         val mockRequest = new MockHttpServletRequest();
         mockRequest.setParameter(key1, value1);
+        mockRequest.setParameter("empty");
 
         val mutableRequest = new MutableHttpServletRequest(mockRequest);
+        assertNull(mutableRequest.getParameter("nonExists"));
+        assertNull(mutableRequest.getParameter("empty"));
+
         val value11 = mutableRequest.getParameter(key1);
         assertEquals(value1, value11);
         val value12 = fetchParameterMap(mutableRequest).get(key1);
@@ -72,7 +76,7 @@ public class MutableHttpServletRequestTest {
 
         assertDoesNotThrow(() -> setRequestParameter(null, key2, value2));
 
-                val value3 = "value3";
+        val value3 = "value3";
         setRequestParameterMap(mutableRequest, of(key2, value3));
         val value31 = mutableRequest.getParameterMap().get(key2)[0];
         assertEquals(value3, value31);
@@ -80,6 +84,16 @@ public class MutableHttpServletRequestTest {
         assertEquals(value3, value32);
 
         assertDoesNotThrow(() -> setRequestParameterMap(null, of(key2, value3)));
+
+        assertDoesNotThrow(() -> mutableRequest.setParameter("SET_KEY", null));
+        assertNull(mutableRequest.getParameterValues("SET_KEY"));
+        assertDoesNotThrow(() -> mutableRequest.setParameter("SET_KEY", "SET_VALUE"));
+        assertEquals("SET_VALUE", mutableRequest.getParameterValues("SET_KEY")[0]);
+        assertDoesNotThrow(() -> mutableRequest.setParameter("SET_KEY", new String[]{"SET_VALUE1", "SET_VALUE2"}));
+        assertEquals("SET_VALUE1", mutableRequest.getParameterValues("SET_KEY")[0]);
+        assertEquals("SET_VALUE2", mutableRequest.getParameterValues("SET_KEY")[1]);
+        assertDoesNotThrow(() -> mutableRequest.setParameter("SET_KEY", 123));
+        assertEquals("123", mutableRequest.getParameterValues("SET_KEY")[0]);
     }
 
     @Test

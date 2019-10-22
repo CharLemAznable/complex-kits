@@ -26,37 +26,37 @@ public class FastJsonHttpMessageConverterBuilder {
         return this;
     }
 
-    public FastJsonHttpMessageConverterBuilder setSerializeConfig(SerializeConfig serializeConfig) {
+    public FastJsonHttpMessageConverterBuilder serializeConfig(SerializeConfig serializeConfig) {
         this.fastJsonConfig.setSerializeConfig(serializeConfig);
         return this;
     }
 
-    public FastJsonHttpMessageConverterBuilder setParserConfig(ParserConfig parserConfig) {
+    public FastJsonHttpMessageConverterBuilder parserConfig(ParserConfig parserConfig) {
         this.fastJsonConfig.setParserConfig(parserConfig);
         return this;
     }
 
-    public FastJsonHttpMessageConverterBuilder setParseProcess(ParseProcess parseProcess) {
+    public FastJsonHttpMessageConverterBuilder parseProcess(ParseProcess parseProcess) {
         this.fastJsonConfig.setParseProcess(parseProcess);
         return this;
     }
 
-    public FastJsonHttpMessageConverterBuilder setSerializerFeatures(SerializerFeature... serializerFeatures) {
+    public FastJsonHttpMessageConverterBuilder serializerFeatures(SerializerFeature... serializerFeatures) {
         this.fastJsonConfig.setSerializerFeatures(serializerFeatures);
         return this;
     }
 
-    public FastJsonHttpMessageConverterBuilder setSerializeFilters(SerializeFilter... serializeFilters) {
+    public FastJsonHttpMessageConverterBuilder serializeFilters(SerializeFilter... serializeFilters) {
         this.fastJsonConfig.setSerializeFilters(serializeFilters);
         return this;
     }
 
-    public FastJsonHttpMessageConverterBuilder setFeatures(Feature... features) {
+    public FastJsonHttpMessageConverterBuilder features(Feature... features) {
         this.fastJsonConfig.setFeatures(features);
         return this;
     }
 
-    public FastJsonHttpMessageConverterBuilder setClassSerializeFilters(Map<Class<?>, SerializeFilter> classSerializeFilters) {
+    public FastJsonHttpMessageConverterBuilder classSerializeFilters(Map<Class<?>, SerializeFilter> classSerializeFilters) {
         this.fastJsonConfig.setClassSerializeFilters(classSerializeFilters);
         return this;
     }
@@ -66,7 +66,7 @@ public class FastJsonHttpMessageConverterBuilder {
         return this;
     }
 
-    public FastJsonHttpMessageConverterBuilder setWriteContentLength(boolean writeContentLength) {
+    public FastJsonHttpMessageConverterBuilder writeContentLength(boolean writeContentLength) {
         this.fastJsonConfig.setWriteContentLength(writeContentLength);
         return this;
     }

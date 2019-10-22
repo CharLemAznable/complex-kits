@@ -1,10 +1,12 @@
 package com.github.charlemaznable.core.spring;
 
+import com.github.charlemaznable.core.spring.testClass.TestAnnotation;
 import com.github.charlemaznable.core.spring.testClass.TestClass;
 import com.github.charlemaznable.core.spring.testClass.TestSpringContext;
+import com.github.charlemaznable.core.spring.testClass.TestSubSpringContext;
 import lombok.val;
+import lombok.var;
 import org.junit.jupiter.api.Test;
-import org.springframework.stereotype.Component;
 
 import static com.github.charlemaznable.core.spring.ClzResolver.getAnnotatedClasses;
 import static com.github.charlemaznable.core.spring.ClzResolver.getClasses;
@@ -25,14 +27,16 @@ public class ClzResolverTest {
         }
         assertEquals(1, countTestClass);
 
-        val subClasses = getSubClasses(basePackage, SpringContext.class);
+        var subClasses = getSubClasses(basePackage, SpringContext.class);
+        assertEquals(2, subClasses.size());
+        subClasses = getSubClasses(basePackage, TestSpringContext.class);
         assertEquals(1, subClasses.size());
         val contextClass = subClasses.get(0);
-        assertEquals(TestSpringContext.class, contextClass);
+        assertEquals(TestSubSpringContext.class, contextClass);
 
-        val componentClasses = getAnnotatedClasses(basePackage, Component.class);
-        assertEquals(1, componentClasses.size());
-        val componentClass = componentClasses.get(0);
-        assertEquals(TestSpringContext.class, componentClass);
+        val annotatedClasses = getAnnotatedClasses(basePackage, TestAnnotation.class);
+        assertEquals(1, annotatedClasses.size());
+        val annotatedClass = annotatedClasses.get(0);
+        assertEquals(TestSpringContext.class, annotatedClass);
     }
 }
