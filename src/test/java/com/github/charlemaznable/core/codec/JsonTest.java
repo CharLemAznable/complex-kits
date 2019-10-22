@@ -119,6 +119,7 @@ public class JsonTest {
                 "mapBean.ff.value2", "v22",
                 "bean2.value2", "v2", "bean2.value3", "v3");
         assertEquals(expected, descFlat(complex));
+        assertTrue(descFlat(new EmptyType()).isEmpty());
     }
 
     @Data
@@ -145,4 +146,7 @@ public class JsonTest {
         private Map<String, BeanType1> mapBean;
         private BeanType2 bean2;
     }
+
+    @Data
+    static class EmptyType {}
 }

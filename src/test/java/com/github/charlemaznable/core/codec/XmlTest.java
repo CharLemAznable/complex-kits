@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.codec;
 
+import com.github.charlemaznable.core.codec.Xml.XmlParseFeature;
 import lombok.var;
 import org.junit.jupiter.api.Test;
 
@@ -39,6 +40,15 @@ public class XmlTest {
         map.put("name5", of("key5", "value5"));
         xml = xml(map);
         assertEquals(map, unXml(xml));
+
+        String rootXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<root/>";
+        String k12xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<xml>\n  <k1><![CDATA[k2]]></k1>\n</xml>\n";
+
+        assertEquals(rootXml, xml(newHashMap(), "root"));
+        assertEquals(k12xml, xml(of("k1", "k2"), true));
+
+        assertEquals(newHashMap(), unXml(rootXml, new XmlParseFeature()));
+        assertEquals(of("xml", of("k1", "k2")), unXml(k12xml, true));
     }
 
     @Test
