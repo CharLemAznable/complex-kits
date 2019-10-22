@@ -92,7 +92,7 @@ public class Xml {
         private static String getEncoding(String text) {
             String result = null;
             val xml = text.trim();
-            if (xml.startsWith("<?map2Element")) {
+            if (xml.startsWith("<?xml")) {
                 int end = xml.indexOf("?>");
                 val sub = xml.substring(0, end);
                 val tokens = new StringTokenizer(sub, " =\"'");
