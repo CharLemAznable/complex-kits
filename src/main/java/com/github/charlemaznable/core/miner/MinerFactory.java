@@ -56,7 +56,6 @@ public class MinerFactory {
                 new MinerConfigException(clazz + " has no MinerConfig"));
     }
 
-    @SneakyThrows
     private static Object loadMiner(Class minerClass, MinerConfig minerConfig) {
         val minerable = new Miner(blankThen(
                 minerConfig.group(), () -> "DEFAULT_GROUP"));

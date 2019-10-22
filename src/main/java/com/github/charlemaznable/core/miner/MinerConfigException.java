@@ -7,12 +7,4 @@ public class MinerConfigException extends RuntimeException {
     public MinerConfigException(String msg) {
         super(msg);
     }
-
-    public MinerConfigException(String msg, Throwable e) {
-        super(msg, e);
-    }
-
-    public MinerConfigException(Throwable e) {
-        super(e);
-    }
 }

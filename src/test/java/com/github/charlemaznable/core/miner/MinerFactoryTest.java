@@ -16,6 +16,7 @@ import java.util.List;
 import static com.github.charlemaznable.core.miner.MinerFactory.getMiner;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MinerFactoryTest {
@@ -38,6 +39,8 @@ public class MinerFactoryTest {
         val stoneDefault = getMiner(StoneDefault.class);
         assertEquals("abc", stoneDefault.abc());
         assertEquals("xyz", stoneDefault.xyz());
+
+        assertThrows(MinerConfigException.class, () -> getMiner(StoneError.class));
     }
 
     @SneakyThrows
@@ -98,6 +101,9 @@ public class MinerFactoryTest {
         assertEquals("John Doe", minerableDefault.getString("full"));
         assertEquals("John Doe Richard", minerableDefault.getString("long"));
     }
+
+    @MinerConfig
+    class StoneError {}
 
     @MinerConfig
     interface StoneDefault {
