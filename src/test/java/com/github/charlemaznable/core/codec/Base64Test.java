@@ -3,6 +3,7 @@ package com.github.charlemaznable.core.codec;
 import org.junit.jupiter.api.Test;
 
 import static com.github.charlemaznable.core.codec.Base64.Format.PURIFIED;
+import static com.github.charlemaznable.core.codec.Base64.Format.URL_SAFE;
 import static com.github.charlemaznable.core.codec.Base64.base64;
 import static com.github.charlemaznable.core.codec.Base64.unBase64;
 import static com.github.charlemaznable.core.codec.Base64.unBase64AsString;
@@ -16,6 +17,9 @@ public class Base64Test {
     public void testBase64() {
         assertEquals("MTIzNDU2Nzg5MA==", base64(bytes("1234567890")));
         assertEquals("MTIzNDU2Nzg5MA==", base64("1234567890"));
+
+        assertEquals("MTIzNDU2Nzg5MA", base64(bytes("1234567890"), URL_SAFE));
+        assertEquals("MTIzNDU2Nzg5MA", base64("1234567890", URL_SAFE));
 
         assertEquals("MTIzNDU2Nzg5MA", base64(bytes("1234567890"), PURIFIED));
         assertEquals("MTIzNDU2Nzg5MA", base64("1234567890", PURIFIED));

@@ -87,13 +87,17 @@ public class Base62 {
         val baos = new ByteArrayOutputStream(data.length);
         var pos = 0;
         var val = 0;
-        for (var i = 0; i < data.length; i++) {
+        var step = 1;
+        for (var i = 0; i < data.length; i += step, step = 1) {
             var c = data[i];
             if (c == 'i') {
                 c = data[i + 1];
                 if (c == 'a') c = 'i';
                 if (c == 'b') c = '+';
-                c = c == 'c' ? '/' : data[i];
+                if (c == 'c') c = '/';
+                if (c == data[i + 1])
+                    c = data[i];
+                else step = 2;
             }
             val = (val << 6) | (decodes[c] & 0xff);
             pos += 6;

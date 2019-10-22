@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import static com.github.charlemaznable.core.codec.Json.desc;
 import static com.github.charlemaznable.core.lang.Listt.isNotEmpty;
 import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
-import static com.github.charlemaznable.core.lang.Str.isNull;
 import static com.github.charlemaznable.core.lang.Str.toStr;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -31,9 +30,8 @@ public abstract class Textable {
         for (val entry : describe.entrySet()) {
             val key = entry.getKey();
             val value = toStr(entry.getValue());
-            if (isNull(key) ||
-                    (isNotEmpty(excludedKeys()) &&
-                            excludedKeys().contains(key)) ||
+            if ((isNotEmpty(excludedKeys()) &&
+                    excludedKeys().contains(key)) ||
                     isEmpty(value)) continue;
 
             result.put(key, processor == null ?
