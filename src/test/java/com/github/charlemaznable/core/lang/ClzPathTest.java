@@ -33,5 +33,6 @@ public class ClzPathTest {
     @Test
     public void testClassResources() {
         assertNotEquals(0, ClzPath.classResources("com/github/charlemaznable/core/lang", "class").length);
+        assertTrue(ClzPath.classResources("", "class").length > 0);
     }
 }

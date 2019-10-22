@@ -141,6 +141,9 @@ public class ClzPath {
 
     private static final String SLASH = "/";
 
+    /**
+     * @see org.springframework.core.io.support.PathMatchingResourcePatternResolver
+     */
     private static class ExtensionMatchClzResources {
 
         public static final String URL_PROTOCOL_VFSFILE = "vfsfile";
@@ -176,22 +179,6 @@ public class ClzPath {
                 }
             }
             return result.toArray(new URL[0]);
-        }
-
-        public static boolean isReadable(URL url) {
-            try {
-                val protocol = url.getProtocol();
-                if (URL_PROTOCOL_FILE.equals(protocol) || URL_PROTOCOL_VFSFILE.equals(protocol) ||
-                        URL_PROTOCOL_VFS.equals(protocol)) {
-                    // Proceed with file system resolution...
-                    val file = getFile(url);
-                    return (file.canRead() && !file.isDirectory());
-                } else {
-                    return true;
-                }
-            } catch (IOException ex) {
-                return false;
-            }
         }
 
         private static String resolveBasePath(String basePath) {
