@@ -16,6 +16,7 @@ import java.util.List;
 import static com.github.charlemaznable.core.miner.MinerFactory.getMiner;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -88,6 +89,14 @@ public class MinerFactoryTest {
         assertEquals("John", minerableDefault.getString("name"));
         assertEquals("John Doe", minerableDefault.getString("full"));
         assertEquals("John Doe Richard", minerableDefault.getString("long"));
+
+        assertEquals(10, minerDefault.shortValue());
+        assertEquals(200, minerDefault.intValue());
+        assertEquals(3000L, minerDefault.longValue());
+        assertEquals(40000F, minerDefault.floatValue());
+        assertEquals(5D, minerDefault.doubleValue());
+        assertEquals('a', minerDefault.byteValue());
+        assertNull(minerDefault.charValue());
     }
 
     @Test
@@ -145,6 +154,27 @@ public class MinerFactoryTest {
         MinerContentBean content();
 
         List<MinerContentBean> list();
+
+        @MinerConfig(defaultValue = "10")
+        short shortValue();
+
+        @MinerConfig(defaultValue = "200")
+        int intValue();
+
+        @MinerConfig(defaultValue = "3000")
+        long longValue();
+
+        @MinerConfig(defaultValue = "40000")
+        float floatValue();
+
+        @MinerConfig(defaultValue = "5")
+        double doubleValue();
+
+        @MinerConfig(defaultValue = "97")
+        byte byteValue();
+
+        @MinerConfig(defaultValue = "a")
+        Character charValue();
     }
 
     @MinerConfig("DEFAULT_DATA")
