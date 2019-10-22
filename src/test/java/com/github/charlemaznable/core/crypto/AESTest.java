@@ -6,6 +6,8 @@ import lombok.val;
 import lombok.var;
 import org.junit.jupiter.api.Test;
 
+import java.security.InvalidKeyException;
+
 import static com.github.charlemaznable.core.codec.Hex.hex;
 import static com.github.charlemaznable.core.codec.Hex.unHex;
 import static com.github.charlemaznable.core.crypto.AES.decrypt;
@@ -14,6 +16,7 @@ import static com.github.charlemaznable.core.lang.Rand.randLetters;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.System.currentTimeMillis;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class AESTest {
 
@@ -54,6 +57,13 @@ public class AESTest {
         val key2 = key + key;
         assertEquals(hex(encrypt("The quick brown fox jumps over the lazy dog", key, keySize)),
                 hex(encrypt("The quick brown fox jumps over the lazy dog", key2, keySize)));
+    }
+
+    @Test
+    public void testAESError() {
+        var key = String.valueOf(currentTimeMillis());
+        assertThrows(InvalidKeyException.class, () -> encrypt("123456", key, 64));
+        assertThrows(InvalidKeyException.class, () -> decrypt(encrypt("123456", key), key, 64));
     }
 
     public void batchRun(int times) {

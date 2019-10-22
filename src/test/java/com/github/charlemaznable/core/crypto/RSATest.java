@@ -6,6 +6,8 @@ import lombok.val;
 import lombok.var;
 import org.junit.jupiter.api.Test;
 
+import java.security.spec.InvalidKeySpecException;
+
 import static com.github.charlemaznable.core.codec.Hex.hex;
 import static com.github.charlemaznable.core.codec.Hex.unHex;
 import static com.github.charlemaznable.core.crypto.RSA.generateKeyPair;
@@ -14,13 +16,16 @@ import static com.github.charlemaznable.core.crypto.RSA.getPrivateKeyString;
 import static com.github.charlemaznable.core.crypto.RSA.getPublicKey;
 import static com.github.charlemaznable.core.crypto.RSA.getPublicKeyString;
 import static com.github.charlemaznable.core.crypto.RSA.privateKey;
+import static com.github.charlemaznable.core.crypto.RSA.privateKeySize;
 import static com.github.charlemaznable.core.crypto.RSA.prvDecrypt;
 import static com.github.charlemaznable.core.crypto.RSA.prvEncrypt;
 import static com.github.charlemaznable.core.crypto.RSA.pubDecrypt;
 import static com.github.charlemaznable.core.crypto.RSA.pubEncrypt;
 import static com.github.charlemaznable.core.crypto.RSA.publicKey;
+import static com.github.charlemaznable.core.crypto.RSA.publicKeySize;
 import static java.lang.Runtime.getRuntime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class RSATest {
 
@@ -38,6 +43,12 @@ public class RSATest {
 
         assertEquals(plainText, prvDecrypt(pubEncrypt(plainText, publicKey), privateKey));
         assertEquals(plainText, pubDecrypt(prvEncrypt(plainText, privateKey), publicKey));
+
+        assertThrows(InvalidKeySpecException.class, () -> publicKey(privateKeyString));
+        assertThrows(InvalidKeySpecException.class, () -> privateKey(publicKeyString));
+
+        assertThrows(InvalidKeySpecException.class, () -> publicKeySize(null));
+        assertThrows(InvalidKeySpecException.class, () -> privateKeySize(null));
     }
 
     @Test

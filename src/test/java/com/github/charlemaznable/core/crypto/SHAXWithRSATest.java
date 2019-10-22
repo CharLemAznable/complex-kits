@@ -6,12 +6,19 @@ import lombok.val;
 import lombok.var;
 import org.junit.jupiter.api.Test;
 
+import java.security.InvalidKeyException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+
 import static com.github.charlemaznable.core.crypto.RSA.generateKeyPair;
 import static com.github.charlemaznable.core.crypto.RSA.getPrivateKeyString;
 import static com.github.charlemaznable.core.crypto.RSA.getPublicKeyString;
+import static com.github.charlemaznable.core.crypto.RSA.privateKey;
+import static com.github.charlemaznable.core.crypto.RSA.publicKey;
 import static com.github.charlemaznable.core.crypto.SHAXWithRSA.SHA1_WITH_RSA;
 import static com.github.charlemaznable.core.crypto.SHAXWithRSA.SHA256_WITH_RSA;
 import static java.lang.Runtime.getRuntime;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SHAXWithRSATest {
@@ -26,11 +33,20 @@ public class SHAXWithRSATest {
 
         val plainText = "{ mac=\"MAC Address\", appId=\"16位字符串\", signature=SHA1(\"appId=xxx&mac=yyy\") }";
 
-        val signBase64 = SHA1_WITH_RSA.signBase64(plainText, privateKeyString);
+        var signBase64 = SHA1_WITH_RSA.signBase64(plainText, privateKeyString);
         assertTrue(SHA1_WITH_RSA.verifyBase64(plainText, signBase64, publicKeyString));
 
-        val signHex = SHA1_WITH_RSA.signHex(plainText, privateKeyString);
+        signBase64 = SHA1_WITH_RSA.signBase64(plainText, privateKey(privateKeyString));
+        assertTrue(SHA1_WITH_RSA.verifyBase64(plainText, signBase64, publicKey(publicKeyString)));
+
+        var signHex = SHA1_WITH_RSA.signHex(plainText, privateKeyString);
         assertTrue(SHA1_WITH_RSA.verifyHex(plainText, signHex, publicKeyString));
+
+        signHex = SHA1_WITH_RSA.signHex(plainText, privateKey(privateKeyString));
+        assertTrue(SHA1_WITH_RSA.verifyHex(plainText, signHex, publicKey(publicKeyString)));
+
+        assertThrows(InvalidKeyException.class, () -> SHA1_WITH_RSA.sign(plainText, (PrivateKey) null));
+        assertThrows(InvalidKeyException.class, () -> SHA1_WITH_RSA.verify(plainText, new byte[0], (PublicKey) null));
     }
 
     @Test
@@ -41,11 +57,20 @@ public class SHAXWithRSATest {
 
         val plainText = "{ mac=\"MAC Address\", appId=\"16位字符串\", signature=SHA1(\"appId=xxx&mac=yyy\") }";
 
-        val signBase64 = SHA256_WITH_RSA.signBase64(plainText, privateKeyString);
+        var signBase64 = SHA256_WITH_RSA.signBase64(plainText, privateKeyString);
         assertTrue(SHA256_WITH_RSA.verifyBase64(plainText, signBase64, publicKeyString));
 
-        val signHex = SHA256_WITH_RSA.signHex(plainText, privateKeyString);
+        signBase64 = SHA256_WITH_RSA.signBase64(plainText, privateKey(privateKeyString));
+        assertTrue(SHA256_WITH_RSA.verifyBase64(plainText, signBase64, publicKey(publicKeyString)));
+
+        var signHex = SHA256_WITH_RSA.signHex(plainText, privateKeyString);
         assertTrue(SHA256_WITH_RSA.verifyHex(plainText, signHex, publicKeyString));
+
+        signHex = SHA256_WITH_RSA.signHex(plainText, privateKey(privateKeyString));
+        assertTrue(SHA256_WITH_RSA.verifyHex(plainText, signHex, publicKey(publicKeyString)));
+
+        assertThrows(InvalidKeyException.class, () -> SHA256_WITH_RSA.sign(plainText, (PrivateKey) null));
+        assertThrows(InvalidKeyException.class, () -> SHA256_WITH_RSA.verify(plainText, new byte[0], (PublicKey) null));
     }
 
     @Test
