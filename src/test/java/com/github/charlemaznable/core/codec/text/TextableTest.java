@@ -35,6 +35,7 @@ public class TextableTest {
 
         private int key1;
         private String key2;
+        private String key3;
     }
 
     @Data
@@ -44,10 +45,11 @@ public class TextableTest {
         private int key1;
         private String key2;
         private String key3;
+        private String key4;
 
         @Override
         protected List<String> excludedKeys() {
-            return newArrayList("key3");
+            return newArrayList("key4");
         }
     }
 }

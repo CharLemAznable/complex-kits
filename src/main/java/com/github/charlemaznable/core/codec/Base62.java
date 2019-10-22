@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.codec;
 
 import lombok.val;
 import lombok.var;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.ByteArrayOutputStream;
 
@@ -87,18 +88,11 @@ public class Base62 {
         val baos = new ByteArrayOutputStream(data.length);
         var pos = 0;
         var val = 0;
-        var step = 1;
-        for (var i = 0; i < data.length; i += step, step = 1) {
-            var c = data[i];
-            if (c == 'i') {
-                c = data[i + 1];
-                if (c == 'a') c = 'i';
-                if (c == 'b') c = '+';
-                if (c == 'c') c = '/';
-                if (c == data[i + 1])
-                    c = data[i];
-                else step = 2;
-            }
+        int step;
+        for (var i = 0; i < data.length; i += step) {
+            val ut = untranslate(data, i);
+            var c = ut.getLeft();
+            step = ut.getRight();
             val = (val << 6) | (decodes[c] & 0xff);
             pos += 6;
             while (pos > 7) {
@@ -108,5 +102,20 @@ public class Base62 {
             }
         }
         return baos.toByteArray();
+    }
+
+    private static Pair<Character, Integer> untranslate(char[] data, int i) {
+        var step = 1;
+        var c = data[i];
+        if (c == 'i') {
+            c = data[i + 1];
+            if (c == 'a') c = 'i';
+            if (c == 'b') c = '+';
+            if (c == 'c') c = '/';
+            if (c == data[i + 1])
+                c = data[i];
+            else step = 2;
+        }
+        return Pair.of(c, step);
     }
 }
