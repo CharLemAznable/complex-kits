@@ -4,7 +4,6 @@ import com.github.charlemaznable.core.lang.Str;
 import lombok.val;
 import lombok.var;
 
-import java.math.BigInteger;
 import java.util.Arrays;
 
 import static com.github.charlemaznable.core.codec.Bytes.bytes;
@@ -156,31 +155,6 @@ public class Base64 {
             return context.eof ? EOF : 0;
         }
 
-        public Object encode(final Object obj) {
-            if (!(obj instanceof byte[])) {
-                throw new IllegalArgumentException("Parameter supplied to Base-N encode is not a byte[]");
-            }
-            return encode((byte[]) obj);
-        }
-
-        public String encodeToString(final byte[] pArray) {
-            return string(encode(pArray));
-        }
-
-        public String encodeAsString(final byte[] pArray) {
-            return string(encode(pArray));
-        }
-
-        public Object decode(final Object obj) {
-            if (obj instanceof byte[]) {
-                return decode((byte[]) obj);
-            } else if (obj instanceof String) {
-                return decode((String) obj);
-            } else {
-                throw new IllegalArgumentException("Parameter supplied to Base-N decode is not a byte[] or a String");
-            }
-        }
-
         public byte[] decode(final String pArray) {
             return decode(bytes(pArray));
         }
@@ -216,20 +190,6 @@ public class Base64 {
         abstract void decode(byte[] pArray, int i, int length, Context context);
 
         protected abstract boolean isInAlphabet(byte value);
-
-        public boolean isInAlphabet(final byte[] arrayOctet, final boolean allowWSPad) {
-            for (val anArrayOctet : arrayOctet) {
-                if (!isInAlphabet(anArrayOctet) &&
-                        (!allowWSPad || (anArrayOctet != pad) && !isWhiteSpace(anArrayOctet))) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        public boolean isInAlphabet(final String basen) {
-            return isInAlphabet(bytes(basen), true);
-        }
 
         protected boolean containsAlphabetOrPad(final byte[] arrayOctet) {
             if (arrayOctet == null) {
@@ -369,29 +329,12 @@ public class Base64 {
             this.encodeTable = urlSafe ? URL_SAFE_ENCODE_TABLE : STANDARD_ENCODE_TABLE;
         }
 
-        public static boolean isBase64(final byte octet) {
-            return octet == PAD_DEFAULT || (octet >= 0 && octet < DECODE_TABLE.length && DECODE_TABLE[octet] != -1);
-        }
-
-        public static boolean isBase64(final String base64) {
-            return isBase64(bytes(base64));
-        }
-
-        public static boolean isBase64(final byte[] arrayOctet) {
-            for (val anArrayOctet : arrayOctet) {
-                if (!isBase64(anArrayOctet) && !isWhiteSpace(anArrayOctet)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
         public static byte[] encodeBase64(final byte[] binaryData) {
             return encodeBase64(binaryData, false);
         }
 
         public static String encodeBase64String(final byte[] binaryData) {
-            return string(encodeBase64(binaryData, false));
+            return string(encodeBase64(binaryData));
         }
 
         public static byte[] encodeBase64URLSafe(final byte[] binaryData) {
@@ -399,7 +342,7 @@ public class Base64 {
         }
 
         public static String encodeBase64URLSafeString(final byte[] binaryData) {
-            return string(encodeBase64(binaryData, false, true));
+            return string(encodeBase64URLSafe(binaryData));
         }
 
         public static byte[] encodeBase64Chunked(final byte[] binaryData) {
@@ -435,49 +378,6 @@ public class Base64 {
 
         public static byte[] decodeBase64(final String base64String) {
             return new ApacheBase64().decode(base64String);
-        }
-
-        public static byte[] decodeBase64(final byte[] base64Data) {
-            return new ApacheBase64().decode(base64Data);
-        }
-
-        public static BigInteger decodeInteger(final byte[] pArray) {
-            return new BigInteger(1, decodeBase64(pArray));
-        }
-
-        public static byte[] encodeInteger(final BigInteger bigInt) {
-            if (bigInt == null) {
-                throw new NullPointerException("encodeInteger called with null parameter");
-            }
-            return encodeBase64(toIntegerBytes(bigInt), false);
-        }
-
-        static byte[] toIntegerBytes(final BigInteger bigInt) {
-            var bitlen = bigInt.bitLength();
-            // round bitlen
-            bitlen = ((bitlen + 7) >> 3) << 3;
-            val bigBytes = bigInt.toByteArray();
-
-            if (((bigInt.bitLength() % 8) != 0) && (((bigInt.bitLength() / 8) + 1) == (bitlen / 8))) {
-                return bigBytes;
-            }
-            // set up params for copying everything but sign bit
-            var startSrc = 0;
-            var len = bigBytes.length;
-
-            // if bigInt is exactly byte-aligned, just skip signbit in copy
-            if ((bigInt.bitLength() % 8) == 0) {
-                startSrc = 1;
-                len--;
-            }
-            val startDst = bitlen / 8 - len; // to pad w/ nulls as per spec
-            val resizedBytes = new byte[bitlen / 8];
-            arraycopy(bigBytes, startSrc, resizedBytes, startDst, len);
-            return resizedBytes;
-        }
-
-        public boolean isUrlSafe() {
-            return this.encodeTable == URL_SAFE_ENCODE_TABLE;
         }
 
         @Override
