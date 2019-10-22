@@ -96,23 +96,6 @@ public class Base64 {
             this.pad = pad;
         }
 
-        @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-        protected static boolean isWhiteSpace(final byte byteToCheck) {
-            switch (byteToCheck) {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        boolean hasData(final Context context) {  // package protected for access from I/O streams
-            return context.buffer != null;
-        }
-
         int available(final Context context) {  // package protected for access from I/O streams
             return context.buffer != null ? context.pos - context.readPos : 0;
         }
@@ -343,10 +326,6 @@ public class Base64 {
 
         public static String encodeBase64URLSafeString(final byte[] binaryData) {
             return string(encodeBase64URLSafe(binaryData));
-        }
-
-        public static byte[] encodeBase64Chunked(final byte[] binaryData) {
-            return encodeBase64(binaryData, true);
         }
 
         public static byte[] encodeBase64(final byte[] binaryData, final boolean isChunked) {
