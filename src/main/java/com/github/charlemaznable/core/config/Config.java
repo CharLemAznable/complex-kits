@@ -5,7 +5,6 @@ import com.github.charlemaznable.core.config.impl.DefConfigSetter;
 import com.github.charlemaznable.core.config.impl.IniConfigable;
 import com.github.charlemaznable.core.config.impl.PropertiesConfigable;
 import com.github.charlemaznable.core.config.impl.PropsConfigable;
-import com.github.charlemaznable.core.config.impl.TableConfigable;
 import lombok.val;
 import lombok.var;
 
@@ -75,10 +74,6 @@ public class Config {
         val inisURL = classResources(basePackage, "ini");
         for (val iniURL : inisURL) {
             configBuilder.addConfig(new IniConfigable(iniURL));
-        }
-        val tablesURL = classResources(basePackage, "table");
-        for (val tableURL : tablesURL) {
-            configBuilder.addConfig(new TableConfigable(tableURL));
         }
 
         return configBuilder.buildConfig();
