@@ -12,6 +12,7 @@ import java.io.DataInputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
 
+import static com.github.charlemaznable.core.lang.Condition.nullThen;
 import static com.github.charlemaznable.core.lang.Str.isNotEmpty;
 import static com.google.common.base.Splitter.on;
 import static com.google.common.collect.Maps.newHashMap;
@@ -23,28 +24,55 @@ public class Http {
 
     private Http() {}
 
-    public static void responseJson(HttpServletResponse rsp, String json) {
-        responseContent(rsp, json, "application/json", UTF_8.name());
+    public static void responseJson(HttpServletResponse response, String json) {
+        responseContent(response, json, "application/json", UTF_8.name());
     }
 
-    public static void responseText(HttpServletResponse rsp, String text) {
-        responseContent(rsp, text, "text/plain", UTF_8.name());
+    public static void responseText(HttpServletResponse response, String text) {
+        responseContent(response, text, "text/plain", UTF_8.name());
     }
 
-    public static void responseHtml(HttpServletResponse rsp, String html) {
-        responseContent(rsp, html, "text/html", UTF_8.name());
+    public static void responseHtml(HttpServletResponse response, String html) {
+        responseContent(response, html, "text/html", UTF_8.name());
     }
 
     @SneakyThrows
-    public static void responseContent(HttpServletResponse rsp, String content,
+    public static void responseContent(HttpServletResponse response, String content,
                                        String contentType, String characterEncoding) {
         if (content == null) return;
 
-        rsp.setHeader("Content-Type", contentType + "; charset=" + characterEncoding);
-        rsp.setCharacterEncoding(characterEncoding);
-        val writer = rsp.getWriter();
+        response.setHeader("Content-Type", contentType + "; charset=" + characterEncoding);
+        response.setCharacterEncoding(characterEncoding);
+        val writer = response.getWriter();
         writer.write(content);
         writer.flush();
+    }
+
+    public static void errorJson(HttpServletResponse response, int statusCode, Throwable ex) {
+        errorJson(response, statusCode, nullThen(ex.getMessage(), ex::toString));
+    }
+
+    public static void errorJson(HttpServletResponse response, int statusCode, String json) {
+        response.setStatus(statusCode);
+        responseJson(response, json);
+    }
+
+    public static void errorText(HttpServletResponse response, int statusCode, Throwable ex) {
+        errorText(response, statusCode, nullThen(ex.getMessage(), ex::toString));
+    }
+
+    public static void errorText(HttpServletResponse response, int statusCode, String text) {
+        response.setStatus(statusCode);
+        responseText(response, text);
+    }
+
+    public static void errorHtml(HttpServletResponse response, int statusCode, Throwable ex) {
+        errorHtml(response, statusCode, nullThen(ex.getMessage(), ex::toString));
+    }
+
+    public static void errorHtml(HttpServletResponse response, int statusCode, String html) {
+        response.setStatus(statusCode);
+        responseHtml(response, html);
     }
 
     public static Map<String, String> fetchParameterMap(HttpServletRequest request) {
@@ -139,26 +167,5 @@ public class Http {
 
     public static boolean isAjax(HttpServletRequest request) {
         return "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
-    }
-
-    public static void error(HttpServletResponse response, int statusCode, Throwable ex) {
-        response.setStatus(statusCode);
-        val message = ex.getMessage();
-        responseText(response, message != null ? message : ex.toString());
-    }
-
-    public static void errorJson(HttpServletResponse response, int statusCode, String json) {
-        response.setStatus(statusCode);
-        responseJson(response, json);
-    }
-
-    public static void errorText(HttpServletResponse response, int statusCode, String text) {
-        response.setStatus(statusCode);
-        responseText(response, text);
-    }
-
-    public static void errorHtml(HttpServletResponse response, int statusCode, String html) {
-        response.setStatus(statusCode);
-        responseHtml(response, html);
     }
 }
