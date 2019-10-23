@@ -65,16 +65,6 @@ public class IniReader {
         }
     }
 
-    private boolean checkLine(String line) {
-        if (isCommentLine(line)) return false;
-        if (isSectionLine(line)) {
-            val section = line.substring(1, line.length() - 1).trim();
-            if (!sections.contains(section)) sections.add(section);
-            return false;
-        }
-        return true;
-    }
-
     private static String parseValue(String val, BufferedReader reader) throws IOException {
         val propertyValue = new StringBuilder();
         boolean lineContinues;
@@ -220,6 +210,16 @@ public class IniReader {
         if (index >= 0 && SEPARATOR_CHARS.indexOf(line.charAt(index)) < 0) index = -1;
 
         return index;
+    }
+
+    private boolean checkLine(String line) {
+        if (isCommentLine(line)) return false;
+        if (isSectionLine(line)) {
+            val section = line.substring(1, line.length() - 1).trim();
+            if (!sections.contains(section)) sections.add(section);
+            return false;
+        }
+        return true;
     }
 
     private void createValueNodes(String key, String value) {

@@ -40,8 +40,6 @@ public interface Configable {
 
     Configable subset(String prefix);
 
-    List<String> getKeyPrefixes();
-
     <T> T getBean(String key, Class<T> beanClass);
 
     <T> List<T> getBeans(String key, Class<T> beanClass);

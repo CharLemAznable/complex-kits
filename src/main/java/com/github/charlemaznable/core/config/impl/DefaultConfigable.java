@@ -8,7 +8,6 @@ import java.util.Properties;
 
 import static com.github.charlemaznable.core.codec.Base64.unBase64;
 import static com.github.charlemaznable.core.crypto.AES.decrypt;
-import static java.lang.System.currentTimeMillis;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.startsWith;
 import static org.apache.commons.lang3.StringUtils.trim;

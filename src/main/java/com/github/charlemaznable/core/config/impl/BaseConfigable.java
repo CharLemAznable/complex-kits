@@ -17,11 +17,10 @@ import static org.apache.commons.lang3.StringUtils.substringBefore;
 
 public abstract class BaseConfigable implements Configable {
 
-    private static Pattern numberPattern = Pattern
-            .compile("(-?[0-9]+\\.[0-9]*|[0-9]*\\.[0-9]+|-?[0-9]+).*");
-
     private static final String CONFIG_NOT_FOUND = " not found in config system";
     private static final String CONFIG_FORMAT_PREFIX = "'s value [";
+    private static Pattern numberPattern = Pattern
+            .compile("(-?[0-9]+\\.[0-9]*|[0-9]*\\.[0-9]+|-?[0-9]+).*");
 
     @Override
     public int getInt(String key) {
@@ -159,20 +158,6 @@ public abstract class BaseConfigable implements Configable {
     @Override
     public String getStr(String key, String defaultValue) {
         return defaultIfEmpty(getStr(key), defaultValue);
-    }
-
-    @Override
-    public List<String> getKeyPrefixes() {
-        List<String> keyPrefixes = newArrayList();
-
-        for (Object key : getProperties().keySet()) {
-            String strKey = (String) key;
-
-            val keyPrefix = substringBefore(strKey, ".");
-            if (!keyPrefixes.contains(keyPrefix)) keyPrefixes.add(keyPrefix);
-        }
-
-        return keyPrefixes;
     }
 
     @Override

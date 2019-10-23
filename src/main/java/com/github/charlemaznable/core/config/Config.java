@@ -127,7 +127,6 @@ public class Config {
     /**
      * 提供一个可以获取配置impl的入口,
      * 用于展示出当前配置impl所有配置的结果集,
-     * 修改了配置刷新相应配置,免重启服务,免发布.
      */
     public static Configable getConfigImpl() {
         return impl;

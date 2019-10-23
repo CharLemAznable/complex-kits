@@ -49,6 +49,16 @@ public class PropsReader extends LineNumberReader {
      * Constant for the index of the group for the separator.
      */
     private static final int IDX_SEPARATOR = 3;
+    private static final Map<Character, Character> UNESCAPE_SLASH_MAP = of(
+            '\\', '\\',
+            '\'', '\'',
+            '\"', '"',
+            'r', '\r',
+            'f', '\f',
+            't', '\t',
+            'n', '\n',
+            'b', '\b'
+    );
     /**
      * Stores the name of the last read property.
      */
@@ -148,17 +158,6 @@ public class PropsReader extends LineNumberReader {
         }
         return Pair.of(true, hadSlash);
     }
-
-    private static final Map<Character, Character> UNESCAPE_SLASH_MAP = of(
-            '\\', '\\',
-            '\'', '\'',
-            '\"', '"',
-            'r', '\r',
-            'f', '\f',
-            't', '\t',
-            'n', '\n',
-            'b', '\b'
-    );
 
     private static void unescapeSlash(char ch, StringBuilder out, char delimiter) {
         if (null != UNESCAPE_SLASH_MAP.get(ch)) out.append(UNESCAPE_SLASH_MAP.get(ch));
