@@ -42,8 +42,6 @@ public interface Configable {
 
     List<String> getKeyPrefixes();
 
-    long refreshConfigSet(String prefix);
-
     <T> T getBean(String key, Class<T> beanClass);
 
     <T> List<T> getBeans(String key, Class<T> beanClass);

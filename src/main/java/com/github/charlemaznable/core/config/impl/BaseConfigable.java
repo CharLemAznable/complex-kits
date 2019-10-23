@@ -3,7 +3,6 @@ package com.github.charlemaznable.core.config.impl;
 import com.github.charlemaznable.core.config.Configable;
 import com.github.charlemaznable.core.config.ex.ConfigNotFoundException;
 import com.github.charlemaznable.core.config.ex.ConfigValueFormatException;
-import com.github.charlemaznable.core.config.utils.AfterPropertiesSet;
 import lombok.val;
 
 import java.util.List;

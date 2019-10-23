@@ -1,4 +1,4 @@
-package com.github.charlemaznable.core.config.utils;
+package com.github.charlemaznable.core.config.impl;
 
 public interface AfterPropertiesSet {
 

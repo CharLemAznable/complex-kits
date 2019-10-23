@@ -1,7 +1,6 @@
 package com.github.charlemaznable.core.config;
 
 import com.github.charlemaznable.core.config.impl.ConfigBuilder;
-import com.github.charlemaznable.core.config.impl.DefConfigSetter;
 import com.github.charlemaznable.core.config.impl.IniConfigable;
 import com.github.charlemaznable.core.config.impl.PropertiesConfigable;
 import com.github.charlemaznable.core.config.impl.PropsConfigable;
@@ -11,10 +10,8 @@ import lombok.var;
 import java.util.List;
 import java.util.Properties;
 
-import static com.github.charlemaznable.core.config.utils.ParamsApplyUtils.createObject;
 import static com.github.charlemaznable.core.lang.ClzPath.classResource;
 import static com.github.charlemaznable.core.lang.ClzPath.classResources;
-import static com.github.charlemaznable.core.lang.Str.isEmpty;
 
 public class Config {
 
@@ -28,27 +25,7 @@ public class Config {
 
     private static void loadConfigImplementation() {
         val defConfig = createConfigable("defconfigdir", "defconfig", null);
-        val bizConfig = createConfigable("bizconfigdir", "bizconfig", defConfig);
-
-        // 加载配置系统独立实现类（比如从Redis、Mysql、Oracle等读取配置的具体实现）
-        // 要求具体配置类必须实现Configable接口，按照需要实现ParamsAppliable、DefConfigSetter接口
-        // 例如：
-        // config.implementation=org.n3r.config.impl.RedisConfigable(127.0.0.1,
-        // 11211)
-        val configImplementation = bizConfig.getStr("config.implementation");
-        if (isEmpty(configImplementation)) {
-            impl = bizConfig;
-            return;
-        }
-
-        impl = loadImpl(configImplementation);
-        if (impl instanceof DefConfigSetter) { // 设置缺省配置读取对象
-            ((DefConfigSetter) impl).setDefConfig(defConfig);
-        }
-    }
-
-    private static Configable loadImpl(String configImplementation) {
-        return createObject(configImplementation, Configable.class);
+        impl = createConfigable("bizconfigdir", "bizconfig", defConfig);
     }
 
     private static Configable createConfigable(String configKey, String defConfigDir, Configable defConfig) {
@@ -137,10 +114,6 @@ public class Config {
 
     public static Configable subset(String prefix) {
         return impl.subset(prefix);
-    }
-
-    public static long refreshConfigSet(String prefix) {
-        return impl.refreshConfigSet(prefix);
     }
 
     public static <T> T getBean(String key, Class<T> beanClass) {

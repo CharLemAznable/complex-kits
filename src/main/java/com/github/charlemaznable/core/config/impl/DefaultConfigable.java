@@ -76,9 +76,4 @@ public class DefaultConfigable extends BaseConfigable {
 
         return subProps;
     }
-
-    @Override
-    public long refreshConfigSet(String prefix) {
-        return currentTimeMillis();
-    }
 }
