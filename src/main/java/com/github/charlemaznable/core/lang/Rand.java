@@ -1,8 +1,8 @@
 package com.github.charlemaznable.core.lang;
 
-import com.github.charlemaznable.core.lang.joou.ULong;
 import lombok.val;
 import lombok.var;
+import org.joou.ULong;
 
 import java.security.SecureRandom;
 import java.util.Map;
@@ -49,7 +49,7 @@ public class Rand {
     public static String randNum(int count) {
         val sb = new StringBuilder(count);
         while (sb.length() < count) {
-            sb.append(new ULong(randLong()));
+            sb.append(ULong.valueOf(randLong()));
         }
 
         return sb.replace(count, sb.length(), "").toString();

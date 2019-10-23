@@ -12,9 +12,12 @@ public class EmptyTest {
     @Test
     public void testEmptyCollection() {
         assertTrue(Empty.isEmpty(null));
+        assertFalse(Empty.isEmpty(new EmptyObject()));
         val list = newArrayList();
         assertTrue(Empty.isEmpty(list));
         list.add("test");
         assertFalse(Empty.isEmpty(list));
     }
+
+    static class EmptyObject {}
 }
