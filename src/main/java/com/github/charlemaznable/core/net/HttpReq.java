@@ -49,7 +49,7 @@ public class HttpReq {
     }
 
     public HttpReq(String baseUrlTemplate, Object... baseUrlArgs) {
-        this.baseUrl = format(baseUrlTemplate, baseUrlArgs);
+        this(format(baseUrlTemplate, baseUrlArgs));
     }
 
     public static String get(String baseUrl) {
@@ -57,38 +57,7 @@ public class HttpReq {
     }
 
     public static String get(String baseUrlTemplate, Object... baseUrlArgs) {
-        return new HttpReq(baseUrlTemplate, baseUrlArgs).get();
-    }
-
-    private static String readResponseBody(HttpURLConnection http, Charset charset) throws IOException {
-        return toString(http.getInputStream(), charset);
-    }
-
-    private static String toString(InputStream inputStream, Charset charset) throws IOException {
-        val baos = new ByteArrayOutputStream();
-        val buffer = new byte[1024];
-
-        int length;
-        while ((length = inputStream.read(buffer)) != -1) {
-            baos.write(buffer, 0, length);
-        }
-
-        return new String(baos.toByteArray(), charset);
-    }
-
-    private Charset parseCharset(String contentType) {
-        if (contentType == null) return this.charset;
-
-        String charsetName = null;
-        for (val param : contentType.replace(" ", "").split(";")) {
-            if (param.startsWith("charset=")) {
-                charsetName = param.split("=", 2)[1];
-                break;
-            }
-        }
-
-        return charsetName == null ?
-                this.charset : Charset.forName(charsetName);
+        return get(format(baseUrlTemplate, baseUrlArgs));
     }
 
     public HttpReq req(String req) {
@@ -173,19 +142,6 @@ public class HttpReq {
         }
     }
 
-    private void postSettings(HttpURLConnection http) throws ProtocolException {
-        // 设置是否向connection输出，因为这个是post请求，参数要放在
-        // http正文内，因此需要设为true
-        http.setDoOutput(true);
-        http.setDoInput(true); // Read from the connection. Default is true.
-        http.setRequestMethod("POST");// 默认是 GET方式
-        http.setUseCaches(false); // Post 请求不能使用缓存
-        http.setInstanceFollowRedirects(true);
-        // 配置本次连接的Content-type，配置为application/x-www-form-urlencoded的
-        // 意思是正文是urlencoded编码过的form参数，下面我们可以看到我们对正文内容使用URLEncoder.encode进行编码
-        http.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-    }
-
     public String get() {
         HttpURLConnection http = null;
         try {
@@ -212,10 +168,6 @@ public class HttpReq {
         }
     }
 
-    private void setHeaders(HttpURLConnection http) {
-        for (val prop : props) http.setRequestProperty(prop.getKey(), prop.getValue());
-    }
-
     private HttpURLConnection commonSettings(String url) throws IOException {
         setFollowRedirects(true);
         val http = (HttpURLConnection) new URL(url).openConnection();
@@ -223,6 +175,23 @@ public class HttpReq {
         http.setConnectTimeout(60 * 1000);
         http.setReadTimeout(60 * 1000);
         return http;
+    }
+
+    private void postSettings(HttpURLConnection http) throws ProtocolException {
+        // 设置是否向connection输出，因为这个是post请求，参数要放在
+        // http正文内，因此需要设为true
+        http.setDoOutput(true);
+        http.setDoInput(true); // Read from the connection. Default is true.
+        http.setRequestMethod("POST");// 默认是 GET方式
+        http.setUseCaches(false); // Post 请求不能使用缓存
+        http.setInstanceFollowRedirects(true);
+        // 配置本次连接的Content-type，配置为application/x-www-form-urlencoded的
+        // 意思是正文是urlencoded编码过的form参数，下面我们可以看到我们对正文内容使用URLEncoder.encode进行编码
+        http.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+    }
+
+    private void setHeaders(HttpURLConnection http) {
+        for (val prop : props) http.setRequestProperty(prop.getKey(), prop.getValue());
     }
 
     private void writePostRequestBody(HttpURLConnection http) throws IOException {
@@ -248,6 +217,25 @@ public class HttpReq {
         return null;
     }
 
+    private Charset parseCharset(String contentType) {
+        if (contentType == null) return this.charset;
+
+        String charsetName = null;
+        for (val param : contentType.replace(" ", "").split(";")) {
+            if (param.startsWith("charset=")) {
+                charsetName = param.split("=", 2)[1];
+                break;
+            }
+        }
+
+        return charsetName == null ?
+                this.charset : Charset.forName(charsetName);
+    }
+
+    private static String readResponseBody(HttpURLConnection http, Charset charset) throws IOException {
+        return toString(http.getInputStream(), charset);
+    }
+
     private String readErrorResponseBody(String url, HttpURLConnection http, int status, Charset charset) throws IOException {
         val errorStream = http.getErrorStream();
         if (errorStream != null) {
@@ -256,5 +244,17 @@ public class HttpReq {
         } else {
             return (url + ", STATUS CODE =" + status + ", headers=" + json(http.getHeaderFields()));
         }
+    }
+
+    private static String toString(InputStream inputStream, Charset charset) throws IOException {
+        val baos = new ByteArrayOutputStream();
+        val buffer = new byte[1024];
+
+        int length;
+        while ((length = inputStream.read(buffer)) != -1) {
+            baos.write(buffer, 0, length);
+        }
+
+        return new String(baos.toByteArray(), charset);
     }
 }
