@@ -53,6 +53,8 @@
 
         <cglib-nodep.version>3.3.0</cglib-nodep.version>
         <joor-java-8.version>0.9.12</joor-java-8.version>
+        <joou-java-6.version>0.9.4</joou-java-6.version>
+        <jool-java-8.version>0.9.14</jool-java-8.version>
         <commons-text.version>1.8</commons-text.version>
         <commons-pool2.version>2.7.0</commons-pool2.version>
         <guava.version>28.1-jre</guava.version>
@@ -88,6 +90,16 @@
             <groupId>org.jooq</groupId>
             <artifactId>joor-java-8</artifactId>
             <version>${joor-java-8.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>joou-java-6</artifactId>
+            <version>${joou-java-6.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jool-java-8</artifactId>
+            <version>${jool-java-8.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
