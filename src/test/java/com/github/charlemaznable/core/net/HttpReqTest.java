@@ -354,7 +354,7 @@ public class HttpReqTest {
                     }
 
                     @Override
-                    public Map<String,List<String>> getHeaderFields() {
+                    public Map<String, List<String>> getHeaderFields() {
                         return newHashMap();
                     }
                 };
@@ -420,7 +420,7 @@ public class HttpReqTest {
                     }
 
                     @Override
-                    public Map<String,List<String>> getHeaderFields() {
+                    public Map<String, List<String>> getHeaderFields() {
                         return newHashMap();
                     }
                 };

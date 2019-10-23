@@ -232,21 +232,21 @@ public class HttpReq {
                 this.charset : Charset.forName(charsetName);
     }
 
-    private static String readResponseBody(HttpURLConnection http, Charset charset) throws IOException {
-        return toString(http.getInputStream(), charset);
+    private String readResponseBody(HttpURLConnection http, Charset charset) throws IOException {
+        return readInputStreamToString(http.getInputStream(), charset);
     }
 
     private String readErrorResponseBody(String url, HttpURLConnection http, int status, Charset charset) throws IOException {
         val errorStream = http.getErrorStream();
         if (errorStream != null) {
-            val error = toString(errorStream, charset);
+            val error = readInputStreamToString(errorStream, charset);
             return (url + ", STATUS CODE =" + status + ", headers=" + json(http.getHeaderFields()) + "\n\n" + error);
         } else {
             return (url + ", STATUS CODE =" + status + ", headers=" + json(http.getHeaderFields()));
         }
     }
 
-    private static String toString(InputStream inputStream, Charset charset) throws IOException {
+    private String readInputStreamToString(InputStream inputStream, Charset charset) throws IOException {
         val baos = new ByteArrayOutputStream();
         val buffer = new byte[1024];
 

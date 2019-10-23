@@ -74,12 +74,11 @@ public class Base64 {
         static final int EOF = -1;
         private static final int DEFAULT_BUFFER_RESIZE_FACTOR = 2;
         private static final int DEFAULT_BUFFER_SIZE = 8192;
-        protected byte pad = PAD_DEFAULT; // instance variable just in case it needs to vary later
         protected final int lineLength;
         private final int unencodedBlockSize;
-
         private final int encodedBlockSize;
         private final int chunkSeparatorLength;
+        protected byte pad = PAD_DEFAULT; // instance variable just in case it needs to vary later
 
         protected ApacheBaseNCodec(final int unencodedBlockSize, final int encodedBlockSize,
                                    final int lineLength, final int chunkSeparatorLength) {

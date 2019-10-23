@@ -45,6 +45,8 @@ import static org.joor.Reflect.onClass;
 
 public class ClzPath {
 
+    private static final String SLASH = "/";
+
     private ClzPath() {}
 
     public static boolean classExists(String className) {
@@ -138,8 +140,6 @@ public class ClzPath {
     public static URL[] classResources(String basePath, String extension) {
         return ExtensionMatchClzResources.classResources(basePath, extension);
     }
-
-    private static final String SLASH = "/";
 
     /**
      * @see org.springframework.core.io.support.PathMatchingResourcePatternResolver

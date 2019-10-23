@@ -150,15 +150,15 @@ public class SpringContext implements ApplicationContextAware {
         return bean;
     }
 
-    @Override
-    public void setApplicationContext(@Nonnull ApplicationContext context) {
-        updateApplicationContext(context);
-    }
-
     @Synchronized
     private static void updateApplicationContext(@Nonnull ApplicationContext context) {
         applicationContext = context;
         defaultListableBeanFactory = (DefaultListableBeanFactory)
                 ((ConfigurableApplicationContext) applicationContext).getBeanFactory();
+    }
+
+    @Override
+    public void setApplicationContext(@Nonnull ApplicationContext context) {
+        updateApplicationContext(context);
     }
 }

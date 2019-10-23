@@ -33,10 +33,10 @@ import static org.springframework.core.annotation.AnnotationUtils.findAnnotation
 @SuppressWarnings("unchecked")
 public class MinerFactory {
 
-    private MinerFactory() {}
-
     private static Cache<Class, Object> minerCache =
             CacheBuilder.newBuilder().expireAfterWrite(ofMinutes(10)).build();
+
+    private MinerFactory() {}
 
     @SneakyThrows
     public static <T> T getMiner(final Class<T> minerClass) {

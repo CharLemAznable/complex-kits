@@ -22,6 +22,8 @@ import static org.springframework.web.servlet.HandlerMapping.URI_TEMPLATE_VARIAB
 
 public class Http {
 
+    private static final String UNKNOWN = "unknown";
+
     private Http() {}
 
     public static void responseJson(HttpServletResponse response, String json) {
@@ -92,8 +94,6 @@ public class Http {
         if (pathVariables != null) pathVariableMap.putAll((Map) pathVariables);
         return pathVariableMap;
     }
-
-    private static final String UNKNOWN = "unknown";
 
     public static String fetchRemoteAddr(HttpServletRequest request) {
         val xForwardedFor = request.getHeader("x-forwarded-for");

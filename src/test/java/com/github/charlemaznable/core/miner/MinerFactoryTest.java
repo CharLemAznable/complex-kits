@@ -112,9 +112,6 @@ public class MinerFactoryTest {
     }
 
     @MinerConfig
-    class StoneError {}
-
-    @MinerConfig
     interface StoneDefault {
 
         @MinerConfig("stone.data")
@@ -190,4 +187,7 @@ public class MinerFactoryTest {
             if (strings.length > 0) this.name = strings[0];
         }
     }
+
+    @MinerConfig
+    class StoneError {}
 }
