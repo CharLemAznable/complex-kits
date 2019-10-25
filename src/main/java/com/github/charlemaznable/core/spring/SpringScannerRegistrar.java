@@ -31,6 +31,7 @@ public class SpringScannerRegistrar implements ImportBeanDefinitionRegistrar, Re
     }
 
     @SuppressWarnings({"NullableProblems", "ConstantConditions"})
+    @Override
     public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
         val annoAttrs = AnnotationAttributes.fromMap(importingClassMetadata.getAnnotationAttributes(scanAnnotationClass.getName()));
         val scanner = new SpringClassPathScanner(registry, factoryBeanClass, this::isCandidateClass, annotationClass);
