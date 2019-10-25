@@ -33,3 +33,13 @@ JAVA常用工具包.
   <version>0.10.4</version>
 </dependency>
 ```
+
+##### Maven Dependency SNAPSHOT
+
+```xml
+<dependency>
+  <groupId>com.github.charlemaznable</groupId>
+  <artifactId>complex-kits</artifactId>
+  <version>0.11.0-SNAPSHOT</version>
+</dependency>
+```
