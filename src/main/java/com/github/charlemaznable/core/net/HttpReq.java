@@ -128,17 +128,10 @@ public class HttpReq {
             http = commonSettings(url);
             postSettings(http);
             setHeaders(http);
-
-            if (sslSocketFactory != null)
-                ((HttpsURLConnection) http).setSSLSocketFactory(sslSocketFactory);
-
-            if (hostnameVerifier != null)
-                ((HttpsURLConnection) http).setHostnameVerifier(hostnameVerifier);
-
+            setSSL(http);
             // 连接，从postUrl.openConnection()至此的配置必须要在connect之前完成，
             // 要注意的是connection.getOutputStream会隐含的进行connect。
             http.connect();
-
             writePostRequestBody(http);
 
             return parseResponse(http, url);
@@ -158,13 +151,7 @@ public class HttpReq {
 
             http = commonSettings(url);
             setHeaders(http);
-
-            if (sslSocketFactory != null)
-                ((HttpsURLConnection) http).setSSLSocketFactory(sslSocketFactory);
-
-            if (hostnameVerifier != null)
-                ((HttpsURLConnection) http).setHostnameVerifier(hostnameVerifier);
-
+            setSSL(http);
             http.connect();
 
             return parseResponse(http, url);
@@ -202,6 +189,16 @@ public class HttpReq {
 
     private void setHeaders(HttpURLConnection http) {
         for (val prop : props) http.setRequestProperty(prop.getKey(), prop.getValue());
+    }
+
+    private void setSSL(HttpURLConnection http) {
+        if (!(http instanceof HttpsURLConnection)) return;
+
+        if (sslSocketFactory != null)
+            ((HttpsURLConnection) http).setSSLSocketFactory(sslSocketFactory);
+
+        if (hostnameVerifier != null)
+            ((HttpsURLConnection) http).setHostnameVerifier(hostnameVerifier);
     }
 
     private void writePostRequestBody(HttpURLConnection http) throws IOException {
