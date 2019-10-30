@@ -19,6 +19,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.Proxy.Type;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
@@ -40,7 +43,6 @@ public class HttpReqTest {
     public void testHttpReqGet() {
         val doGetUrlTemp = "http://test.addr:8080%s";
         val dogetPath = "/doGet";
-//        @Cleanup val requestStream = new ByteArrayOutputStream();
         val responseString = "RESPONSE";
         @Cleanup val responseStream = new ByteArrayInputStream(bytes(responseString));
 
@@ -74,11 +76,6 @@ public class HttpReqTest {
 
                     @Override
                     public void disconnect() {}
-
-//            @Mock
-//            public OutputStream getOutputStream() {
-//                return requestStream;
-//            }
 
                     @Override
                     public int getResponseCode() {
@@ -137,6 +134,72 @@ public class HttpReqTest {
                 return null;
             }
         }).hostnameVerifier((s, sslSession) -> false).get();
+        assertEquals(responseString, result);
+    }
+
+    @SneakyThrows
+    @Test
+    public void testHttpReqGetProxy() {
+        val doGetUrlTemp = "http://test.addr:8080%s";
+        val dogetPath = "/doGet";
+        val responseString = "RESPONSE";
+        @Cleanup val responseStream = new ByteArrayInputStream(bytes(responseString));
+        val doGetProxy = new Proxy(Type.HTTP, new InetSocketAddress("127.0.0.1", 8090));
+
+        new MockUp<URL>(URL.class) {
+            @SneakyThrows
+            @Mock
+            public URLConnection openConnection(Proxy proxy) {
+                assertEquals(doGetProxy, proxy);
+                return new HttpsURLConnection(null) {
+                    @Override
+                    public String getCipherSuite() {
+                        return null;
+                    }
+
+                    @Override
+                    public Certificate[] getLocalCertificates() {
+                        return new Certificate[0];
+                    }
+
+                    @Override
+                    public Certificate[] getServerCertificates() {
+                        return new Certificate[0];
+                    }
+
+                    @Override
+                    public boolean usingProxy() {
+                        return null != proxy;
+                    }
+
+                    @Override
+                    public void connect() {}
+
+                    @Override
+                    public void disconnect() {}
+
+                    @Override
+                    public int getResponseCode() {
+                        return HttpStatus.OK.value();
+                    }
+
+                    @Override
+                    public String getHeaderField(String name) {
+                        if ("Content-Type".equals(name)) {
+                            return "text/plain; charset=UTF-8";
+                        }
+                        return "";
+                    }
+
+                    @Override
+                    public InputStream getInputStream() {
+                        return responseStream;
+                    }
+                };
+            }
+        };
+
+        val result = new HttpReq(doGetUrlTemp, dogetPath).proxy(doGetProxy).get();
         assertEquals(responseString, result);
     }
 
