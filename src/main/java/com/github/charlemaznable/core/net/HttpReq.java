@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
+import java.net.Proxy;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -43,6 +44,8 @@ public class HttpReq {
     private SSLSocketFactory sslSocketFactory;
 
     private HostnameVerifier hostnameVerifier;
+
+    private Proxy proxy;
 
     public HttpReq(String baseUrl) {
         this.baseUrl = baseUrl;
@@ -111,6 +114,11 @@ public class HttpReq {
         return this;
     }
 
+    public HttpReq proxy(Proxy proxy) {
+        this.proxy = proxy;
+        return this;
+    }
+
     public String post() {
         HttpURLConnection http = null;
         try {
@@ -168,9 +176,11 @@ public class HttpReq {
         }
     }
 
-    private HttpURLConnection commonSettings(String url) throws IOException {
+    private HttpURLConnection commonSettings(String urlString) throws IOException {
         setFollowRedirects(true);
-        val http = (HttpURLConnection) new URL(url).openConnection();
+        val url = new URL(urlString);
+        val http = (HttpURLConnection) (null == this.proxy ?
+                url.openConnection() : url.openConnection(this.proxy));
         http.setRequestProperty("Accept-Charset", this.charset.name());
         http.setConnectTimeout(60 * 1000);
         http.setReadTimeout(60 * 1000);
