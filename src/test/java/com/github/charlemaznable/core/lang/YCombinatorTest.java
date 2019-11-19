@@ -1,6 +1,6 @@
 package com.github.charlemaznable.core.lang;
 
-import com.github.charlemaznable.core.lang.YCombinator.CacheableUnaryFunction;
+import com.github.charlemaznable.core.lang.YCombinator.CacheableUnaryOperator;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -44,7 +44,7 @@ public class YCombinatorTest {
     @Test
     public void testYCombinatorCache() {
         List<Integer> facOrder = newArrayList();
-        val fac = YCombinator.of(new CacheableUnaryFunction<Integer, Integer>() {
+        val fac = YCombinator.of(new CacheableUnaryOperator<Integer, Integer>() {
             @Override
             public Function<Integer, Integer> apply(Function<Integer, Integer> recFunc) {
                 return n -> {
@@ -61,7 +61,7 @@ public class YCombinatorTest {
         assertEquals(0, facOrder.size());
 
         List<Integer> fibOrder = newArrayList();
-        val fib = YCombinator.of(new CacheableUnaryFunction<Integer, Integer>() {
+        val fib = YCombinator.of(new CacheableUnaryOperator<Integer, Integer>() {
             @Override
             public Function<Integer, Integer> apply(Function<Integer, Integer> recFunc) {
                 return n -> {

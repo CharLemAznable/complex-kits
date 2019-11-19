@@ -12,19 +12,16 @@ public class YCombinator {
 
     private YCombinator() {}
 
-    public static <T, R> Function<T, R> of(UnaryFunction<Function<T, R>> f) {
+    public static <T, R> Function<T, R> of(UnaryOperator<Function<T, R>> f) {
         return n -> f.apply(of(f)).apply(n);
     }
 
-    public static <T, R> Function<T, R> of(CacheableUnaryFunction<T, R> f) {
+    public static <T, R> Function<T, R> of(CacheableUnaryOperator<T, R> f) {
         return n -> nullThen(f.getIfPresent(n), () -> f.put(n, f.apply(of(f)).apply(n)));
     }
 
-    @FunctionalInterface
-    public interface UnaryFunction<T> extends UnaryOperator<T> {}
-
-    public abstract static class CacheableUnaryFunction<T, R>
-            implements UnaryFunction<Function<T, R>> {
+    public abstract static class CacheableUnaryOperator<T, R>
+            implements UnaryOperator<Function<T, R>> {
 
         private Cache<T, R> cache = CacheBuilder.newBuilder().build();
 
