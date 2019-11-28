@@ -4,6 +4,7 @@ import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.val;
 import lombok.var;
+import org.springframework.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -75,6 +76,11 @@ public class Http {
     public static void errorHtml(HttpServletResponse response, int statusCode, String html) {
         response.setStatus(statusCode);
         responseHtml(response, html);
+    }
+
+    public static void errorHttpStatus(HttpServletResponse response, HttpStatus httpStatus) {
+        response.setStatus(httpStatus.value());
+        responseText(response, httpStatus.getReasonPhrase());
     }
 
     public static Map<String, String> fetchParameterMap(HttpServletRequest request) {

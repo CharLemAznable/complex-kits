@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.net;
 
 import com.github.charlemaznable.core.spring.MutableHttpServletRequest;
 import lombok.val;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,6 +43,11 @@ public class HttpTestController {
     @RequestMapping("/html-error")
     public void htmlError(HttpServletResponse response) {
         Http.errorHtml(response, 404, new IllegalStateException("html"));
+    }
+
+    @RequestMapping("/http-status-error")
+    public void httpStatus(HttpServletResponse response) {
+        Http.errorHttpStatus(response, HttpStatus.NOT_FOUND);
     }
 
     @RequestMapping("/parameter")

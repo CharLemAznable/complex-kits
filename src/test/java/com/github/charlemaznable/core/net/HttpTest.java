@@ -9,6 +9,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -78,6 +79,12 @@ public class HttpTest {
                 .andReturn().getResponse();
         assertEquals("html", responseHtml.getContentAsString());
         assertEquals("text/html; charset=UTF-8", responseHtml.getContentType());
+
+        val responseHttpStatus = mockMvc.perform(get("/http-status-error"))
+                .andExpect(status().isNotFound())
+                .andReturn().getResponse();
+        assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), responseHttpStatus.getContentAsString());
+        assertEquals("text/plain; charset=UTF-8", responseHttpStatus.getContentType());
     }
 
     @SneakyThrows
