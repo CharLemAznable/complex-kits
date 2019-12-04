@@ -6,9 +6,9 @@ import com.github.charlemaznable.core.lang.ex.EmptyObjectException;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import lombok.val;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -123,17 +123,17 @@ public class Condition {
     }
 
     @CanIgnoreReturnValue
-    public static @NonNull <T> T checkNotNull(T object) {
+    public static @Nonnull <T> T checkNotNull(T object) {
         return Preconditions.checkNotNull(object);
     }
 
     @CanIgnoreReturnValue
-    public static @NonNull <T> T checkNotNull(T object, @Nullable Object errorMessage) {
+    public static @Nonnull <T> T checkNotNull(T object, @Nullable Object errorMessage) {
         return Preconditions.checkNotNull(object, errorMessage);
     }
 
     @CanIgnoreReturnValue
-    public static @NonNull <T> T checkNotNull(T object, @Nullable RuntimeException errorException) {
+    public static @Nonnull <T> T checkNotNull(T object, @Nullable RuntimeException errorException) {
         if (null == object) {
             throw nullThen(errorException, NullPointerException::new);
         }
@@ -141,7 +141,7 @@ public class Condition {
     }
 
     @CanIgnoreReturnValue
-    public static @NonNull <T> T checkNotEmpty(T object) {
+    public static @Nonnull <T> T checkNotEmpty(T object) {
         if (isEmpty(object)) {
             throw new EmptyObjectException();
         }
@@ -149,7 +149,7 @@ public class Condition {
     }
 
     @CanIgnoreReturnValue
-    public static @NonNull <T> T checkNotEmpty(T object, @Nullable Object errorMessage) {
+    public static @Nonnull <T> T checkNotEmpty(T object, @Nullable Object errorMessage) {
         if (isEmpty(object)) {
             throw new EmptyObjectException(String.valueOf(errorMessage));
         }
@@ -157,7 +157,7 @@ public class Condition {
     }
 
     @CanIgnoreReturnValue
-    public static @NonNull <T> T checkNotEmpty(T object, @Nullable RuntimeException errorException) {
+    public static @Nonnull <T> T checkNotEmpty(T object, @Nullable RuntimeException errorException) {
         if (isEmpty(object)) {
             throw nullThen(errorException, EmptyObjectException::new);
         }
@@ -165,7 +165,7 @@ public class Condition {
     }
 
     @CanIgnoreReturnValue
-    public static @NonNull String checkNotBlank(String string) {
+    public static @Nonnull String checkNotBlank(String string) {
         if (isBlank(string)) {
             throw new BlankStringException();
         }
@@ -173,7 +173,7 @@ public class Condition {
     }
 
     @CanIgnoreReturnValue
-    public static @NonNull String checkNotBlank(String string, @Nullable Object errorMessage) {
+    public static @Nonnull String checkNotBlank(String string, @Nullable Object errorMessage) {
         if (isBlank(string)) {
             throw new BlankStringException(String.valueOf(errorMessage));
         }
@@ -181,7 +181,7 @@ public class Condition {
     }
 
     @CanIgnoreReturnValue
-    public static @NonNull String checkNotBlank(String string, @Nullable RuntimeException errorException) {
+    public static @Nonnull String checkNotBlank(String string, @Nullable RuntimeException errorException) {
         if (isBlank(string)) {
             throw nullThen(errorException, BlankStringException::new);
         }
