@@ -3,9 +3,9 @@ package com.github.charlemaznable.core.lang;
 import com.github.charlemaznable.core.lang.ex.BadConditionException;
 import com.github.charlemaznable.core.lang.ex.BlankStringException;
 import com.github.charlemaznable.core.lang.ex.EmptyObjectException;
-import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import lombok.val;
+import org.jetbrains.annotations.Contract;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -123,66 +123,90 @@ public class Condition {
     }
 
     @CanIgnoreReturnValue
-    public static @Nonnull <T> T checkNotNull(T object) {
-        return Preconditions.checkNotNull(object);
+    @Nonnull
+    @Contract(value = "null -> fail", pure = true)
+    public static <T> T checkNotNull(@Nullable T object) {
+        if (object == null) {
+            throw new NullPointerException();
+        }
+        return object;
     }
 
     @CanIgnoreReturnValue
-    public static @Nonnull <T> T checkNotNull(T object, @Nullable Object errorMessage) {
-        return Preconditions.checkNotNull(object, errorMessage);
+    @Nonnull
+    @Contract(value = "null, _ -> fail", pure = true)
+    public static <T> T checkNotNull(@Nullable T object, @Nullable Object errorMessage) {
+        if (object == null) {
+            throw new NullPointerException(String.valueOf(errorMessage));
+        }
+        return object;
     }
 
     @CanIgnoreReturnValue
-    public static @Nonnull <T> T checkNotNull(T object, @Nullable RuntimeException errorException) {
-        if (null == object) {
+    @Nonnull
+    @Contract(value = "null, _ -> fail", pure = true)
+    public static <T> T checkNotNull(@Nullable T object, @Nullable RuntimeException errorException) {
+        if (object == null) {
             throw nullThen(errorException, NullPointerException::new);
         }
         return object;
     }
 
     @CanIgnoreReturnValue
-    public static @Nonnull <T> T checkNotEmpty(T object) {
-        if (isEmpty(object)) {
+    @Nonnull
+    @Contract(value = "null -> fail", pure = true)
+    public static <T> T checkNotEmpty(@Nullable T object) {
+        if (object == null || isEmpty(object)) {
             throw new EmptyObjectException();
         }
         return object;
     }
 
     @CanIgnoreReturnValue
-    public static @Nonnull <T> T checkNotEmpty(T object, @Nullable Object errorMessage) {
-        if (isEmpty(object)) {
+    @Nonnull
+    @Contract(value = "null, _ -> fail", pure = true)
+    public static <T> T checkNotEmpty(@Nullable T object, @Nullable Object errorMessage) {
+        if (object == null || isEmpty(object)) {
             throw new EmptyObjectException(String.valueOf(errorMessage));
         }
         return object;
     }
 
     @CanIgnoreReturnValue
-    public static @Nonnull <T> T checkNotEmpty(T object, @Nullable RuntimeException errorException) {
-        if (isEmpty(object)) {
+    @Nonnull
+    @Contract(value = "null, _ -> fail", pure = true)
+    public static <T> T checkNotEmpty(@Nullable T object, @Nullable RuntimeException errorException) {
+        if (object == null || isEmpty(object)) {
             throw nullThen(errorException, EmptyObjectException::new);
         }
         return object;
     }
 
     @CanIgnoreReturnValue
-    public static @Nonnull String checkNotBlank(String string) {
-        if (isBlank(string)) {
+    @Nonnull
+    @Contract(value = "null -> fail", pure = true)
+    public static String checkNotBlank(@Nullable String string) {
+        if (string == null || isBlank(string)) {
             throw new BlankStringException();
         }
         return string;
     }
 
     @CanIgnoreReturnValue
-    public static @Nonnull String checkNotBlank(String string, @Nullable Object errorMessage) {
-        if (isBlank(string)) {
+    @Nonnull
+    @Contract(value = "null, _ -> fail", pure = true)
+    public static String checkNotBlank(@Nullable String string, @Nullable Object errorMessage) {
+        if (string == null || isBlank(string)) {
             throw new BlankStringException(String.valueOf(errorMessage));
         }
         return string;
     }
 
     @CanIgnoreReturnValue
-    public static @Nonnull String checkNotBlank(String string, @Nullable RuntimeException errorException) {
-        if (isBlank(string)) {
+    @Nonnull
+    @Contract(value = "null, _ -> fail", pure = true)
+    public static String checkNotBlank(@Nullable String string, @Nullable RuntimeException errorException) {
+        if (string == null || isBlank(string)) {
             throw nullThen(errorException, BlankStringException::new);
         }
         return string;
