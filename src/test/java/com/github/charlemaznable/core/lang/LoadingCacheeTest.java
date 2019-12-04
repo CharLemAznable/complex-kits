@@ -1,7 +1,6 @@
 package com.github.charlemaznable.core.lang;
 
 import com.google.common.cache.CacheLoader;
-import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -29,7 +28,7 @@ public class LoadingCacheeTest {
     public void testSimpleCache() {
         val simpleCache = simpleCache(new CacheLoader<String, String>() {
             @Override
-            public String load(@NonNull @Nonnull String s) {
+            public String load(@Nonnull String s) {
                 if (s.equals("ex")) {
                     throw new RuntimeException("ex");
                 }
@@ -50,7 +49,7 @@ public class LoadingCacheeTest {
     public void testAccessCache() {
         val accessCache = accessCache(new CacheLoader<String, String>() {
             @Override
-            public String load(@NonNull @Nonnull String s) {
+            public String load(@Nonnull String s) {
                 return s + toStr(currentTimeMillis());
             }
         }, Duration.ofMillis(200));
@@ -72,7 +71,7 @@ public class LoadingCacheeTest {
     public void testWriteCache() {
         val writeCache = writeCache(new CacheLoader<String, String>() {
             @Override
-            public String load(@NonNull @Nonnull String s) {
+            public String load(@Nonnull String s) {
                 return s + toStr(currentTimeMillis());
             }
         }, Duration.ofMillis(100));
