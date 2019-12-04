@@ -123,17 +123,17 @@ public class Condition {
     }
 
     @CanIgnoreReturnValue
-    public static <T> T checkNotNull(T object) {
+    public static @NonNull <T> T checkNotNull(T object) {
         return Preconditions.checkNotNull(object);
     }
 
     @CanIgnoreReturnValue
-    public static <T> T checkNotNull(T object, @Nullable Object errorMessage) {
+    public static @NonNull <T> T checkNotNull(T object, @Nullable Object errorMessage) {
         return Preconditions.checkNotNull(object, errorMessage);
     }
 
     @CanIgnoreReturnValue
-    public static <T> T checkNotNull(T object, @NonNull RuntimeException errorException) {
+    public static @NonNull <T> T checkNotNull(T object, @Nullable RuntimeException errorException) {
         if (null == object) {
             throw nullThen(errorException, NullPointerException::new);
         }
@@ -141,7 +141,7 @@ public class Condition {
     }
 
     @CanIgnoreReturnValue
-    public static <T> T checkNotEmpty(T object) {
+    public static @NonNull <T> T checkNotEmpty(T object) {
         if (isEmpty(object)) {
             throw new EmptyObjectException();
         }
@@ -149,7 +149,7 @@ public class Condition {
     }
 
     @CanIgnoreReturnValue
-    public static <T> T checkNotEmpty(T object, @Nullable Object errorMessage) {
+    public static @NonNull <T> T checkNotEmpty(T object, @Nullable Object errorMessage) {
         if (isEmpty(object)) {
             throw new EmptyObjectException(String.valueOf(errorMessage));
         }
@@ -157,7 +157,7 @@ public class Condition {
     }
 
     @CanIgnoreReturnValue
-    public static <T> T checkNotEmpty(T object, @NonNull RuntimeException errorException) {
+    public static @NonNull <T> T checkNotEmpty(T object, @Nullable RuntimeException errorException) {
         if (isEmpty(object)) {
             throw nullThen(errorException, EmptyObjectException::new);
         }
@@ -165,7 +165,7 @@ public class Condition {
     }
 
     @CanIgnoreReturnValue
-    public static String checkNotBlank(String string) {
+    public static @NonNull String checkNotBlank(String string) {
         if (isBlank(string)) {
             throw new BlankStringException();
         }
@@ -173,7 +173,7 @@ public class Condition {
     }
 
     @CanIgnoreReturnValue
-    public static String checkNotBlank(String string, @Nullable Object errorMessage) {
+    public static @NonNull String checkNotBlank(String string, @Nullable Object errorMessage) {
         if (isBlank(string)) {
             throw new BlankStringException(String.valueOf(errorMessage));
         }
@@ -181,7 +181,7 @@ public class Condition {
     }
 
     @CanIgnoreReturnValue
-    public static String checkNotBlank(String string, @NonNull RuntimeException errorException) {
+    public static @NonNull String checkNotBlank(String string, @Nullable RuntimeException errorException) {
         if (isBlank(string)) {
             throw nullThen(errorException, BlankStringException::new);
         }
@@ -192,11 +192,11 @@ public class Condition {
         if (!condition.getAsBoolean()) throw new BadConditionException();
     }
 
-    public static void checkCondition(BooleanSupplier condition, @NonNull Object errorMessage) {
+    public static void checkCondition(BooleanSupplier condition, @Nullable Object errorMessage) {
         if (!condition.getAsBoolean()) throw new BadConditionException(String.valueOf(errorMessage));
     }
 
-    public static void checkCondition(BooleanSupplier condition, @NonNull RuntimeException errorException) {
+    public static void checkCondition(BooleanSupplier condition, @Nullable RuntimeException errorException) {
         if (!condition.getAsBoolean()) throw nullThen(errorException, BadConditionException::new);
     }
 
@@ -205,12 +205,12 @@ public class Condition {
         executable.execute();
     }
 
-    public static void checkCondition(BooleanSupplier condition, Executable executable, @NonNull Object errorMessage) {
+    public static void checkCondition(BooleanSupplier condition, Executable executable, @Nullable Object errorMessage) {
         if (!condition.getAsBoolean()) throw new BadConditionException(String.valueOf(errorMessage));
         executable.execute();
     }
 
-    public static void checkCondition(BooleanSupplier condition, Executable executable, @NonNull RuntimeException errorException) {
+    public static void checkCondition(BooleanSupplier condition, Executable executable, @Nullable RuntimeException errorException) {
         if (!condition.getAsBoolean()) throw nullThen(errorException, BadConditionException::new);
         executable.execute();
     }
@@ -222,13 +222,13 @@ public class Condition {
     }
 
     @CanIgnoreReturnValue
-    public static <T> T checkCondition(BooleanSupplier condition, Supplier<T> action, @NonNull Object errorMessage) {
+    public static <T> T checkCondition(BooleanSupplier condition, Supplier<T> action, @Nullable Object errorMessage) {
         if (!condition.getAsBoolean()) throw new BadConditionException(String.valueOf(errorMessage));
         return action.get();
     }
 
     @CanIgnoreReturnValue
-    public static <T> T checkCondition(BooleanSupplier condition, Supplier<T> action, @NonNull RuntimeException errorException) {
+    public static <T> T checkCondition(BooleanSupplier condition, Supplier<T> action, @Nullable RuntimeException errorException) {
         if (!condition.getAsBoolean()) throw nullThen(errorException, BadConditionException::new);
         return action.get();
     }
