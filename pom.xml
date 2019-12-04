@@ -62,7 +62,6 @@
         <fastjson.version>1.2.62</fastjson.version>
         <dom4j.version>2.1.1</dom4j.version>
         <diamond-client.version>0.0.21</diamond-client.version>
-        <annotations.version>18.0.0</annotations.version>
 
         <lombok.version>1.18.10</lombok.version>
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
@@ -137,11 +136,6 @@
             <groupId>com.github.bingoohuang</groupId>
             <artifactId>diamond-client</artifactId>
             <version>${diamond-client.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>${annotations.version}</version>
         </dependency>
 
         <dependency>
