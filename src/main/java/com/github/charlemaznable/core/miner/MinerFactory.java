@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.miner;
 
+import com.github.charlemaznable.core.config.impl.PropsConfigable;
 import com.github.charlemaznable.core.lang.EasyEnhancer;
 import com.github.charlemaznable.core.lang.Str;
 import com.google.common.cache.Cache;
@@ -16,6 +17,7 @@ import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import net.sf.cglib.proxy.NoOp;
+import org.apache.commons.text.StringSubstitutor;
 import org.n3r.diamond.client.Miner;
 import org.n3r.diamond.client.Minerable;
 import org.n3r.diamond.client.impl.DiamondUtils;
@@ -23,9 +25,12 @@ import org.n3r.diamond.client.impl.DiamondUtils;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
+import java.util.Map;
 
+import static com.github.charlemaznable.core.lang.ClzPath.classResource;
 import static com.github.charlemaznable.core.lang.Condition.blankThen;
 import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
+import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static com.github.charlemaznable.core.lang.Str.isNotBlank;
 import static java.time.Duration.ofMinutes;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
@@ -35,6 +40,24 @@ public class MinerFactory {
 
     private static Cache<Class, Object> minerCache =
             CacheBuilder.newBuilder().expireAfterWrite(ofMinutes(10)).build();
+    private static StringSubstitutor minerSubstitutor;
+
+    static {
+        val envPropsURL = classResource("miner.env.props");
+        if (envPropsURL != null) {
+            val envProps = new PropsConfigable(envPropsURL).getProperties();
+            Map<String, String> envPropsMap = newHashMap();
+            val propNames = envProps.propertyNames();
+            while (propNames.hasMoreElements()) {
+                val propName = (String) propNames.nextElement();
+                val propValue = envProps.getProperty(propName);
+                envPropsMap.put(propName, propValue);
+            }
+            minerSubstitutor = new StringSubstitutor(envPropsMap);
+        } else {
+            minerSubstitutor = new StringSubstitutor();
+        }
+    }
 
     private MinerFactory() {}
 
@@ -57,9 +80,9 @@ public class MinerFactory {
     }
 
     private static Object loadMiner(Class minerClass, MinerConfig minerConfig) {
-        val minerable = new Miner(blankThen(
-                minerConfig.group(), () -> "DEFAULT_GROUP"));
-        val dataId = minerConfig.dataId();
+        val group = minerSubstitutor.replace(minerConfig.group());
+        val minerable = new Miner(blankThen(group, () -> "DEFAULT_GROUP"));
+        val dataId = minerSubstitutor.replace(minerConfig.dataId());
         val minerProxy = new MinerProxy(isNotBlank(dataId)
                 ? minerable.getMiner(dataId) : minerable);
 
@@ -89,9 +112,12 @@ public class MinerFactory {
             }
 
             val minerConfig = findAnnotation(method, MinerConfig.class);
-            val group = null != minerConfig ? minerConfig.group() : "";
-            val dataId = null != minerConfig ? minerConfig.dataId() : "";
-            var defaultValue = null != minerConfig ? minerConfig.defaultValue() : null;
+            val group = minerSubstitutor.replace(
+                    null != minerConfig ? minerConfig.group() : "");
+            val dataId = minerSubstitutor.replace(
+                    null != minerConfig ? minerConfig.dataId() : "");
+            var defaultValue = minerSubstitutor.replace(
+                    null != minerConfig ? minerConfig.defaultValue() : null);
             var defaultArgument = args.length > 0 ? args[0] : null;
 
             val stone = minerable.getStone(group, blankThen(dataId, method::getName));

@@ -111,6 +111,19 @@ public class MinerFactoryTest {
         assertEquals("John Doe Richard", minerableDefault.getString("long"));
     }
 
+    @Test
+    public void testStoneProps() {
+        MockDiamondServer.setConfigInfo("GROUPGroup", "DataDATA",
+                "name=John\nfull=${this.name} Doe\nlong=${this.full} Richard");
+
+        val stoneProps = getMiner(StoneProps.class);
+        assertNotNull(stoneProps);
+        assertEquals("John", stoneProps.name());
+        assertEquals("John Doe", stoneProps.full());
+        assertEquals("John Doe Richard", stoneProps.longName());
+        assertEquals("DEFAULTDefault", stoneProps.prop());
+    }
+
     @MinerConfig
     interface StoneDefault {
 
@@ -190,4 +203,18 @@ public class MinerFactoryTest {
 
     @MinerConfig
     class StoneError {}
+
+    @MinerConfig(group = "${group}Group", dataId = "Data${data}")
+    interface StoneProps {
+
+        String name();
+
+        String full();
+
+        @MinerConfig("long")
+        String longName();
+
+        @MinerConfig(dataId = "Prop${prop}", defaultValue = "${default}Default")
+        String prop();
+    }
 }
