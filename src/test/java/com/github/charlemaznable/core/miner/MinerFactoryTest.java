@@ -16,7 +16,6 @@ import java.util.List;
 import static com.github.charlemaznable.core.miner.MinerFactory.getMiner;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -96,7 +95,15 @@ public class MinerFactoryTest {
         assertEquals(40000F, minerDefault.floatValue());
         assertEquals(5D, minerDefault.doubleValue());
         assertEquals('a', minerDefault.byteValue());
-        assertNull(minerDefault.charValue());
+        assertEquals('a', minerDefault.charValue());
+
+        assertEquals(0, minerDefault.shortValueDefault());
+        assertEquals(0, minerDefault.intValueDefault());
+        assertEquals(0, minerDefault.longValueDefault());
+        assertEquals(0, minerDefault.floatValueDefault());
+        assertEquals(0, minerDefault.doubleValueDefault());
+        assertEquals(0, minerDefault.byteValueDefault());
+        assertEquals('\0', minerDefault.charValueDefault());
     }
 
     @Test
@@ -184,7 +191,21 @@ public class MinerFactoryTest {
         byte byteValue();
 
         @MinerConfig(defaultValue = "a")
-        Character charValue();
+        char charValue();
+
+        short shortValueDefault();
+
+        int intValueDefault();
+
+        long longValueDefault();
+
+        float floatValueDefault();
+
+        double doubleValueDefault();
+
+        byte byteValueDefault();
+
+        char charValueDefault();
     }
 
     @MinerConfig("DEFAULT_DATA")

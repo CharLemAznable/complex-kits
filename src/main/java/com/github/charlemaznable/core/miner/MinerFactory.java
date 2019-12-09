@@ -117,7 +117,8 @@ public class MinerFactory {
             val dataId = minerSubstitutor.replace(
                     null != minerConfig ? minerConfig.dataId() : "");
             var defaultValue = minerSubstitutor.replace(
-                    null != minerConfig ? minerConfig.defaultValue() : null);
+                    null != minerConfig ? blankThen(
+                            minerConfig.defaultValue(), () -> null) : null);
             var defaultArgument = args.length > 0 ? args[0] : null;
 
             val stone = minerable.getStone(group, blankThen(dataId, method::getName));
@@ -150,6 +151,7 @@ public class MinerFactory {
             if (rt == float.class) return Float.parseFloat(value);
             if (rt == double.class) return Double.parseDouble(value);
             if (rt == byte.class) return Byte.parseByte(value);
+            if (rt == char.class) return value.length() > 0 ? value.charAt(0) : '\0';
             return null;
         }
 
