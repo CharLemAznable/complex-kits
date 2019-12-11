@@ -7,6 +7,7 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import lombok.val;
 import org.jetbrains.annotations.Contract;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
@@ -122,6 +123,7 @@ public class Condition {
     }
 
     @Contract(value = "null -> fail", pure = true)
+    @Nonnull
     @CanIgnoreReturnValue
     public static <T> T checkNotNull(@Nullable T object) {
         if (object == null) {
@@ -131,6 +133,7 @@ public class Condition {
     }
 
     @Contract(value = "null, _ -> fail", pure = true)
+    @Nonnull
     @CanIgnoreReturnValue
     public static <T> T checkNotNull(@Nullable T object, Object errorMessage) {
         if (object == null) {
@@ -140,6 +143,7 @@ public class Condition {
     }
 
     @Contract(value = "null, _ -> fail", pure = true)
+    @Nonnull
     @CanIgnoreReturnValue
     public static <T> T checkNotNull(@Nullable T object, RuntimeException errorException) {
         if (object == null) {
@@ -149,6 +153,7 @@ public class Condition {
     }
 
     @Contract(value = "null -> fail", pure = true)
+    @Nonnull
     @CanIgnoreReturnValue
     public static <T> T checkNotEmpty(@Nullable T object) {
         if (object == null || isEmpty(object))
@@ -157,6 +162,7 @@ public class Condition {
     }
 
     @Contract(value = "null, _ -> fail", pure = true)
+    @Nonnull
     @CanIgnoreReturnValue
     public static <T> T checkNotEmpty(@Nullable T object, Object errorMessage) {
         if (object == null || isEmpty(object))
@@ -165,6 +171,7 @@ public class Condition {
     }
 
     @Contract(value = "null, _ -> fail", pure = true)
+    @Nonnull
     @CanIgnoreReturnValue
     public static <T> T checkNotEmpty(@Nullable T object, RuntimeException errorException) {
         if (object == null || isEmpty(object))
@@ -173,6 +180,7 @@ public class Condition {
     }
 
     @Contract(value = "null -> fail", pure = true)
+    @Nonnull
     @CanIgnoreReturnValue
     public static String checkNotBlank(@Nullable String string) {
         if (string == null || isBlank(string))
@@ -181,6 +189,7 @@ public class Condition {
     }
 
     @Contract(value = "null, _ -> fail", pure = true)
+    @Nonnull
     @CanIgnoreReturnValue
     public static String checkNotBlank(@Nullable String string, Object errorMessage) {
         if (string == null || isBlank(string))
@@ -189,6 +198,7 @@ public class Condition {
     }
 
     @Contract(value = "null, _ -> fail", pure = true)
+    @Nonnull
     @CanIgnoreReturnValue
     public static String checkNotBlank(@Nullable String string, RuntimeException errorException) {
         if (string == null || isBlank(string))
