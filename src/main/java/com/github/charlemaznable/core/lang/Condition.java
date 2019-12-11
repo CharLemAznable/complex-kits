@@ -5,8 +5,8 @@ import com.github.charlemaznable.core.lang.ex.BlankStringException;
 import com.github.charlemaznable.core.lang.ex.EmptyObjectException;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import lombok.val;
+import org.jetbrains.annotations.Contract;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
@@ -121,70 +121,76 @@ public class Condition {
         return isBlank(string) ? blankAction.get() : notBlankAction.apply(string);
     }
 
+    @Contract(value = "null -> fail", pure = true)
     @CanIgnoreReturnValue
-    @Nonnull
     public static <T> T checkNotNull(@Nullable T object) {
-        if (object == null) throw new NullPointerException();
+        if (object == null) {
+            throw new NullPointerException();
+        }
         return object;
     }
 
+    @Contract(value = "null, _ -> fail", pure = true)
     @CanIgnoreReturnValue
-    @Nonnull
-    public static <T> T checkNotNull(@Nullable T object, @Nullable Object errorMessage) {
-        if (object == null) throw new NullPointerException(String.valueOf(errorMessage));
+    public static <T> T checkNotNull(@Nullable T object, Object errorMessage) {
+        if (object == null) {
+            throw new NullPointerException(String.valueOf(errorMessage));
+        }
         return object;
     }
 
+    @Contract(value = "null, _ -> fail", pure = true)
     @CanIgnoreReturnValue
-    @Nonnull
-    public static <T> T checkNotNull(@Nullable T object, @Nullable RuntimeException errorException) {
-        if (object == null) throw nullThen(errorException, NullPointerException::new);
+    public static <T> T checkNotNull(@Nullable T object, RuntimeException errorException) {
+        if (object == null) {
+            throw nullThen(errorException, NullPointerException::new);
+        }
         return object;
     }
 
+    @Contract(value = "null -> fail", pure = true)
     @CanIgnoreReturnValue
-    @Nonnull
     public static <T> T checkNotEmpty(@Nullable T object) {
         if (object == null || isEmpty(object))
             throw new EmptyObjectException();
         return object;
     }
 
+    @Contract(value = "null, _ -> fail", pure = true)
     @CanIgnoreReturnValue
-    @Nonnull
-    public static <T> T checkNotEmpty(@Nullable T object, @Nullable Object errorMessage) {
+    public static <T> T checkNotEmpty(@Nullable T object, Object errorMessage) {
         if (object == null || isEmpty(object))
             throw new EmptyObjectException(String.valueOf(errorMessage));
         return object;
     }
 
+    @Contract(value = "null, _ -> fail", pure = true)
     @CanIgnoreReturnValue
-    @Nonnull
-    public static <T> T checkNotEmpty(@Nullable T object, @Nullable RuntimeException errorException) {
+    public static <T> T checkNotEmpty(@Nullable T object, RuntimeException errorException) {
         if (object == null || isEmpty(object))
             throw nullThen(errorException, EmptyObjectException::new);
         return object;
     }
 
+    @Contract(value = "null -> fail", pure = true)
     @CanIgnoreReturnValue
-    @Nonnull
     public static String checkNotBlank(@Nullable String string) {
         if (string == null || isBlank(string))
             throw new BlankStringException();
         return string;
     }
 
+    @Contract(value = "null, _ -> fail", pure = true)
     @CanIgnoreReturnValue
-    @Nonnull
-    public static String checkNotBlank(@Nullable String string, @Nullable Object errorMessage) {
+    public static String checkNotBlank(@Nullable String string, Object errorMessage) {
         if (string == null || isBlank(string))
             throw new BlankStringException(String.valueOf(errorMessage));
         return string;
     }
 
+    @Contract(value = "null, _ -> fail", pure = true)
     @CanIgnoreReturnValue
-    @Nonnull
-    public static String checkNotBlank(@Nullable String string, @Nullable RuntimeException errorException) {
+    public static String checkNotBlank(@Nullable String string, RuntimeException errorException) {
         if (string == null || isBlank(string))
             throw nullThen(errorException, BlankStringException::new);
         return string;
@@ -194,11 +200,11 @@ public class Condition {
         if (!condition.getAsBoolean()) throw new BadConditionException();
     }
 
-    public static void checkCondition(BooleanSupplier condition, @Nullable Object errorMessage) {
+    public static void checkCondition(BooleanSupplier condition, Object errorMessage) {
         if (!condition.getAsBoolean()) throw new BadConditionException(String.valueOf(errorMessage));
     }
 
-    public static void checkCondition(BooleanSupplier condition, @Nullable RuntimeException errorException) {
+    public static void checkCondition(BooleanSupplier condition, RuntimeException errorException) {
         if (!condition.getAsBoolean()) throw nullThen(errorException, BadConditionException::new);
     }
 
@@ -207,12 +213,12 @@ public class Condition {
         executable.execute();
     }
 
-    public static void checkCondition(BooleanSupplier condition, Executable executable, @Nullable Object errorMessage) {
+    public static void checkCondition(BooleanSupplier condition, Executable executable, Object errorMessage) {
         if (!condition.getAsBoolean()) throw new BadConditionException(String.valueOf(errorMessage));
         executable.execute();
     }
 
-    public static void checkCondition(BooleanSupplier condition, Executable executable, @Nullable RuntimeException errorException) {
+    public static void checkCondition(BooleanSupplier condition, Executable executable, RuntimeException errorException) {
         if (!condition.getAsBoolean()) throw nullThen(errorException, BadConditionException::new);
         executable.execute();
     }
@@ -224,13 +230,13 @@ public class Condition {
     }
 
     @CanIgnoreReturnValue
-    public static <T> T checkCondition(BooleanSupplier condition, Supplier<T> action, @Nullable Object errorMessage) {
+    public static <T> T checkCondition(BooleanSupplier condition, Supplier<T> action, Object errorMessage) {
         if (!condition.getAsBoolean()) throw new BadConditionException(String.valueOf(errorMessage));
         return action.get();
     }
 
     @CanIgnoreReturnValue
-    public static <T> T checkCondition(BooleanSupplier condition, Supplier<T> action, @Nullable RuntimeException errorException) {
+    public static <T> T checkCondition(BooleanSupplier condition, Supplier<T> action, RuntimeException errorException) {
         if (!condition.getAsBoolean()) throw nullThen(errorException, BadConditionException::new);
         return action.get();
     }
