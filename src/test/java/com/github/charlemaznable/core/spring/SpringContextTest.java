@@ -7,6 +7,7 @@ import com.github.charlemaznable.core.spring.testClass.TestCreateClassB;
 import com.github.charlemaznable.core.spring.testClass.TestCreateClassC;
 import com.github.charlemaznable.core.spring.testClass.TestMultiClass;
 import com.github.charlemaznable.core.spring.testClass.TestSpringContext;
+import lombok.val;
 import lombok.var;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -119,7 +120,8 @@ public class SpringContextTest {
         createBeanC = TestSpringContext.getBean(TestCreateClassC.class.getName(), TestCreateClassC.class);
         assertNull(createBeanC);
 
-        TestSpringContext.autowireBean(new TestCreateClassC());
+        val autowiredBean = new TestCreateClassC();
+        assertEquals(autowiredBean, TestSpringContext.autowireBean(autowiredBean));
 
         createBeanC = TestSpringContext.getBean(TestCreateClassC.class);
         assertNotNull(createBeanC);

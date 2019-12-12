@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.spring;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import lombok.Synchronized;
 import lombok.val;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -116,7 +117,6 @@ public class SpringContext implements ApplicationContextAware {
         return applicationContext.getBeanNamesForAnnotation(annotation);
     }
 
-    @SuppressWarnings("UnusedReturnValue")
     public static <T> T createBean(Class<T> clazz) {
         val beanDefinition = BeanDefinitionBuilder
                 .genericBeanDefinition(clazz).getBeanDefinition();
@@ -126,7 +126,6 @@ public class SpringContext implements ApplicationContextAware {
         return getBean(clazz);
     }
 
-    @SuppressWarnings("UnusedReturnValue")
     public static <T> T createBean(String beanName, Class<T> clazz) {
         val beanDefinition = BeanDefinitionBuilder
                 .genericBeanDefinition(clazz).getBeanDefinition();
@@ -136,14 +135,14 @@ public class SpringContext implements ApplicationContextAware {
         return getBean(beanName, clazz);
     }
 
-    @SuppressWarnings("UnusedReturnValue")
+    @CanIgnoreReturnValue
     public static <T> T autowireBean(T bean) {
         val beanDefinition = BeanDefinitionBuilder
                 .genericBeanDefinition(bean.getClass()).getBeanDefinition();
         return autowireBean(getBeanClassName(beanDefinition), bean);
     }
 
-    @SuppressWarnings("UnusedReturnValue")
+    @CanIgnoreReturnValue
     public static <T> T autowireBean(String beanName, T bean) {
         defaultListableBeanFactory.autowireBean(bean);
         defaultListableBeanFactory.registerSingleton(beanName, bean);
