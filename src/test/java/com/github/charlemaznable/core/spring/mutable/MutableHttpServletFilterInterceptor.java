@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,13 +19,17 @@ import static com.github.charlemaznable.core.spring.MutableHttpServletUtils.setR
 public class MutableHttpServletFilterInterceptor implements HandlerInterceptor {
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+    public boolean preHandle(@Nonnull HttpServletRequest request,
+                             @Nonnull HttpServletResponse response,
+                             @Nonnull Object handler) {
         setRequestParameter(request, "IN_PREHANDLE", "TRUE");
         return true;
     }
 
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) {
+    public void postHandle(@Nonnull HttpServletRequest request,
+                           @Nonnull HttpServletResponse response,
+                           @Nonnull Object handler, ModelAndView modelAndView) {
         val responseContentAsString = getResponseContentAsString(response);
         val responseMap = unJson(responseContentAsString);
         responseMap.put("IN_POSTHANDLE", "TRUE");
