@@ -13,6 +13,7 @@ import org.springframework.core.type.ClassMetadata;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Nonnull;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 
@@ -24,18 +25,23 @@ public class SpringScannerRegistrar implements ImportBeanDefinitionRegistrar, Re
     private ResourceLoader resourceLoader;
 
     @SafeVarargs
-    public SpringScannerRegistrar(Class<? extends Annotation> scanAnnotationClass, Class factoryBeanClass, Class<? extends Annotation>... annotationClass) {
+    public SpringScannerRegistrar(Class<? extends Annotation> scanAnnotationClass,
+                                  Class factoryBeanClass,
+                                  Class<? extends Annotation>... annotationClass) {
         this.scanAnnotationClass = scanAnnotationClass;
         this.factoryBeanClass = factoryBeanClass;
         this.annotationClass = annotationClass;
     }
 
-    @SuppressWarnings({"NullableProblems", "ConstantConditions"})
     @Override
-    public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
-        val annoAttrs = AnnotationAttributes.fromMap(importingClassMetadata.getAnnotationAttributes(scanAnnotationClass.getName()));
-        val scanner = new SpringClassPathScanner(registry, factoryBeanClass, this::isCandidateClass, annotationClass);
+    public void registerBeanDefinitions(@Nonnull AnnotationMetadata importingClassMetadata,
+                                        @Nonnull BeanDefinitionRegistry registry) {
+        val annoAttrs = AnnotationAttributes.fromMap(importingClassMetadata
+                .getAnnotationAttributes(scanAnnotationClass.getName()));
+        if (annoAttrs == null) return;
 
+        val scanner = new SpringClassPathScanner(
+                registry, factoryBeanClass, this::isCandidateClass, annotationClass);
         if (resourceLoader != null) { // this check is needed in Spring 3.1
             scanner.setResourceLoader(resourceLoader);
         }
@@ -69,8 +75,7 @@ public class SpringScannerRegistrar implements ImportBeanDefinitionRegistrar, Re
         scanner.doScan(StringUtils.toStringArray(basePackages));
     }
 
-    @SuppressWarnings("NullableProblems")
-    public void setResourceLoader(ResourceLoader resourceLoader) {
+    public void setResourceLoader(@Nonnull ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
     }
 

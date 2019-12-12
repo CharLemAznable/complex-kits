@@ -78,14 +78,12 @@ public class HttpReq {
         return this;
     }
 
-    @SuppressWarnings("UnusedReturnValue")
     public HttpReq param(String name, String value) {
         if (params.length() > 0) params.append('&');
         params.append(name).append('=').append(encode(value));
         return this;
     }
 
-    @SuppressWarnings("UnusedReturnValue")
     public HttpReq params(Map<String, String> params) {
         for (val paramEntry : params.entrySet()) {
             val key = paramEntry.getKey();

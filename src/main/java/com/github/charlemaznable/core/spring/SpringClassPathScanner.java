@@ -10,6 +10,7 @@ import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 import org.springframework.core.type.ClassMetadata;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 
+import javax.annotation.Nonnull;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Set;
@@ -38,7 +39,7 @@ public class SpringClassPathScanner extends ClassPathBeanDefinitionScanner {
         }
     }
 
-    @SuppressWarnings("NullableProblems")
+    @Nonnull
     @Override
     public Set<BeanDefinitionHolder> doScan(String... basePackages) {
         val beanDefinitions = super.doScan(basePackages);
@@ -70,9 +71,8 @@ public class SpringClassPathScanner extends ClassPathBeanDefinitionScanner {
         return null == isCandidateClass || isCandidateClass.test(beanDefinition.getMetadata());
     }
 
-    @SuppressWarnings("NullableProblems")
     @Override
-    protected boolean checkCandidate(String beanName, BeanDefinition beanDefinition) {
+    protected boolean checkCandidate(@Nonnull String beanName, @Nonnull BeanDefinition beanDefinition) {
         if (super.checkCandidate(beanName, beanDefinition)) {
             return true;
         } else {
