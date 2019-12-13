@@ -2,14 +2,13 @@ package com.github.charlemaznable.core.miner;
 
 import com.github.charlemaznable.core.config.impl.PropsConfigable;
 import com.github.charlemaznable.core.lang.EasyEnhancer;
+import com.github.charlemaznable.core.lang.LoadingCachee;
 import com.github.charlemaznable.core.lang.Str;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.LoadingCache;
 import com.google.common.primitives.Primitives;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.ToString;
 import lombok.val;
 import lombok.var;
@@ -32,12 +31,14 @@ import static com.github.charlemaznable.core.lang.Condition.blankThen;
 import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static com.github.charlemaznable.core.lang.Str.isNotBlank;
+import static com.google.common.cache.CacheLoader.from;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 
 @SuppressWarnings("unchecked")
 public class MinerFactory {
 
-    private static Cache<Class, Object> minerCache = CacheBuilder.newBuilder().build();
+    private static LoadingCache<Class, Object> minerCache
+            = LoadingCachee.simpleCache(from(MinerFactory::loadMiner));
     private static StringSubstitutor minerSubstitutor;
 
     static {
@@ -59,25 +60,14 @@ public class MinerFactory {
 
     private MinerFactory() {}
 
-    @SneakyThrows
     public static <T> T getMiner(final Class<T> minerClass) {
+        return (T) LoadingCachee.get(minerCache, minerClass);
+    }
+
+    private static Object loadMiner(Class minerClass) {
         ensureClassIsAnInterface(minerClass);
         val minerConfig = checkMinerConfig(minerClass);
-        return (T) minerCache.get(minerClass, () -> loadMiner(minerClass, minerConfig));
-    }
 
-    private static <T> void ensureClassIsAnInterface(Class<T> clazz) {
-        if (clazz.isInterface()) return;
-
-        throw new MinerConfigException(clazz + " is not An Interface");
-    }
-
-    private static <T> MinerConfig checkMinerConfig(Class<T> clazz) {
-        return checkNotNull(findAnnotation(clazz, MinerConfig.class),
-                new MinerConfigException(clazz + " has no MinerConfig"));
-    }
-
-    private static Object loadMiner(Class minerClass, MinerConfig minerConfig) {
         val group = minerSubstitutor.replace(minerConfig.group());
         val minerable = new Miner(blankThen(group, () -> "DEFAULT_GROUP"));
         val dataId = minerSubstitutor.replace(minerConfig.dataId());
@@ -90,6 +80,16 @@ public class MinerFactory {
                     if (method.isDefault()) return 1;
                     return 0;
                 }, new Callback[]{minerProxy, NoOp.INSTANCE}, null);
+    }
+
+    private static <T> void ensureClassIsAnInterface(Class<T> clazz) {
+        if (clazz.isInterface()) return;
+        throw new MinerConfigException(clazz + " is not An Interface");
+    }
+
+    private static <T> MinerConfig checkMinerConfig(Class<T> clazz) {
+        return checkNotNull(findAnnotation(clazz, MinerConfig.class),
+                new MinerConfigException(clazz + " has no MinerConfig"));
     }
 
     @NoArgsConstructor
