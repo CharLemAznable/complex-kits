@@ -12,6 +12,5 @@ public class HexTest {
     public void testHex() {
         assertEquals(hex(bytes("The quick brown fox jumps over the lazy dog")),
                 hex(bytes("The quick brown fox jumps over the lazy dog")));
-
     }
 }
