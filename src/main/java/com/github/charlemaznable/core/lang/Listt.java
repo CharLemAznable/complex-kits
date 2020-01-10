@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import lombok.val;
 import lombok.var;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -14,12 +15,11 @@ import java.util.Random;
 
 import static com.github.charlemaznable.core.lang.Mapp.of;
 import static com.google.common.collect.Sets.newHashSet;
-import static java.lang.System.currentTimeMillis;
 import static org.joor.Reflect.onClass;
 
 public class Listt {
 
-    private static Random shuffleRandom = new Random(currentTimeMillis());
+    private static Random shuffleRandom = new SecureRandom();
 
     private Listt() {}
 

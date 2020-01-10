@@ -12,6 +12,7 @@ import static com.github.charlemaznable.core.codec.DigestHMAC.SHA1;
 import static com.github.charlemaznable.core.codec.DigestHMAC.SHA256;
 import static com.github.charlemaznable.core.codec.DigestHMAC.SHA512;
 import static com.github.charlemaznable.core.codec.Hex.hex;
+import static com.github.charlemaznable.core.lang.Rand.randAlphanumeric;
 import static javax.crypto.Mac.getInstance;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -19,7 +20,7 @@ public class DigestHMACTest {
 
     @Test
     public void testDigestMACHex() throws Exception {
-        val key = "192006250b4c09247ec02edce69f6a2d";
+        val key = randAlphanumeric(32);
 
         val hashMD5Hex = MD5.digestHex("可以提供有状态的Hasher", key);
         assertEquals(hashMD5Hex, MD5.digestHex("可以提供有状态的Hasher", key));
@@ -54,7 +55,7 @@ public class DigestHMACTest {
 
     @Test
     public void testDigestMACBase64() throws Exception {
-        val key = "192006250b4c09247ec02edce69f6a2d";
+        val key = randAlphanumeric(32);
 
         val hashMD5Base64 = MD5.digestBase64("可以提供有状态的Hasher", key);
         assertEquals(hashMD5Base64, MD5.digestBase64("可以提供有状态的Hasher", key));
