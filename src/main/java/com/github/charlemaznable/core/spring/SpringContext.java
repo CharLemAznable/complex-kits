@@ -1,6 +1,7 @@
 package com.github.charlemaznable.core.spring;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import lombok.AllArgsConstructor;
 import lombok.Synchronized;
 import lombok.val;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -32,7 +33,7 @@ public class SpringContext implements ApplicationContextAware {
     }
 
     public static <T> T getBean(String beanName, T defaultValue) {
-        return getBean(beanName, () -> defaultValue);
+        return getBean(beanName, new DefaultValueSupplier<>(defaultValue));
     }
 
     public static <T> T getBean(String beanName, Supplier<T> defaultSupplier) {
@@ -48,11 +49,11 @@ public class SpringContext implements ApplicationContextAware {
     }
 
     public static <T> T getBeanOrReflect(Class<T> clazz) {
-        return getBean(clazz, (Supplier<T>) () -> onClass(clazz).create().get());
+        return getBean(clazz, new ReflectBeanSupplier<>(clazz));
     }
 
     public static <T> T getBeanOrCreate(Class<T> clazz) {
-        return getBean(clazz, (Supplier<T>) () -> createBean(clazz));
+        return getBean(clazz, new CreateBeanSupplier<>(clazz));
     }
 
     public static <T> T getBean(Class<T> clazz) {
@@ -60,7 +61,7 @@ public class SpringContext implements ApplicationContextAware {
     }
 
     public static <T> T getBean(Class<T> clazz, T defaultValue) {
-        return getBean(clazz, (Supplier<T>) () -> defaultValue);
+        return getBean(clazz, new DefaultValueSupplier<>(defaultValue));
     }
 
     public static <T> T getBean(Class<T> clazz, Supplier<T> defaultSupplier) {
@@ -76,11 +77,11 @@ public class SpringContext implements ApplicationContextAware {
     }
 
     public static <T> T getBeanOrReflect(String beanName, Class<T> clazz) {
-        return getBean(beanName, clazz, (Supplier<T>) () -> onClass(clazz).create().get());
+        return getBean(beanName, clazz, new ReflectBeanSupplier<>(clazz));
     }
 
     public static <T> T getBeanOrCreate(String beanName, Class<T> clazz) {
-        return getBean(beanName, clazz, (Supplier<T>) () -> createBean(beanName, clazz));
+        return getBean(beanName, clazz, new CreateBeanWithNameSupplier<>(beanName, clazz));
     }
 
     public static <T> T getBean(String beanName, Class<T> clazz) {
@@ -88,7 +89,7 @@ public class SpringContext implements ApplicationContextAware {
     }
 
     public static <T> T getBean(String beanName, Class<T> clazz, T defaultValue) {
-        return getBean(beanName, clazz, (Supplier<T>) () -> defaultValue);
+        return getBean(beanName, clazz, new DefaultValueSupplier<>(defaultValue));
     }
 
     public static <T> T getBean(String beanName, Class<T> clazz, Supplier<T> defaultSupplier) {
@@ -159,5 +160,50 @@ public class SpringContext implements ApplicationContextAware {
     @Override
     public void setApplicationContext(@Nonnull ApplicationContext context) {
         updateApplicationContext(context);
+    }
+
+    @AllArgsConstructor
+    static class ReflectBeanSupplier<T> implements Supplier<T> {
+
+        private Class<T> clazz;
+
+        @Override
+        public T get() {
+            return onClass(clazz).create().get();
+        }
+    }
+
+    @AllArgsConstructor
+    static class CreateBeanSupplier<T> implements Supplier<T> {
+
+        private Class<T> clazz;
+
+        @Override
+        public T get() {
+            return createBean(clazz);
+        }
+    }
+
+    @AllArgsConstructor
+    static class CreateBeanWithNameSupplier<T> implements Supplier<T> {
+
+        private String beanName;
+        private Class<T> clazz;
+
+        @Override
+        public T get() {
+            return createBean(beanName, clazz);
+        }
+    }
+
+    @AllArgsConstructor
+    static class DefaultValueSupplier<T> implements Supplier<T> {
+
+        private T defaultValue;
+
+        @Override
+        public T get() {
+            return defaultValue;
+        }
     }
 }
