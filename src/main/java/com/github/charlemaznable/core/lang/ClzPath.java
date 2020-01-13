@@ -1,9 +1,11 @@
 package com.github.charlemaznable.core.lang;
 
+import com.github.charlemaznable.core.config.impl.PropsConfigable;
 import com.google.common.io.Resources;
 import lombok.SneakyThrows;
 import lombok.val;
 import lombok.var;
+import org.apache.commons.text.StringSubstitutor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,11 +23,13 @@ import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 import static com.github.charlemaznable.core.lang.Listt.newArrayList;
+import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static com.github.charlemaznable.core.lang.Str.isEmpty;
 import static com.github.charlemaznable.core.lang.Str.toStr;
 import static com.google.common.collect.Sets.newLinkedHashSet;
@@ -110,6 +114,23 @@ public class ClzPath {
 
     public static List<String> classResourceAsLines(String classPath) {
         return urlAsLines(classResource(classPath));
+    }
+
+    public static StringSubstitutor classResourceAsSubstitutor(String classPath) {
+        val propsURL = classResource(classPath);
+        if (propsURL != null) {
+            val envProps = new PropsConfigable(propsURL).getProperties();
+            Map<String, String> envPropsMap = newHashMap();
+            val propNames = envProps.propertyNames();
+            while (propNames.hasMoreElements()) {
+                val propName = (String) propNames.nextElement();
+                val propValue = envProps.getProperty(propName);
+                envPropsMap.put(propName, propValue);
+            }
+            return new StringSubstitutor(envPropsMap);
+        } else {
+            return new StringSubstitutor();
+        }
     }
 
     public static InputStream urlAsInputStream(URL url) {

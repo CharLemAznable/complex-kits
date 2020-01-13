@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.miner;
 
-import com.github.charlemaznable.core.config.impl.PropsConfigable;
 import com.github.charlemaznable.core.lang.EasyEnhancer;
 import com.github.charlemaznable.core.lang.LoadingCachee;
 import com.github.charlemaznable.core.lang.Str;
@@ -24,12 +23,10 @@ import org.n3r.diamond.client.impl.DiamondUtils;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
-import java.util.Map;
 
-import static com.github.charlemaznable.core.lang.ClzPath.classResource;
+import static com.github.charlemaznable.core.lang.ClzPath.classResourceAsSubstitutor;
 import static com.github.charlemaznable.core.lang.Condition.blankThen;
 import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
-import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static com.github.charlemaznable.core.lang.Str.isNotBlank;
 import static com.google.common.cache.CacheLoader.from;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
@@ -42,20 +39,7 @@ public class MinerFactory {
     private static StringSubstitutor minerSubstitutor;
 
     static {
-        val envPropsURL = classResource("miner.env.props");
-        if (envPropsURL != null) {
-            val envProps = new PropsConfigable(envPropsURL).getProperties();
-            Map<String, String> envPropsMap = newHashMap();
-            val propNames = envProps.propertyNames();
-            while (propNames.hasMoreElements()) {
-                val propName = (String) propNames.nextElement();
-                val propValue = envProps.getProperty(propName);
-                envPropsMap.put(propName, propValue);
-            }
-            minerSubstitutor = new StringSubstitutor(envPropsMap);
-        } else {
-            minerSubstitutor = new StringSubstitutor();
-        }
+        minerSubstitutor = classResourceAsSubstitutor("miner.env.props");
     }
 
     private MinerFactory() {}
@@ -64,7 +48,7 @@ public class MinerFactory {
         return (T) LoadingCachee.get(minerCache, minerClass);
     }
 
-    private static Object loadMiner(Class minerClass) {
+    private static <T> Object loadMiner(Class<T> minerClass) {
         ensureClassIsAnInterface(minerClass);
         val minerConfig = checkMinerConfig(minerClass);
 
@@ -74,7 +58,7 @@ public class MinerFactory {
         val minerProxy = new MinerProxy(isNotBlank(dataId)
                 ? minerable.getMiner(dataId) : minerable);
 
-        return EasyEnhancer.create(MinerObject.class,
+        return EasyEnhancer.create(MinerDummy.class,
                 new Class[]{minerClass, Minerable.class},
                 method -> {
                     if (method.isDefault()) return 1;
@@ -95,7 +79,7 @@ public class MinerFactory {
     @NoArgsConstructor
     @EqualsAndHashCode
     @ToString
-    private static class MinerObject {}
+    private static class MinerDummy {}
 
     @AllArgsConstructor
     private static class MinerProxy implements MethodInterceptor {
