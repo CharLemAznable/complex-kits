@@ -1,9 +1,13 @@
 package com.github.charlemaznable.core.miner;
 
+import com.github.charlemaznable.core.miner.MinerConfig.DataIdProvider;
+import com.github.charlemaznable.core.miner.MinerConfig.DefaultValueProvider;
+import com.github.charlemaznable.core.miner.MinerConfig.GroupProvider;
 import com.google.common.base.Splitter;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.joor.ReflectException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -11,11 +15,14 @@ import org.n3r.diamond.client.Minerable;
 import org.n3r.diamond.client.cache.ParamsAppliable;
 import org.n3r.diamond.client.impl.MockDiamondServer;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 import static com.github.charlemaznable.core.miner.MinerFactory.getMiner;
+import static org.joor.Reflect.onClass;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -29,6 +36,12 @@ public class MinerFactoryTest {
     @AfterAll
     public static void afterClass() {
         MockDiamondServer.tearDownMockServer();
+    }
+
+    @Test
+    public void testConstruct() {
+        assertThrows(ReflectException.class,
+                () -> onClass(MinerFactory.class).create().get());
     }
 
     @Test
@@ -225,7 +238,10 @@ public class MinerFactoryTest {
     @MinerConfig
     class StoneError {}
 
-    @MinerConfig(group = "${group}Group", dataId = "Data${data}")
+    @MinerConfig(
+            groupProvider = ClassGroupProvider.class,
+            dataIdProvider = ClassDataIdProvider.class
+    )
     interface StoneProps {
 
         String name();
@@ -235,7 +251,50 @@ public class MinerFactoryTest {
         @MinerConfig("long")
         String longName();
 
-        @MinerConfig(dataId = "Prop${prop}", defaultValue = "${default}Default")
+        @MinerConfig(
+                dataIdProvider = MethodDataIdProvider.class,
+                defaultValueProvider = MethodDefaultValueProvider.class
+        )
         String prop();
+    }
+
+    public static class ClassGroupProvider implements GroupProvider {
+
+        @Override
+        public String group(Class<?> minerClass, Method method) {
+            assertEquals(StoneProps.class, minerClass);
+            assertNull(method);
+            return "${group}Group";
+        }
+    }
+
+    public static class ClassDataIdProvider implements DataIdProvider {
+
+        @Override
+        public String dataId(Class<?> minerClass, Method method) {
+            assertEquals(StoneProps.class, minerClass);
+            assertNull(method);
+            return "Data${data}";
+        }
+    }
+
+    public static class MethodDataIdProvider implements DataIdProvider {
+
+        @Override
+        public String dataId(Class<?> minerClass, Method method) {
+            assertEquals(StoneProps.class, minerClass);
+            assertEquals("prop", method.getName());
+            return "Prop${prop}";
+        }
+    }
+
+    public static class MethodDefaultValueProvider implements DefaultValueProvider {
+
+        @Override
+        public String defaultValue(Class<?> minerClass, Method method) {
+            assertEquals(StoneProps.class, minerClass);
+            assertEquals("prop", method.getName());
+            return "${default}Default";
+        }
     }
 }

@@ -8,6 +8,7 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.Method;
 
 @Documented
 @Inherited
@@ -31,4 +32,25 @@ public @interface MinerConfig {
      * effective when annotated on ElementType.METHOD
      */
     String defaultValue() default "";
+
+    Class<? extends GroupProvider> groupProvider() default GroupProvider.class;
+
+    Class<? extends DataIdProvider> dataIdProvider() default DataIdProvider.class;
+
+    Class<? extends DefaultValueProvider> defaultValueProvider() default DefaultValueProvider.class;
+
+    interface GroupProvider {
+
+        String group(Class<?> minerClass, Method method);
+    }
+
+    interface DataIdProvider {
+
+        String dataId(Class<?> minerClass, Method method);
+    }
+
+    interface DefaultValueProvider {
+
+        String defaultValue(Class<?> minerClass, Method method);
+    }
 }

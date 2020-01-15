@@ -3,6 +3,9 @@ package com.github.charlemaznable.core.miner;
 import com.github.charlemaznable.core.lang.EasyEnhancer;
 import com.github.charlemaznable.core.lang.LoadingCachee;
 import com.github.charlemaznable.core.lang.Str;
+import com.github.charlemaznable.core.miner.MinerConfig.DataIdProvider;
+import com.github.charlemaznable.core.miner.MinerConfig.DefaultValueProvider;
+import com.github.charlemaznable.core.miner.MinerConfig.GroupProvider;
 import com.google.common.cache.LoadingCache;
 import com.google.common.primitives.Primitives;
 import lombok.AllArgsConstructor;
@@ -28,6 +31,7 @@ import static com.github.charlemaznable.core.lang.ClzPath.classResourceAsSubstit
 import static com.github.charlemaznable.core.lang.Condition.blankThen;
 import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static com.github.charlemaznable.core.lang.Str.isNotBlank;
+import static com.github.charlemaznable.core.spring.SpringContext.getBeanOrReflect;
 import static com.google.common.cache.CacheLoader.from;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 
@@ -42,9 +46,11 @@ public class MinerFactory {
         minerSubstitutor = classResourceAsSubstitutor("miner.env.props");
     }
 
-    private MinerFactory() {}
+    private MinerFactory() {
+        throw new UnsupportedOperationException();
+    }
 
-    public static <T> T getMiner(final Class<T> minerClass) {
+    public static <T> T getMiner(Class<T> minerClass) {
         return (T) LoadingCachee.get(minerCache, minerClass);
     }
 
@@ -52,11 +58,11 @@ public class MinerFactory {
         ensureClassIsAnInterface(minerClass);
         val minerConfig = checkMinerConfig(minerClass);
 
-        val group = minerSubstitutor.replace(minerConfig.group());
+        val group = checkMinerGroup(minerClass, minerConfig);
         val minerable = new Miner(blankThen(group, () -> "DEFAULT_GROUP"));
-        val dataId = minerSubstitutor.replace(minerConfig.dataId());
-        val minerProxy = new MinerProxy(isNotBlank(dataId)
-                ? minerable.getMiner(dataId) : minerable);
+        val dataId = checkMinerDataId(minerClass, minerConfig);
+        val minerProxy = new MinerProxy(minerClass,
+                isNotBlank(dataId) ? minerable.getMiner(dataId) : minerable);
 
         return EasyEnhancer.create(MinerDummy.class,
                 new Class[]{minerClass, Minerable.class},
@@ -76,6 +82,18 @@ public class MinerFactory {
                 new MinerConfigException(clazz + " has no MinerConfig"));
     }
 
+    private static <T> String checkMinerGroup(Class<T> clazz, MinerConfig minerConfig) {
+        val providerClass = minerConfig.groupProvider();
+        return minerSubstitutor.replace(GroupProvider.class == providerClass ?
+                minerConfig.group() : getBeanOrReflect(providerClass).group(clazz, null));
+    }
+
+    private static <T> String checkMinerDataId(Class<T> clazz, MinerConfig minerConfig) {
+        val providerClass = minerConfig.dataIdProvider();
+        return minerSubstitutor.replace(DataIdProvider.class == providerClass ?
+                minerConfig.dataId() : getBeanOrReflect(providerClass).dataId(clazz, null));
+    }
+
     @NoArgsConstructor
     @EqualsAndHashCode
     @ToString
@@ -84,6 +102,7 @@ public class MinerFactory {
     @AllArgsConstructor
     private static class MinerProxy implements MethodInterceptor {
 
+        private Class minerClass;
         private Minerable minerable;
 
         @Override
@@ -94,13 +113,9 @@ public class MinerFactory {
             }
 
             val minerConfig = findAnnotation(method, MinerConfig.class);
-            val group = minerSubstitutor.replace(
-                    null != minerConfig ? minerConfig.group() : "");
-            val dataId = minerSubstitutor.replace(
-                    null != minerConfig ? minerConfig.dataId() : "");
-            var defaultValue = minerSubstitutor.replace(
-                    null != minerConfig ? blankThen(
-                            minerConfig.defaultValue(), () -> null) : null);
+            val group = checkMinerGroup(method, minerConfig);
+            val dataId = checkMinerDataId(method, minerConfig);
+            var defaultValue = checkMinerDefaultValue(method, minerConfig);
             var defaultArgument = args.length > 0 ? args[0] : null;
 
             val stone = minerable.getStone(group, blankThen(dataId, method::getName));
@@ -108,6 +123,28 @@ public class MinerFactory {
             if (null != defaultArgument) return defaultArgument;
             if (null != defaultValue) return convertType(defaultValue, method);
             return null;
+        }
+
+        private String checkMinerGroup(Method method, MinerConfig minerConfig) {
+            if (null == minerConfig) return "";
+            val providerClass = minerConfig.groupProvider();
+            return minerSubstitutor.replace(GroupProvider.class == providerClass ?
+                    minerConfig.group() : getBeanOrReflect(providerClass).group(minerClass, method));
+        }
+
+        private String checkMinerDataId(Method method, MinerConfig minerConfig) {
+            if (null == minerConfig) return "";
+            val providerClass = minerConfig.dataIdProvider();
+            return minerSubstitutor.replace(DataIdProvider.class == providerClass ?
+                    minerConfig.dataId() : getBeanOrReflect(providerClass).dataId(minerClass, method));
+        }
+
+        private String checkMinerDefaultValue(Method method, MinerConfig minerConfig) {
+            if (null == minerConfig) return null;
+            val providerClass = minerConfig.defaultValueProvider();
+            val defaultValue = DefaultValueProvider.class == providerClass ? minerConfig.defaultValue()
+                    : getBeanOrReflect(providerClass).defaultValue(minerClass, method);
+            return minerSubstitutor.replace(blankThen(defaultValue, () -> null));
         }
 
         private Object convertType(String value, Method method) {
@@ -122,7 +159,6 @@ public class MinerFactory {
 
             return parseObjects((Class) ((ParameterizedType) grt)
                     .getActualTypeArguments()[0], value);
-
         }
 
         private Object parsePrimitive(Class<?> rt, String value) {
