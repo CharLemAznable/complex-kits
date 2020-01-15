@@ -252,6 +252,7 @@ public class MinerFactoryTest {
         String longName();
 
         @MinerConfig(
+                groupProvider = MethodGroupProvider.class,
                 dataIdProvider = MethodDataIdProvider.class,
                 defaultValueProvider = MethodDefaultValueProvider.class
         )
@@ -275,6 +276,16 @@ public class MinerFactoryTest {
             assertEquals(StoneProps.class, minerClass);
             assertNull(method);
             return "Data${data}";
+        }
+    }
+
+    public static class MethodGroupProvider implements GroupProvider {
+
+        @Override
+        public String group(Class<?> minerClass, Method method) {
+            assertEquals(StoneProps.class, minerClass);
+            assertEquals("prop", method.getName());
+            return "";
         }
     }
 
