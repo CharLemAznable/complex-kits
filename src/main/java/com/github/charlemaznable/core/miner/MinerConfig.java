@@ -41,16 +41,35 @@ public @interface MinerConfig {
 
     interface GroupProvider {
 
-        String group(Class<?> minerClass, Method method);
+        default String group(Class<?> minerClass) {
+            throw new MinerConfigException(this.getClass().getName()
+                    + "#group(Class<?>) need be overwritten");
+        }
+
+        default String group(Class<?> minerClass, Method method) {
+            throw new MinerConfigException(this.getClass().getName()
+                    + "#group(Class<?>, Method) need be overwritten");
+        }
     }
 
     interface DataIdProvider {
 
-        String dataId(Class<?> minerClass, Method method);
+        default String dataId(Class<?> minerClass) {
+            throw new MinerConfigException(this.getClass().getName()
+                    + "#dataId(Class<?>) need be overwritten");
+        }
+
+        default String dataId(Class<?> minerClass, Method method) {
+            throw new MinerConfigException(this.getClass().getName()
+                    + "#dataId(Class<?>, Method) need be overwritten");
+        }
     }
 
     interface DefaultValueProvider {
 
-        String defaultValue(Class<?> minerClass, Method method);
+        default String defaultValue(Class<?> minerClass, Method method) {
+            throw new MinerConfigException(this.getClass().getName()
+                    + "#defaultValue(Class<?>, Method) need be overwritten");
+        }
     }
 }

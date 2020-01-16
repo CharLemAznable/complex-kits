@@ -85,13 +85,13 @@ public class MinerFactory {
     private static <T> String checkMinerGroup(Class<T> clazz, MinerConfig minerConfig) {
         val providerClass = minerConfig.groupProvider();
         return minerSubstitutor.replace(GroupProvider.class == providerClass ?
-                minerConfig.group() : getBeanOrReflect(providerClass).group(clazz, null));
+                minerConfig.group() : getBeanOrReflect(providerClass).group(clazz));
     }
 
     private static <T> String checkMinerDataId(Class<T> clazz, MinerConfig minerConfig) {
         val providerClass = minerConfig.dataIdProvider();
         return minerSubstitutor.replace(DataIdProvider.class == providerClass ?
-                minerConfig.dataId() : getBeanOrReflect(providerClass).dataId(clazz, null));
+                minerConfig.dataId() : getBeanOrReflect(providerClass).dataId(clazz));
     }
 
     @NoArgsConstructor

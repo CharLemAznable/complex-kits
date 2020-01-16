@@ -22,7 +22,6 @@ import static com.github.charlemaznable.core.miner.MinerFactory.getMiner;
 import static org.joor.Reflect.onClass;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -142,6 +141,15 @@ public class MinerFactoryTest {
         assertEquals("John Doe", stoneProps.full());
         assertEquals("John Doe Richard", stoneProps.longName());
         assertEquals("DEFAULTDefault", stoneProps.prop());
+
+        assertThrows(MinerConfigException.class, () -> getMiner(ProvideError1.class));
+        assertThrows(MinerConfigException.class, () -> getMiner(ProvideError2.class));
+        val error3 = getMiner(ProvideError3.class);
+        assertThrows(MinerConfigException.class, error3::prop);
+        val error4 = getMiner(ProvideError4.class);
+        assertThrows(MinerConfigException.class, error4::prop);
+        val error5 = getMiner(ProvideError5.class);
+        assertThrows(MinerConfigException.class, error5::prop);
     }
 
     @MinerConfig
@@ -239,8 +247,8 @@ public class MinerFactoryTest {
     class StoneError {}
 
     @MinerConfig(
-            groupProvider = ClassGroupProvider.class,
-            dataIdProvider = ClassDataIdProvider.class
+            groupProvider = TestGroupProvider.class,
+            dataIdProvider = TestDataIdProvider.class
     )
     interface StoneProps {
 
@@ -252,34 +260,20 @@ public class MinerFactoryTest {
         String longName();
 
         @MinerConfig(
-                groupProvider = MethodGroupProvider.class,
-                dataIdProvider = MethodDataIdProvider.class,
-                defaultValueProvider = MethodDefaultValueProvider.class
+                groupProvider = TestGroupProvider.class,
+                dataIdProvider = TestDataIdProvider.class,
+                defaultValueProvider = TestDefaultValueProvider.class
         )
         String prop();
     }
 
-    public static class ClassGroupProvider implements GroupProvider {
+    public static class TestGroupProvider implements GroupProvider {
 
         @Override
-        public String group(Class<?> minerClass, Method method) {
+        public String group(Class<?> minerClass) {
             assertEquals(StoneProps.class, minerClass);
-            assertNull(method);
             return "${group}Group";
         }
-    }
-
-    public static class ClassDataIdProvider implements DataIdProvider {
-
-        @Override
-        public String dataId(Class<?> minerClass, Method method) {
-            assertEquals(StoneProps.class, minerClass);
-            assertNull(method);
-            return "Data${data}";
-        }
-    }
-
-    public static class MethodGroupProvider implements GroupProvider {
 
         @Override
         public String group(Class<?> minerClass, Method method) {
@@ -289,7 +283,13 @@ public class MinerFactoryTest {
         }
     }
 
-    public static class MethodDataIdProvider implements DataIdProvider {
+    public static class TestDataIdProvider implements DataIdProvider {
+
+        @Override
+        public String dataId(Class<?> minerClass) {
+            assertEquals(StoneProps.class, minerClass);
+            return "Data${data}";
+        }
 
         @Override
         public String dataId(Class<?> minerClass, Method method) {
@@ -299,13 +299,95 @@ public class MinerFactoryTest {
         }
     }
 
-    public static class MethodDefaultValueProvider implements DefaultValueProvider {
+    public static class TestDefaultValueProvider implements DefaultValueProvider {
 
         @Override
         public String defaultValue(Class<?> minerClass, Method method) {
             assertEquals(StoneProps.class, minerClass);
             assertEquals("prop", method.getName());
             return "${default}Default";
+        }
+    }
+
+    @MinerConfig(
+            groupProvider = ErrorGroupProvider.class
+    )
+    interface ProvideError1 {}
+
+    @MinerConfig(
+            groupProvider = NoErrorGroupProvider.class,
+            dataIdProvider = ErrorDataIdProvider.class
+    )
+    interface ProvideError2 {}
+
+    @MinerConfig(
+            groupProvider = NoErrorGroupProvider.class,
+            dataIdProvider = NoErrorDataIdProvider.class
+    )
+    interface ProvideError3 {
+
+        @MinerConfig(
+                groupProvider = ErrorGroupProvider.class
+        )
+        String prop();
+    }
+
+    @MinerConfig(
+            groupProvider = NoErrorGroupProvider.class,
+            dataIdProvider = NoErrorDataIdProvider.class
+    )
+    interface ProvideError4 {
+
+        @MinerConfig(
+                groupProvider = NoErrorGroupProvider.class,
+                dataIdProvider = ErrorDataIdProvider.class
+        )
+        String prop();
+    }
+
+    @MinerConfig(
+            groupProvider = NoErrorGroupProvider.class,
+            dataIdProvider = NoErrorDataIdProvider.class
+    )
+    interface ProvideError5 {
+
+        @MinerConfig(
+                groupProvider = NoErrorGroupProvider.class,
+                dataIdProvider = NoErrorDataIdProvider.class,
+                defaultValueProvider = ErrorDefaultValueProvider.class
+        )
+        String prop();
+    }
+
+    public static class ErrorGroupProvider implements GroupProvider {}
+
+    public static class ErrorDataIdProvider implements DataIdProvider {}
+
+    public static class ErrorDefaultValueProvider implements DefaultValueProvider {}
+
+    public static class NoErrorGroupProvider implements GroupProvider {
+
+        @Override
+        public String group(Class<?> minerClass) {
+            return "${group}Group";
+        }
+
+        @Override
+        public String group(Class<?> minerClass, Method method) {
+            return "";
+        }
+    }
+
+    public static class NoErrorDataIdProvider implements DataIdProvider {
+
+        @Override
+        public String dataId(Class<?> minerClass) {
+            return "Data${data}";
+        }
+
+        @Override
+        public String dataId(Class<?> minerClass, Method method) {
+            return "Prop${prop}";
         }
     }
 }
