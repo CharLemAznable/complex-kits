@@ -2,7 +2,6 @@ package com.github.charlemaznable.core.net;
 
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.net.ssl.HostnameVerifier;
@@ -26,6 +25,7 @@ import static com.github.charlemaznable.core.lang.Str.isEmpty;
 import static com.github.charlemaznable.core.net.Url.encode;
 import static java.lang.String.format;
 import static java.net.HttpURLConnection.setFollowRedirects;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.tuple.Pair.of;
 
 @Slf4j
@@ -35,7 +35,7 @@ public class HttpReq {
 
     private String req;
 
-    private Charset charset = Charsets.UTF_8;
+    private Charset charset = UTF_8;
 
     private StringBuilder params = new StringBuilder();
 
