@@ -5,6 +5,7 @@ import lombok.var;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.annotation.Nonnull;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -212,7 +213,7 @@ public final class IniReader {
         return index;
     }
 
-    private boolean checkLine(String line) {
+    private boolean checkLine(@Nonnull String line) {
         if (isCommentLine(line)) return false;
         if (isSectionLine(line)) {
             val section = line.substring(1, line.length() - 1).trim();
@@ -251,8 +252,7 @@ public final class IniReader {
      * @return true if the line is empty or starts with one of the comment
      * characters
      */
-    protected boolean isCommentLine(String line) {
-        if (line == null) return false;
+    protected boolean isCommentLine(@Nonnull String line) {
         // blank lines are also treated as comment lines
         return line.length() < 1 || COMMENT_CHARS.indexOf(line.charAt(0)) >= 0;
     }
@@ -263,8 +263,8 @@ public final class IniReader {
      * @param line The line to check.
      * @return true if the line contains a section
      */
-    protected boolean isSectionLine(String line) {
-        return line != null && line.startsWith("[") && line.endsWith("]");
+    protected boolean isSectionLine(@Nonnull String line) {
+        return line.startsWith("[") && line.endsWith("]");
     }
 
     /**
