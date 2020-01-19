@@ -21,7 +21,7 @@ import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.springframework.web.servlet.HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE;
 
-public class Http {
+public final class Http {
 
     private static final String UNKNOWN = "unknown";
 

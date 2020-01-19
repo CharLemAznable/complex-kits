@@ -4,7 +4,7 @@ import com.github.charlemaznable.core.spring.SpringFactoryBean;
 import com.github.charlemaznable.core.spring.SpringScannerRegistrar;
 import org.springframework.core.type.ClassMetadata;
 
-public class MinerScannerRegistrar extends SpringScannerRegistrar {
+public final class MinerScannerRegistrar extends SpringScannerRegistrar {
 
     public MinerScannerRegistrar() {
         super(MinerScan.class, MinerFactoryBean.class, MinerConfig.class);

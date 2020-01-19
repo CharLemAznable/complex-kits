@@ -11,7 +11,7 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Map;
 
-public class Mapp {
+public final class Mapp {
 
     private Mapp() {}
 

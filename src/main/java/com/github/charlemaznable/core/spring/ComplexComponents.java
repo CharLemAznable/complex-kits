@@ -1,5 +1,5 @@
 package com.github.charlemaznable.core.spring;
 
 @ComplexComponentScan
-public class ComplexComponents {
+public final class ComplexComponents {
 }

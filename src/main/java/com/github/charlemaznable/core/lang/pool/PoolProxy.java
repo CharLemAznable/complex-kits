@@ -22,7 +22,7 @@ import static com.github.charlemaznable.core.lang.Condition.nullThen;
 /**
  * 对象池代理工具
  */
-public class PoolProxy {
+public final class PoolProxy {
 
     private PoolProxy() {}
 
@@ -35,7 +35,7 @@ public class PoolProxy {
     }
 
     @RequiredArgsConstructor
-    public static class ObjectPoolBuilder<T> {
+    public static final class ObjectPoolBuilder<T> {
 
         @NonNull
         private ObjectPool<T> pool;
@@ -62,7 +62,7 @@ public class PoolProxy {
     }
 
     @RequiredArgsConstructor
-    public static class PooledObjectCreatorBuilder<T> {
+    public static final class PooledObjectCreatorBuilder<T> {
 
         @NonNull
         private PooledObjectCreator<T> creator;
@@ -94,7 +94,7 @@ public class PoolProxy {
      * 调用代理对象完成任务, 即由代理完成 [从对象池取出对象]->完成任务->[向对象池交还对象]
      */
     @AllArgsConstructor
-    private static class ObjectPoolProxy<T> implements MethodInterceptor {
+    private static final class ObjectPoolProxy<T> implements MethodInterceptor {
 
         private ObjectPool<T> pool;
 
@@ -118,7 +118,7 @@ public class PoolProxy {
      * 池化对象工厂封装
      */
     @AllArgsConstructor
-    private static class PoolProxyPooledObjectFactory<T> extends BasePooledObjectFactory<T> {
+    private static final class PoolProxyPooledObjectFactory<T> extends BasePooledObjectFactory<T> {
 
         private PooledObjectCreator<T> pooledObjectCreator;
         private Object[] createArguments;

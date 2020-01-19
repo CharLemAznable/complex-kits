@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 import static com.github.charlemaznable.core.lang.Mapp.of;
 import static java.util.regex.Pattern.compile;
 
-public class PropsReader extends LineNumberReader {
+public final class PropsReader extends LineNumberReader {
 
     static final String COMMENT_CHARS = "#!";
 

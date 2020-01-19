@@ -3,7 +3,7 @@ package com.github.charlemaznable.core.lang;
 import java.util.Collection;
 import java.util.Map;
 
-public class Empty {
+public final class Empty {
 
     private Empty() {}
 

@@ -12,7 +12,7 @@ import static com.github.charlemaznable.core.lang.ClzPath.urlAsInputStream;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
 
-public class PropsConfigable extends DefaultConfigable {
+public final class PropsConfigable extends DefaultConfigable {
 
     public PropsConfigable(URL url) {
         super(buildProperties(url));

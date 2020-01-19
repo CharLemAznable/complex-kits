@@ -17,7 +17,7 @@ import java.util.Map;
 import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
-public class FastJsonHttpMessageConverterBuilder {
+public final class FastJsonHttpMessageConverterBuilder {
 
     private FastJsonConfig fastJsonConfig = new FastJsonConfig();
 

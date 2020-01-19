@@ -8,7 +8,7 @@ import java.math.BigInteger;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 
-public class Hex {
+public final class Hex {
 
     private Hex() {}
 

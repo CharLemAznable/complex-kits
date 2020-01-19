@@ -13,7 +13,7 @@ import java.util.Properties;
 import static com.github.charlemaznable.core.lang.ClzPath.classResource;
 import static com.github.charlemaznable.core.lang.ClzPath.classResources;
 
-public class Config {
+public final class Config {
 
     private static Configable impl;
 

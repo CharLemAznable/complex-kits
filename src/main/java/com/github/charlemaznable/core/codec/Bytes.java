@@ -4,7 +4,7 @@ import java.nio.charset.Charset;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class Bytes {
+public final class Bytes {
 
     private Bytes() {}
 

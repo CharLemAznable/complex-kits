@@ -158,12 +158,12 @@ public class SpringContext implements ApplicationContextAware {
     }
 
     @Override
-    public void setApplicationContext(@Nonnull ApplicationContext context) {
-        updateApplicationContext(context);
+    public final void setApplicationContext(@Nonnull ApplicationContext context) {
+        SpringContext.updateApplicationContext(context);
     }
 
     @AllArgsConstructor
-    static class ReflectBeanSupplier<T> implements Supplier<T> {
+    static final class ReflectBeanSupplier<T> implements Supplier<T> {
 
         private Class<T> clazz;
 
@@ -174,7 +174,7 @@ public class SpringContext implements ApplicationContextAware {
     }
 
     @AllArgsConstructor
-    static class CreateBeanSupplier<T> implements Supplier<T> {
+    static final class CreateBeanSupplier<T> implements Supplier<T> {
 
         private Class<T> clazz;
 
@@ -185,7 +185,7 @@ public class SpringContext implements ApplicationContextAware {
     }
 
     @AllArgsConstructor
-    static class CreateBeanWithNameSupplier<T> implements Supplier<T> {
+    static final class CreateBeanWithNameSupplier<T> implements Supplier<T> {
 
         private String beanName;
         private Class<T> clazz;
@@ -197,7 +197,7 @@ public class SpringContext implements ApplicationContextAware {
     }
 
     @AllArgsConstructor
-    static class DefaultValueSupplier<T> implements Supplier<T> {
+    static final class DefaultValueSupplier<T> implements Supplier<T> {
 
         private T defaultValue;
 

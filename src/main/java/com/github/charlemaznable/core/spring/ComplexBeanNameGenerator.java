@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
 
 import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 
-public class ComplexBeanNameGenerator extends AnnotationBeanNameGenerator {
+public final class ComplexBeanNameGenerator extends AnnotationBeanNameGenerator {
 
     public static String getBeanClassName(BeanDefinition definition) {
         return checkNotNull(definition.getBeanClassName());

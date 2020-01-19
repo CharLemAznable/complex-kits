@@ -5,7 +5,7 @@ import java.util.Date;
 
 import static java.util.Calendar.getInstance;
 
-public class Now {
+public final class Now {
 
     private Now() {}
 

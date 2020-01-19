@@ -29,7 +29,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.tuple.Pair.of;
 
 @Slf4j
-public class HttpReq {
+public final class HttpReq {
 
     private final String baseUrl;
 

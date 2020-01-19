@@ -31,7 +31,7 @@ import static com.github.charlemaznable.core.codec.Bytes.string;
 import static javax.crypto.Cipher.DECRYPT_MODE;
 import static javax.crypto.Cipher.ENCRYPT_MODE;
 
-public class RSA {
+public final class RSA {
 
     private static final String RSAKEY = "RSA";
 

@@ -16,7 +16,7 @@ import static org.springframework.core.io.support.ResourcePatternResolver.CLASSP
 import static org.springframework.util.ClassUtils.convertClassNameToResourcePath;
 import static org.springframework.util.SystemPropertyUtils.resolvePlaceholders;
 
-public class ClzResolver {
+public final class ClzResolver {
 
     private static final String PATTERN = "/**/*.class";
 

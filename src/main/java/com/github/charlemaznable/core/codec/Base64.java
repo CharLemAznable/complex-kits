@@ -13,7 +13,7 @@ import static java.lang.Math.min;
 import static java.lang.String.format;
 import static java.lang.System.arraycopy;
 
-public class Base64 {
+public final class Base64 {
 
     private Base64() {}
 
@@ -58,6 +58,7 @@ public class Base64 {
     }
 
     public enum Format {
+
         STANDARD,
         // URL安全(将Base64中的URL非法字符'+'和'/'转为'-'和'_', 见RFC3548)
         URL_SAFE,
@@ -226,7 +227,7 @@ public class Base64 {
         }
     }
 
-    private static class ApacheBase64 extends ApacheBaseNCodec {
+    private static final class ApacheBase64 extends ApacheBaseNCodec {
 
         static final byte[] CHUNK_SEPARATOR = {'\r', '\n'};
         private static final int BITS_PER_ENCODED_BYTE = 6;

@@ -7,7 +7,7 @@ import java.io.Closeable;
 import static com.github.charlemaznable.core.lang.Clz.getMethod;
 import static com.github.charlemaznable.core.lang.Clz.invokeQuietly;
 
-public class Closer {
+public final class Closer {
 
     private Closer() {}
 

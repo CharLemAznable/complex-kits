@@ -4,7 +4,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
-public class Math {
+public final class Math {
 
     private Math() {}
 

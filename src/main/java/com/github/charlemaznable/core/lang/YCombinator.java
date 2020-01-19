@@ -8,7 +8,7 @@ import java.util.function.UnaryOperator;
 
 import static com.github.charlemaznable.core.lang.Condition.nullThen;
 
-public class YCombinator {
+public final class YCombinator {
 
     private YCombinator() {}
 

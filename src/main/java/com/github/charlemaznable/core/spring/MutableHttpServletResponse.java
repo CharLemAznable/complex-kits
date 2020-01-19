@@ -15,7 +15,7 @@ import java.nio.charset.Charset;
 import static com.github.charlemaznable.core.codec.Bytes.bytes;
 import static com.github.charlemaznable.core.codec.Bytes.string;
 
-public class MutableHttpServletResponse extends HttpServletResponseWrapper {
+public final class MutableHttpServletResponse extends HttpServletResponseWrapper {
 
     private ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     private MutableServletOutputStream mutableServletOutputStream;
@@ -86,7 +86,7 @@ public class MutableHttpServletResponse extends HttpServletResponseWrapper {
     }
 
     @AllArgsConstructor
-    static class MutableServletOutputStream extends ServletOutputStream {
+    static final class MutableServletOutputStream extends ServletOutputStream {
 
         private ByteArrayOutputStream byteArrayOutputStream;
 

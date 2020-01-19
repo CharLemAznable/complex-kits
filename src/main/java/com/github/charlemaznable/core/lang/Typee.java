@@ -7,7 +7,7 @@ import java.lang.reflect.Type;
 
 import static com.github.charlemaznable.core.lang.Clz.isAssignable;
 
-public class Typee {
+public final class Typee {
 
     private Typee() {}
 

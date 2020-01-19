@@ -12,7 +12,7 @@ import static com.google.common.collect.Maps.newHashMap;
 import static java.lang.Math.max;
 import static org.apache.commons.lang3.RandomStringUtils.random;
 
-public class Rand {
+public final class Rand {
 
     /*
      * Thread-safe. It uses synchronization to protect the integrity of its state.

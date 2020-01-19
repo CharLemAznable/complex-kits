@@ -47,7 +47,7 @@ import static org.apache.commons.lang3.StringUtils.replace;
 import static org.joor.Reflect.on;
 import static org.joor.Reflect.onClass;
 
-public class ClzPath {
+public final class ClzPath {
 
     private static final String SLASH = "/";
 
@@ -165,7 +165,7 @@ public class ClzPath {
     /**
      * @see org.springframework.core.io.support.PathMatchingResourcePatternResolver
      */
-    private static class ExtensionMatchClzResources {
+    private static final class ExtensionMatchClzResources {
 
         public static final String URL_PROTOCOL_VFSFILE = "vfsfile";
         private static final String FILE_URL_PREFIX = "file:";
@@ -470,7 +470,7 @@ public class ClzPath {
         }
     }
 
-    private static class VfsFileDelegate {
+    private static final class VfsFileDelegate {
 
         private static final String VFS3_PKG = "org.jboss.vfs.";
 
@@ -508,7 +508,7 @@ public class ClzPath {
         }
     }
 
-    private static class VfsResourceMatchingDelegate {
+    private static final class VfsResourceMatchingDelegate {
 
         public static Set<URL> findMatchingResources(URL rootResource, String extension) {
             val root = VfsFileDelegate.getRoot(rootResource);
@@ -518,7 +518,7 @@ public class ClzPath {
         }
     }
 
-    private static class ExtensionMatchVFVisitor implements InvocationHandler {
+    private static final class ExtensionMatchVFVisitor implements InvocationHandler {
 
         private final String extension;
 

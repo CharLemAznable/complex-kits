@@ -1,6 +1,6 @@
 package com.github.charlemaznable.core.miner;
 
-public class MinerConfigException extends RuntimeException {
+public final class MinerConfigException extends RuntimeException {
 
     private static final long serialVersionUID = -1468891602796981081L;
 

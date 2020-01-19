@@ -10,7 +10,7 @@ import java.util.Properties;
 import static com.github.charlemaznable.core.lang.ClzPath.urlAsInputStream;
 import static com.google.common.io.Closeables.closeQuietly;
 
-public class PropertiesConfigable extends DefaultConfigable {
+public final class PropertiesConfigable extends DefaultConfigable {
 
     public PropertiesConfigable(URL url) {
         super(buildProperties(url));

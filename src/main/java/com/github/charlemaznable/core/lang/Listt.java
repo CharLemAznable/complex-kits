@@ -17,7 +17,7 @@ import static com.github.charlemaznable.core.lang.Mapp.of;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.joor.Reflect.onClass;
 
-public class Listt {
+public final class Listt {
 
     private static Random shuffleRandom = new SecureRandom();
 

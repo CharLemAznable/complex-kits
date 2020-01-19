@@ -8,7 +8,7 @@ import java.net.URLEncoder;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.StringUtils.replace;
 
-public class Url {
+public final class Url {
 
     private Url() {}
 

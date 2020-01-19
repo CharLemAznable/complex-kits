@@ -27,7 +27,7 @@ import static org.dom4j.DocumentHelper.createElement;
 import static org.dom4j.io.OutputFormat.createCompactFormat;
 import static org.dom4j.io.OutputFormat.createPrettyPrint;
 
-public class Xml {
+public final class Xml {
 
     private static final String TEXT = "#text";
 
@@ -73,7 +73,7 @@ public class Xml {
         return rootAsTop ? of(rootElement.getName(), map) : map;
     }
 
-    private static class XmlString2Map {
+    private static final class XmlString2Map {
 
         @SneakyThrows
         public static Document xmlString2Document(String text, XmlParseFeature feature) {
@@ -211,7 +211,7 @@ public class Xml {
         }
     }
 
-    private static class Map2XmlString {
+    private static final class Map2XmlString {
 
         @SneakyThrows
         private static String document2XmlString(Document document, boolean prettyFormat) {
@@ -261,7 +261,7 @@ public class Xml {
     }
 
     @Getter
-    public static class XmlParseFeature {
+    public static final class XmlParseFeature {
 
         private static final String DISALLOW_DOCTYPE_DECL_NAME
                 = "http://apache.org/map2Element/features/disallow-doctype-decl";

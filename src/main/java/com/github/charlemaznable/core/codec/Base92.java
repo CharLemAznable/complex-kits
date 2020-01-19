@@ -1,6 +1,6 @@
 package com.github.charlemaznable.core.codec;
 
-public class Base92 {
+public final class Base92 {
 
     private static BaseX baseX92 = new BaseX(
             "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz`1234567890-=~!@#$%^&*()_+[]{}|;':,./<>?");

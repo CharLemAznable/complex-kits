@@ -7,7 +7,7 @@ import static org.apache.commons.pool2.impl.GenericObjectPoolConfig.DEFAULT_MAX_
 import static org.apache.commons.pool2.impl.GenericObjectPoolConfig.DEFAULT_MAX_TOTAL;
 import static org.apache.commons.pool2.impl.GenericObjectPoolConfig.DEFAULT_MIN_IDLE;
 
-public class PoolProxyConfigBuilder {
+public final class PoolProxyConfigBuilder {
 
     private int maxTotal = DEFAULT_MAX_TOTAL;
     private int maxIdle = DEFAULT_MAX_IDLE;

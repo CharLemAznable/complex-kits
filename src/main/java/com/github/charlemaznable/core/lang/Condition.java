@@ -17,7 +17,7 @@ import static com.github.charlemaznable.core.lang.Empty.isEmpty;
 import static com.github.charlemaznable.core.lang.Str.isBlank;
 import static com.github.charlemaznable.core.lang.Str.isNotBlank;
 
-public class Condition {
+public final class Condition {
 
     private Condition() {}
 

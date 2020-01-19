@@ -17,7 +17,7 @@ import static com.github.charlemaznable.core.lang.Iterablee.forEach;
 import static com.github.charlemaznable.core.lang.Mapp.map;
 import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 
-public class Json {
+public final class Json {
 
     private Json() {}
 

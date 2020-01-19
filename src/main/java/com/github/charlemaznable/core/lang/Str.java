@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 import static java.util.regex.Pattern.compile;
 import static org.apache.commons.lang3.StringUtils.repeat;
 
-public class Str {
+public final class Str {
 
     /**
      * 整数匹配模式.

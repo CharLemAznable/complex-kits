@@ -14,7 +14,7 @@ import java.io.IOException;
 
 @Slf4j
 @Component
-public class MutableHttpServletFilter extends OncePerRequestFilter {
+public final class MutableHttpServletFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@Nonnull HttpServletRequest httpServletRequest,

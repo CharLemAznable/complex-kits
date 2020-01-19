@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import static com.google.common.cache.CacheBuilder.newBuilder;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
-public class LoadingCachee {
+public final class LoadingCachee {
 
     private LoadingCachee() {}
 

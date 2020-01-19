@@ -14,7 +14,7 @@ import static javax.crypto.Cipher.DECRYPT_MODE;
 import static javax.crypto.Cipher.ENCRYPT_MODE;
 import static javax.crypto.Cipher.getInstance;
 
-public class AES {
+public final class AES {
 
     private static final String KEY_ALGORITHM = "AES";
 

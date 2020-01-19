@@ -7,7 +7,7 @@ import java.lang.annotation.Repeatable;
 
 import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
-public class AnnotationElf {
+public final class AnnotationElf {
 
     private AnnotationElf() {
         throw new UnsupportedOperationException();

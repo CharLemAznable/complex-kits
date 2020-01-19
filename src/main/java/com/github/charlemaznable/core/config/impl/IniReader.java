@@ -17,7 +17,7 @@ import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static java.lang.Character.isWhitespace;
 import static java.lang.System.getProperty;
 
-public class IniReader {
+public final class IniReader {
 
     protected static final String COMMENT_CHARS = "#;";
 

@@ -21,7 +21,7 @@ import static com.github.charlemaznable.core.codec.Bytes.bytes;
 import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class MutableHttpServletRequest extends HttpServletRequestWrapper {
+public final class MutableHttpServletRequest extends HttpServletRequestWrapper {
 
     private Map<String, String[]> params;
     private String content;
@@ -110,7 +110,7 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper {
     }
 
     @AllArgsConstructor
-    static class MutableServletInputStream extends ServletInputStream {
+    static final class MutableServletInputStream extends ServletInputStream {
 
         private ByteArrayInputStream byteArrayInputStream;
 

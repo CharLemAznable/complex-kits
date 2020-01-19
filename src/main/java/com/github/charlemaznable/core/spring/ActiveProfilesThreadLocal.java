@@ -1,6 +1,6 @@
 package com.github.charlemaznable.core.spring;
 
-public class ActiveProfilesThreadLocal {
+public final class ActiveProfilesThreadLocal {
 
     private static ThreadLocal<String[]> local = new ThreadLocal<>();
 

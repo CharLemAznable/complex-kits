@@ -34,8 +34,15 @@ public class SpringScannerRegistrar implements ImportBeanDefinitionRegistrar, Re
     }
 
     @Override
-    public void registerBeanDefinitions(@Nonnull AnnotationMetadata importingClassMetadata,
-                                        @Nonnull BeanDefinitionRegistry registry) {
+    public final void registerBeanDefinitions(@Nonnull AnnotationMetadata importingClassMetadata,
+                                              @Nonnull BeanDefinitionRegistry registry,
+                                              BeanNameGenerator importBeanNameGenerator) {
+        this.registerBeanDefinitions(importingClassMetadata, registry);
+    }
+
+    @Override
+    public final void registerBeanDefinitions(@Nonnull AnnotationMetadata importingClassMetadata,
+                                              @Nonnull BeanDefinitionRegistry registry) {
         val annoAttrs = AnnotationAttributes.fromMap(importingClassMetadata
                 .getAnnotationAttributes(scanAnnotationClass.getName()));
         if (annoAttrs == null) return;
@@ -75,7 +82,8 @@ public class SpringScannerRegistrar implements ImportBeanDefinitionRegistrar, Re
         scanner.doScan(StringUtils.toStringArray(basePackages));
     }
 
-    public void setResourceLoader(@Nonnull ResourceLoader resourceLoader) {
+    @Override
+    public final void setResourceLoader(@Nonnull ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
     }
 

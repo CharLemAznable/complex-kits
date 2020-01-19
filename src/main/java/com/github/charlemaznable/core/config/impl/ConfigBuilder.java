@@ -4,7 +4,7 @@ import com.github.charlemaznable.core.config.Configable;
 
 import java.util.Properties;
 
-public class ConfigBuilder implements DefConfigSetter {
+public final class ConfigBuilder implements DefConfigSetter {
 
     private Properties properties;
 

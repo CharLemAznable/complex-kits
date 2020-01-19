@@ -3,7 +3,7 @@ package com.github.charlemaznable.core.codec;
 import lombok.val;
 import lombok.var;
 
-public class BaseX {
+public final class BaseX {
 
     private int base;
 

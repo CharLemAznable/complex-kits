@@ -7,7 +7,7 @@ import static com.github.charlemaznable.core.codec.Bytes.bytes;
 import static com.github.charlemaznable.core.codec.Bytes.string;
 import static java.lang.Integer.parseInt;
 
-public class Base16 {
+public final class Base16 {
 
     private Base16() {}
 

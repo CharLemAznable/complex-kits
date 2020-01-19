@@ -13,7 +13,7 @@ import static com.github.charlemaznable.core.lang.ClzPath.urlAsInputStream;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
 
-public class IniConfigable extends DefaultConfigable {
+public final class IniConfigable extends DefaultConfigable {
 
     public IniConfigable(URL url) {
         super(buildProperties(url));

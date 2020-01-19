@@ -36,7 +36,7 @@ import static com.google.common.cache.CacheLoader.from;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 
 @SuppressWarnings("unchecked")
-public class MinerFactory {
+public final class MinerFactory {
 
     private static LoadingCache<Class, Object> minerCache
             = LoadingCachee.simpleCache(from(MinerFactory::loadMiner));

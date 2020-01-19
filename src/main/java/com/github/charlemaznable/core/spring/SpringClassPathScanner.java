@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.function.Predicate;
 
-public class SpringClassPathScanner extends ClassPathBeanDefinitionScanner {
+public final class SpringClassPathScanner extends ClassPathBeanDefinitionScanner {
 
     private final Class factoryBeanClass;
     private final Predicate<ClassMetadata> isCandidateClass;

@@ -9,7 +9,7 @@ import java.util.Date;
 
 import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 
-public class DateFormatter {
+public final class DateFormatter {
 
     private SimpleDateFormat format;
 

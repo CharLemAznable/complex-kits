@@ -11,7 +11,7 @@ import static com.github.charlemaznable.core.lang.Condition.checkNull;
 import static java.lang.reflect.Modifier.isAbstract;
 import static org.joor.Reflect.wrapper;
 
-public class Clz {
+public final class Clz {
 
     private Clz() {}
 

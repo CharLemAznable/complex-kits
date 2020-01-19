@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 
 import static java.util.Objects.requireNonNull;
 
-public class Iterablee {
+public final class Iterablee {
 
     public static final int NOT_FOUND = -1;
 
