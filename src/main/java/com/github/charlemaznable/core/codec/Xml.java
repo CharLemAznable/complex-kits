@@ -239,6 +239,7 @@ public final class Xml {
                         val subElement = body.addElement(key);
                         map2Element((Map) value, subElement);
                     } else {
+                        if (null == value) continue;
                         body.addElement(key).addCDATA(value.toString());
                     }
                 }

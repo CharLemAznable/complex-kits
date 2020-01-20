@@ -29,6 +29,11 @@ public class XmlTest {
         xml = xml(map);
         assertEquals(map, unXml(xml));
 
+        map.put("null", null);
+        xml = xml(map);
+        map.remove("null");
+        assertEquals(map, unXml(xml));
+
         map.put("name3", "function matchwo(a,b){if(a<b&&a<0)then{return 1}else{return 0}}");
         xml = xml(map);
         assertEquals(map, unXml(xml));
