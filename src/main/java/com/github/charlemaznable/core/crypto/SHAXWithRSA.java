@@ -19,13 +19,13 @@ public enum SHAXWithRSA {
 
     SHA1_WITH_RSA {
         @Override
-        protected String signAlgorithms() {
+        protected final String signAlgorithms() {
             return "SHA1WithRSA";
         }
     },
     SHA256_WITH_RSA {
         @Override
-        protected String signAlgorithms() {
+        protected final String signAlgorithms() {
             return "SHA256WithRSA";
         }
     };

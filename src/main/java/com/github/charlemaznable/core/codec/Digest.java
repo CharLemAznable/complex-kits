@@ -17,32 +17,32 @@ public enum Digest {
     @Deprecated
     MD5 {
         @Override
-        protected Hasher digestHasher() {
+        protected final Hasher digestHasher() {
             return md5().newHasher();
         }
     },
     @Deprecated
     SHA1 {
         @Override
-        protected Hasher digestHasher() {
+        protected final Hasher digestHasher() {
             return sha1().newHasher();
         }
     },
     SHA256 {
         @Override
-        protected Hasher digestHasher() {
+        protected final Hasher digestHasher() {
             return sha256().newHasher();
         }
     },
     SHA384 {
         @Override
-        protected Hasher digestHasher() {
+        protected final Hasher digestHasher() {
             return sha384().newHasher();
         }
     },
     SHA512 {
         @Override
-        protected Hasher digestHasher() {
+        protected final Hasher digestHasher() {
             return sha512().newHasher();
         }
     };

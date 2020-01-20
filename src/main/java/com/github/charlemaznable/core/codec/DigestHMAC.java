@@ -17,45 +17,45 @@ public enum DigestHMAC {
 
     MD5 {
         @Override
-        protected Hasher digestHasher(Key key) {
+        protected final Hasher digestHasher(Key key) {
             return hmacMd5(key).newHasher();
         }
 
         @Override
-        protected Hasher digestHasher(byte[] key) {
+        protected final Hasher digestHasher(byte[] key) {
             return hmacMd5(key).newHasher();
         }
     },
     SHA1 {
         @Override
-        protected Hasher digestHasher(Key key) {
+        protected final Hasher digestHasher(Key key) {
             return hmacSha1(key).newHasher();
         }
 
         @Override
-        protected Hasher digestHasher(byte[] key) {
+        protected final Hasher digestHasher(byte[] key) {
             return hmacSha1(key).newHasher();
         }
     },
     SHA256 {
         @Override
-        protected Hasher digestHasher(Key key) {
+        protected final Hasher digestHasher(Key key) {
             return hmacSha256(key).newHasher();
         }
 
         @Override
-        protected Hasher digestHasher(byte[] key) {
+        protected final Hasher digestHasher(byte[] key) {
             return hmacSha256(key).newHasher();
         }
     },
     SHA512 {
         @Override
-        protected Hasher digestHasher(Key key) {
+        protected final Hasher digestHasher(Key key) {
             return hmacSha512(key).newHasher();
         }
 
         @Override
-        protected Hasher digestHasher(byte[] key) {
+        protected final Hasher digestHasher(byte[] key) {
             return hmacSha512(key).newHasher();
         }
     };

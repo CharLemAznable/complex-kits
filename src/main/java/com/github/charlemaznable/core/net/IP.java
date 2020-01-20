@@ -13,13 +13,13 @@ public enum IP {
 
     V4 {
         @Override
-        protected boolean checkInetAddress(InetAddress inetAddress) {
+        protected final boolean checkInetAddress(InetAddress inetAddress) {
             return inetAddress instanceof Inet4Address;
         }
     },
     V6 {
         @Override
-        protected boolean checkInetAddress(InetAddress inetAddress) {
+        protected final boolean checkInetAddress(InetAddress inetAddress) {
             return inetAddress instanceof Inet6Address;
         }
     };
