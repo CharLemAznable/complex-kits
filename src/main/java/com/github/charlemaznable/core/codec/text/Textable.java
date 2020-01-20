@@ -19,11 +19,11 @@ public abstract class Textable {
     public static final String DEFAULT_ENTRY_SEPARATOR = "&";
     public static final String DEFAULT_KEY_VALUE_SEPARATOR = "=";
 
-    public String toText() {
+    public final String toText() {
         return this.toText(defaultProcessor());
     }
 
-    public String toText(Processor processor) {
+    public final String toText(Processor processor) {
         Map<String, String> result = newHashMap();
 
         Map<String, Object> describe = desc(this);

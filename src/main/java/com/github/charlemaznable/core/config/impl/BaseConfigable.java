@@ -23,7 +23,7 @@ public abstract class BaseConfigable implements Configable {
             .compile("(-?[0-9]+\\.[0-9]*|[0-9]*\\.[0-9]+|-?[0-9]+).*");
 
     @Override
-    public int getInt(String key) {
+    public final int getInt(String key) {
         val str = getStr(key);
         if (isEmpty(str)) throw new ConfigNotFoundException(key + CONFIG_NOT_FOUND);
 
@@ -39,7 +39,7 @@ public abstract class BaseConfigable implements Configable {
     }
 
     @Override
-    public long getLong(String key) {
+    public final long getLong(String key) {
         val str = getStr(key);
         if (isEmpty(str))
             throw new ConfigNotFoundException(key + CONFIG_NOT_FOUND);
@@ -56,7 +56,7 @@ public abstract class BaseConfigable implements Configable {
     }
 
     @Override
-    public boolean getBool(String key) {
+    public final boolean getBool(String key) {
         val str = getStr(key);
         if (isEmpty(str))
             throw new ConfigNotFoundException(key + CONFIG_NOT_FOUND);
@@ -65,7 +65,7 @@ public abstract class BaseConfigable implements Configable {
     }
 
     @Override
-    public float getFloat(String key) {
+    public final float getFloat(String key) {
         val str = getStr(key);
         if (isEmpty(str))
             throw new ConfigNotFoundException(key + CONFIG_NOT_FOUND);
@@ -79,7 +79,7 @@ public abstract class BaseConfigable implements Configable {
     }
 
     @Override
-    public double getDouble(String key) {
+    public final double getDouble(String key) {
         val str = getStr(key);
         if (isEmpty(str))
             throw new ConfigNotFoundException(key + CONFIG_NOT_FOUND);
@@ -93,7 +93,7 @@ public abstract class BaseConfigable implements Configable {
     }
 
     @Override
-    public int getInt(String key, int defaultValue) {
+    public final int getInt(String key, int defaultValue) {
         val str = getStr(key);
         if (isEmpty(str)) return defaultValue;
 
@@ -107,7 +107,7 @@ public abstract class BaseConfigable implements Configable {
     }
 
     @Override
-    public long getLong(String key, long defaultValue) {
+    public final long getLong(String key, long defaultValue) {
         val str = getStr(key);
         if (isEmpty(str)) return defaultValue;
 
@@ -121,7 +121,7 @@ public abstract class BaseConfigable implements Configable {
     }
 
     @Override
-    public boolean getBool(String key, boolean defaultValue) {
+    public final boolean getBool(String key, boolean defaultValue) {
         val str = getStr(key);
         if (isEmpty(str)) return defaultValue;
 
@@ -134,7 +134,7 @@ public abstract class BaseConfigable implements Configable {
     }
 
     @Override
-    public float getFloat(String key, float defaultValue) {
+    public final float getFloat(String key, float defaultValue) {
         val str = getStr(key);
         if (isEmpty(str)) return defaultValue;
 
@@ -145,7 +145,7 @@ public abstract class BaseConfigable implements Configable {
     }
 
     @Override
-    public double getDouble(String key, double defaultValue) {
+    public final double getDouble(String key, double defaultValue) {
         val str = getStr(key);
         if (isEmpty(str)) return defaultValue;
 
@@ -156,12 +156,12 @@ public abstract class BaseConfigable implements Configable {
     }
 
     @Override
-    public String getStr(String key, String defaultValue) {
+    public final String getStr(String key, String defaultValue) {
         return defaultIfEmpty(getStr(key), defaultValue);
     }
 
     @Override
-    public <T> T getBean(String key, Class<T> beanClass) {
+    public final <T> T getBean(String key, Class<T> beanClass) {
         val json = getStr(key);
         if (isEmpty(json)) return null;
 
@@ -179,7 +179,7 @@ public abstract class BaseConfigable implements Configable {
     }
 
     @Override
-    public <T> List<T> getBeans(String key, Class<T> beanClass) {
+    public final <T> List<T> getBeans(String key, Class<T> beanClass) {
         List<T> beans = newArrayList();
         val json = getStr(key);
         if (isEmpty(json)) return beans;

@@ -27,7 +27,7 @@ public enum IP {
     protected abstract boolean checkInetAddress(InetAddress inetAddress);
 
     @SneakyThrows
-    public String localIP() {
+    public final String localIP() {
         val netInterfaces = getNetworkInterfaces();
         while (netInterfaces.hasMoreElements()) {
             val ni = netInterfaces.nextElement();
@@ -35,7 +35,7 @@ public enum IP {
             while (address.hasMoreElements()) {
                 val ip = address.nextElement();
                 if (ip.isSiteLocalAddress() &&
-                        !isReservedAddress(ip) &&
+                        isNotReservedAddress(ip) &&
                         checkInetAddress(ip)) {
                     return filterAdapterName(ip.getHostAddress());
                 }
@@ -45,7 +45,7 @@ public enum IP {
     }
 
     @SneakyThrows
-    public String netIP() {
+    public final String netIP() {
         val netInterfaces = getNetworkInterfaces();
         while (netInterfaces.hasMoreElements()) {
             val ni = netInterfaces.nextElement();
@@ -53,7 +53,7 @@ public enum IP {
             while (address.hasMoreElements()) {
                 val ip = address.nextElement();
                 if (!ip.isSiteLocalAddress() &&
-                        !isReservedAddress(ip) &&
+                        isNotReservedAddress(ip) &&
                         checkInetAddress(ip)) {
                     return filterAdapterName(ip.getHostAddress());
                 }
@@ -62,10 +62,10 @@ public enum IP {
         return localIP();
     }
 
-    private boolean isReservedAddress(InetAddress inetAddress) {
-        return (inetAddress.isLinkLocalAddress() ||
-                inetAddress.isLoopbackAddress() ||
-                inetAddress.isAnyLocalAddress());
+    private boolean isNotReservedAddress(InetAddress inetAddress) {
+        return (!inetAddress.isLinkLocalAddress() &&
+                !inetAddress.isLoopbackAddress() &&
+                !inetAddress.isAnyLocalAddress());
     }
 
     private String filterAdapterName(String hostAddress) {

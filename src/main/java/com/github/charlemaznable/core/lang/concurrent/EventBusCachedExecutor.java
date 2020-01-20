@@ -15,7 +15,7 @@ public abstract class EventBusCachedExecutor extends EventBusExecutor {
     }
 
     @Override
-    public Executor eventBusExecutor() {
+    public final Executor eventBusExecutor() {
         return newCachedThreadPool();
     }
 }

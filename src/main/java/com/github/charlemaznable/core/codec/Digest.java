@@ -49,108 +49,108 @@ public enum Digest {
 
     protected abstract Hasher digestHasher();
 
-    public byte[] digest(byte[] info) {
+    public final byte[] digest(byte[] info) {
         return digestHasher().putBytes(info).hash().asBytes();
     }
 
-    public byte[] digest(String info) {
+    public final byte[] digest(String info) {
         return digest(bytes(info));
     }
 
-    public byte[] digest(byte[] info, byte[] salt) {
+    public final byte[] digest(byte[] info, byte[] salt) {
         return digestHasher().putBytes(salt).putBytes(info)
                 .putBytes(salt).hash().asBytes();
     }
 
-    public byte[] digest(byte[] info, String salt) {
+    public final byte[] digest(byte[] info, String salt) {
         return digest(info, bytes(salt));
     }
 
-    public byte[] digest(String info, byte[] salt) {
+    public final byte[] digest(String info, byte[] salt) {
         return digest(bytes(info), salt);
     }
 
-    public byte[] digest(String info, String salt) {
+    public final byte[] digest(String info, String salt) {
         return digest(bytes(info), bytes(salt));
     }
 
-    public String digestBase64(byte[] info) {
+    public final String digestBase64(byte[] info) {
         return base64(digest(info), STANDARD);
     }
 
-    public String digestBase64(String info) {
+    public final String digestBase64(String info) {
         return digestBase64(bytes(info));
     }
 
-    public String digestBase64(byte[] info, byte[] salt) {
+    public final String digestBase64(byte[] info, byte[] salt) {
         return base64(digest(info, salt), STANDARD);
     }
 
-    public String digestBase64(byte[] info, String salt) {
+    public final String digestBase64(byte[] info, String salt) {
         return digestBase64(info, bytes(salt));
     }
 
-    public String digestBase64(String info, byte[] salt) {
+    public final String digestBase64(String info, byte[] salt) {
         return digestBase64(bytes(info), salt);
     }
 
-    public String digestBase64(String info, String salt) {
+    public final String digestBase64(String info, String salt) {
         return digestBase64(bytes(info), bytes(salt));
     }
 
-    public String digestHex(byte[] info) {
+    public final String digestHex(byte[] info) {
         return hex(digest(info));
     }
 
-    public String digestHex(String info) {
+    public final String digestHex(String info) {
         return digestHex(bytes(info));
     }
 
-    public String digestHex(byte[] info, byte[] salt) {
+    public final String digestHex(byte[] info, byte[] salt) {
         return hex(digest(info, salt));
     }
 
-    public String digestHex(byte[] info, String salt) {
+    public final String digestHex(byte[] info, String salt) {
         return digestHex(info, bytes(salt));
     }
 
-    public String digestHex(String info, byte[] salt) {
+    public final String digestHex(String info, byte[] salt) {
         return digestHex(bytes(info), salt);
     }
 
-    public String digestHex(String info, String salt) {
+    public final String digestHex(String info, String salt) {
         return digestHex(bytes(info), bytes(salt));
     }
 
     @Deprecated
-    public byte[] digestDeprecated(String info) {
+    public final byte[] digestDeprecated(String info) {
         return digestHasher().putUnencodedChars(info).hash().asBytes();
     }
 
     @Deprecated
-    public byte[] digestDeprecated(String info, String salt) {
+    public final byte[] digestDeprecated(String info, String salt) {
         return digestHasher().putUnencodedChars(salt)
                 .putUnencodedChars(info)
                 .putUnencodedChars(salt).hash().asBytes();
     }
 
     @Deprecated
-    public String digestBase64Deprecated(String info) {
+    public final String digestBase64Deprecated(String info) {
         return base64(digestDeprecated(info), STANDARD);
     }
 
     @Deprecated
-    public String digestBase64Deprecated(String info, String salt) {
+    public final String digestBase64Deprecated(String info, String salt) {
         return base64(digestDeprecated(info, salt), STANDARD);
     }
 
     @Deprecated
-    public String digestHexDeprecated(String info) {
+    public final String digestHexDeprecated(String info) {
         return hex(digestDeprecated(info));
     }
 
     @Deprecated
-    public String digestHexDeprecated(String info, String salt) {
+    public final String digestHexDeprecated(String info, String salt) {
         return hex(digestDeprecated(info, salt));
     }
 }

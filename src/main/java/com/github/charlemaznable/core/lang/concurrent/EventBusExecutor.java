@@ -25,11 +25,11 @@ public abstract class EventBusExecutor {
         executor = new ScheduledThreadPoolExecutor(getRuntime().availableProcessors() + 1);
     }
 
-    public void post(Object event) {
+    public final void post(Object event) {
         post(event, 0, NANOSECONDS);
     }
 
-    public void post(Object event, long delay, TimeUnit unit) {
+    public final void post(Object event, long delay, TimeUnit unit) {
         executor.schedule(() -> eventBus.post(event), delay, unit);
     }
 

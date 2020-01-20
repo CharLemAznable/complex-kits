@@ -64,79 +64,79 @@ public enum DigestHMAC {
 
     protected abstract Hasher digestHasher(byte[] key);
 
-    protected Hasher digestHasher(String key) {
+    protected final Hasher digestHasher(String key) {
         return digestHasher(bytes(key));
     }
 
-    public byte[] digest(byte[] info, Key key) {
+    public final byte[] digest(byte[] info, Key key) {
         return digestHasher(key).putBytes(info).hash().asBytes();
     }
 
-    public byte[] digest(byte[] info, byte[] key) {
+    public final byte[] digest(byte[] info, byte[] key) {
         return digestHasher(key).putBytes(info).hash().asBytes();
     }
 
-    public byte[] digest(byte[] info, String key) {
+    public final byte[] digest(byte[] info, String key) {
         return digestHasher(key).putBytes(info).hash().asBytes();
     }
 
-    public byte[] digest(String info, Key key) {
+    public final byte[] digest(String info, Key key) {
         return digest(bytes(info), key);
     }
 
-    public byte[] digest(String info, byte[] key) {
+    public final byte[] digest(String info, byte[] key) {
         return digest(bytes(info), key);
     }
 
-    public byte[] digest(String info, String key) {
+    public final byte[] digest(String info, String key) {
         return digest(bytes(info), key);
     }
 
-    public String digestBase64(byte[] info, Key key) {
+    public final String digestBase64(byte[] info, Key key) {
         return base64(digest(info, key), STANDARD);
     }
 
-    public String digestBase64(byte[] info, byte[] key) {
+    public final String digestBase64(byte[] info, byte[] key) {
         return base64(digest(info, key), STANDARD);
     }
 
-    public String digestBase64(byte[] info, String key) {
+    public final String digestBase64(byte[] info, String key) {
         return base64(digest(info, key), STANDARD);
     }
 
-    public String digestBase64(String info, Key key) {
+    public final String digestBase64(String info, Key key) {
         return digestBase64(bytes(info), key);
     }
 
-    public String digestBase64(String info, byte[] key) {
+    public final String digestBase64(String info, byte[] key) {
         return digestBase64(bytes(info), key);
     }
 
-    public String digestBase64(String info, String key) {
+    public final String digestBase64(String info, String key) {
         return digestBase64(bytes(info), key);
     }
 
-    public String digestHex(byte[] info, Key key) {
+    public final String digestHex(byte[] info, Key key) {
         return hex(digest(info, key));
     }
 
-    public String digestHex(byte[] info, byte[] key) {
+    public final String digestHex(byte[] info, byte[] key) {
         return hex(digest(info, key));
     }
 
-    public String digestHex(byte[] info, String key) {
+    public final String digestHex(byte[] info, String key) {
         return hex(digest(info, key));
     }
 
-    public String digestHex(String info, Key key) {
+    public final String digestHex(String info, Key key) {
         return digestHex(bytes(info), key);
     }
 
-    public String digestHex(String info, byte[] key) {
+    public final String digestHex(String info, byte[] key) {
         return digestHex(bytes(info), key);
     }
 
-    public String digestHex(String info, String key) {
+    public final String digestHex(String info, String key) {
         return digestHex(bytes(info), key);
     }
 }
