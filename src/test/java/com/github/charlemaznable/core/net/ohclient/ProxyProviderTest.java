@@ -7,7 +7,7 @@ import com.github.charlemaznable.core.net.ohclient.exception.OhException;
 import lombok.SneakyThrows;
 import lombok.val;
 import okhttp3.OkHttpClient;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

@@ -61,27 +61,10 @@ import static com.google.common.cache.CacheLoader.from;
 import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedRepeatableAnnotations;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 
-public final class OhProxy implements MethodInterceptor {
+public final class OhProxy extends OhRoot implements MethodInterceptor {
 
     Class ohClass;
     String baseUrl;
-
-    Proxy proxy;
-    SSLSocketFactory sslSocketFactory;
-    X509TrustManager x509TrustManager;
-    HostnameVerifier hostnameVerifier;
-    OkHttpClient okHttpClient;
-
-    Charset acceptCharset;
-    ContentFormat contentFormat;
-    RequestMethod requestMethod;
-    List<Pair<String, String>> headers;
-    List<Pair<String, String>> pathVars;
-    List<Pair<String, Object>> parameters;
-    List<Pair<String, Object>> contexts;
-
-    Map<HttpStatus, Class<? extends RuntimeException>> statusMapping;
-    Map<HttpStatus.Series, Class<? extends RuntimeException>> statusSeriesMapping;
 
     LoadingCache<Method, OhMappingProxy> ohMappingProxyCache
             = LoadingCachee.simpleCache(from(this::loadMappingProxy));

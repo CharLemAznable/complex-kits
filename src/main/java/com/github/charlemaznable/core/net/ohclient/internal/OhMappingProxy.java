@@ -62,28 +62,11 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedRepeatableAnnotations;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 
-public final class OhMappingProxy {
+public final class OhMappingProxy extends OhRoot {
 
     Class ohClass;
     Method ohMethod;
     String requestUrl;
-
-    Proxy proxy;
-    SSLSocketFactory sslSocketFactory;
-    X509TrustManager x509TrustManager;
-    HostnameVerifier hostnameVerifier;
-    OkHttpClient okHttpClient;
-
-    Charset acceptCharset;
-    ContentFormat contentFormat;
-    RequestMethod requestMethod;
-    List<Pair<String, String>> headers;
-    List<Pair<String, String>> pathVars;
-    List<Pair<String, Object>> parameters;
-    List<Pair<String, Object>> contexts;
-
-    Map<HttpStatus, Class<? extends RuntimeException>> statusMapping;
-    Map<HttpStatus.Series, Class<? extends RuntimeException>> statusSeriesMapping;
 
     boolean returnFuture; // Future<V>
     boolean returnCollection; // Collection<E>

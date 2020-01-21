@@ -25,7 +25,6 @@ import javax.net.ssl.X509TrustManager;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.Proxy;
-import java.util.List;
 import java.util.Map;
 
 import static com.alibaba.fastjson.JSON.toJSONString;
@@ -41,18 +40,8 @@ import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.CO
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_CONTENT_FORMAT;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.log;
 
-public final class OhCall {
+public final class OhCall extends OhRoot {
 
-    Proxy proxy;
-    SSLSocketFactory sslSocketFactory;
-    X509TrustManager x509TrustManager;
-    HostnameVerifier hostnameVerifier;
-    OkHttpClient okHttpClient;
-
-    List<Pair<String, String>> headers;
-    List<Pair<String, String>> pathVars;
-    List<Pair<String, Object>> parameters;
-    List<Pair<String, Object>> contexts;
     String requestBodyRaw;
     Request request;
 
@@ -60,7 +49,7 @@ public final class OhCall {
         initialByProxy(proxy);
         processArguments(proxy.ohMethod, args);
         this.okHttpClient = buildOkHttpClient(proxy);
-        this.request = buildRequest(proxy);
+        this.request = buildRequest(proxy.requestUrl);
     }
 
     @SneakyThrows
@@ -74,6 +63,9 @@ public final class OhCall {
         this.x509TrustManager = proxy.x509TrustManager;
         this.hostnameVerifier = proxy.hostnameVerifier;
 
+        this.acceptCharset = proxy.acceptCharset;
+        this.contentFormat = proxy.contentFormat;
+        this.requestMethod = proxy.requestMethod;
         this.headers = newArrayList(proxy.headers);
         this.pathVars = newArrayList(proxy.pathVars);
         this.parameters = newArrayList(proxy.parameters);
@@ -181,12 +173,12 @@ public final class OhCall {
         return httpClientBuilder.build();
     }
 
-    private Request buildRequest(OhMappingProxy proxy) {
+    private Request buildRequest(String url) {
         val requestBuilder = new Request.Builder();
 
-        val acceptCharsetName = proxy.acceptCharset.name();
+        val acceptCharsetName = this.acceptCharset.name();
         requestBuilder.header(ACCEPT_CHARSET, acceptCharsetName);
-        val contentType = proxy.contentFormat.contentType();
+        val contentType = this.contentFormat.contentType();
         requestBuilder.header(CONTENT_TYPE, contentType);
         for (val header : this.headers) {
             checkNull(header.getValue(),
@@ -199,7 +191,7 @@ public final class OhCall {
             pathVarMap.put(pathVar.getKey(), pathVar.getValue());
         }
         val pathVarSubstitutor = new StringSubstitutor(pathVarMap, "{", "}");
-        val requestUrl = pathVarSubstitutor.replace(proxy.requestUrl);
+        val requestUrl = pathVarSubstitutor.replace(url);
 
         Map<String, Object> parameterMap = newHashMap();
         for (val parameter : this.parameters) {
@@ -211,7 +203,7 @@ public final class OhCall {
             contextMap.put(context.getKey(), context.getValue());
         }
 
-        val requestMethod = proxy.requestMethod.toString();
+        val requestMethod = this.requestMethod.toString();
         if (!HttpMethod.permitsRequestBody(requestMethod)) {
             requestBuilder.method(requestMethod, null);
             val addQuery = DEFAULT_CONTENT_FORMAT
@@ -221,7 +213,7 @@ public final class OhCall {
                     (requestUrl.contains("?") ? "&" : "?") + addQuery);
         } else {
             val content = nullThen(this.requestBodyRaw, () ->
-                    proxy.contentFormat.format(parameterMap, contextMap));
+                    this.contentFormat.format(parameterMap, contextMap));
             requestBuilder.method(requestMethod, RequestBody.create(
                     MediaType.parse(contentType), content));
             requestBuilder.url(requestUrl);
