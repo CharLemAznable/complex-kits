@@ -63,6 +63,7 @@
         <dom4j.version>2.1.1</dom4j.version>
         <diamond-client.version>0.0.21</diamond-client.version>
         <annotations.version>18.0.0</annotations.version>
+        <okhttp.version>3.14.6</okhttp.version>
 
         <lombok.version>1.18.10</lombok.version>
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
@@ -143,6 +144,11 @@
             <artifactId>annotations</artifactId>
             <version>${annotations.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>${okhttp.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -185,6 +191,12 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <version>${spring.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>mockwebserver</artifactId>
+            <version>${okhttp.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
