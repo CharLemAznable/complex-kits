@@ -55,6 +55,7 @@ import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static com.github.charlemaznable.core.lang.Str.isBlank;
 import static com.github.charlemaznable.core.lang.Str.isNotBlank;
+import static com.github.charlemaznable.core.lang.Str.toStr;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.ohExecutorService;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.ohSubstitutor;
 import static com.github.charlemaznable.core.spring.SpringContext.getBeanOrReflect;
@@ -177,13 +178,16 @@ public final class OhMappingProxy extends OhRoot {
         val response = new OhCall(this, args).execute();
 
         val statusCode = response.code();
-        val errorMapping = new ErrorMappingFunction();
+        val responseBody = notNullThen(response.body(), OhResponseBody::new);
+
+        val responseContent = toStr(notNullThen(
+                responseBody, ResponseBodyExtractor::string));
+        val errorMapping = new ErrorMappingFunction(responseContent);
         notNullThen(this.statusMapping.get(HttpStatus
                 .valueOf(statusCode)), errorMapping);
         notNullThen(this.statusSeriesMapping.get(HttpStatus.Series
                 .valueOf(statusCode)), errorMapping);
 
-        val responseBody = response.body();
         val responseObjs = processResponseBody(statusCode, responseBody);
         if (this.returnCollection) {
             val responseObj = responseObjs.get(0);

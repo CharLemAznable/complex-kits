@@ -62,11 +62,36 @@ public class OhResponseMappingTest {
         assertThrows(OhServerError.class, httpClient::sampleServerError);
 
         val defaultHttpClient = getClient(DefaultMappingHttpClient.class);
-        assertThrows(OhClientError.class, defaultHttpClient::sampleNotFound);
-        assertThrows(OhClientError.class, defaultHttpClient::sampleClientError);
-        assertThrows(OhClientError.class, defaultHttpClient::sampleMappingNotFound);
-        assertThrows(OhClientError.class, defaultHttpClient::sampleMappingClientError);
-        assertThrows(OhServerError.class, defaultHttpClient::sampleServerError);
+        try {
+            defaultHttpClient.sampleNotFound();
+        } catch (Exception e) {
+            assertEquals(OhClientError.class, e.getClass());
+            assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), e.getMessage());
+        }
+        try {
+            defaultHttpClient.sampleClientError();
+        } catch (Exception e) {
+            assertEquals(OhClientError.class, e.getClass());
+            assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), e.getMessage());
+        }
+        try {
+            defaultHttpClient.sampleMappingNotFound();
+        } catch (Exception e) {
+            assertEquals(OhClientError.class, e.getClass());
+            assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), e.getMessage());
+        }
+        try {
+            defaultHttpClient.sampleMappingClientError();
+        } catch (Exception e) {
+            assertEquals(OhClientError.class, e.getClass());
+            assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), e.getMessage());
+        }
+        try {
+            defaultHttpClient.sampleServerError();
+        } catch (Exception e) {
+            assertEquals(OhServerError.class, e.getClass());
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), e.getMessage());
+        }
 
         val disabledHttpClient = getClient(DisabledMappingHttpClient.class);
         assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), disabledHttpClient.sampleNotFound());
@@ -107,15 +132,15 @@ public class OhResponseMappingTest {
     @OhClient("${root}:41180")
     public interface DefaultMappingHttpClient {
 
-        String sampleNotFound();
+        void sampleNotFound();
 
-        String sampleClientError();
+        void sampleClientError();
 
-        String sampleMappingNotFound();
+        void sampleMappingNotFound();
 
-        String sampleMappingClientError();
+        void sampleMappingClientError();
 
-        String sampleServerError();
+        void sampleServerError();
     }
 
     @OhDefaultErrorMappingDisabled

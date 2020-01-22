@@ -68,27 +68,27 @@ public class ReturnTest {
 
         assertDoesNotThrow(httpClient::sampleVoid);
         val futureVoid = httpClient.sampleFutureVoid();
-        await().forever().pollDelay(Duration.ofMillis(1000)).until(futureVoid::isDone);
+        await().forever().pollDelay(Duration.ofMillis(100)).until(futureVoid::isDone);
         assertDoesNotThrow((ThrowingSupplier<Void>) futureVoid::get);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), httpClient.sampleStatusCode());
         val futureStatusCode = httpClient.sampleFutureStatusCode();
-        await().forever().pollDelay(Duration.ofMillis(1000)).until(futureStatusCode::isDone);
+        await().forever().pollDelay(Duration.ofMillis(100)).until(futureStatusCode::isDone);
         assertEquals(HttpStatus.NOT_IMPLEMENTED.value(), futureStatusCode.get());
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, httpClient.sampleStatus());
         val futureStatus = httpClient.sampleFutureStatus();
-        await().forever().pollDelay(Duration.ofMillis(1000)).until(futureStatus::isDone);
+        await().forever().pollDelay(Duration.ofMillis(100)).until(futureStatus::isDone);
         assertEquals(HttpStatus.NOT_IMPLEMENTED, futureStatus.get());
 
         assertEquals(HttpStatus.Series.SERVER_ERROR, httpClient.sampleStatusSeries());
         val futureStatusSeries = httpClient.sampleFutureStatusSeries();
-        await().forever().pollDelay(Duration.ofMillis(1000)).until(futureStatusSeries::isDone);
+        await().forever().pollDelay(Duration.ofMillis(100)).until(futureStatusSeries::isDone);
         assertEquals(HttpStatus.Series.SERVER_ERROR, futureStatusSeries.get());
 
         assertTrue(httpClient.sampleSuccess());
         val futureFailure = httpClient.sampleFailure();
-        await().forever().pollDelay(Duration.ofMillis(1000)).until(futureFailure::isDone);
+        await().forever().pollDelay(Duration.ofMillis(100)).until(futureFailure::isDone);
         assertFalse(futureFailure.get());
 
         mockWebServer.shutdown();
@@ -117,7 +117,7 @@ public class ReturnTest {
 
         assertNotNull(httpClient.sampleResponseBody());
         val futureResponseBody = httpClient.sampleFutureResponseBody();
-        await().forever().pollDelay(Duration.ofMillis(1000)).until(futureResponseBody::isDone);
+        await().forever().pollDelay(Duration.ofMillis(100)).until(futureResponseBody::isDone);
         assertNotNull(futureResponseBody.get());
 
         @Cleanup val isr = new InputStreamReader(httpClient.sampleInputStream(), "UTF-8");
@@ -125,7 +125,7 @@ public class ReturnTest {
             assertEquals("OK", bufferedReader.readLine());
         }
         val futureInputStream = httpClient.sampleFutureInputStream();
-        await().forever().pollDelay(Duration.ofMillis(1000)).until(futureInputStream::isDone);
+        await().forever().pollDelay(Duration.ofMillis(100)).until(futureInputStream::isDone);
         @Cleanup val isr2 = new InputStreamReader(futureInputStream.get(), "UTF-8");
         try (val bufferedReader = new BufferedReader(isr2)) {
             assertEquals("OK", bufferedReader.readLine());
@@ -133,26 +133,26 @@ public class ReturnTest {
 
         assertEquals("OK", httpClient.sampleBufferedSource().readUtf8());
         val futureBufferedSource = httpClient.sampleFutureBufferedSource();
-        await().forever().pollDelay(Duration.ofMillis(1000)).until(futureBufferedSource::isDone);
+        await().forever().pollDelay(Duration.ofMillis(100)).until(futureBufferedSource::isDone);
         assertEquals("OK", futureBufferedSource.get().readUtf8());
 
         assertEquals("OK", string(httpClient.sampleByteArray()));
         val futureByteArray = httpClient.sampleFutureByteArray();
-        await().forever().pollDelay(Duration.ofMillis(1000)).until(futureByteArray::isDone);
+        await().forever().pollDelay(Duration.ofMillis(100)).until(futureByteArray::isDone);
         assertEquals("OK", string(futureByteArray.get()));
 
         try (val bufferedReader = new BufferedReader(httpClient.sampleReader())) {
             assertEquals("OK", bufferedReader.readLine());
         }
         val futureReader = httpClient.sampleFutureReader();
-        await().forever().pollDelay(Duration.ofMillis(1000)).until(futureReader::isDone);
+        await().forever().pollDelay(Duration.ofMillis(100)).until(futureReader::isDone);
         try (val bufferedReader = new BufferedReader(futureReader.get())) {
             assertEquals("OK", bufferedReader.readLine());
         }
 
         assertEquals("OK", httpClient.sampleString());
         val futureString = httpClient.sampleFutureString();
-        await().forever().pollDelay(Duration.ofMillis(1000)).until(futureString::isDone);
+        await().forever().pollDelay(Duration.ofMillis(100)).until(futureString::isDone);
         assertEquals("OK", futureString.get());
 
         mockWebServer.shutdown();
