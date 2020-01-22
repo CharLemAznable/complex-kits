@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 
 @Documented
 @Inherited
-@Target({ElementType.METHOD})
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface OhMapping {
 
