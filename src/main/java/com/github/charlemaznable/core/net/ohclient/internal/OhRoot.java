@@ -1,6 +1,7 @@
 package com.github.charlemaznable.core.net.ohclient.internal;
 
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat.ContentFormat;
+import com.github.charlemaznable.core.net.ohclient.exception.OhError;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,6 @@ class OhRoot {
     List<Pair<String, Object>> parameters;
     List<Pair<String, Object>> contexts;
 
-    Map<HttpStatus, Class<? extends RuntimeException>> statusMapping;
-    Map<HttpStatus.Series, Class<? extends RuntimeException>> statusSeriesMapping;
+    Map<HttpStatus, Class<? extends OhError>> statusMapping;
+    Map<HttpStatus.Series, Class<? extends OhError>> statusSeriesMapping;
 }

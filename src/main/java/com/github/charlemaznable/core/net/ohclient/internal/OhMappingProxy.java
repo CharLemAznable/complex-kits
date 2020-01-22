@@ -11,6 +11,7 @@ import com.github.charlemaznable.core.net.ohclient.config.OhConfigSSL;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigSSL.HostnameVerifierProvider;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigSSL.SSLSocketFactoryProvider;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigSSL.X509TrustManagerProvider;
+import com.github.charlemaznable.core.net.ohclient.exception.OhError;
 import com.github.charlemaznable.core.net.ohclient.exception.OhException;
 import com.github.charlemaznable.core.net.ohclient.param.OhFixedContext;
 import com.github.charlemaznable.core.net.ohclient.param.OhFixedHeader;
@@ -55,7 +56,6 @@ import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static com.github.charlemaznable.core.lang.Str.isBlank;
 import static com.github.charlemaznable.core.lang.Str.isNotBlank;
-import static com.github.charlemaznable.core.lang.Str.toStr;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.ohExecutorService;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.ohSubstitutor;
 import static com.github.charlemaznable.core.spring.SpringContext.getBeanOrReflect;
@@ -120,8 +120,9 @@ public final class OhMappingProxy extends OhRoot {
         return internalExecute(args);
     }
 
+    @SuppressWarnings("unchecked")
     private void processReturnType(Method method) {
-        val returnType = method.getReturnType();
+        var returnType = method.getReturnType();
         this.returnFuture = Future.class == returnType;
         this.returnCollection = Collection.class.isAssignableFrom(returnType);
         this.returnMap = Map.class.isAssignableFrom(returnType);
@@ -154,11 +155,11 @@ public final class OhMappingProxy extends OhRoot {
             }
 
             parameterizedType = (ParameterizedType) futureTypeArgument;
-            Class futureTypeClass = (Class) parameterizedType.getRawType();
-            this.returnCollection = Collection.class.isAssignableFrom(futureTypeClass);
-            this.returnMap = Map.class.isAssignableFrom(futureTypeClass);
-            this.returnPair = Pair.class.isAssignableFrom(futureTypeClass);
-            this.returnTriple = Triple.class.isAssignableFrom(futureTypeClass);
+            returnType = (Class) parameterizedType.getRawType();
+            this.returnCollection = Collection.class.isAssignableFrom(returnType);
+            this.returnMap = Map.class.isAssignableFrom(returnType);
+            this.returnPair = Pair.class.isAssignableFrom(returnType);
+            this.returnTriple = Triple.class.isAssignableFrom(returnType);
             actualTypeArguments = parameterizedType.getActualTypeArguments();
         }
         if (this.returnMap) {
@@ -166,10 +167,15 @@ public final class OhMappingProxy extends OhRoot {
             this.returnTypes = newArrayList(Map.class);
             return;
         }
-        // 以泛型参数类型作为返回值解析目标类型
-        this.returnTypes = newArrayList();
-        for (Type actualTypeArgument : actualTypeArguments) {
-            this.returnTypes.add((Class) actualTypeArgument);
+        if (this.returnCollection || this.returnPair || this.returnTriple) {
+            // 以泛型参数类型作为返回值解析目标类型
+            this.returnTypes = newArrayList();
+            for (Type actualTypeArgument : actualTypeArguments) {
+                this.returnTypes.add((Class) actualTypeArgument);
+            }
+        } else {
+            // 以泛型类型作为返回值解析目标类型
+            this.returnTypes = newArrayList(returnType);
         }
     }
 
@@ -180,9 +186,7 @@ public final class OhMappingProxy extends OhRoot {
         val statusCode = response.code();
         val responseBody = notNullThen(response.body(), OhResponseBody::new);
 
-        val responseContent = toStr(notNullThen(
-                responseBody, ResponseBodyExtractor::string));
-        val errorMapping = new ErrorMappingFunction(responseContent);
+        val errorMapping = new ErrorMappingFunction(statusCode, responseBody);
         notNullThen(this.statusMapping.get(HttpStatus
                 .valueOf(statusCode)), errorMapping);
         notNullThen(this.statusSeriesMapping.get(HttpStatus.Series
@@ -225,15 +229,15 @@ public final class OhMappingProxy extends OhRoot {
     }
 
     private Object processReturnTypeValue(int statusCode, ResponseBody responseBody, Class returnType) {
-        if (void.class == returnType || Void.class == returnType) {
+        if (returnVoid(returnType)) {
             return null;
-        } else if (int.class == returnType || Integer.class == returnType) {
+        } else if (returnInteger(returnType)) {
             return statusCode;
         } else if (HttpStatus.class == returnType) {
             return HttpStatus.valueOf(statusCode);
         } else if (HttpStatus.Series.class == returnType) {
             return HttpStatus.Series.valueOf(statusCode);
-        } else if (boolean.class == returnType || Boolean.class == returnType) {
+        } else if (returnBoolean(returnType)) {
             return HttpStatus.valueOf(statusCode).is2xxSuccessful();
         } else if (ResponseBody.class.isAssignableFrom(returnType)) {
             return responseBody;
@@ -245,12 +249,28 @@ public final class OhMappingProxy extends OhRoot {
             return notNullThen(responseBody, ResponseBodyExtractor::bytes);
         } else if (Reader.class.isAssignableFrom(returnType)) {
             return notNullThen(responseBody, ResponseBodyExtractor::charStream);
-        } else if (String.class == returnType) {
+        } else if (returnUnCollectionString(returnType)) {
             return notNullThen(responseBody, ResponseBodyExtractor::string);
         } else {
             return notNullThen(responseBody, body ->
                     ResponseBodyExtractor.object(body, returnType));
         }
+    }
+
+    private boolean returnVoid(Class returnType) {
+        return void.class == returnType || Void.class == returnType;
+    }
+
+    private boolean returnInteger(Class returnType) {
+        return int.class == returnType || Integer.class == returnType;
+    }
+
+    private boolean returnBoolean(Class returnType) {
+        return boolean.class == returnType || Boolean.class == returnType;
+    }
+
+    private boolean returnUnCollectionString(Class returnType) {
+        return String.class == returnType && !this.returnCollection;
     }
 
     static class Elf {
@@ -383,16 +403,14 @@ public final class OhMappingProxy extends OhRoot {
             return result;
         }
 
-        static Map<HttpStatus, Class<? extends RuntimeException>>
-        checkStatusMapping(Method method, OhProxy proxy) {
+        static Map<HttpStatus, Class<? extends OhError>> checkStatusMapping(Method method, OhProxy proxy) {
             val result = newHashMap(proxy.statusMapping);
             result.putAll(newArrayList(findMergedRepeatableAnnotations(method, OhStatusMapping.class)).stream()
                     .collect(Collectors.toMap(OhStatusMapping::status, OhStatusMapping::exception)));
             return result;
         }
 
-        static Map<HttpStatus.Series, Class<? extends RuntimeException>>
-        checkStatusSeriesMapping(Method method, OhProxy proxy) {
+        static Map<HttpStatus.Series, Class<? extends OhError>> checkStatusSeriesMapping(Method method, OhProxy proxy) {
             val result = newHashMap(proxy.statusSeriesMapping);
             result.putAll(newArrayList(findMergedRepeatableAnnotations(method, OhStatusSeriesMapping.class)).stream()
                     .collect(Collectors.toMap(OhStatusSeriesMapping::statusSeries, OhStatusSeriesMapping::exception)));

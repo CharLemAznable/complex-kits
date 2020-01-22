@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.net.ohclient.param;
 
+import com.github.charlemaznable.core.net.ohclient.exception.OhError;
 import org.springframework.http.HttpStatus;
 
 import java.lang.annotation.Documented;
@@ -19,5 +20,5 @@ public @interface OhStatusSeriesMapping {
 
     HttpStatus.Series statusSeries();
 
-    Class<? extends RuntimeException> exception();
+    Class<? extends OhError> exception() default OhError.class;
 }

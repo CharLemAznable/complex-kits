@@ -14,9 +14,8 @@ import com.github.charlemaznable.core.net.ohclient.config.OhConfigSSL.HostnameVe
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigSSL.SSLSocketFactoryProvider;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigSSL.X509TrustManagerProvider;
 import com.github.charlemaznable.core.net.ohclient.config.OhDefaultErrorMappingDisabled;
-import com.github.charlemaznable.core.net.ohclient.exception.OhClientError;
+import com.github.charlemaznable.core.net.ohclient.exception.OhError;
 import com.github.charlemaznable.core.net.ohclient.exception.OhException;
-import com.github.charlemaznable.core.net.ohclient.exception.OhServerError;
 import com.github.charlemaznable.core.net.ohclient.param.OhFixedContext;
 import com.github.charlemaznable.core.net.ohclient.param.OhFixedHeader;
 import com.github.charlemaznable.core.net.ohclient.param.OhFixedParameter;
@@ -221,16 +220,16 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
                     }).collect(Collectors.toList());
         }
 
-        static Map<HttpStatus, Class<? extends RuntimeException>> checkStatusMapping(Class clazz) {
+        static Map<HttpStatus, Class<? extends OhError>> checkStatusMapping(Class clazz) {
             return newArrayList(findMergedRepeatableAnnotations(clazz, OhStatusMapping.class)).stream()
                     .collect(Collectors.toMap(OhStatusMapping::status, OhStatusMapping::exception));
         }
 
-        static Map<HttpStatus.Series, Class<? extends RuntimeException>> checkStatusSeriesMapping(Class clazz) {
+        static Map<HttpStatus.Series, Class<? extends OhError>> checkStatusSeriesMapping(Class clazz) {
             val disabled = findAnnotation(clazz, OhDefaultErrorMappingDisabled.class);
-            Map<HttpStatus.Series, Class<? extends RuntimeException>> result = checkNull(
-                    disabled, () -> of(HttpStatus.Series.CLIENT_ERROR, OhClientError.class,
-                            HttpStatus.Series.SERVER_ERROR, OhServerError.class), x -> newHashMap());
+            Map<HttpStatus.Series, Class<? extends OhError>> result = checkNull(
+                    disabled, () -> of(HttpStatus.Series.CLIENT_ERROR, OhError.class,
+                            HttpStatus.Series.SERVER_ERROR, OhError.class), x -> newHashMap());
             result.putAll(newArrayList(findMergedRepeatableAnnotations(clazz, OhStatusSeriesMapping.class)).stream()
                     .collect(Collectors.toMap(OhStatusSeriesMapping::statusSeries, OhStatusSeriesMapping::exception)));
             return result;

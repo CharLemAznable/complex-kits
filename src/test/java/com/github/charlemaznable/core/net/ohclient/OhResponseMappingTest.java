@@ -1,8 +1,7 @@
 package com.github.charlemaznable.core.net.ohclient;
 
 import com.github.charlemaznable.core.net.ohclient.config.OhDefaultErrorMappingDisabled;
-import com.github.charlemaznable.core.net.ohclient.exception.OhClientError;
-import com.github.charlemaznable.core.net.ohclient.exception.OhServerError;
+import com.github.charlemaznable.core.net.ohclient.exception.OhError;
 import com.github.charlemaznable.core.net.ohclient.param.OhStatusMapping;
 import com.github.charlemaznable.core.net.ohclient.param.OhStatusSeriesMapping;
 import lombok.SneakyThrows;
@@ -59,38 +58,48 @@ public class OhResponseMappingTest {
         assertThrows(ClientErrorException.class, httpClient::sampleClientError);
         assertThrows(NotFoundException2.class, httpClient::sampleMappingNotFound);
         assertThrows(ClientErrorException2.class, httpClient::sampleMappingClientError);
-        assertThrows(OhServerError.class, httpClient::sampleServerError);
+        assertThrows(OhError.class, httpClient::sampleServerError);
 
         val defaultHttpClient = getClient(DefaultMappingHttpClient.class);
         try {
             defaultHttpClient.sampleNotFound();
         } catch (Exception e) {
-            assertEquals(OhClientError.class, e.getClass());
-            assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), e.getMessage());
+            assertEquals(OhError.class, e.getClass());
+            OhError er = (OhError) e;
+            assertEquals(HttpStatus.NOT_FOUND.value(), er.getStatusCode());
+            assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), er.getMessage());
         }
         try {
             defaultHttpClient.sampleClientError();
         } catch (Exception e) {
-            assertEquals(OhClientError.class, e.getClass());
-            assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), e.getMessage());
+            assertEquals(OhError.class, e.getClass());
+            OhError er = (OhError) e;
+            assertEquals(HttpStatus.FORBIDDEN.value(), er.getStatusCode());
+            assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), er.getMessage());
         }
         try {
             defaultHttpClient.sampleMappingNotFound();
         } catch (Exception e) {
-            assertEquals(OhClientError.class, e.getClass());
-            assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), e.getMessage());
+            assertEquals(OhError.class, e.getClass());
+            OhError er = (OhError) e;
+            assertEquals(HttpStatus.NOT_FOUND.value(), er.getStatusCode());
+            assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), er.getMessage());
         }
         try {
             defaultHttpClient.sampleMappingClientError();
         } catch (Exception e) {
-            assertEquals(OhClientError.class, e.getClass());
-            assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), e.getMessage());
+            assertEquals(OhError.class, e.getClass());
+            OhError er = (OhError) e;
+            assertEquals(HttpStatus.FORBIDDEN.value(), er.getStatusCode());
+            assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), er.getMessage());
         }
         try {
             defaultHttpClient.sampleServerError();
         } catch (Exception e) {
-            assertEquals(OhServerError.class, e.getClass());
-            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), e.getMessage());
+            assertEquals(OhError.class, e.getClass());
+            OhError er = (OhError) e;
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), er.getStatusCode());
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), er.getMessage());
         }
 
         val disabledHttpClient = getClient(DisabledMappingHttpClient.class);
@@ -158,23 +167,39 @@ public class OhResponseMappingTest {
         String sampleServerError();
     }
 
-    public static class NotFoundException extends RuntimeException {
+    public static class NotFoundException extends OhError {
 
         private static final long serialVersionUID = -6500698707558354057L;
+
+        public NotFoundException(int statusCode, String message) {
+            super(statusCode, message);
+        }
     }
 
-    public static class ClientErrorException extends RuntimeException {
+    public static class ClientErrorException extends OhError {
 
         private static final long serialVersionUID = -3870950937253448454L;
+
+        public ClientErrorException(int statusCode, String message) {
+            super(statusCode, message);
+        }
     }
 
-    public static class NotFoundException2 extends RuntimeException {
+    public static class NotFoundException2 extends OhError {
 
         private static final long serialVersionUID = 8138254149072329848L;
+
+        public NotFoundException2(int statusCode, String message) {
+            super(statusCode, message);
+        }
     }
 
-    public static class ClientErrorException2 extends RuntimeException {
+    public static class ClientErrorException2 extends OhError {
 
         private static final long serialVersionUID = -7855725166604686605L;
+
+        public ClientErrorException2(int statusCode, String message) {
+            super(statusCode, message);
+        }
     }
 }
