@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import static com.github.charlemaznable.core.codec.Json.desc;
 import static com.github.charlemaznable.core.lang.Condition.checkBlank;
 import static com.github.charlemaznable.core.lang.Condition.checkNull;
 import static com.github.charlemaznable.core.lang.Condition.notNullThen;
@@ -70,6 +71,7 @@ public final class OhMappingProxy extends OhRoot {
 
     boolean returnFuture; // Future<V>
     boolean returnCollection; // Collection<E>
+    boolean returnMap; // Map<K, V>
     boolean returnPair; // Pair<L, R>
     boolean returnTriple; // Triple<L, M, R>
     List<Class> returnTypes;
@@ -121,6 +123,7 @@ public final class OhMappingProxy extends OhRoot {
         val returnType = method.getReturnType();
         this.returnFuture = Future.class == returnType;
         this.returnCollection = Collection.class.isAssignableFrom(returnType);
+        this.returnMap = Map.class.isAssignableFrom(returnType);
         this.returnPair = Pair.class.isAssignableFrom(returnType);
         this.returnTriple = Triple.class.isAssignableFrom(returnType);
 
@@ -128,7 +131,7 @@ public final class OhMappingProxy extends OhRoot {
         if (!(genericReturnType instanceof ParameterizedType)) {
             // 错误的泛型时
             if (this.returnFuture || this.returnCollection ||
-                    this.returnPair || this.returnTriple) {
+                    this.returnMap || this.returnPair || this.returnTriple) {
                 // 如返回支持的泛型类型则抛出异常
                 throw new OhException("Method return type generic Error");
             } else {
@@ -152,10 +155,17 @@ public final class OhMappingProxy extends OhRoot {
             parameterizedType = (ParameterizedType) futureTypeArgument;
             Class futureTypeClass = (Class) parameterizedType.getRawType();
             this.returnCollection = Collection.class.isAssignableFrom(futureTypeClass);
+            this.returnMap = Map.class.isAssignableFrom(futureTypeClass);
             this.returnPair = Pair.class.isAssignableFrom(futureTypeClass);
             this.returnTriple = Triple.class.isAssignableFrom(futureTypeClass);
             actualTypeArguments = parameterizedType.getActualTypeArguments();
         }
+        if (this.returnMap) {
+            // 返回Map时, 直接解析返回值为Map
+            this.returnTypes = newArrayList(Map.class);
+            return;
+        }
+        // 以泛型参数类型作为返回值解析目标类型
         this.returnTypes = newArrayList();
         for (Type actualTypeArgument : actualTypeArguments) {
             this.returnTypes.add((Class) actualTypeArgument);
@@ -183,6 +193,14 @@ public final class OhMappingProxy extends OhRoot {
                 return newArrayList(responseObj);
             }
 
+        } else if (this.returnMap) {
+            val responseObj = responseObjs.get(0);
+            if (responseObj instanceof Map) {
+                return newHashMap((Map) responseObj);
+            } else {
+                return desc(responseObj);
+            }
+
         } else if (this.returnPair) {
             return Pair.of(responseObjs.get(0), responseObjs.get(1));
 
@@ -197,32 +215,38 @@ public final class OhMappingProxy extends OhRoot {
     private List<Object> processResponseBody(int statusCode, ResponseBody responseBody) {
         List<Object> returnValues = newArrayList();
         for (val returnType : this.returnTypes) {
-            if (int.class == returnType || Integer.class == returnType) {
-                returnValues.add(statusCode);
-            } else if (HttpStatus.class == returnType) {
-                returnValues.add(HttpStatus.valueOf(statusCode));
-            } else if (HttpStatus.Series.class == returnType) {
-                returnValues.add(HttpStatus.Series.valueOf(statusCode));
-            } else if (boolean.class == returnType || Boolean.class == returnType) {
-                returnValues.add(HttpStatus.valueOf(statusCode).is2xxSuccessful());
-            } else if (ResponseBody.class.isAssignableFrom(returnType)) {
-                returnValues.add(responseBody);
-            } else if (InputStream.class == returnType) {
-                returnValues.add(notNullThen(responseBody, ResponseBodyExtractor::byteStream));
-            } else if (BufferedSource.class.isAssignableFrom(returnType)) {
-                returnValues.add(notNullThen(responseBody, ResponseBodyExtractor::source));
-            } else if (byte[].class == returnType) {
-                returnValues.add(notNullThen(responseBody, ResponseBodyExtractor::bytes));
-            } else if (Reader.class.isAssignableFrom(returnType)) {
-                returnValues.add(notNullThen(responseBody, ResponseBodyExtractor::charStream));
-            } else if (String.class == returnType) {
-                returnValues.add(notNullThen(responseBody, ResponseBodyExtractor::string));
-            } else {
-                returnValues.add(notNullThen(responseBody, body ->
-                        ResponseBodyExtractor.object(body, returnType)));
-            }
+            returnValues.add(processReturnTypeValue(statusCode, responseBody, returnType));
         }
         return returnValues;
+    }
+
+    private Object processReturnTypeValue(int statusCode, ResponseBody responseBody, Class returnType) {
+        if (void.class == returnType || Void.class == returnType) {
+            return null;
+        } else if (int.class == returnType || Integer.class == returnType) {
+            return statusCode;
+        } else if (HttpStatus.class == returnType) {
+            return HttpStatus.valueOf(statusCode);
+        } else if (HttpStatus.Series.class == returnType) {
+            return HttpStatus.Series.valueOf(statusCode);
+        } else if (boolean.class == returnType || Boolean.class == returnType) {
+            return HttpStatus.valueOf(statusCode).is2xxSuccessful();
+        } else if (ResponseBody.class.isAssignableFrom(returnType)) {
+            return responseBody;
+        } else if (InputStream.class == returnType) {
+            return notNullThen(responseBody, ResponseBodyExtractor::byteStream);
+        } else if (BufferedSource.class.isAssignableFrom(returnType)) {
+            return (notNullThen(responseBody, ResponseBodyExtractor::source));
+        } else if (byte[].class == returnType) {
+            return notNullThen(responseBody, ResponseBodyExtractor::bytes);
+        } else if (Reader.class.isAssignableFrom(returnType)) {
+            return notNullThen(responseBody, ResponseBodyExtractor::charStream);
+        } else if (String.class == returnType) {
+            return notNullThen(responseBody, ResponseBodyExtractor::string);
+        } else {
+            return notNullThen(responseBody, body ->
+                    ResponseBodyExtractor.object(body, returnType));
+        }
     }
 
     static class Elf {
