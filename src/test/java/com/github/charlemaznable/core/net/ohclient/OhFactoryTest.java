@@ -71,6 +71,8 @@ public class OhFactoryTest {
         assertEquals("OhClient@" + httpClient.hashCode(), httpClient.toString());
         assertEquals(httpClient, getClient(AcceptCharsetHttpClient.class));
         assertEquals(httpClient.hashCode(), getClient(AcceptCharsetHttpClient.class).hashCode());
+
+        mockWebServer.shutdown();
     }
 
     @SneakyThrows
@@ -112,6 +114,8 @@ public class OhFactoryTest {
         assertEquals("OhClient@" + httpClient.hashCode(), httpClient.toString());
         assertEquals(httpClient, getClient(ContentFormatHttpClient.class));
         assertEquals(httpClient.hashCode(), getClient(ContentFormatHttpClient.class).hashCode());
+
+        mockWebServer.shutdown();
     }
 
     @SneakyThrows
@@ -145,6 +149,8 @@ public class OhFactoryTest {
         assertEquals("OhClient@" + httpClient.hashCode(), httpClient.toString());
         assertEquals(httpClient, getClient(RequestMethodHttpClient.class));
         assertEquals(httpClient.hashCode(), getClient(RequestMethodHttpClient.class).hashCode());
+
+        mockWebServer.shutdown();
     }
 
     @OhConfigAcceptCharset("ISO-8859-1")

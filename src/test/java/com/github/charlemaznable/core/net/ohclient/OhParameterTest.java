@@ -72,6 +72,12 @@ public class OhParameterTest {
                         assertNull(requestUrl.queryParameter("T3"));
                         assertEquals("V4", requestUrl.queryParameter("T4"));
                         return new MockResponse().setBody("OK");
+                    case "/sampleBundle2":
+                        assertEquals("V1", requestUrl.queryParameter("T1"));
+                        assertEquals("V2", requestUrl.queryParameter("T2"));
+                        assertNull(requestUrl.queryParameter("T3"));
+                        assertNull(requestUrl.queryParameter("T4"));
+                        return new MockResponse().setBody("OK");
                 }
                 return new MockResponse()
                         .setResponseCode(HttpStatus.NOT_FOUND.value())
@@ -85,6 +91,9 @@ public class OhParameterTest {
         assertEquals("OK", httpClient.sampleMapping());
         assertEquals("OK", httpClient.sampleParameters(null, "V4"));
         assertEquals("OK", httpClient.sampleBundle(new Bundle(null, null, "V4")));
+        assertEquals("OK", httpClient.sampleBundle2(null));
+
+        mockWebServer.shutdown();
     }
 
     @SneakyThrows
@@ -97,50 +106,58 @@ public class OhParameterTest {
                 val body = request.getBody().readUtf8();
                 switch (request.getPath()) {
                     case "/sampleDefault":
-                        val paramMap = Splitter.on("&")
+                        val defaultMap = Splitter.on("&")
                                 .withKeyValueSeparator("=").split(body);
-                        assertEquals("V1", paramMap.get("T1"));
-                        assertEquals("V2", paramMap.get("T2"));
-                        assertNull(paramMap.get("T3"));
-                        assertNull(paramMap.get("T4"));
+                        assertEquals("V1", defaultMap.get("T1"));
+                        assertEquals("V2", defaultMap.get("T2"));
+                        assertNull(defaultMap.get("T3"));
+                        assertNull(defaultMap.get("T4"));
                         return new MockResponse().setBody("OK");
                     case "/sampleMapping":
-                        val paramMap2 = unJson(body);
-                        assertEquals("V1", paramMap2.get("T1"));
-                        assertNull(paramMap2.get("T2"));
-                        assertEquals("V3", paramMap2.get("T3"));
-                        assertNull(paramMap2.get("T4"));
+                        val mappingMap = unJson(body);
+                        assertEquals("V1", mappingMap.get("T1"));
+                        assertNull(mappingMap.get("T2"));
+                        assertEquals("V3", mappingMap.get("T3"));
+                        assertNull(mappingMap.get("T4"));
                         return new MockResponse().setBody("OK");
                     case "/sampleParameters":
-                        val paramMap3 = unXml(body);
-                        assertEquals("V1", paramMap3.get("T1"));
-                        assertNull(paramMap3.get("T2"));
-                        assertNull(paramMap3.get("T3"));
-                        assertEquals("V4", paramMap3.get("T4"));
+                        val paramMap = unXml(body);
+                        assertEquals("V1", paramMap.get("T1"));
+                        assertNull(paramMap.get("T2"));
+                        assertNull(paramMap.get("T3"));
+                        assertEquals("V4", paramMap.get("T4"));
                         return new MockResponse().setBody("OK");
                     case "/sampleBundle":
-                        val paramMap4 = Splitter.on("&")
+                        val bundleMap = Splitter.on("&")
                                 .withKeyValueSeparator("=").split(body);
-                        assertEquals("V1", paramMap4.get("T1"));
-                        assertNull(paramMap4.get("T2"));
-                        assertNull(paramMap4.get("T3"));
-                        assertEquals("V4", paramMap4.get("T4"));
+                        assertEquals("V1", bundleMap.get("T1"));
+                        assertNull(bundleMap.get("T2"));
+                        assertNull(bundleMap.get("T3"));
+                        assertEquals("V4", bundleMap.get("T4"));
+                        return new MockResponse().setBody("OK");
+                    case "/sampleBundle2":
+                        val bundleMap2 = Splitter.on("&")
+                                .withKeyValueSeparator("=").split(body);
+                        assertEquals("V1", bundleMap2.get("T1"));
+                        assertEquals("V2", bundleMap2.get("T2"));
+                        assertNull(bundleMap2.get("T3"));
+                        assertNull(bundleMap2.get("T4"));
                         return new MockResponse().setBody("OK");
                     case "/sampleRaw":
-                        val paramMap5 = Splitter.on("&")
+                        val rawMap = Splitter.on("&")
                                 .withKeyValueSeparator("=").split(body);
-                        assertNull(paramMap5.get("T1"));
-                        assertNull(paramMap5.get("T2"));
-                        assertEquals("V3", paramMap5.get("T3"));
-                        assertEquals("V4", paramMap5.get("T4"));
+                        assertNull(rawMap.get("T1"));
+                        assertNull(rawMap.get("T2"));
+                        assertEquals("V3", rawMap.get("T3"));
+                        assertEquals("V4", rawMap.get("T4"));
                         return new MockResponse().setBody("OK");
                     case "/sampleRawError":
-                        val paramMap6 = Splitter.on("&")
+                        val rawErrorMap = Splitter.on("&")
                                 .withKeyValueSeparator("=").split(body);
-                        assertEquals("V1", paramMap6.get("T1"));
-                        assertEquals("V2", paramMap6.get("T2"));
-                        assertNull(paramMap6.get("T3"));
-                        assertNull(paramMap6.get("T4"));
+                        assertEquals("V1", rawErrorMap.get("T1"));
+                        assertEquals("V2", rawErrorMap.get("T2"));
+                        assertNull(rawErrorMap.get("T3"));
+                        assertNull(rawErrorMap.get("T4"));
                         return new MockResponse().setBody("OK");
                 }
                 return new MockResponse()
@@ -155,8 +172,11 @@ public class OhParameterTest {
         assertEquals("OK", httpClient.sampleMapping());
         assertEquals("OK", httpClient.sampleParameters(null, "V4"));
         assertEquals("OK", httpClient.sampleBundle(new Bundle(null, null, "V4")));
+        assertEquals("OK", httpClient.sampleBundle2(null));
         assertEquals("OK", httpClient.sampleRaw("T3=V3&T4=V4"));
         assertEquals("OK", httpClient.sampleRawError(new Object()));
+
+        mockWebServer.shutdown();
     }
 
     @OhFixedPathVar(name = "T0", value = "V0")
@@ -179,6 +199,8 @@ public class OhParameterTest {
                                 @OhParameter("T4") String v4);
 
         String sampleBundle(@OhParameterBundle Bundle bundle);
+
+        String sampleBundle2(@OhParameterBundle Bundle bundle);
     }
 
     @OhFixedParameter(name = "T1", value = "V1")
@@ -202,6 +224,8 @@ public class OhParameterTest {
                                 @OhParameter("T4") String v4);
 
         String sampleBundle(@OhParameterBundle Bundle bundle);
+
+        String sampleBundle2(@OhParameterBundle Bundle bundle);
 
         String sampleRaw(@OhRequestBodyRaw String raw);
 

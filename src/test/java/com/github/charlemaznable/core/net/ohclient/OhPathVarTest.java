@@ -45,6 +45,8 @@ public class OhPathVarTest {
         assertEquals("V2", httpClient.sampleDefault());
         assertEquals("V3", httpClient.sampleMapping());
         assertEquals("V4", httpClient.samplePathVars("V4"));
+
+        mockWebServer.shutdown();
     }
 
     @OhFixedPathVar(name = "P1", value = "V1")

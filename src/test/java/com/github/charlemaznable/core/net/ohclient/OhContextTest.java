@@ -71,6 +71,8 @@ public class OhContextTest {
         assertEquals("OK", httpClient.sampleDefault());
         assertEquals("OK", httpClient.sampleMapping());
         assertEquals("OK", httpClient.sampleContexts(null, "V4"));
+
+        mockWebServer.shutdown();
     }
 
     @OhConfigRequestMethod(RequestMethod.POST)

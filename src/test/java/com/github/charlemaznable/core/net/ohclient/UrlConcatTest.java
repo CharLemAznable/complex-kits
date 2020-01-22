@@ -19,7 +19,7 @@ public class UrlConcatTest {
     @SneakyThrows
     @Test
     public void testUrlPlainConcat() {
-        startMockWebServer(41100);
+        val mockWebServer = startMockWebServer(41100);
 
         val httpClient = getClient(UrlPlainHttpClient.class);
         assertEquals("Root", httpClient.empty());
@@ -27,12 +27,14 @@ public class UrlConcatTest {
         assertEquals("Sample", httpClient.sample());
         assertEquals("Sample", httpClient.sampleWithSlash());
         assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), httpClient.notFound());
+
+        shutdownMockWebServer(mockWebServer);
     }
 
     @SneakyThrows
     @Test
     public void testUrlProviderConcat() {
-        startMockWebServer(41101);
+        val mockWebServer = startMockWebServer(41101);
 
         val httpClient = getClient(UrlProviderHttpClient.class);
         assertEquals("Root", httpClient.empty());
@@ -40,10 +42,12 @@ public class UrlConcatTest {
         assertEquals("Sample", httpClient.sample());
         assertEquals("Sample", httpClient.sampleWithSlash());
         assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), httpClient.notFound());
+
+        shutdownMockWebServer(mockWebServer);
     }
 
     @SneakyThrows
-    private void startMockWebServer(int port) {
+    private MockWebServer startMockWebServer(int port) {
         val mockWebServer = new MockWebServer();
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
@@ -60,6 +64,12 @@ public class UrlConcatTest {
             }
         });
         mockWebServer.start(port);
+        return mockWebServer;
+    }
+
+    @SneakyThrows
+    private void shutdownMockWebServer(MockWebServer mockWebServer) {
+        mockWebServer.shutdown();
     }
 
     @OhDefaultErrorMappingDisabled

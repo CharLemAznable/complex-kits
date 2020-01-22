@@ -60,6 +60,8 @@ public class OhHeaderTest {
         assertEquals("OK", httpClient.sampleDefault());
         assertEquals("OK", httpClient.sampleMapping());
         assertEquals("OK", httpClient.sampleHeaders(null, "V4"));
+
+        mockWebServer.shutdown();
     }
 
     @SneakyThrows
