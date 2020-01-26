@@ -133,11 +133,13 @@ public final class OhMappingProxy extends OhRoot {
         if (!(genericReturnType instanceof ParameterizedType)) {
             // 错误的泛型时
             if (this.returnFuture || this.returnCollection ||
-                    this.returnMap || this.returnPair || this.returnTriple) {
+                    this.returnPair || this.returnTriple) {
                 // 如返回支持的泛型类型则抛出异常
+                // 不包括Map<K, V>
                 throw new OhException("Method return type generic Error");
             } else {
                 // 否则以方法返回类型作为实际返回类型
+                // 返回Map时, 直接解析返回值为Map
                 this.returnTypes = newArrayList(returnType);
                 return;
             }
@@ -161,11 +163,6 @@ public final class OhMappingProxy extends OhRoot {
             this.returnPair = Pair.class.isAssignableFrom(returnType);
             this.returnTriple = Triple.class.isAssignableFrom(returnType);
             actualTypeArguments = parameterizedType.getActualTypeArguments();
-        }
-        if (this.returnMap) {
-            // 返回Map时, 直接解析返回值为Map
-            this.returnTypes = newArrayList(Map.class);
-            return;
         }
         if (this.returnCollection || this.returnPair || this.returnTriple) {
             // 以泛型参数类型作为返回值解析目标类型

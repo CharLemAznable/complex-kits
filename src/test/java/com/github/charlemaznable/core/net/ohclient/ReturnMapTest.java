@@ -42,6 +42,7 @@ public class ReturnMapTest {
                         return new MockResponse().setResponseCode(HttpStatus.OK.value())
                                 .setBody(xml(of("John", of("name", "Doe"))));
                     case "/sampleMapNull":
+                    case "/sampleFutureMapNull":
                         return new MockResponse().setResponseCode(HttpStatus.OK.value())
                                 .setBody("");
                 }
@@ -57,13 +58,18 @@ public class ReturnMapTest {
         var beanMap = (Map) map.get("John");
         assertEquals("Doe", beanMap.get("name"));
 
-        val futureMap = httpClient.sampleFutureMap();
+        var futureMap = httpClient.sampleFutureMap();
         await().forever().pollDelay(Duration.ofMillis(100)).until(futureMap::isDone);
         map = futureMap.get();
         beanMap = (Map) map.get("John");
         assertEquals("Doe", beanMap.get("name"));
 
         map = httpClient.sampleMapNull();
+        assertNull(map);
+
+        futureMap = httpClient.sampleFutureMapNull();
+        await().forever().pollDelay(Duration.ofMillis(100)).until(futureMap::isDone);
+        map = futureMap.get();
         assertNull(map);
 
         mockWebServer.shutdown();
@@ -77,6 +83,8 @@ public class ReturnMapTest {
         Future<Map<String, Object>> sampleFutureMap();
 
         Map<String, Object> sampleMapNull();
+
+        Future<Map<String, Object>> sampleFutureMapNull();
     }
 
     @AllArgsConstructor
