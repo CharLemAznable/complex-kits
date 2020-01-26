@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 import static com.github.charlemaznable.core.codec.Json.json;
 import static com.github.charlemaznable.core.codec.Json.jsonOf;
@@ -32,6 +33,7 @@ public class ReturnErrorTest {
             @Override
             public MockResponse dispatch(RecordedRequest request) {
                 switch (request.getPath()) {
+                    case "/sampleFuture":
                     case "/sampleList":
                         return new MockResponse().setResponseCode(HttpStatus.OK.value())
                                 .setBody(json(newArrayList("John", "Doe")));
@@ -52,6 +54,7 @@ public class ReturnErrorTest {
         mockWebServer.start(41196);
         val httpClient = getClient(ErrorHttpClient.class);
 
+        assertThrows(OhException.class, httpClient::sampleFuture);
         assertThrows(OhException.class, httpClient::sampleList);
         assertThrows(IllegalArgumentException.class, httpClient::sampleMapError);
 
@@ -66,6 +69,8 @@ public class ReturnErrorTest {
 
     @OhClient("${root}:41196")
     public interface ErrorHttpClient {
+
+        Future sampleFuture();
 
         List sampleList();
 
