@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.miner;
 
 import com.github.charlemaznable.core.miner.testClass.TestConfiguration;
 import com.github.charlemaznable.core.miner.testClass.TestMiner;
+import com.github.charlemaznable.core.miner.testClass.TestMiner2;
 import com.github.charlemaznable.core.miner.testClass.TestSpringContext;
 import lombok.val;
 import org.junit.jupiter.api.AfterAll;
@@ -42,5 +43,8 @@ public class MinerScanTest {
         assertEquals("John Doe Richard", minerDefault.longName());
         assertEquals("xyz", minerDefault.abc("xyz"));
         assertNull(minerDefault.abc(null));
+
+        val minerDefault2 = TestSpringContext.getBean(TestMiner2.class);
+        assertNull(minerDefault2);
     }
 }

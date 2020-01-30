@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.net.ohclient;
 
 import com.github.charlemaznable.core.net.ohclient.testscan.TestConfiguration;
 import com.github.charlemaznable.core.net.ohclient.testscan.TestHttpClient;
+import com.github.charlemaznable.core.net.ohclient.testscan.TestHttpClient2;
 import com.github.charlemaznable.core.spring.SpringContext;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -16,6 +17,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TestConfiguration.class)
@@ -42,6 +44,9 @@ public class OhScanTest {
         val testHttpClient = SpringContext.getBean(TestHttpClient.class);
         assertEquals("Sample", testHttpClient.sample());
         assertEquals("{Sample}", testHttpClient.sampleWrapper());
+
+        val testHttpClient2 = SpringContext.getBean(TestHttpClient2.class);
+        assertNull(testHttpClient2);
 
         mockWebServer.shutdown();
     }

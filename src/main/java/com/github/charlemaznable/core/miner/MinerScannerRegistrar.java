@@ -12,7 +12,7 @@ public final class MinerScannerRegistrar extends SpringScannerRegistrar {
 
     @Override
     protected boolean isCandidateClass(ClassMetadata classMetadata) {
-        return (classMetadata.isInterface() && classMetadata.isIndependent());
+        return classMetadata.isInterface();
     }
 
     public static class MinerFactoryBean extends SpringFactoryBean {
