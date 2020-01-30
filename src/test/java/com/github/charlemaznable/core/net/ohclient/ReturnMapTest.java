@@ -75,7 +75,8 @@ public class ReturnMapTest {
         mockWebServer.shutdown();
     }
 
-    @OhClient("${root}:41193")
+    @OhClient
+    @OhMapping("${root}:41193")
     public interface MapHttpClient {
 
         Map<String, Object> sampleMap();

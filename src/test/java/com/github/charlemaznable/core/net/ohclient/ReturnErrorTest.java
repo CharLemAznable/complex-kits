@@ -67,7 +67,8 @@ public class ReturnErrorTest {
         mockWebServer.shutdown();
     }
 
-    @OhClient("${root}:41196")
+    @OhClient
+    @OhMapping("${root}:41196")
     public interface ErrorHttpClient {
 
         Future sampleFuture();

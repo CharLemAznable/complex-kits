@@ -84,7 +84,8 @@ public class ReturnTripleTest {
         mockWebServer.shutdown();
     }
 
-    @OhClient("${root}:41195")
+    @OhClient
+    @OhMapping("${root}:41195")
     public interface TripleHttpClient {
 
         Triple<Integer, HttpStatus, Bean> sampleStatusCodeAndBean();

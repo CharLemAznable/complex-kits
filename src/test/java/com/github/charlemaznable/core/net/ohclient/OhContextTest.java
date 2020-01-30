@@ -79,7 +79,8 @@ public class OhContextTest {
     @OhConfigContentFormat(TestContextFormat.class)
     @OhFixedContext(name = "C1", value = "V1")
     @OhFixedContext(name = "C2", valueProvider = C2Provider.class)
-    @OhClient("${root}:41170")
+    @OhMapping("${root}:41170")
+    @OhClient
     public interface ContextHttpClient {
 
         String sampleDefault();

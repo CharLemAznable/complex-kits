@@ -34,6 +34,7 @@ import static com.github.charlemaznable.core.lang.Str.isNotBlank;
 import static com.github.charlemaznable.core.spring.SpringContext.getBeanOrReflect;
 import static com.google.common.cache.CacheLoader.from;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
+import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
 @SuppressWarnings("unchecked")
 public final class MinerFactory {
@@ -78,7 +79,7 @@ public final class MinerFactory {
     }
 
     private static <T> MinerConfig checkMinerConfig(Class<T> clazz) {
-        return checkNotNull(findAnnotation(clazz, MinerConfig.class),
+        return checkNotNull(getAnnotation(clazz, MinerConfig.class),
                 new MinerConfigException(clazz + " has no MinerConfig"));
     }
 

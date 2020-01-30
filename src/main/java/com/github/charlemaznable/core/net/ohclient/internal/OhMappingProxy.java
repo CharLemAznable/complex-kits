@@ -1,6 +1,7 @@
 package com.github.charlemaznable.core.net.ohclient.internal;
 
 import com.github.charlemaznable.core.net.ohclient.OhMapping;
+import com.github.charlemaznable.core.net.ohclient.OhMapping.UrlProvider;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigAcceptCharset;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat.ContentFormat;
@@ -80,7 +81,7 @@ public final class OhMappingProxy extends OhRoot {
     OhMappingProxy(Class ohClass, Method ohMethod, OhProxy proxy) {
         this.ohClass = ohClass;
         this.ohMethod = ohMethod;
-        this.requestUrl = Elf.checkRequestUrl(this.ohMethod, proxy);
+        this.requestUrl = Elf.checkRequestUrl(this.ohClass, this.ohMethod, proxy);
 
         this.proxy = Elf.checkProxy(this.ohClass, this.ohMethod, proxy);
         val configSSL = Elf.checkConfigSSL(this.ohMethod);
@@ -276,10 +277,13 @@ public final class OhMappingProxy extends OhRoot {
             throw new UnsupportedOperationException();
         }
 
-        static String checkRequestUrl(Method method, OhProxy proxy) {
+        static String checkRequestUrl(Class clazz, Method method, OhProxy proxy) {
             val ohMapping = findAnnotation(method, OhMapping.class);
-            val url = checkNull(ohMapping, method::getName,
-                    mapping -> ohSubstitutor.replace(mapping.value()));
+            val url = checkNull(ohMapping, method::getName, annotation -> {
+                val providerClass = annotation.urlProvider();
+                return ohSubstitutor.replace(UrlProvider.class == providerClass ?
+                        annotation.value() : getBeanOrReflect(providerClass).url(clazz, method));
+            });
             if (isBlank(url)) return proxy.baseUrl;
             if (isBlank(proxy.baseUrl)) return url;
             return removeEnd(proxy.baseUrl, "/") + prependIfMissing(url, "/");

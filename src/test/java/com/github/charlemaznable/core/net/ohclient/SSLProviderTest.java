@@ -144,7 +144,8 @@ public class SSLProviderTest {
         assertThrows(OhException.class, httpClient::error3);
     }
 
-    @OhClient("${root}:41120")
+    @OhClient
+    @OhMapping("${root}:41120")
     @OhConfigSSL(
             sslSocketFactoryProvider = TestSSLSocketFactoryProvider.class,
             hostnameVerifierProvider = TestHostnameVerifierProvider.class)
@@ -153,7 +154,8 @@ public class SSLProviderTest {
         String sample();
     }
 
-    @OhClient("${root}:41121")
+    @OhClient
+    @OhMapping("${root}:41121")
     @OhConfigSSL(
             sslSocketFactoryProvider = TestSSLSocketFactoryProvider.class,
             x509TrustManagerProvider = TestX509TrustManagerProvider.class,
@@ -163,7 +165,8 @@ public class SSLProviderTest {
         String sample();
     }
 
-    @OhClient("${root}:41122")
+    @OhClient
+    @OhMapping("${root}:41122")
     @OhConfigSSL(
             sslSocketFactoryProvider = TestSSLSocketFactoryProvider.class,
             hostnameVerifierProvider = TestHostnameVerifierProvider.class)
@@ -172,7 +175,8 @@ public class SSLProviderTest {
         String sample(SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier);
     }
 
-    @OhClient("${root}:41123")
+    @OhClient
+    @OhMapping("${root}:41123")
     @OhConfigSSL(
             sslSocketFactoryProvider = TestSSLSocketFactoryProvider.class,
             x509TrustManagerProvider = TestX509TrustManagerProvider.class,
@@ -182,7 +186,8 @@ public class SSLProviderTest {
         String sample(SSLSocketFactory sslSocketFactory, X509TrustManager x509TrustManager, HostnameVerifier hostnameVerifier);
     }
 
-    @OhClient("${root}:41124")
+    @OhClient
+    @OhMapping("${root}:41124")
     public interface MethodSSLHttpClient {
 
         String sample();
@@ -206,7 +211,8 @@ public class SSLProviderTest {
     @OhConfigSSLDisabled
     public @interface Disabled {}
 
-    @OhClient("${root}:41124")
+    @OhClient
+    @OhMapping("${root}:41124")
     @OhConfigSSL(
             sslSocketFactoryProvider = TestSSLSocketFactoryProvider.class,
             hostnameVerifierProvider = TestHostnameVerifierProvider.class)
@@ -218,25 +224,29 @@ public class SSLProviderTest {
         String sampleDisabled();
     }
 
-    @OhClient("${root}:41125")
+    @OhClient
+    @OhMapping("${root}:41125")
     @OhConfigSSL(
             sslSocketFactoryProvider = ErrorSSLSocketFactoryProvider.class)
     public interface ErrorSSLHttpClient1 {}
 
-    @OhClient("${root}:41125")
+    @OhClient
+    @OhMapping("${root}:41125")
     @OhConfigSSL(
             sslSocketFactoryProvider = NoErrorSSLSocketFactoryProvider.class,
             x509TrustManagerProvider = ErrorX509TrustManagerProvider.class)
     public interface ErrorSSLHttpClient2 {}
 
-    @OhClient("${root}:41125")
+    @OhClient
+    @OhMapping("${root}:41125")
     @OhConfigSSL(
             sslSocketFactoryProvider = NoErrorSSLSocketFactoryProvider.class,
             x509TrustManagerProvider = NoErrorX509TrustManagerProvider.class,
             hostnameVerifierProvider = ErrorHostnameVerifierProvider.class)
     public interface ErrorSSLHttpClient3 {}
 
-    @OhClient("${root}:41125")
+    @OhClient
+    @OhMapping("${root}:41125")
     @OhConfigSSL(
             sslSocketFactoryProvider = NoErrorSSLSocketFactoryProvider.class,
             x509TrustManagerProvider = NoErrorX509TrustManagerProvider.class,

@@ -159,7 +159,8 @@ public class ReturnTest {
     }
 
     @OhDefaultErrorMappingDisabled
-    @OhClient("${root}:41190")
+    @OhClient
+    @OhMapping("${root}:41190")
     public interface StatusCodeHttpClient {
 
         void sampleVoid();

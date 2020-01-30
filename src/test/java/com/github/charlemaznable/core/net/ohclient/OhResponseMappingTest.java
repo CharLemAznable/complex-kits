@@ -116,7 +116,8 @@ public class OhResponseMappingTest {
             exception = NotFoundException.class)
     @OhStatusSeriesMapping(statusSeries = HttpStatus.Series.CLIENT_ERROR,
             exception = ClientErrorException.class)
-    @OhClient("${root}:41180")
+    @OhMapping("${root}:41180")
+    @OhClient
     public interface MappingHttpClient {
 
         String sampleNotFound();
@@ -138,7 +139,8 @@ public class OhResponseMappingTest {
         String sampleServerError();
     }
 
-    @OhClient("${root}:41180")
+    @OhMapping("${root}:41180")
+    @OhClient
     public interface DefaultMappingHttpClient {
 
         void sampleNotFound();
@@ -153,7 +155,8 @@ public class OhResponseMappingTest {
     }
 
     @OhDefaultErrorMappingDisabled
-    @OhClient("${root}:41180")
+    @OhMapping("${root}:41180")
+    @OhClient
     public interface DisabledMappingHttpClient {
 
         String sampleNotFound();

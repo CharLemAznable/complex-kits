@@ -87,7 +87,8 @@ public class ReturnListTest {
         mockWebServer.shutdown();
     }
 
-    @OhClient("${root}:41192")
+    @OhClient
+    @OhMapping("${root}:41192")
     public interface ListHttpClient {
 
         List<Bean> sampleListBean();

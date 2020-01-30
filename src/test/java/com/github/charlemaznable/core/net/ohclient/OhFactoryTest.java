@@ -25,6 +25,7 @@ import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.joor.Reflect.onClass;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
@@ -153,8 +154,35 @@ public class OhFactoryTest {
         mockWebServer.shutdown();
     }
 
+    @SneakyThrows
+    @Test
+    public void testExtendInterface() {
+        val mockWebServer = new MockWebServer();
+        mockWebServer.setDispatcher(new Dispatcher() {
+            @Override
+            public MockResponse dispatch(RecordedRequest request) {
+                switch (request.getPath()) {
+                    case "/sample":
+                        return new MockResponse().setBody("OK");
+                }
+                return new MockResponse()
+                        .setResponseCode(HttpStatus.NOT_FOUND.value())
+                        .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
+            }
+        });
+        mockWebServer.start(41133);
+
+        val baseHttpClient = getClient(BaseHttpClient.class);
+        assertNotNull(baseHttpClient);
+
+        assertThrows(OhException.class, () -> getClient(SubHttpClient.class));
+
+        mockWebServer.shutdown();
+    }
+
     @OhConfigAcceptCharset("ISO-8859-1")
-    @OhClient("${root}:41130")
+    @OhMapping("${root}:41130")
+    @OhClient
     public interface AcceptCharsetHttpClient {
 
         String sample();
@@ -165,7 +193,8 @@ public class OhFactoryTest {
 
     @OhConfigRequestMethod(RequestMethod.POST)
     @OhConfigContentFormat(FormContentFormat.class)
-    @OhClient("${root}:41131")
+    @OhMapping("${root}:41131")
+    @OhClient
     public interface ContentFormatHttpClient {
 
         String sample();
@@ -178,7 +207,8 @@ public class OhFactoryTest {
     }
 
     @OhConfigRequestMethod(RequestMethod.POST)
-    @OhClient("${root}:41132")
+    @OhMapping("${root}:41132")
+    @OhClient
     public interface RequestMethodHttpClient {
 
         String sample();
@@ -186,6 +216,12 @@ public class OhFactoryTest {
         @OhConfigRequestMethod(RequestMethod.GET)
         String sample2();
     }
+
+    @OhMapping("${root}:41133")
+    @OhClient
+    public interface BaseHttpClient {}
+
+    public interface SubHttpClient extends BaseHttpClient {}
 
     public static class TestNotInterface {}
 }

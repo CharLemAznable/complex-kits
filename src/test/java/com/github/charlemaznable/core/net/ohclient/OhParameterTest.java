@@ -182,7 +182,8 @@ public class OhParameterTest {
     @OhFixedPathVar(name = "T0", value = "V0")
     @OhFixedParameter(name = "T1", value = "V1")
     @OhFixedParameter(name = "T2", valueProvider = T2Provider.class)
-    @OhClient("${root}:41160")
+    @OhMapping("${root}:41160")
+    @OhClient
     public interface GetParameterHttpClient {
 
         String sampleDefault();
@@ -207,7 +208,8 @@ public class OhParameterTest {
     @OhFixedParameter(name = "T2", valueProvider = T2Provider.class)
     @OhConfigRequestMethod(RequestMethod.POST)
     @OhConfigContentFormat(FormContentFormat.class)
-    @OhClient("${root}:41161")
+    @OhMapping("${root}:41161")
+    @OhClient
     public interface PostParameterHttpClient {
 
         String sampleDefault();

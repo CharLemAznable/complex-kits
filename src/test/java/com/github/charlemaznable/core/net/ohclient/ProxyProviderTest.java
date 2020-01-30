@@ -102,21 +102,24 @@ public class ProxyProviderTest {
         assertThrows(OhException.class, httpClient::sample);
     }
 
-    @OhClient("${root}:41110")
+    @OhClient
+    @OhMapping("${root}:41110")
     @OhConfigProxy(ip = "127.0.0.1", port = 41111)
     public interface ProxyPlainHttpClient {
 
         String sample();
     }
 
-    @OhClient("${root}:41112")
+    @OhClient
+    @OhMapping("${root}:41112")
     @OhConfigProxy(proxyProvider = TestProxyProvider.class)
     public interface ProxyProviderHttpClient {
 
         String sample();
     }
 
-    @OhClient("${root}:41114")
+    @OhClient
+    @OhMapping("${root}:41114")
     @OhConfigProxy(ip = "127.0.0.1", port = 41115)
     public interface ProxyParamHttpClient {
 
@@ -130,7 +133,8 @@ public class ProxyProviderTest {
     @OhConfigProxyDisabled
     public @interface Disabled {}
 
-    @OhClient("${root}:41116")
+    @OhClient
+    @OhMapping("${root}:41116")
     @OhConfigProxy(proxyProvider = MethodProxyProvider.class)
     public interface MethodProxyHttpClient {
 
@@ -146,11 +150,13 @@ public class ProxyProviderTest {
         String sampleDisabled();
     }
 
-    @OhClient("${root}:41119")
+    @OhClient
+    @OhMapping("${root}:41119")
     @OhConfigProxy(proxyProvider = ErrorProxyProvider.class)
     public interface ErrorProxyHttpClient1 {}
 
-    @OhClient("${root}:41119")
+    @OhClient
+    @OhMapping("${root}:41119")
     @OhConfigProxy(proxyProvider = NoErrorProxyProvider.class)
     public interface ErrorProxyHttpClient2 {
 

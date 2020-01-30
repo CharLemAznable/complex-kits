@@ -76,7 +76,8 @@ public class OhHeaderTest {
 
     @OhFixedHeader(name = "H1", value = "V1")
     @OhFixedHeader(name = "H2", valueProvider = H2Provider.class)
-    @OhClient("${root}:41140")
+    @OhMapping("${root}:41140")
+    @OhClient
     public interface HeaderHttpClient {
 
         String sampleDefault();
@@ -92,11 +93,13 @@ public class OhHeaderTest {
     }
 
     @OhFixedHeader(name = "H2", valueProvider = ErrorClassProvider.class)
-    @OhClient("${root}:41141")
+    @OhMapping("${root}:41141")
+    @OhClient
     public interface ErrorFixedHttpClient1 {}
 
     @OhFixedHeader(name = "H2", valueProvider = H2Provider.class)
-    @OhClient("${root}:41142")
+    @OhMapping("${root}:41142")
+    @OhClient
     public interface ErrorFixedHttpClient2 {
 
         @OhFixedHeader(name = "H2", valueProvider = ErrorMethodProvider.class)

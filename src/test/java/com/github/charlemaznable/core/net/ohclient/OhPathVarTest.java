@@ -51,18 +51,19 @@ public class OhPathVarTest {
 
     @OhFixedPathVar(name = "P1", value = "V1")
     @OhFixedPathVar(name = "P2", valueProvider = P2Provider.class)
-    @OhClient("${root}:41150/{P1}/{P2}")
+    @OhMapping("${root}:41150/{P1}/{P2}")
+    @OhClient
     public interface PathVarHttpClient {
 
-        @OhMapping("")
+        @OhMapping
         String sampleDefault();
 
         @OhFixedPathVar(name = "P2", valueProvider = P2Provider.class)
-        @OhMapping("")
+        @OhMapping
         String sampleMapping();
 
         @OhFixedPathVar(name = "P2", value = "V3")
-        @OhMapping("")
+        @OhMapping
         String samplePathVars(@OhPathVar("P2") String v4);
     }
 

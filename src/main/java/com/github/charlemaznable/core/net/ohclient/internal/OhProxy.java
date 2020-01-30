@@ -2,7 +2,8 @@ package com.github.charlemaznable.core.net.ohclient.internal;
 
 import com.github.charlemaznable.core.lang.LoadingCachee;
 import com.github.charlemaznable.core.net.ohclient.OhClient;
-import com.github.charlemaznable.core.net.ohclient.OhClient.UrlProvider;
+import com.github.charlemaznable.core.net.ohclient.OhMapping;
+import com.github.charlemaznable.core.net.ohclient.OhMapping.UrlProvider;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigAcceptCharset;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat.ContentFormat;
@@ -59,6 +60,7 @@ import static com.github.charlemaznable.core.spring.SpringContext.getBeanOrRefle
 import static com.google.common.cache.CacheLoader.from;
 import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedRepeatableAnnotations;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
+import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
 public final class OhProxy extends OhRoot implements MethodInterceptor {
 
@@ -70,6 +72,7 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
 
     public OhProxy(Class ohClass) {
         this.ohClass = ohClass;
+        Elf.checkOhClient(this.ohClass);
         this.baseUrl = Elf.checkBaseUrl(this.ohClass);
 
         this.proxy = Elf.checkProxy(this.ohClass);
@@ -115,12 +118,17 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
             throw new UnsupportedOperationException();
         }
 
-        static String checkBaseUrl(Class clazz) {
-            val ohClient = checkNotNull(findAnnotation(clazz, OhClient.class),
+        static void checkOhClient(Class clazz) {
+            checkNotNull(getAnnotation(clazz, OhClient.class),
                     new OhException(clazz.getName() + " has no OhClient annotation"));
-            val providerClass = ohClient.urlProvider();
+        }
+
+        static String checkBaseUrl(Class clazz) {
+            val ohMapping = findAnnotation(clazz, OhMapping.class);
+            if (null == ohMapping) return "";
+            val providerClass = ohMapping.urlProvider();
             return ohSubstitutor.replace(UrlProvider.class == providerClass ?
-                    ohClient.url() : getBeanOrReflect(providerClass).url(clazz));
+                    ohMapping.value() : getBeanOrReflect(providerClass).url(clazz));
         }
 
         static Proxy checkProxy(Class clazz) {

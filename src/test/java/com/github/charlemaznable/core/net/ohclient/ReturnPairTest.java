@@ -70,7 +70,8 @@ public class ReturnPairTest {
         mockWebServer.shutdown();
     }
 
-    @OhClient("${root}:41194")
+    @OhClient
+    @OhMapping("${root}:41194")
     public interface PairHttpClient {
 
         Pair<Integer, Bean> sampleStatusAndBean();

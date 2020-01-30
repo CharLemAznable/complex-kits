@@ -3,6 +3,7 @@ package com.github.charlemaznable.core.net.ohclient;
 import com.github.charlemaznable.core.net.ohclient.testscan.TestConfiguration;
 import com.github.charlemaznable.core.net.ohclient.testscan.TestHttpClient;
 import com.github.charlemaznable.core.net.ohclient.testscan.TestHttpClient2;
+import com.github.charlemaznable.core.net.ohclient.testscan.TestHttpClient3;
 import com.github.charlemaznable.core.spring.SpringContext;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -46,7 +47,11 @@ public class OhScanTest {
         assertEquals("{Sample}", testHttpClient.sampleWrapper());
 
         val testHttpClient2 = SpringContext.getBean(TestHttpClient2.class);
-        assertNull(testHttpClient2);
+        assertEquals("Sample", testHttpClient2.sample());
+        assertEquals("[Sample]", testHttpClient2.sampleWrapper());
+
+        val testHttpClient3 = SpringContext.getBean(TestHttpClient3.class);
+        assertNull(testHttpClient3);
 
         mockWebServer.shutdown();
     }
