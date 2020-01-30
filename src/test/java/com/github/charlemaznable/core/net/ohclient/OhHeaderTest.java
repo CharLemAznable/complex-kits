@@ -106,12 +106,12 @@ public class OhHeaderTest {
     public static class H2Provider implements OhFixedValueProvider {
 
         @Override
-        public String value(Class<?> clazz) {
+        public String value(Class<?> clazz, String name) {
             return "V2";
         }
 
         @Override
-        public String value(Class<?> clazz, Method method) {
+        public String value(Class<?> clazz, Method method, String name) {
             return null;
         }
     }
@@ -121,7 +121,7 @@ public class OhHeaderTest {
     public static class ErrorMethodProvider implements OhFixedValueProvider {
 
         @Override
-        public String value(Class<?> clazz) {
+        public String value(Class<?> clazz, String name) {
             return "V2";
         }
     }

@@ -235,12 +235,12 @@ public class OhParameterTest {
     public static class T2Provider implements OhFixedValueProvider {
 
         @Override
-        public String value(Class<?> clazz) {
+        public String value(Class<?> clazz, String name) {
             return "V2";
         }
 
         @Override
-        public String value(Class<?> clazz, Method method) {
+        public String value(Class<?> clazz, Method method, String name) {
             return null;
         }
     }

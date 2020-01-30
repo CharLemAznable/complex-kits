@@ -360,9 +360,10 @@ public final class OhMappingProxy extends OhRoot {
             val result = newArrayList(proxy.headers);
             result.addAll(newArrayList(findMergedRepeatableAnnotations(method, OhFixedHeader.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
+                        val name = an.name();
                         val providerClass = an.valueProvider();
-                        return Pair.of(an.name(), OhFixedValueProvider.class == providerClass ?
-                                an.value() : getBeanOrReflect(providerClass).value(clazz, method));
+                        return Pair.of(name, OhFixedValueProvider.class == providerClass ?
+                                an.value() : getBeanOrReflect(providerClass).value(clazz, method, name));
                     }).collect(Collectors.toList()));
             return result;
         }
@@ -371,9 +372,10 @@ public final class OhMappingProxy extends OhRoot {
             val result = newArrayList(proxy.pathVars);
             result.addAll(newArrayList(findMergedRepeatableAnnotations(method, OhFixedPathVar.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
+                        val name = an.name();
                         val providerClass = an.valueProvider();
-                        return Pair.of(an.name(), OhFixedValueProvider.class == providerClass ?
-                                an.value() : getBeanOrReflect(providerClass).value(clazz, method));
+                        return Pair.of(name, OhFixedValueProvider.class == providerClass ?
+                                an.value() : getBeanOrReflect(providerClass).value(clazz, method, name));
                     }).collect(Collectors.toList()));
             return result;
         }
@@ -382,9 +384,10 @@ public final class OhMappingProxy extends OhRoot {
             val result = newArrayList(proxy.parameters);
             result.addAll(newArrayList(findMergedRepeatableAnnotations(method, OhFixedParameter.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
+                        val name = an.name();
                         val providerClass = an.valueProvider();
-                        return Pair.of(an.name(), (Object) (OhFixedValueProvider.class == providerClass ?
-                                an.value() : getBeanOrReflect(providerClass).value(clazz, method)));
+                        return Pair.of(name, (Object) (OhFixedValueProvider.class == providerClass ?
+                                an.value() : getBeanOrReflect(providerClass).value(clazz, method, name)));
                     }).collect(Collectors.toList()));
             return result;
         }
@@ -393,9 +396,10 @@ public final class OhMappingProxy extends OhRoot {
             val result = newArrayList(proxy.contexts);
             result.addAll(newArrayList(findMergedRepeatableAnnotations(method, OhFixedContext.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
+                        val name = an.name();
                         val providerClass = an.valueProvider();
-                        return Pair.of(an.name(), (Object) (OhFixedValueProvider.class == providerClass ?
-                                an.value() : getBeanOrReflect(providerClass).value(clazz, method)));
+                        return Pair.of(name, (Object) (OhFixedValueProvider.class == providerClass ?
+                                an.value() : getBeanOrReflect(providerClass).value(clazz, method, name)));
                     }).collect(Collectors.toList()));
             return result;
         }

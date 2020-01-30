@@ -187,36 +187,40 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
         static List<Pair<String, String>> checkFixedHeaders(Class clazz) {
             return newArrayList(findMergedRepeatableAnnotations(clazz, OhFixedHeader.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
+                        val name = an.name();
                         val providerClass = an.valueProvider();
-                        return Pair.of(an.name(), OhFixedValueProvider.class == providerClass ?
-                                an.value() : getBeanOrReflect(providerClass).value(clazz));
+                        return Pair.of(name, OhFixedValueProvider.class == providerClass ?
+                                an.value() : getBeanOrReflect(providerClass).value(clazz, name));
                     }).collect(Collectors.toList());
         }
 
         static List<Pair<String, String>> checkFixedPathVars(Class clazz) {
             return newArrayList(findMergedRepeatableAnnotations(clazz, OhFixedPathVar.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
+                        val name = an.name();
                         val providerClass = an.valueProvider();
-                        return Pair.of(an.name(), OhFixedValueProvider.class == providerClass ?
-                                an.value() : getBeanOrReflect(providerClass).value(clazz));
+                        return Pair.of(name, OhFixedValueProvider.class == providerClass ?
+                                an.value() : getBeanOrReflect(providerClass).value(clazz, name));
                     }).collect(Collectors.toList());
         }
 
         static List<Pair<String, Object>> checkFixedParameters(Class clazz) {
             return newArrayList(findMergedRepeatableAnnotations(clazz, OhFixedParameter.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
+                        val name = an.name();
                         val providerClass = an.valueProvider();
-                        return Pair.of(an.name(), (Object) (OhFixedValueProvider.class == providerClass ?
-                                an.value() : getBeanOrReflect(providerClass).value(clazz)));
+                        return Pair.of(name, (Object) (OhFixedValueProvider.class == providerClass ?
+                                an.value() : getBeanOrReflect(providerClass).value(clazz, name)));
                     }).collect(Collectors.toList());
         }
 
         static List<Pair<String, Object>> checkFixedContexts(Class clazz) {
             return newArrayList(findMergedRepeatableAnnotations(clazz, OhFixedContext.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
+                        val name = an.name();
                         val providerClass = an.valueProvider();
-                        return Pair.of(an.name(), (Object) (OhFixedValueProvider.class == providerClass ?
-                                an.value() : getBeanOrReflect(providerClass).value(clazz)));
+                        return Pair.of(name, (Object) (OhFixedValueProvider.class == providerClass ?
+                                an.value() : getBeanOrReflect(providerClass).value(clazz, name)));
                     }).collect(Collectors.toList());
         }
 

@@ -6,13 +6,13 @@ import java.lang.reflect.Method;
 
 public interface OhFixedValueProvider {
 
-    default String value(Class<?> clazz) {
+    default String value(Class<?> clazz, String name) {
         throw new OhException(this.getClass().getName()
-                + "#value(Class<?>) need be overwritten");
+                + "#value(Class<?>, String) need be overwritten");
     }
 
-    default String value(Class<?> clazz, Method method) {
+    default String value(Class<?> clazz, Method method, String name) {
         throw new OhException(this.getClass().getName()
-                + "#value(Class<?>, Method) need be overwritten");
+                + "#value(Class<?>, Method, String) need be overwritten");
     }
 }

@@ -69,12 +69,12 @@ public class OhPathVarTest {
     public static class P2Provider implements OhFixedValueProvider {
 
         @Override
-        public String value(Class<?> clazz) {
+        public String value(Class<?> clazz, String name) {
             return "V2";
         }
 
         @Override
-        public String value(Class<?> clazz, Method method) {
+        public String value(Class<?> clazz, Method method, String name) {
             return "V3";
         }
     }
