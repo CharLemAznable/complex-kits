@@ -37,7 +37,6 @@ import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static com.github.charlemaznable.core.lang.Str.isBlank;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.ACCEPT_CHARSET;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.CONTENT_TYPE;
-import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_CONTENT_FORMAT;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.log;
 
 public final class OhCall extends OhRoot {
@@ -206,8 +205,7 @@ public final class OhCall extends OhRoot {
         val requestMethod = this.requestMethod.toString();
         if (!HttpMethod.permitsRequestBody(requestMethod)) {
             requestBuilder.method(requestMethod, null);
-            val addQuery = DEFAULT_CONTENT_FORMAT
-                    .format(parameterMap, contextMap);
+            val addQuery = this.contentFormat.format(parameterMap, contextMap);
             if (isBlank(addQuery)) requestBuilder.url(requestUrl);
             else requestBuilder.url(requestUrl +
                     (requestUrl.contains("?") ? "&" : "?") + addQuery);
