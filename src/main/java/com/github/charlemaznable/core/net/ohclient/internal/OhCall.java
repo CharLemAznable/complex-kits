@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.net.ohclient.internal;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.github.charlemaznable.core.lang.Str;
+import com.github.charlemaznable.core.net.ohclient.OhReq;
 import com.github.charlemaznable.core.net.ohclient.param.OhContext;
 import com.github.charlemaznable.core.net.ohclient.param.OhHeader;
 import com.github.charlemaznable.core.net.ohclient.param.OhParameter;
@@ -155,7 +156,6 @@ public final class OhCall extends OhRoot {
                 "but Type is {} instead String.", argument.getClass());
     }
 
-    @SuppressWarnings("deprecation")
     private OkHttpClient buildOkHttpClient(OhMappingProxy proxy) {
         val sameProxy = this.proxy == proxy.proxy;
         val sameSSLSocketFactory = this.sslSocketFactory == proxy.sslSocketFactory;
@@ -164,12 +164,11 @@ public final class OhCall extends OhRoot {
         if (sameProxy && sameSSLSocketFactory && sameX509TrustManager
                 && sameHostnameVerifier) return proxy.okHttpClient;
 
-        val httpClientBuilder = new OkHttpClient.Builder().proxy(this.proxy);
-        notNullThen(this.sslSocketFactory, xx -> checkNull(this.x509TrustManager,
-                () -> httpClientBuilder.sslSocketFactory(this.sslSocketFactory),
-                yy -> httpClientBuilder.sslSocketFactory(this.sslSocketFactory, this.x509TrustManager)));
-        notNullThen(this.hostnameVerifier, httpClientBuilder::hostnameVerifier);
-        return httpClientBuilder.build();
+        return new OhReq().proxy(this.proxy)
+                .sslSocketFactory(this.sslSocketFactory)
+                .x509TrustManager(this.x509TrustManager)
+                .hostnameVerifier(this.hostnameVerifier)
+                .buildHttpClient();
     }
 
     private Request buildRequest(String url) {

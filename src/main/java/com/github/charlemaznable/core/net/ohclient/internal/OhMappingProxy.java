@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.net.ohclient.internal;
 
 import com.github.charlemaznable.core.net.ohclient.OhMapping;
 import com.github.charlemaznable.core.net.ohclient.OhMapping.UrlProvider;
+import com.github.charlemaznable.core.net.ohclient.OhReq;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigAcceptCharset;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat.ContentFormat;
@@ -325,7 +326,6 @@ public final class OhMappingProxy extends OhRoot {
                     : getBeanOrReflect(providerClass).hostnameVerifier(clazz, method);
         }
 
-        @SuppressWarnings("deprecation")
         static OkHttpClient buildOkHttpClient(OhMappingProxy mappingProxy, OhProxy proxy) {
             val sameProxy = mappingProxy.proxy == proxy.proxy;
             val sameSSLSocketFactory = mappingProxy.sslSocketFactory == proxy.sslSocketFactory;
@@ -334,12 +334,11 @@ public final class OhMappingProxy extends OhRoot {
             if (sameProxy && sameSSLSocketFactory && sameX509TrustManager
                     && sameHostnameVerifier) return proxy.okHttpClient;
 
-            val httpClientBuilder = new OkHttpClient.Builder().proxy(mappingProxy.proxy);
-            notNullThen(mappingProxy.sslSocketFactory, sslSocketFactory -> checkNull(mappingProxy.x509TrustManager,
-                    () -> httpClientBuilder.sslSocketFactory(mappingProxy.sslSocketFactory),
-                    xx -> httpClientBuilder.sslSocketFactory(mappingProxy.sslSocketFactory, mappingProxy.x509TrustManager)));
-            notNullThen(mappingProxy.hostnameVerifier, httpClientBuilder::hostnameVerifier);
-            return httpClientBuilder.build();
+            return new OhReq().proxy(mappingProxy.proxy)
+                    .sslSocketFactory(mappingProxy.sslSocketFactory)
+                    .x509TrustManager(mappingProxy.x509TrustManager)
+                    .hostnameVerifier(mappingProxy.hostnameVerifier)
+                    .buildHttpClient();
         }
 
         static Charset checkAcceptCharset(Method method, OhProxy proxy) {

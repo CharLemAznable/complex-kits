@@ -4,6 +4,7 @@ import com.github.charlemaznable.core.lang.LoadingCachee;
 import com.github.charlemaznable.core.net.ohclient.OhClient;
 import com.github.charlemaznable.core.net.ohclient.OhMapping;
 import com.github.charlemaznable.core.net.ohclient.OhMapping.UrlProvider;
+import com.github.charlemaznable.core.net.ohclient.OhReq;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigAcceptCharset;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat.ContentFormat;
@@ -164,14 +165,12 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
                     : getBeanOrReflect(providerClass).hostnameVerifier(clazz);
         }
 
-        @SuppressWarnings("deprecation")
         static OkHttpClient buildOkHttpClient(OhProxy proxy) {
-            val httpClientBuilder = new OkHttpClient.Builder().proxy(proxy.proxy);
-            notNullThen(proxy.sslSocketFactory, xx -> checkNull(proxy.x509TrustManager,
-                    () -> httpClientBuilder.sslSocketFactory(proxy.sslSocketFactory),
-                    yy -> httpClientBuilder.sslSocketFactory(proxy.sslSocketFactory, proxy.x509TrustManager)));
-            notNullThen(proxy.hostnameVerifier, httpClientBuilder::hostnameVerifier);
-            return httpClientBuilder.build();
+            return new OhReq().proxy(proxy.proxy)
+                    .sslSocketFactory(proxy.sslSocketFactory)
+                    .x509TrustManager(proxy.x509TrustManager)
+                    .hostnameVerifier(proxy.hostnameVerifier)
+                    .buildHttpClient();
         }
 
         static Charset checkAcceptCharset(Class clazz) {

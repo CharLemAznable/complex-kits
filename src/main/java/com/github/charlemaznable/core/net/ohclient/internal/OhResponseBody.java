@@ -10,7 +10,7 @@ import okio.BufferedSource;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-class OhResponseBody extends ResponseBody {
+public class OhResponseBody extends ResponseBody {
 
     private MediaType contentType;
     private long contentLength;
