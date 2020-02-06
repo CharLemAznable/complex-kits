@@ -8,6 +8,7 @@ import com.github.charlemaznable.core.net.ohclient.OhReq;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigAcceptCharset;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat.ContentFormat;
+import com.github.charlemaznable.core.net.ohclient.config.OhConfigIsolatedConnectionPool;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigProxy;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigProxy.ProxyProvider;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigRequestMethod;
@@ -57,6 +58,7 @@ import static com.github.charlemaznable.core.lang.Str.isNotBlank;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_ACCEPT_CHARSET;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_CONTENT_FORMAT;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_REQUEST_METHOD;
+import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.ohConnectionPool;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.ohSubstitutor;
 import static com.github.charlemaznable.core.spring.SpringContext.getBeanOrReflect;
 import static com.google.common.cache.CacheLoader.from;
@@ -84,7 +86,7 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
             this.x509TrustManager = Elf.checkX509TrustManager(this.ohClass, configSSL);
             this.hostnameVerifier = Elf.checkHostnameVerifier(this.ohClass, configSSL);
         }
-        this.connectionPool = new ConnectionPool();
+        this.connectionPool = Elf.checkConnectionPool(this.ohClass);
         this.okHttpClient = Elf.buildOkHttpClient(this);
 
         this.acceptCharset = Elf.checkAcceptCharset(this.ohClass);
@@ -165,6 +167,11 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
             val providerClass = configSSL.hostnameVerifierProvider();
             return HostnameVerifierProvider.class == providerClass ? null
                     : getBeanOrReflect(providerClass).hostnameVerifier(clazz);
+        }
+
+        static ConnectionPool checkConnectionPool(Class clazz) {
+            val configIsolated = findAnnotation(clazz, OhConfigIsolatedConnectionPool.class);
+            return checkNull(configIsolated, () -> ohConnectionPool, x -> new ConnectionPool());
         }
 
         static OkHttpClient buildOkHttpClient(OhProxy proxy) {

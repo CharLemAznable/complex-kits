@@ -6,6 +6,7 @@ import com.github.charlemaznable.core.net.ohclient.OhReq;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigAcceptCharset;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat.ContentFormat;
+import com.github.charlemaznable.core.net.ohclient.config.OhConfigIsolatedConnectionPool;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigProxy;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigProxy.ProxyProvider;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigRequestMethod;
@@ -25,6 +26,7 @@ import com.github.charlemaznable.core.net.ohclient.param.OhStatusSeriesMapping;
 import lombok.SneakyThrows;
 import lombok.val;
 import lombok.var;
+import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import okio.BufferedSource;
@@ -98,7 +100,7 @@ public final class OhMappingProxy extends OhRoot {
             this.x509TrustManager = proxy.x509TrustManager;
             this.hostnameVerifier = proxy.hostnameVerifier;
         }
-        this.connectionPool = proxy.connectionPool;
+        this.connectionPool = Elf.checkConnectionPool(this.ohMethod, proxy);
         this.okHttpClient = Elf.buildOkHttpClient(this, proxy);
 
         this.acceptCharset = Elf.checkAcceptCharset(this.ohMethod, proxy);
@@ -325,6 +327,11 @@ public final class OhMappingProxy extends OhRoot {
             val providerClass = configSSL.hostnameVerifierProvider();
             return HostnameVerifierProvider.class == providerClass ? null
                     : getBeanOrReflect(providerClass).hostnameVerifier(clazz, method);
+        }
+
+        static ConnectionPool checkConnectionPool(Method method, OhProxy proxy) {
+            val configIsolated = findAnnotation(method, OhConfigIsolatedConnectionPool.class);
+            return checkNull(configIsolated, () -> proxy.connectionPool, x -> new ConnectionPool());
         }
 
         static OkHttpClient buildOkHttpClient(OhMappingProxy mappingProxy, OhProxy proxy) {

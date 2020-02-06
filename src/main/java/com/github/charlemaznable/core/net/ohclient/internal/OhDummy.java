@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.net.ohclient.internal;
 
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import okhttp3.ConnectionPool;
 import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,12 +17,14 @@ import static java.util.concurrent.Executors.newCachedThreadPool;
 public class OhDummy {
 
     static final Logger log = LoggerFactory.getLogger("OhClient");
-    static StringSubstitutor ohSubstitutor;
-    static ExecutorService ohExecutorService;
+    static final StringSubstitutor ohSubstitutor;
+    static final ExecutorService ohExecutorService;
+    static final ConnectionPool ohConnectionPool;
 
     static {
         ohSubstitutor = classResourceAsSubstitutor("ohclient.env.props");
         ohExecutorService = newCachedThreadPool();
+        ohConnectionPool = new ConnectionPool();
     }
 
     @Override
