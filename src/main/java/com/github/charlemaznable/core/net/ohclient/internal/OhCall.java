@@ -62,6 +62,7 @@ public final class OhCall extends OhRoot {
         this.sslSocketFactory = proxy.sslSocketFactory;
         this.x509TrustManager = proxy.x509TrustManager;
         this.hostnameVerifier = proxy.hostnameVerifier;
+        this.connectionPool = proxy.connectionPool;
 
         this.acceptCharset = proxy.acceptCharset;
         this.contentFormat = proxy.contentFormat;
@@ -168,6 +169,7 @@ public final class OhCall extends OhRoot {
                 .sslSocketFactory(this.sslSocketFactory)
                 .x509TrustManager(this.x509TrustManager)
                 .hostnameVerifier(this.hostnameVerifier)
+                .connectionPool(this.connectionPool)
                 .buildHttpClient();
     }
 

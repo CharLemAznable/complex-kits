@@ -29,6 +29,7 @@ import com.google.common.cache.LoadingCache;
 import lombok.val;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
+import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
@@ -83,6 +84,7 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
             this.x509TrustManager = Elf.checkX509TrustManager(this.ohClass, configSSL);
             this.hostnameVerifier = Elf.checkHostnameVerifier(this.ohClass, configSSL);
         }
+        this.connectionPool = new ConnectionPool();
         this.okHttpClient = Elf.buildOkHttpClient(this);
 
         this.acceptCharset = Elf.checkAcceptCharset(this.ohClass);
@@ -170,6 +172,7 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
                     .sslSocketFactory(proxy.sslSocketFactory)
                     .x509TrustManager(proxy.x509TrustManager)
                     .hostnameVerifier(proxy.hostnameVerifier)
+                    .connectionPool(proxy.connectionPool)
                     .buildHttpClient();
         }
 

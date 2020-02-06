@@ -98,6 +98,7 @@ public final class OhMappingProxy extends OhRoot {
             this.x509TrustManager = proxy.x509TrustManager;
             this.hostnameVerifier = proxy.hostnameVerifier;
         }
+        this.connectionPool = proxy.connectionPool;
         this.okHttpClient = Elf.buildOkHttpClient(this, proxy);
 
         this.acceptCharset = Elf.checkAcceptCharset(this.ohMethod, proxy);
@@ -338,6 +339,7 @@ public final class OhMappingProxy extends OhRoot {
                     .sslSocketFactory(mappingProxy.sslSocketFactory)
                     .x509TrustManager(mappingProxy.x509TrustManager)
                     .hostnameVerifier(mappingProxy.hostnameVerifier)
+                    .connectionPool(mappingProxy.connectionPool)
                     .buildHttpClient();
         }
 

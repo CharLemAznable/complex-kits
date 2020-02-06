@@ -8,6 +8,7 @@ import com.github.charlemaznable.core.net.ohclient.internal.OhResponseBody;
 import com.github.charlemaznable.core.net.ohclient.internal.ResponseBodyExtractor;
 import lombok.SneakyThrows;
 import lombok.val;
+import okhttp3.ConnectionPool;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -43,6 +44,7 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
 public class OhReq {
 
     private static ExecutorService futureExecutorService = newCachedThreadPool();
+    private static ConnectionPool globalConnectionPool = new ConnectionPool();
 
     private String baseUrl;
 
@@ -50,6 +52,7 @@ public class OhReq {
     private SSLSocketFactory sslSocketFactory;
     private X509TrustManager x509TrustManager;
     private HostnameVerifier hostnameVerifier;
+    private ConnectionPool connectionPool;
 
     private String reqPath;
 
@@ -88,6 +91,11 @@ public class OhReq {
 
     public OhReq hostnameVerifier(HostnameVerifier hostnameVerifier) {
         this.hostnameVerifier = hostnameVerifier;
+        return this;
+    }
+
+    public OhReq connectionPool(ConnectionPool connectionPool) {
+        this.connectionPool = connectionPool;
         return this;
     }
 
@@ -166,6 +174,7 @@ public class OhReq {
                 () -> httpClientBuilder.sslSocketFactory(this.sslSocketFactory),
                 yy -> httpClientBuilder.sslSocketFactory(this.sslSocketFactory, this.x509TrustManager)));
         notNullThen(this.hostnameVerifier, httpClientBuilder::hostnameVerifier);
+        httpClientBuilder.connectionPool(nullThen(this.connectionPool, () -> globalConnectionPool));
         return httpClientBuilder.build();
     }
 

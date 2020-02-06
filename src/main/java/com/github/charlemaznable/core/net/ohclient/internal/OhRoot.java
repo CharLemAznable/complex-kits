@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.net.ohclient.internal;
 
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat.ContentFormat;
 import com.github.charlemaznable.core.net.ohclient.exception.OhError;
+import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ class OhRoot {
     SSLSocketFactory sslSocketFactory;
     X509TrustManager x509TrustManager;
     HostnameVerifier hostnameVerifier;
+    ConnectionPool connectionPool;
     OkHttpClient okHttpClient;
 
     Charset acceptCharset;
