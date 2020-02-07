@@ -7,6 +7,7 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import javax.annotation.Nonnull;
 import java.util.function.Function;
 
 @RequiredArgsConstructor
@@ -15,7 +16,6 @@ public class SpringFactoryBean implements FactoryBean, ApplicationContextAware {
     private final Function<Class, Object> factory;
     @Setter
     private Class xyzInterface;
-    @Setter
     private ApplicationContext applicationContext;
 
     @Override
@@ -33,5 +33,11 @@ public class SpringFactoryBean implements FactoryBean, ApplicationContextAware {
     @Override
     public boolean isSingleton() {
         return true;
+    }
+
+    @Override
+    public void setApplicationContext(@Nonnull ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+        SpringContext.updateApplicationContext(applicationContext);
     }
 }
