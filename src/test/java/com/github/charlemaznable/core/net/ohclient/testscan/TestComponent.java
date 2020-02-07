@@ -6,6 +6,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class TestComponent {
 
-    @Autowired
+    @Autowired(required = false)
     public TestHttpClient testHttpClient;
 }
