@@ -4,7 +4,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat.FormContentFormat;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat.JsonContentFormat;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat.XmlContentFormat;
+import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat.TextXmlContentFormat;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigRequestMethod;
 import com.github.charlemaznable.core.net.ohclient.param.OhFixedParameter;
 import com.github.charlemaznable.core.net.ohclient.param.OhFixedPathVar;
@@ -219,7 +219,7 @@ public class OhParameterTest {
         @OhFixedParameter(name = "T3", value = "V3")
         String sampleMapping();
 
-        @OhConfigContentFormat(XmlContentFormat.class)
+        @OhConfigContentFormat(TextXmlContentFormat.class)
         @OhFixedParameter(name = "T2", valueProvider = T2Provider.class)
         @OhFixedParameter(name = "T3", value = "V3")
         String sampleParameters(@OhParameter("T3") String v3,

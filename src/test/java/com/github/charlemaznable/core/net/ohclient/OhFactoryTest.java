@@ -4,7 +4,7 @@ import com.github.charlemaznable.core.net.ohclient.config.OhConfigAcceptCharset;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat.FormContentFormat;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat.JsonContentFormat;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat.XmlContentFormat;
+import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat.ApplicationXmlContentFormat;
 import com.github.charlemaznable.core.net.ohclient.config.OhConfigRequestMethod;
 import com.github.charlemaznable.core.net.ohclient.exception.OhException;
 import lombok.SneakyThrows;
@@ -202,7 +202,7 @@ public class OhFactoryTest {
         @OhConfigContentFormat(JsonContentFormat.class)
         String sample2();
 
-        @OhConfigContentFormat(XmlContentFormat.class)
+        @OhConfigContentFormat(ApplicationXmlContentFormat.class)
         String sample3();
     }
 

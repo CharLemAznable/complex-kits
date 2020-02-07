@@ -22,6 +22,7 @@ import static java.util.Objects.nonNull;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.springframework.http.MediaType.TEXT_XML_VALUE;
 
 @Documented
 @Inherited
@@ -70,19 +71,30 @@ public @interface OhConfigContentFormat {
         }
     }
 
-    class XmlContentFormat implements ContentFormat {
+    abstract class XmlContentFormat implements ContentFormat {
 
         public static final String XML_ROOT_NAME = "XML_ROOT_NAME";
-
-        @Override
-        public String contentType() {
-            return APPLICATION_XML_VALUE;
-        }
 
         @Override
         public String format(@Nonnull final Map<String, Object> parameterMap,
                              @Nonnull final Map<String, Object> contextMap) {
             return xml(newHashMap(parameterMap), getStr(contextMap, XML_ROOT_NAME, "xml"));
+        }
+    }
+
+    class ApplicationXmlContentFormat extends XmlContentFormat {
+
+        @Override
+        public String contentType() {
+            return APPLICATION_XML_VALUE;
+        }
+    }
+
+    class TextXmlContentFormat extends XmlContentFormat {
+
+        @Override
+        public String contentType() {
+            return TEXT_XML_VALUE;
         }
     }
 }
