@@ -1,17 +1,15 @@
 package com.github.charlemaznable.core.config;
 
 import com.github.charlemaznable.core.config.impl.ConfigBuilder;
-import com.github.charlemaznable.core.config.impl.IniConfigable;
-import com.github.charlemaznable.core.config.impl.PropertiesConfigable;
-import com.github.charlemaznable.core.config.impl.PropsConfigable;
+import com.github.charlemaznable.core.config.impl.PropsConfigLoader;
 import lombok.val;
 import lombok.var;
 
 import java.util.List;
 import java.util.Properties;
+import java.util.ServiceLoader;
 
 import static com.github.charlemaznable.core.lang.ClzPath.classResource;
-import static com.github.charlemaznable.core.spring.ClzResolver.getResources;
 
 public final class Config {
 
@@ -35,24 +33,18 @@ public final class Config {
         var basePackage = defConfigDir;
         val envURL = classResource("envspace.props");
         if (envURL != null) {
-            val envSpaceConfig = new PropsConfigable(envURL);
+            val envSpaceConfig = new PropsConfigLoader().loadConfigable(envURL);
             basePackage = envSpaceConfig.getStr(configKey, defConfigDir);
             configBuilder.addConfig(envSpaceConfig);
         }
 
-        val propertiesURL = getResources(basePackage, "properties");
-        for (val propertyURL : propertiesURL) {
-            configBuilder.addConfig(new PropertiesConfigable(propertyURL));
+        val configLoaders = ServiceLoader.load(ConfigLoader.class);
+        for (val configLoader : configLoaders) {
+            val resources = configLoader.loadResources(basePackage);
+            for (val resource : resources) {
+                configBuilder.addConfig(configLoader.loadConfigable(resource));
+            }
         }
-        val propsURL = getResources(basePackage, "props");
-        for (val propURL : propsURL) {
-            configBuilder.addConfig(new PropsConfigable(propURL));
-        }
-        val inisURL = getResources(basePackage, "ini");
-        for (val iniURL : inisURL) {
-            configBuilder.addConfig(new IniConfigable(iniURL));
-        }
-
         return configBuilder.buildConfig();
     }
 
