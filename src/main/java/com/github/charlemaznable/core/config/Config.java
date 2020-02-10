@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Properties;
 
 import static com.github.charlemaznable.core.lang.ClzPath.classResource;
-import static com.github.charlemaznable.core.lang.ClzPath.classResources;
+import static com.github.charlemaznable.core.spring.ClzResolver.getResources;
 
 public final class Config {
 
@@ -40,15 +40,15 @@ public final class Config {
             configBuilder.addConfig(envSpaceConfig);
         }
 
-        val propertiesURL = classResources(basePackage, "properties");
+        val propertiesURL = getResources(basePackage, "properties");
         for (val propertyURL : propertiesURL) {
             configBuilder.addConfig(new PropertiesConfigable(propertyURL));
         }
-        val propsURL = classResources(basePackage, "props");
+        val propsURL = getResources(basePackage, "props");
         for (val propURL : propsURL) {
             configBuilder.addConfig(new PropsConfigable(propURL));
         }
-        val inisURL = classResources(basePackage, "ini");
+        val inisURL = getResources(basePackage, "ini");
         for (val iniURL : inisURL) {
             configBuilder.addConfig(new IniConfigable(iniURL));
         }

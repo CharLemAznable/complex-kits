@@ -8,10 +8,15 @@ import lombok.val;
 import lombok.var;
 import org.junit.jupiter.api.Test;
 
+import java.net.URL;
+
 import static com.github.charlemaznable.core.spring.ClzResolver.getAnnotatedClasses;
 import static com.github.charlemaznable.core.spring.ClzResolver.getClasses;
+import static com.github.charlemaznable.core.spring.ClzResolver.getResources;
 import static com.github.charlemaznable.core.spring.ClzResolver.getSubClasses;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ClzResolverTest {
 
@@ -38,5 +43,11 @@ public class ClzResolverTest {
         assertEquals(1, annotatedClasses.size());
         val annotatedClass = annotatedClasses.get(0);
         assertEquals(TestSpringContext.class, annotatedClass);
+    }
+
+    @Test
+    public void testGetResources() {
+        assertNotEquals(0, getResources("com/github/charlemaznable/core/lang", "class").toArray(new URL[0]).length);
+        assertTrue(getResources("", "class").toArray(new URL[0]).length > 0);
     }
 }
