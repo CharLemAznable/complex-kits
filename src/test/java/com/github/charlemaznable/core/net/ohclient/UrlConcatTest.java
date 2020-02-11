@@ -1,9 +1,9 @@
 package com.github.charlemaznable.core.net.ohclient;
 
+import com.github.charlemaznable.core.net.common.DefaultErrorMappingDisabled;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.Mapping.UrlProvider;
-import com.github.charlemaznable.core.net.common.DefaultErrorMappingDisabled;
 import com.github.charlemaznable.core.net.common.ProviderException;
 import lombok.SneakyThrows;
 import lombok.val;

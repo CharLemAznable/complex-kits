@@ -1,8 +1,8 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.FixedPathVar;
 import com.github.charlemaznable.core.net.common.FixedValueProvider;
+import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.PathVar;
 import lombok.SneakyThrows;

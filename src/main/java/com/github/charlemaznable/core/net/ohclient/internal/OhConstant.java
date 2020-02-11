@@ -1,8 +1,8 @@
 package com.github.charlemaznable.core.net.ohclient.internal;
 
-import com.github.charlemaznable.core.net.common.HttpMethod;
 import com.github.charlemaznable.core.net.common.ContentFormat.ContentFormatter;
 import com.github.charlemaznable.core.net.common.ContentFormat.FormContentFormatter;
+import com.github.charlemaznable.core.net.common.HttpMethod;
 
 import java.nio.charset.Charset;
 

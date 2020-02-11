@@ -1,20 +1,20 @@
 package com.github.charlemaznable.core.net.ohclient;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.github.charlemaznable.core.net.common.HttpStatus;
-import com.github.charlemaznable.core.net.common.HttpMethod;
 import com.github.charlemaznable.core.net.common.ContentFormat;
 import com.github.charlemaznable.core.net.common.ContentFormat.FormContentFormatter;
 import com.github.charlemaznable.core.net.common.ContentFormat.JsonContentFormatter;
 import com.github.charlemaznable.core.net.common.ContentFormat.TextXmlContentFormatter;
-import com.github.charlemaznable.core.net.common.Mapping;
-import com.github.charlemaznable.core.net.common.RequestMethod;
 import com.github.charlemaznable.core.net.common.FixedParameter;
 import com.github.charlemaznable.core.net.common.FixedPathVar;
 import com.github.charlemaznable.core.net.common.FixedValueProvider;
+import com.github.charlemaznable.core.net.common.HttpMethod;
+import com.github.charlemaznable.core.net.common.HttpStatus;
+import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.Parameter;
 import com.github.charlemaznable.core.net.common.ParameterBundle;
 import com.github.charlemaznable.core.net.common.RequestBodyRaw;
+import com.github.charlemaznable.core.net.common.RequestMethod;
 import com.google.common.base.Splitter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

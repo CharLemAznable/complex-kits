@@ -1,12 +1,12 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.net.common.HttpStatus;
-import com.github.charlemaznable.core.net.common.HttpMethod;
 import com.github.charlemaznable.core.net.common.AcceptCharset;
 import com.github.charlemaznable.core.net.common.ContentFormat;
 import com.github.charlemaznable.core.net.common.ContentFormat.ApplicationXmlContentFormatter;
 import com.github.charlemaznable.core.net.common.ContentFormat.FormContentFormatter;
 import com.github.charlemaznable.core.net.common.ContentFormat.JsonContentFormatter;
+import com.github.charlemaznable.core.net.common.HttpMethod;
+import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.RequestMethod;
 import lombok.SneakyThrows;
