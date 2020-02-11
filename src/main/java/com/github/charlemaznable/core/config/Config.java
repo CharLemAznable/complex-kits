@@ -13,13 +13,19 @@ import static com.github.charlemaznable.core.lang.ClzPath.classResource;
 
 public final class Config {
 
+    private static ServiceLoader<ConfigLoader> configLoaders;
     private static Configable impl;
 
     static {
+        loadConfigLoaders();
         loadConfigImplementation();
     }
 
     private Config() {}
+
+    private static void loadConfigLoaders() {
+        configLoaders = ServiceLoader.load(ConfigLoader.class);
+    }
 
     private static void loadConfigImplementation() {
         val defConfig = createConfigable("defconfigdir", "defconfig", null);
@@ -38,7 +44,6 @@ public final class Config {
             configBuilder.addConfig(envSpaceConfig);
         }
 
-        val configLoaders = ServiceLoader.load(ConfigLoader.class);
         for (val configLoader : configLoaders) {
             val resources = configLoader.loadResources(basePackage);
             for (val resource : resources) {
