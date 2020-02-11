@@ -1,9 +1,10 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigProxy;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigProxy.ProxyProvider;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigProxyDisabled;
-import com.github.charlemaznable.core.net.ohclient.exception.OhException;
+import com.github.charlemaznable.core.net.common.ClientProxy;
+import com.github.charlemaznable.core.net.common.ClientProxy.ProxyProvider;
+import com.github.charlemaznable.core.net.common.ClientProxyDisabled;
+import com.github.charlemaznable.core.net.common.Mapping;
+import com.github.charlemaznable.core.net.common.ProviderException;
 import lombok.SneakyThrows;
 import lombok.val;
 import okhttp3.OkHttpClient;
@@ -95,32 +96,32 @@ public class ProxyProviderTest {
     @SneakyThrows
     @Test
     public void testErrorProxy() {
-        assertThrows(OhException.class, () ->
+        assertThrows(ProviderException.class, () ->
                 getClient(ErrorProxyHttpClient1.class));
 
         val httpClient = getClient(ErrorProxyHttpClient2.class);
-        assertThrows(OhException.class, httpClient::sample);
+        assertThrows(ProviderException.class, httpClient::sample);
     }
 
     @OhClient
-    @OhMapping("${root}:41110")
-    @OhConfigProxy(ip = "127.0.0.1", port = 41111)
+    @Mapping("${root}:41110")
+    @ClientProxy(ip = "127.0.0.1", port = 41111)
     public interface ProxyPlainHttpClient {
 
         String sample();
     }
 
     @OhClient
-    @OhMapping("${root}:41112")
-    @OhConfigProxy(proxyProvider = TestProxyProvider.class)
+    @Mapping("${root}:41112")
+    @ClientProxy(proxyProvider = TestProxyProvider.class)
     public interface ProxyProviderHttpClient {
 
         String sample();
     }
 
     @OhClient
-    @OhMapping("${root}:41114")
-    @OhConfigProxy(ip = "127.0.0.1", port = 41115)
+    @Mapping("${root}:41114")
+    @ClientProxy(ip = "127.0.0.1", port = 41115)
     public interface ProxyParamHttpClient {
 
         String sample(Proxy proxy);
@@ -130,20 +131,20 @@ public class ProxyProviderTest {
     @Inherited
     @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
     @Retention(RetentionPolicy.RUNTIME)
-    @OhConfigProxyDisabled
+    @ClientProxyDisabled
     public @interface Disabled {}
 
     @OhClient
-    @OhMapping("${root}:41116")
-    @OhConfigProxy(proxyProvider = MethodProxyProvider.class)
+    @Mapping("${root}:41116")
+    @ClientProxy(proxyProvider = MethodProxyProvider.class)
     public interface MethodProxyHttpClient {
 
         String sampleDefault();
 
-        @OhConfigProxy(ip = "127.0.0.1", port = 41118)
+        @ClientProxy(ip = "127.0.0.1", port = 41118)
         String samplePlain();
 
-        @OhConfigProxy(proxyProvider = MethodProxyProvider.class)
+        @ClientProxy(proxyProvider = MethodProxyProvider.class)
         String sampleProvider();
 
         @Disabled
@@ -151,16 +152,16 @@ public class ProxyProviderTest {
     }
 
     @OhClient
-    @OhMapping("${root}:41119")
-    @OhConfigProxy(proxyProvider = ErrorProxyProvider.class)
+    @Mapping("${root}:41119")
+    @ClientProxy(proxyProvider = ErrorProxyProvider.class)
     public interface ErrorProxyHttpClient1 {}
 
     @OhClient
-    @OhMapping("${root}:41119")
-    @OhConfigProxy(proxyProvider = NoErrorProxyProvider.class)
+    @Mapping("${root}:41119")
+    @ClientProxy(proxyProvider = NoErrorProxyProvider.class)
     public interface ErrorProxyHttpClient2 {
 
-        @OhConfigProxy(proxyProvider = ErrorProxyProvider.class)
+        @ClientProxy(proxyProvider = ErrorProxyProvider.class)
         String sample();
     }
 

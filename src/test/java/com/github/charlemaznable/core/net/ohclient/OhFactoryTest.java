@@ -1,12 +1,14 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigAcceptCharset;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat.FormContentFormat;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat.JsonContentFormat;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat.ApplicationXmlContentFormat;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigRequestMethod;
-import com.github.charlemaznable.core.net.ohclient.exception.OhException;
+import com.github.charlemaznable.core.net.common.HttpStatus;
+import com.github.charlemaznable.core.net.common.HttpMethod;
+import com.github.charlemaznable.core.net.common.AcceptCharset;
+import com.github.charlemaznable.core.net.common.ContentFormat;
+import com.github.charlemaznable.core.net.common.ContentFormat.ApplicationXmlContentFormatter;
+import com.github.charlemaznable.core.net.common.ContentFormat.FormContentFormatter;
+import com.github.charlemaznable.core.net.common.ContentFormat.JsonContentFormatter;
+import com.github.charlemaznable.core.net.common.Mapping;
+import com.github.charlemaznable.core.net.common.RequestMethod;
 import lombok.SneakyThrows;
 import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
@@ -15,12 +17,13 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.joor.ReflectException;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import static com.github.charlemaznable.core.net.ohclient.OhFactory.getClient;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.ACCEPT_CHARSET;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.CONTENT_TYPE;
+import static com.google.common.net.MediaType.APPLICATION_XML_UTF_8;
+import static com.google.common.net.MediaType.FORM_DATA;
+import static com.google.common.net.MediaType.JSON_UTF_8;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.joor.Reflect.onClass;
@@ -28,9 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 
 public class OhFactoryTest {
 
@@ -86,17 +86,17 @@ public class OhFactoryTest {
                 switch (request.getPath()) {
                     case "/sample":
                         val contentType = request.getHeader(CONTENT_TYPE);
-                        assertTrue(contentType.startsWith(APPLICATION_FORM_URLENCODED_VALUE));
+                        assertTrue(contentType.startsWith(FORM_DATA.toString()));
                         val bodyString = request.getBody().readUtf8();
                         return new MockResponse().setBody(bodyString);
                     case "/sample2":
                         val contentType2 = request.getHeader(CONTENT_TYPE);
-                        assertTrue(contentType2.startsWith(APPLICATION_JSON_VALUE));
+                        assertTrue(contentType2.startsWith(JSON_UTF_8.toString()));
                         val bodyString2 = request.getBody().readUtf8();
                         return new MockResponse().setBody(bodyString2);
                     case "/sample3":
                         val contentType3 = request.getHeader(CONTENT_TYPE);
-                        assertTrue(contentType3.startsWith(APPLICATION_XML_VALUE));
+                        assertTrue(contentType3.startsWith(APPLICATION_XML_UTF_8.toString()));
                         val bodyString3 = request.getBody().readUtf8();
                         return new MockResponse().setBody(bodyString3);
                 }
@@ -180,44 +180,44 @@ public class OhFactoryTest {
         mockWebServer.shutdown();
     }
 
-    @OhConfigAcceptCharset("ISO-8859-1")
-    @OhMapping("${root}:41130")
+    @AcceptCharset("ISO-8859-1")
+    @Mapping("${root}:41130")
     @OhClient
     public interface AcceptCharsetHttpClient {
 
         String sample();
 
-        @OhConfigAcceptCharset("UTF-8")
+        @AcceptCharset("UTF-8")
         String sample2();
     }
 
-    @OhConfigRequestMethod(RequestMethod.POST)
-    @OhConfigContentFormat(FormContentFormat.class)
-    @OhMapping("${root}:41131")
+    @RequestMethod(HttpMethod.POST)
+    @ContentFormat(FormContentFormatter.class)
+    @Mapping("${root}:41131")
     @OhClient
     public interface ContentFormatHttpClient {
 
         String sample();
 
-        @OhConfigContentFormat(JsonContentFormat.class)
+        @ContentFormat(JsonContentFormatter.class)
         String sample2();
 
-        @OhConfigContentFormat(ApplicationXmlContentFormat.class)
+        @ContentFormat(ApplicationXmlContentFormatter.class)
         String sample3();
     }
 
-    @OhConfigRequestMethod(RequestMethod.POST)
-    @OhMapping("${root}:41132")
+    @RequestMethod(HttpMethod.POST)
+    @Mapping("${root}:41132")
     @OhClient
     public interface RequestMethodHttpClient {
 
         String sample();
 
-        @OhConfigRequestMethod(RequestMethod.GET)
+        @RequestMethod(HttpMethod.GET)
         String sample2();
     }
 
-    @OhMapping("${root}:41133")
+    @Mapping("${root}:41133")
     @OhClient
     public interface BaseHttpClient {}
 

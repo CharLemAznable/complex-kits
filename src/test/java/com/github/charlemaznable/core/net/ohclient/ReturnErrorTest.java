@@ -1,6 +1,7 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.net.ohclient.exception.OhException;
+import com.github.charlemaznable.core.net.common.HttpStatus;
+import com.github.charlemaznable.core.net.common.Mapping;
 import lombok.SneakyThrows;
 import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
@@ -10,7 +11,6 @@ import okhttp3.mockwebserver.RecordedRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Map;
@@ -68,7 +68,7 @@ public class ReturnErrorTest {
     }
 
     @OhClient
-    @OhMapping("${root}:41196")
+    @Mapping("${root}:41196")
     public interface ErrorHttpClient {
 
         Future sampleFuture();

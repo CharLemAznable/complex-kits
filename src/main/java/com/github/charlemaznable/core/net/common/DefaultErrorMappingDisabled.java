@@ -1,6 +1,4 @@
-package com.github.charlemaznable.core.net.ohclient.testscan;
-
-import com.github.charlemaznable.core.net.common.Mapping;
+package com.github.charlemaznable.core.net.common;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -13,6 +11,5 @@ import java.lang.annotation.Target;
 @Inherited
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Mapping("${root}:41102")
-public @interface TestClientMapping {
+public @interface DefaultErrorMappingDisabled {
 }

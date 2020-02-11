@@ -2,13 +2,13 @@ package com.github.charlemaznable.core.net.ohclient.internal;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.github.charlemaznable.core.lang.Str;
+import com.github.charlemaznable.core.net.common.RequestBodyRaw;
 import com.github.charlemaznable.core.net.ohclient.OhReq;
-import com.github.charlemaznable.core.net.ohclient.param.OhContext;
-import com.github.charlemaznable.core.net.ohclient.param.OhHeader;
-import com.github.charlemaznable.core.net.ohclient.param.OhParameter;
-import com.github.charlemaznable.core.net.ohclient.param.OhParameterBundle;
-import com.github.charlemaznable.core.net.ohclient.param.OhPathVar;
-import com.github.charlemaznable.core.net.ohclient.param.OhRequestBodyRaw;
+import com.github.charlemaznable.core.net.common.Context;
+import com.github.charlemaznable.core.net.common.Header;
+import com.github.charlemaznable.core.net.common.Parameter;
+import com.github.charlemaznable.core.net.common.ParameterBundle;
+import com.github.charlemaznable.core.net.common.PathVar;
 import lombok.SneakyThrows;
 import lombok.val;
 import okhttp3.MediaType;
@@ -46,7 +46,7 @@ public final class OhCall extends OhRoot {
     Request request;
 
     OhCall(OhMappingProxy proxy, Object[] args) {
-        initialByProxy(proxy);
+        initial(proxy);
         processArguments(proxy.ohMethod, args);
         this.okHttpClient = buildOkHttpClient(proxy);
         this.request = buildRequest(proxy.requestUrl);
@@ -57,16 +57,16 @@ public final class OhCall extends OhRoot {
         return this.okHttpClient.newCall(this.request).execute();
     }
 
-    private void initialByProxy(OhMappingProxy proxy) {
-        this.proxy = proxy.proxy;
+    private void initial(OhMappingProxy proxy) {
+        this.clientProxy = proxy.clientProxy;
         this.sslSocketFactory = proxy.sslSocketFactory;
         this.x509TrustManager = proxy.x509TrustManager;
         this.hostnameVerifier = proxy.hostnameVerifier;
         this.connectionPool = proxy.connectionPool;
 
         this.acceptCharset = proxy.acceptCharset;
-        this.contentFormat = proxy.contentFormat;
-        this.requestMethod = proxy.requestMethod;
+        this.contentFormatter = proxy.contentFormatter;
+        this.httpMethod = proxy.httpMethod;
         this.headers = newArrayList(proxy.headers);
         this.pathVars = newArrayList(proxy.pathVars);
         this.parameters = newArrayList(proxy.parameters);
@@ -89,7 +89,7 @@ public final class OhCall extends OhRoot {
 
     private boolean processParameterType(Object argument, Class parameterType) {
         if (Proxy.class.isAssignableFrom(parameterType)) {
-            this.proxy = (Proxy) argument;
+            this.clientProxy = (Proxy) argument;
         } else if (SSLSocketFactory.class.isAssignableFrom(parameterType)) {
             this.sslSocketFactory = (SSLSocketFactory) argument;
         } else if (X509TrustManager.class.isAssignableFrom(parameterType)) {
@@ -104,41 +104,41 @@ public final class OhCall extends OhRoot {
 
     private void processParameterAnnotations(Object argument, Annotation[] annotations) {
         for (Annotation annotation : annotations) {
-            if (annotation instanceof OhHeader) {
-                processOhHeader(argument, (OhHeader) annotation);
-            } else if (annotation instanceof OhPathVar) {
-                processOhPathVar(argument, (OhPathVar) annotation);
-            } else if (annotation instanceof OhParameter) {
-                processOhParameter(argument, (OhParameter) annotation);
-            } else if (annotation instanceof OhContext) {
-                processOhContext(argument, (OhContext) annotation);
-            } else if (annotation instanceof OhParameterBundle) {
-                processOhParameterBundle(argument);
-            } else if (annotation instanceof OhRequestBodyRaw) {
-                processOhRequestBodyRaw(argument);
+            if (annotation instanceof Header) {
+                processHeader(argument, (Header) annotation);
+            } else if (annotation instanceof PathVar) {
+                processPathVar(argument, (PathVar) annotation);
+            } else if (annotation instanceof Parameter) {
+                processParameter(argument, (Parameter) annotation);
+            } else if (annotation instanceof Context) {
+                processContext(argument, (Context) annotation);
+            } else if (annotation instanceof ParameterBundle) {
+                processParameterBundle(argument);
+            } else if (annotation instanceof RequestBodyRaw) {
+                processRequestBodyRaw(argument);
             }
         }
     }
 
-    private void processOhHeader(Object argument, OhHeader header) {
+    private void processHeader(Object argument, Header header) {
         this.headers.add(Pair.of(header.value(),
                 notNullThen(argument, Str::toStr)));
     }
 
-    private void processOhPathVar(Object argument, OhPathVar pathVar) {
+    private void processPathVar(Object argument, PathVar pathVar) {
         this.pathVars.add(Pair.of(pathVar.value(),
                 notNullThen(argument, Str::toStr)));
     }
 
-    private void processOhParameter(Object argument, OhParameter parameter) {
+    private void processParameter(Object argument, Parameter parameter) {
         this.parameters.add(Pair.of(parameter.value(), argument));
     }
 
-    private void processOhContext(Object argument, OhContext context) {
+    private void processContext(Object argument, Context context) {
         this.contexts.add(Pair.of(context.value(), argument));
     }
 
-    private void processOhParameterBundle(Object argument) {
+    private void processParameterBundle(Object argument) {
         if (null == argument) return;
         Map<String, Object> beanDesc = unJson(toJSONString(
                 argument, SerializerFeature.WriteMapNullValue));
@@ -147,25 +147,25 @@ public final class OhCall extends OhRoot {
         }
     }
 
-    private void processOhRequestBodyRaw(Object argument) {
+    private void processRequestBodyRaw(Object argument) {
         if (null == argument || (argument instanceof String)) {
             // OhRequestBodyRaw参数传值null时, 则继续使用parameters构造请求
             this.requestBodyRaw = (String) argument;
             return;
         }
-        log.warn("Argument annotated with @OhRequestBodyRaw, " +
+        log.warn("Argument annotated with @RequestBodyRaw, " +
                 "but Type is {} instead String.", argument.getClass());
     }
 
     private OkHttpClient buildOkHttpClient(OhMappingProxy proxy) {
-        val sameProxy = this.proxy == proxy.proxy;
+        val sameClientProxy = this.clientProxy == proxy.clientProxy;
         val sameSSLSocketFactory = this.sslSocketFactory == proxy.sslSocketFactory;
         val sameX509TrustManager = this.x509TrustManager == proxy.x509TrustManager;
         val sameHostnameVerifier = this.hostnameVerifier == proxy.hostnameVerifier;
-        if (sameProxy && sameSSLSocketFactory && sameX509TrustManager
+        if (sameClientProxy && sameSSLSocketFactory && sameX509TrustManager
                 && sameHostnameVerifier) return proxy.okHttpClient;
 
-        return new OhReq().proxy(this.proxy)
+        return new OhReq().clientProxy(this.clientProxy)
                 .sslSocketFactory(this.sslSocketFactory)
                 .x509TrustManager(this.x509TrustManager)
                 .hostnameVerifier(this.hostnameVerifier)
@@ -178,7 +178,7 @@ public final class OhCall extends OhRoot {
 
         val acceptCharsetName = this.acceptCharset.name();
         requestBuilder.header(ACCEPT_CHARSET, acceptCharsetName);
-        val contentType = this.contentFormat.contentType();
+        val contentType = this.contentFormatter.contentType();
         requestBuilder.header(CONTENT_TYPE, contentType);
         for (val header : this.headers) {
             checkNull(header.getValue(),
@@ -203,16 +203,16 @@ public final class OhCall extends OhRoot {
             contextMap.put(context.getKey(), context.getValue());
         }
 
-        val requestMethod = this.requestMethod.toString();
+        val requestMethod = this.httpMethod.toString();
         if (!HttpMethod.permitsRequestBody(requestMethod)) {
             requestBuilder.method(requestMethod, null);
-            val addQuery = this.contentFormat.format(parameterMap, contextMap);
+            val addQuery = this.contentFormatter.format(parameterMap, contextMap);
             if (isBlank(addQuery)) requestBuilder.url(requestUrl);
             else requestBuilder.url(requestUrl +
                     (requestUrl.contains("?") ? "&" : "?") + addQuery);
         } else {
             val content = nullThen(this.requestBodyRaw, () ->
-                    this.contentFormat.format(parameterMap, contextMap));
+                    this.contentFormatter.format(parameterMap, contextMap));
             requestBuilder.method(requestMethod, RequestBody.create(
                     MediaType.parse(contentType), content));
             requestBuilder.url(requestUrl);

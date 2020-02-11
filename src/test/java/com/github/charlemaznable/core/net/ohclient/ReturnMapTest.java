@@ -1,5 +1,7 @@
 package com.github.charlemaznable.core.net.ohclient;
 
+import com.github.charlemaznable.core.net.common.HttpStatus;
+import com.github.charlemaznable.core.net.common.Mapping;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +13,6 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import java.time.Duration;
 import java.util.Map;
@@ -76,7 +77,7 @@ public class ReturnMapTest {
     }
 
     @OhClient
-    @OhMapping("${root}:41193")
+    @Mapping("${root}:41193")
     public interface MapHttpClient {
 
         Map<String, Object> sampleMap();

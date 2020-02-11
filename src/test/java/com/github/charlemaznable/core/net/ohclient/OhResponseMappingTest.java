@@ -1,9 +1,11 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.net.ohclient.config.OhDefaultErrorMappingDisabled;
-import com.github.charlemaznable.core.net.ohclient.exception.OhError;
-import com.github.charlemaznable.core.net.ohclient.param.OhStatusMapping;
-import com.github.charlemaznable.core.net.ohclient.param.OhStatusSeriesMapping;
+import com.github.charlemaznable.core.net.common.DefaultErrorMappingDisabled;
+import com.github.charlemaznable.core.net.common.HttpStatus;
+import com.github.charlemaznable.core.net.common.Mapping;
+import com.github.charlemaznable.core.net.common.StatusError;
+import com.github.charlemaznable.core.net.common.StatusErrorMapping;
+import com.github.charlemaznable.core.net.common.StatusSeriesErrorMapping;
 import lombok.SneakyThrows;
 import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
@@ -11,7 +13,6 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import static com.github.charlemaznable.core.net.ohclient.OhFactory.getClient;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -58,46 +59,46 @@ public class OhResponseMappingTest {
         assertThrows(ClientErrorException.class, httpClient::sampleClientError);
         assertThrows(NotFoundException2.class, httpClient::sampleMappingNotFound);
         assertThrows(ClientErrorException2.class, httpClient::sampleMappingClientError);
-        assertThrows(OhError.class, httpClient::sampleServerError);
+        assertThrows(StatusError.class, httpClient::sampleServerError);
 
         val defaultHttpClient = getClient(DefaultMappingHttpClient.class);
         try {
             defaultHttpClient.sampleNotFound();
         } catch (Exception e) {
-            assertEquals(OhError.class, e.getClass());
-            OhError er = (OhError) e;
+            assertEquals(StatusError.class, e.getClass());
+            StatusError er = (StatusError) e;
             assertEquals(HttpStatus.NOT_FOUND.value(), er.getStatusCode());
             assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), er.getMessage());
         }
         try {
             defaultHttpClient.sampleClientError();
         } catch (Exception e) {
-            assertEquals(OhError.class, e.getClass());
-            OhError er = (OhError) e;
+            assertEquals(StatusError.class, e.getClass());
+            StatusError er = (StatusError) e;
             assertEquals(HttpStatus.FORBIDDEN.value(), er.getStatusCode());
             assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), er.getMessage());
         }
         try {
             defaultHttpClient.sampleMappingNotFound();
         } catch (Exception e) {
-            assertEquals(OhError.class, e.getClass());
-            OhError er = (OhError) e;
+            assertEquals(StatusError.class, e.getClass());
+            StatusError er = (StatusError) e;
             assertEquals(HttpStatus.NOT_FOUND.value(), er.getStatusCode());
             assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), er.getMessage());
         }
         try {
             defaultHttpClient.sampleMappingClientError();
         } catch (Exception e) {
-            assertEquals(OhError.class, e.getClass());
-            OhError er = (OhError) e;
+            assertEquals(StatusError.class, e.getClass());
+            StatusError er = (StatusError) e;
             assertEquals(HttpStatus.FORBIDDEN.value(), er.getStatusCode());
             assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), er.getMessage());
         }
         try {
             defaultHttpClient.sampleServerError();
         } catch (Exception e) {
-            assertEquals(OhError.class, e.getClass());
-            OhError er = (OhError) e;
+            assertEquals(StatusError.class, e.getClass());
+            StatusError er = (StatusError) e;
             assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), er.getStatusCode());
             assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), er.getMessage());
         }
@@ -112,11 +113,11 @@ public class OhResponseMappingTest {
         mockWebServer.shutdown();
     }
 
-    @OhStatusMapping(status = HttpStatus.NOT_FOUND,
+    @StatusErrorMapping(status = HttpStatus.NOT_FOUND,
             exception = NotFoundException.class)
-    @OhStatusSeriesMapping(statusSeries = HttpStatus.Series.CLIENT_ERROR,
+    @StatusSeriesErrorMapping(statusSeries = HttpStatus.Series.CLIENT_ERROR,
             exception = ClientErrorException.class)
-    @OhMapping("${root}:41180")
+    @Mapping("${root}:41180")
     @OhClient
     public interface MappingHttpClient {
 
@@ -124,22 +125,22 @@ public class OhResponseMappingTest {
 
         String sampleClientError();
 
-        @OhStatusMapping(status = HttpStatus.NOT_FOUND,
+        @StatusErrorMapping(status = HttpStatus.NOT_FOUND,
                 exception = NotFoundException2.class)
-        @OhStatusSeriesMapping(statusSeries = HttpStatus.Series.CLIENT_ERROR,
+        @StatusSeriesErrorMapping(statusSeries = HttpStatus.Series.CLIENT_ERROR,
                 exception = ClientErrorException2.class)
         String sampleMappingNotFound();
 
-        @OhStatusMapping(status = HttpStatus.NOT_FOUND,
+        @StatusErrorMapping(status = HttpStatus.NOT_FOUND,
                 exception = NotFoundException2.class)
-        @OhStatusSeriesMapping(statusSeries = HttpStatus.Series.CLIENT_ERROR,
+        @StatusSeriesErrorMapping(statusSeries = HttpStatus.Series.CLIENT_ERROR,
                 exception = ClientErrorException2.class)
         String sampleMappingClientError();
 
         String sampleServerError();
     }
 
-    @OhMapping("${root}:41180")
+    @Mapping("${root}:41180")
     @OhClient
     public interface DefaultMappingHttpClient {
 
@@ -154,8 +155,8 @@ public class OhResponseMappingTest {
         void sampleServerError();
     }
 
-    @OhDefaultErrorMappingDisabled
-    @OhMapping("${root}:41180")
+    @DefaultErrorMappingDisabled
+    @Mapping("${root}:41180")
     @OhClient
     public interface DisabledMappingHttpClient {
 
@@ -170,7 +171,7 @@ public class OhResponseMappingTest {
         String sampleServerError();
     }
 
-    public static class NotFoundException extends OhError {
+    public static class NotFoundException extends StatusError {
 
         private static final long serialVersionUID = -6500698707558354057L;
 
@@ -179,7 +180,7 @@ public class OhResponseMappingTest {
         }
     }
 
-    public static class ClientErrorException extends OhError {
+    public static class ClientErrorException extends StatusError {
 
         private static final long serialVersionUID = -3870950937253448454L;
 
@@ -188,7 +189,7 @@ public class OhResponseMappingTest {
         }
     }
 
-    public static class NotFoundException2 extends OhError {
+    public static class NotFoundException2 extends StatusError {
 
         private static final long serialVersionUID = 8138254149072329848L;
 
@@ -197,7 +198,7 @@ public class OhResponseMappingTest {
         }
     }
 
-    public static class ClientErrorException2 extends OhError {
+    public static class ClientErrorException2 extends StatusError {
 
         private static final long serialVersionUID = -7855725166604686605L;
 

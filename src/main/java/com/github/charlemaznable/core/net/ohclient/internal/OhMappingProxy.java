@@ -1,28 +1,31 @@
 package com.github.charlemaznable.core.net.ohclient.internal;
 
-import com.github.charlemaznable.core.net.ohclient.OhMapping;
-import com.github.charlemaznable.core.net.ohclient.OhMapping.UrlProvider;
+import com.github.charlemaznable.core.net.common.AcceptCharset;
+import com.github.charlemaznable.core.net.common.ClientProxy;
+import com.github.charlemaznable.core.net.common.ClientProxy.ProxyProvider;
+import com.github.charlemaznable.core.net.common.ClientSSL;
+import com.github.charlemaznable.core.net.common.ClientSSL.HostnameVerifierProvider;
+import com.github.charlemaznable.core.net.common.ClientSSL.SSLSocketFactoryProvider;
+import com.github.charlemaznable.core.net.common.ClientSSL.X509TrustManagerProvider;
+import com.github.charlemaznable.core.net.common.ContentFormat;
+import com.github.charlemaznable.core.net.common.ContentFormat.ContentFormatter;
+import com.github.charlemaznable.core.net.common.FixedContext;
+import com.github.charlemaznable.core.net.common.FixedHeader;
+import com.github.charlemaznable.core.net.common.FixedParameter;
+import com.github.charlemaznable.core.net.common.FixedPathVar;
+import com.github.charlemaznable.core.net.common.FixedValueProvider;
+import com.github.charlemaznable.core.net.common.HttpMethod;
+import com.github.charlemaznable.core.net.common.HttpStatus;
+import com.github.charlemaznable.core.net.common.IsolatedConnectionPool;
+import com.github.charlemaznable.core.net.common.Mapping;
+import com.github.charlemaznable.core.net.common.Mapping.UrlProvider;
+import com.github.charlemaznable.core.net.common.RequestMethod;
+import com.github.charlemaznable.core.net.common.StatusError;
+import com.github.charlemaznable.core.net.common.StatusErrorFunction;
+import com.github.charlemaznable.core.net.common.StatusErrorMapping;
+import com.github.charlemaznable.core.net.common.StatusSeriesErrorMapping;
 import com.github.charlemaznable.core.net.ohclient.OhReq;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigAcceptCharset;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat.ContentFormat;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigIsolatedConnectionPool;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigProxy;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigProxy.ProxyProvider;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigRequestMethod;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigSSL;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigSSL.HostnameVerifierProvider;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigSSL.SSLSocketFactoryProvider;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigSSL.X509TrustManagerProvider;
-import com.github.charlemaznable.core.net.ohclient.exception.OhError;
-import com.github.charlemaznable.core.net.ohclient.exception.OhException;
-import com.github.charlemaznable.core.net.ohclient.param.OhFixedContext;
-import com.github.charlemaznable.core.net.ohclient.param.OhFixedHeader;
-import com.github.charlemaznable.core.net.ohclient.param.OhFixedParameter;
-import com.github.charlemaznable.core.net.ohclient.param.OhFixedPathVar;
-import com.github.charlemaznable.core.net.ohclient.param.OhFixedValueProvider;
-import com.github.charlemaznable.core.net.ohclient.param.OhStatusMapping;
-import com.github.charlemaznable.core.net.ohclient.param.OhStatusSeriesMapping;
+import com.github.charlemaznable.core.net.ohclient.OhException;
 import lombok.SneakyThrows;
 import lombok.val;
 import lombok.var;
@@ -32,8 +35,6 @@ import okhttp3.ResponseBody;
 import okio.BufferedSource;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
@@ -86,15 +87,15 @@ public final class OhMappingProxy extends OhRoot {
         this.ohMethod = ohMethod;
         this.requestUrl = Elf.checkRequestUrl(this.ohClass, this.ohMethod, proxy);
 
-        this.proxy = Elf.checkProxy(this.ohClass, this.ohMethod, proxy);
-        val configSSL = Elf.checkConfigSSL(this.ohMethod);
-        if (null != configSSL) {
+        this.clientProxy = Elf.checkClientProxy(this.ohClass, this.ohMethod, proxy);
+        val clientSSL = Elf.checkClientSSL(this.ohMethod);
+        if (null != clientSSL) {
             this.sslSocketFactory = Elf.checkSSLSocketFactory(
-                    this.ohClass, this.ohMethod, configSSL);
+                    this.ohClass, this.ohMethod, clientSSL);
             this.x509TrustManager = Elf.checkX509TrustManager(
-                    this.ohClass, this.ohMethod, configSSL);
+                    this.ohClass, this.ohMethod, clientSSL);
             this.hostnameVerifier = Elf.checkHostnameVerifier(
-                    this.ohClass, this.ohMethod, configSSL);
+                    this.ohClass, this.ohMethod, clientSSL);
         } else {
             this.sslSocketFactory = proxy.sslSocketFactory;
             this.x509TrustManager = proxy.x509TrustManager;
@@ -104,15 +105,15 @@ public final class OhMappingProxy extends OhRoot {
         this.okHttpClient = Elf.buildOkHttpClient(this, proxy);
 
         this.acceptCharset = Elf.checkAcceptCharset(this.ohMethod, proxy);
-        this.contentFormat = Elf.checkContentFormat(this.ohMethod, proxy);
-        this.requestMethod = Elf.checkRequestMethod(this.ohMethod, proxy);
+        this.contentFormatter = Elf.checkContentFormatter(this.ohMethod, proxy);
+        this.httpMethod = Elf.checkHttpMethod(this.ohMethod, proxy);
         this.headers = Elf.checkFixedHeaders(this.ohClass, this.ohMethod, proxy);
         this.pathVars = Elf.checkFixedPathVars(this.ohClass, this.ohMethod, proxy);
         this.parameters = Elf.checkFixedParameters(this.ohClass, this.ohMethod, proxy);
         this.contexts = Elf.checkFixedContexts(this.ohClass, this.ohMethod, proxy);
 
-        this.statusMapping = Elf.checkStatusMapping(this.ohMethod, proxy);
-        this.statusSeriesMapping = Elf.checkStatusSeriesMapping(this.ohMethod, proxy);
+        this.statusErrorMapping = Elf.checkStatusErrorMapping(this.ohMethod, proxy);
+        this.statusSeriesErrorMapping = Elf.checkStatusSeriesErrorMapping(this.ohMethod, proxy);
 
         processReturnType(this.ohMethod);
     }
@@ -188,11 +189,11 @@ public final class OhMappingProxy extends OhRoot {
         val statusCode = response.code();
         val responseBody = notNullThen(response.body(), OhResponseBody::new);
 
-        val errorMapping = new ErrorMappingFunction(statusCode, responseBody);
-        notNullThen(this.statusMapping.get(HttpStatus
-                .valueOf(statusCode)), errorMapping);
-        notNullThen(this.statusSeriesMapping.get(HttpStatus.Series
-                .valueOf(statusCode)), errorMapping);
+        val errorMapping = new StatusErrorFunction(statusCode, responseBody);
+        notNullThen(this.statusErrorMapping.get(
+                HttpStatus.valueOf(statusCode)), errorMapping);
+        notNullThen(this.statusSeriesErrorMapping.get(
+                HttpStatus.Series.valueOf(statusCode)), errorMapping);
 
         val responseObjs = processResponseBody(statusCode, responseBody);
         if (this.returnCollection) {
@@ -282,8 +283,8 @@ public final class OhMappingProxy extends OhRoot {
         }
 
         static String checkRequestUrl(Class clazz, Method method, OhProxy proxy) {
-            val ohMapping = findAnnotation(method, OhMapping.class);
-            val url = checkNull(ohMapping, method::getName, annotation -> {
+            val mapping = findAnnotation(method, Mapping.class);
+            val url = checkNull(mapping, method::getName, annotation -> {
                 val providerClass = annotation.urlProvider();
                 return ohSubstitutor.replace(UrlProvider.class == providerClass ?
                         annotation.value() : getBeanOrReflect(providerClass).url(clazz, method));
@@ -293,9 +294,9 @@ public final class OhMappingProxy extends OhRoot {
             return removeEnd(proxy.baseUrl, "/") + prependIfMissing(url, "/");
         }
 
-        static Proxy checkProxy(Class clazz, Method method, OhProxy proxy) {
-            val configProxy = findAnnotation(method, OhConfigProxy.class);
-            return checkNull(configProxy, () -> proxy.proxy, annotation -> {
+        static Proxy checkClientProxy(Class clazz, Method method, OhProxy proxy) {
+            val clientProxy = findAnnotation(method, ClientProxy.class);
+            return checkNull(clientProxy, () -> proxy.clientProxy, annotation -> {
                 val providerClass = annotation.proxyProvider();
                 return ProxyProvider.class == providerClass ?
                         checkBlank(annotation.ip(), () -> null, s -> new Proxy(Proxy.Type.HTTP,
@@ -304,45 +305,42 @@ public final class OhMappingProxy extends OhRoot {
             });
         }
 
-        static OhConfigSSL checkConfigSSL(Method method) {
-            return findAnnotation(method, OhConfigSSL.class);
+        static ClientSSL checkClientSSL(Method method) {
+            return findAnnotation(method, ClientSSL.class);
         }
 
-        static SSLSocketFactory checkSSLSocketFactory(Class clazz, Method method,
-                                                      OhConfigSSL configSSL) {
-            val providerClass = configSSL.sslSocketFactoryProvider();
+        static SSLSocketFactory checkSSLSocketFactory(Class clazz, Method method, ClientSSL clientSSL) {
+            val providerClass = clientSSL.sslSocketFactoryProvider();
             return SSLSocketFactoryProvider.class == providerClass ? null
                     : getBeanOrReflect(providerClass).sslSocketFactory(clazz, method);
         }
 
-        static X509TrustManager checkX509TrustManager(Class clazz, Method method,
-                                                      OhConfigSSL configSSL) {
-            val providerClass = configSSL.x509TrustManagerProvider();
+        static X509TrustManager checkX509TrustManager(Class clazz, Method method, ClientSSL clientSSL) {
+            val providerClass = clientSSL.x509TrustManagerProvider();
             return X509TrustManagerProvider.class == providerClass ? null
                     : getBeanOrReflect(providerClass).x509TrustManager(clazz, method);
         }
 
-        static HostnameVerifier checkHostnameVerifier(Class clazz, Method method,
-                                                      OhConfigSSL configSSL) {
-            val providerClass = configSSL.hostnameVerifierProvider();
+        static HostnameVerifier checkHostnameVerifier(Class clazz, Method method, ClientSSL clientSSL) {
+            val providerClass = clientSSL.hostnameVerifierProvider();
             return HostnameVerifierProvider.class == providerClass ? null
                     : getBeanOrReflect(providerClass).hostnameVerifier(clazz, method);
         }
 
         static ConnectionPool checkConnectionPool(Method method, OhProxy proxy) {
-            val configIsolated = findAnnotation(method, OhConfigIsolatedConnectionPool.class);
-            return checkNull(configIsolated, () -> proxy.connectionPool, x -> new ConnectionPool());
+            val isolated = findAnnotation(method, IsolatedConnectionPool.class);
+            return checkNull(isolated, () -> proxy.connectionPool, x -> new ConnectionPool());
         }
 
         static OkHttpClient buildOkHttpClient(OhMappingProxy mappingProxy, OhProxy proxy) {
-            val sameProxy = mappingProxy.proxy == proxy.proxy;
+            val sameClientProxy = mappingProxy.clientProxy == proxy.clientProxy;
             val sameSSLSocketFactory = mappingProxy.sslSocketFactory == proxy.sslSocketFactory;
             val sameX509TrustManager = mappingProxy.x509TrustManager == proxy.x509TrustManager;
             val sameHostnameVerifier = mappingProxy.hostnameVerifier == proxy.hostnameVerifier;
-            if (sameProxy && sameSSLSocketFactory && sameX509TrustManager
+            if (sameClientProxy && sameSSLSocketFactory && sameX509TrustManager
                     && sameHostnameVerifier) return proxy.okHttpClient;
 
-            return new OhReq().proxy(mappingProxy.proxy)
+            return new OhReq().clientProxy(mappingProxy.clientProxy)
                     .sslSocketFactory(mappingProxy.sslSocketFactory)
                     .x509TrustManager(mappingProxy.x509TrustManager)
                     .hostnameVerifier(mappingProxy.hostnameVerifier)
@@ -351,30 +349,29 @@ public final class OhMappingProxy extends OhRoot {
         }
 
         static Charset checkAcceptCharset(Method method, OhProxy proxy) {
-            val configAcceptCharset = findAnnotation(method, OhConfigAcceptCharset.class);
-            return checkNull(configAcceptCharset, () -> proxy.acceptCharset,
+            val acceptCharset = findAnnotation(method, AcceptCharset.class);
+            return checkNull(acceptCharset, () -> proxy.acceptCharset,
                     annotation -> Charset.forName(annotation.value()));
         }
 
-        static ContentFormat checkContentFormat(Method method, OhProxy proxy) {
-            val configContentType = findAnnotation(method, OhConfigContentFormat.class);
-            return checkNull(configContentType, () -> proxy.contentFormat,
+        static ContentFormatter checkContentFormatter(Method method, OhProxy proxy) {
+            val contentFormat = findAnnotation(method, ContentFormat.class);
+            return checkNull(contentFormat, () -> proxy.contentFormatter,
                     annotation -> getBeanOrReflect(annotation.value()));
         }
 
-        static RequestMethod checkRequestMethod(Method method, OhProxy proxy) {
-            val configRequestMethod = findAnnotation(method, OhConfigRequestMethod.class);
-            return checkNull(configRequestMethod, () -> proxy.requestMethod,
-                    OhConfigRequestMethod::value);
+        static HttpMethod checkHttpMethod(Method method, OhProxy proxy) {
+            val requestMethod = findAnnotation(method, RequestMethod.class);
+            return checkNull(requestMethod, () -> proxy.httpMethod, RequestMethod::value);
         }
 
         static List<Pair<String, String>> checkFixedHeaders(Class clazz, Method method, OhProxy proxy) {
             val result = newArrayList(proxy.headers);
-            result.addAll(newArrayList(findMergedRepeatableAnnotations(method, OhFixedHeader.class))
+            result.addAll(newArrayList(findMergedRepeatableAnnotations(method, FixedHeader.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
                         val name = an.name();
                         val providerClass = an.valueProvider();
-                        return Pair.of(name, OhFixedValueProvider.class == providerClass ?
+                        return Pair.of(name, FixedValueProvider.class == providerClass ?
                                 an.value() : getBeanOrReflect(providerClass).value(clazz, method, name));
                     }).collect(Collectors.toList()));
             return result;
@@ -382,11 +379,11 @@ public final class OhMappingProxy extends OhRoot {
 
         static List<Pair<String, String>> checkFixedPathVars(Class clazz, Method method, OhProxy proxy) {
             val result = newArrayList(proxy.pathVars);
-            result.addAll(newArrayList(findMergedRepeatableAnnotations(method, OhFixedPathVar.class))
+            result.addAll(newArrayList(findMergedRepeatableAnnotations(method, FixedPathVar.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
                         val name = an.name();
                         val providerClass = an.valueProvider();
-                        return Pair.of(name, OhFixedValueProvider.class == providerClass ?
+                        return Pair.of(name, FixedValueProvider.class == providerClass ?
                                 an.value() : getBeanOrReflect(providerClass).value(clazz, method, name));
                     }).collect(Collectors.toList()));
             return result;
@@ -394,11 +391,11 @@ public final class OhMappingProxy extends OhRoot {
 
         static List<Pair<String, Object>> checkFixedParameters(Class clazz, Method method, OhProxy proxy) {
             val result = newArrayList(proxy.parameters);
-            result.addAll(newArrayList(findMergedRepeatableAnnotations(method, OhFixedParameter.class))
+            result.addAll(newArrayList(findMergedRepeatableAnnotations(method, FixedParameter.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
                         val name = an.name();
                         val providerClass = an.valueProvider();
-                        return Pair.of(name, (Object) (OhFixedValueProvider.class == providerClass ?
+                        return Pair.of(name, (Object) (FixedValueProvider.class == providerClass ?
                                 an.value() : getBeanOrReflect(providerClass).value(clazz, method, name)));
                     }).collect(Collectors.toList()));
             return result;
@@ -406,27 +403,27 @@ public final class OhMappingProxy extends OhRoot {
 
         static List<Pair<String, Object>> checkFixedContexts(Class clazz, Method method, OhProxy proxy) {
             val result = newArrayList(proxy.contexts);
-            result.addAll(newArrayList(findMergedRepeatableAnnotations(method, OhFixedContext.class))
+            result.addAll(newArrayList(findMergedRepeatableAnnotations(method, FixedContext.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
                         val name = an.name();
                         val providerClass = an.valueProvider();
-                        return Pair.of(name, (Object) (OhFixedValueProvider.class == providerClass ?
+                        return Pair.of(name, (Object) (FixedValueProvider.class == providerClass ?
                                 an.value() : getBeanOrReflect(providerClass).value(clazz, method, name)));
                     }).collect(Collectors.toList()));
             return result;
         }
 
-        static Map<HttpStatus, Class<? extends OhError>> checkStatusMapping(Method method, OhProxy proxy) {
-            val result = newHashMap(proxy.statusMapping);
-            result.putAll(newArrayList(findMergedRepeatableAnnotations(method, OhStatusMapping.class)).stream()
-                    .collect(Collectors.toMap(OhStatusMapping::status, OhStatusMapping::exception)));
+        static Map<HttpStatus, Class<? extends StatusError>> checkStatusErrorMapping(Method method, OhProxy proxy) {
+            val result = newHashMap(proxy.statusErrorMapping);
+            result.putAll(newArrayList(findMergedRepeatableAnnotations(method, StatusErrorMapping.class)).stream()
+                    .collect(Collectors.toMap(StatusErrorMapping::status, StatusErrorMapping::exception)));
             return result;
         }
 
-        static Map<HttpStatus.Series, Class<? extends OhError>> checkStatusSeriesMapping(Method method, OhProxy proxy) {
-            val result = newHashMap(proxy.statusSeriesMapping);
-            result.putAll(newArrayList(findMergedRepeatableAnnotations(method, OhStatusSeriesMapping.class)).stream()
-                    .collect(Collectors.toMap(OhStatusSeriesMapping::statusSeries, OhStatusSeriesMapping::exception)));
+        static Map<HttpStatus.Series, Class<? extends StatusError>> checkStatusSeriesErrorMapping(Method method, OhProxy proxy) {
+            val result = newHashMap(proxy.statusSeriesErrorMapping);
+            result.putAll(newArrayList(findMergedRepeatableAnnotations(method, StatusSeriesErrorMapping.class)).stream()
+                    .collect(Collectors.toMap(StatusSeriesErrorMapping::statusSeries, StatusSeriesErrorMapping::exception)));
             return result;
         }
     }

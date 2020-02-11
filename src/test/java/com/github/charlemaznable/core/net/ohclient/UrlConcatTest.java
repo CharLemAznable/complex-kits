@@ -1,8 +1,10 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.net.ohclient.OhMapping.UrlProvider;
-import com.github.charlemaznable.core.net.ohclient.config.OhDefaultErrorMappingDisabled;
-import com.github.charlemaznable.core.net.ohclient.exception.OhException;
+import com.github.charlemaznable.core.net.common.HttpStatus;
+import com.github.charlemaznable.core.net.common.Mapping;
+import com.github.charlemaznable.core.net.common.Mapping.UrlProvider;
+import com.github.charlemaznable.core.net.common.DefaultErrorMappingDisabled;
+import com.github.charlemaznable.core.net.common.ProviderException;
 import lombok.SneakyThrows;
 import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
@@ -10,7 +12,6 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import java.lang.reflect.Method;
 
@@ -53,11 +54,11 @@ public class UrlConcatTest {
     @SneakyThrows
     @Test
     public void testErrorUrl() {
-        assertThrows(OhException.class, () ->
+        assertThrows(ProviderException.class, () ->
                 getClient(ErrorUrlHttpClient1.class));
 
         val httpClient = getClient(ErrorUrlHttpClient2.class);
-        assertThrows(OhException.class, httpClient::sample);
+        assertThrows(ProviderException.class, httpClient::sample);
     }
 
     @SneakyThrows
@@ -86,53 +87,53 @@ public class UrlConcatTest {
         mockWebServer.shutdown();
     }
 
-    @OhDefaultErrorMappingDisabled
+    @DefaultErrorMappingDisabled
     @OhClient
-    @OhMapping("${root}:41100")
+    @Mapping("${root}:41100")
     public interface UrlPlainHttpClient {
 
-        @OhMapping
+        @Mapping
         String empty();
 
-        @OhMapping("/")
+        @Mapping("/")
         String root();
 
         String sample();
 
-        @OhMapping(urlProvider = TestUrlProvider.class)
+        @Mapping(urlProvider = TestUrlProvider.class)
         String sampleWithSlash();
 
         String notFound();
     }
 
-    @OhDefaultErrorMappingDisabled
+    @DefaultErrorMappingDisabled
     @OhClient
-    @OhMapping(urlProvider = TestUrlProvider.class)
+    @Mapping(urlProvider = TestUrlProvider.class)
     public interface UrlProviderHttpClient {
 
-        @OhMapping
+        @Mapping
         String empty();
 
-        @OhMapping("/")
+        @Mapping("/")
         String root();
 
         String sample();
 
-        @OhMapping(urlProvider = TestUrlProvider.class)
+        @Mapping(urlProvider = TestUrlProvider.class)
         String sampleWithSlash();
 
         String notFound();
     }
 
     @OhClient
-    @OhMapping(urlProvider = ClassErrorUrlProvider.class)
+    @Mapping(urlProvider = ClassErrorUrlProvider.class)
     public interface ErrorUrlHttpClient1 {}
 
     @OhClient
-    @OhMapping(urlProvider = MethodErrorUrlProvider.class)
+    @Mapping(urlProvider = MethodErrorUrlProvider.class)
     public interface ErrorUrlHttpClient2 {
 
-        @OhMapping(urlProvider = MethodErrorUrlProvider.class)
+        @Mapping(urlProvider = MethodErrorUrlProvider.class)
         String sample();
     }
 

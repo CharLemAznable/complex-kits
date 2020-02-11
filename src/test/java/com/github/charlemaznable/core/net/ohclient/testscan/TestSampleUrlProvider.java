@@ -1,7 +1,7 @@
 package com.github.charlemaznable.core.net.ohclient.testscan;
 
 import com.github.charlemaznable.core.miner.MinerConfig;
-import com.github.charlemaznable.core.net.ohclient.OhMapping.UrlProvider;
+import com.github.charlemaznable.core.net.common.Mapping.UrlProvider;
 
 import java.lang.reflect.Method;
 

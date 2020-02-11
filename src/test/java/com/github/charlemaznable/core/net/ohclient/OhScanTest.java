@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.net.ohclient;
 
+import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.ohclient.testscan.TestComponent;
 import com.github.charlemaznable.core.net.ohclient.testscan.TestConfiguration;
 import com.github.charlemaznable.core.net.ohclient.testscan.TestHttpClient2;
@@ -14,7 +15,6 @@ import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 

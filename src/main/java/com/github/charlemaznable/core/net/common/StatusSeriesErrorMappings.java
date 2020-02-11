@@ -1,6 +1,4 @@
-package com.github.charlemaznable.core.net.ohclient.testscan;
-
-import com.github.charlemaznable.core.net.common.Mapping;
+package com.github.charlemaznable.core.net.common;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -11,8 +9,9 @@ import java.lang.annotation.Target;
 
 @Documented
 @Inherited
-@Target({ElementType.TYPE})
+@Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-@Mapping("${root}:41102")
-public @interface TestClientMapping {
+public @interface StatusSeriesErrorMappings {
+
+    StatusSeriesErrorMapping[] value();
 }

@@ -1,12 +1,12 @@
 package com.github.charlemaznable.core.net.ohclient.internal;
 
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat.ContentFormat;
-import com.github.charlemaznable.core.net.ohclient.exception.OhError;
+import com.github.charlemaznable.core.net.common.ContentFormat.ContentFormatter;
+import com.github.charlemaznable.core.net.common.HttpMethod;
+import com.github.charlemaznable.core.net.common.HttpStatus;
+import com.github.charlemaznable.core.net.common.StatusError;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
@@ -18,7 +18,7 @@ import java.util.Map;
 
 class OhRoot {
 
-    Proxy proxy;
+    Proxy clientProxy;
     SSLSocketFactory sslSocketFactory;
     X509TrustManager x509TrustManager;
     HostnameVerifier hostnameVerifier;
@@ -26,13 +26,13 @@ class OhRoot {
     OkHttpClient okHttpClient;
 
     Charset acceptCharset;
-    ContentFormat contentFormat;
-    RequestMethod requestMethod;
+    ContentFormatter contentFormatter;
+    HttpMethod httpMethod;
     List<Pair<String, String>> headers;
     List<Pair<String, String>> pathVars;
     List<Pair<String, Object>> parameters;
     List<Pair<String, Object>> contexts;
 
-    Map<HttpStatus, Class<? extends OhError>> statusMapping;
-    Map<HttpStatus.Series, Class<? extends OhError>> statusSeriesMapping;
+    Map<HttpStatus, Class<? extends StatusError>> statusErrorMapping;
+    Map<HttpStatus.Series, Class<? extends StatusError>> statusSeriesErrorMapping;
 }

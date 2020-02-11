@@ -1,9 +1,11 @@
 package com.github.charlemaznable.core.net.ohclient;
 
 import com.github.charlemaznable.core.lang.Mapp;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat.ContentFormat;
-import com.github.charlemaznable.core.net.ohclient.exception.OhError;
-import com.github.charlemaznable.core.net.ohclient.internal.ErrorMappingFunction;
+import com.github.charlemaznable.core.net.common.ContentFormat.ContentFormatter;
+import com.github.charlemaznable.core.net.common.HttpMethod;
+import com.github.charlemaznable.core.net.common.HttpStatus;
+import com.github.charlemaznable.core.net.common.StatusError;
+import com.github.charlemaznable.core.net.common.StatusErrorFunction;
 import com.github.charlemaznable.core.net.ohclient.internal.OhResponseBody;
 import com.github.charlemaznable.core.net.ohclient.internal.ResponseBodyExtractor;
 import lombok.SneakyThrows;
@@ -14,8 +16,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
@@ -36,7 +36,7 @@ import static com.github.charlemaznable.core.lang.Str.isBlank;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.ACCEPT_CHARSET;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.CONTENT_TYPE;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_ACCEPT_CHARSET;
-import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_CONTENT_FORMAT;
+import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_CONTENT_FORMATTER;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 import static org.apache.commons.lang3.StringUtils.prependIfMissing;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
@@ -48,7 +48,7 @@ public class OhReq {
 
     private String baseUrl;
 
-    private Proxy proxy;
+    private Proxy clientProxy;
     private SSLSocketFactory sslSocketFactory;
     private X509TrustManager x509TrustManager;
     private HostnameVerifier hostnameVerifier;
@@ -57,16 +57,16 @@ public class OhReq {
     private String reqPath;
 
     private Charset acceptCharset = DEFAULT_ACCEPT_CHARSET;
-    private ContentFormat contentFormat = DEFAULT_CONTENT_FORMAT;
+    private ContentFormatter contentFormatter = DEFAULT_CONTENT_FORMATTER;
 
     private List<Pair<String, String>> headers = newArrayList();
     private List<Pair<String, Object>> parameters = newArrayList();
     private String requestBody;
 
-    private Map<HttpStatus, Class<? extends OhError>> statusMapping = newHashMap();
-    private Map<HttpStatus.Series, Class<? extends OhError>> statusSeriesMapping = Mapp.of(
-            HttpStatus.Series.CLIENT_ERROR, OhError.class,
-            HttpStatus.Series.SERVER_ERROR, OhError.class);
+    private Map<HttpStatus, Class<? extends StatusError>> statusErrorMapping = newHashMap();
+    private Map<HttpStatus.Series, Class<? extends StatusError>> statusSeriesErrorMapping = Mapp.of(
+            HttpStatus.Series.CLIENT_ERROR, StatusError.class,
+            HttpStatus.Series.SERVER_ERROR, StatusError.class);
 
     public OhReq() {}
 
@@ -74,8 +74,8 @@ public class OhReq {
         this.baseUrl = baseUrl;
     }
 
-    public OhReq proxy(Proxy proxy) {
-        this.proxy = proxy;
+    public OhReq clientProxy(Proxy proxy) {
+        this.clientProxy = proxy;
         return this;
     }
 
@@ -109,8 +109,8 @@ public class OhReq {
         return this;
     }
 
-    public OhReq contentFormat(ContentFormat contentFormat) {
-        this.contentFormat = contentFormat;
+    public OhReq contentFormat(ContentFormatter contentFormatter) {
+        this.contentFormatter = contentFormatter;
         return this;
     }
 
@@ -139,13 +139,13 @@ public class OhReq {
         return this;
     }
 
-    public OhReq statusMapping(HttpStatus httpStatus, Class<? extends OhError> errorClass) {
-        this.statusMapping.put(httpStatus, errorClass);
+    public OhReq statusErrorMapping(HttpStatus httpStatus, Class<? extends StatusError> errorClass) {
+        this.statusErrorMapping.put(httpStatus, errorClass);
         return this;
     }
 
-    public OhReq statusSeriesMapping(HttpStatus.Series httpStatusSeries, Class<? extends OhError> errorClass) {
-        this.statusSeriesMapping.put(httpStatusSeries, errorClass);
+    public OhReq statusSeriesErrorMapping(HttpStatus.Series httpStatusSeries, Class<? extends StatusError> errorClass) {
+        this.statusSeriesErrorMapping.put(httpStatusSeries, errorClass);
         return this;
     }
 
@@ -169,7 +169,7 @@ public class OhReq {
 
     @SuppressWarnings("deprecation")
     public OkHttpClient buildHttpClient() {
-        val httpClientBuilder = new OkHttpClient.Builder().proxy(this.proxy);
+        val httpClientBuilder = new OkHttpClient.Builder().proxy(this.clientProxy);
         notNullThen(this.sslSocketFactory, xx -> checkNull(this.x509TrustManager,
                 () -> httpClientBuilder.sslSocketFactory(this.sslSocketFactory),
                 yy -> httpClientBuilder.sslSocketFactory(this.sslSocketFactory, this.x509TrustManager)));
@@ -183,8 +183,8 @@ public class OhReq {
         val parameterMap = fetchParameterMap();
         val requestBuilder = buildCommon();
 
-        requestBuilder.method(RequestMethod.GET.toString(), null);
-        val addQuery = this.contentFormat.format(parameterMap, newHashMap());
+        requestBuilder.method(HttpMethod.GET.toString(), null);
+        val addQuery = this.contentFormatter.format(parameterMap, newHashMap());
         if (isBlank(addQuery)) requestBuilder.url(requestUrl);
         else requestBuilder.url(requestUrl +
                 (requestUrl.contains("?") ? "&" : "?") + addQuery);
@@ -197,9 +197,9 @@ public class OhReq {
         val requestBuilder = buildCommon();
 
         val content = nullThen(this.requestBody, () ->
-                this.contentFormat.format(parameterMap, newHashMap()));
-        requestBuilder.method(RequestMethod.POST.toString(), RequestBody.create(
-                MediaType.parse(this.contentFormat.contentType()), content));
+                this.contentFormatter.format(parameterMap, newHashMap()));
+        requestBuilder.method(HttpMethod.POST.toString(), RequestBody.create(
+                MediaType.parse(this.contentFormatter.contentType()), content));
         requestBuilder.url(requestUrl);
         return requestBuilder.build();
     }
@@ -222,7 +222,7 @@ public class OhReq {
         val requestBuilder = new Request.Builder();
         val acceptCharsetName = this.acceptCharset.name();
         requestBuilder.header(ACCEPT_CHARSET, acceptCharsetName);
-        val contentType = this.contentFormat.contentType();
+        val contentType = this.contentFormatter.contentType();
         requestBuilder.header(CONTENT_TYPE, contentType);
         for (val header : this.headers) {
             checkNull(header.getValue(),
@@ -239,11 +239,11 @@ public class OhReq {
         val statusCode = response.code();
         val responseBody = notNullThen(response.body(), OhResponseBody::new);
 
-        val errorMapping = new ErrorMappingFunction(statusCode, responseBody);
-        notNullThen(this.statusMapping.get(HttpStatus
-                .valueOf(statusCode)), errorMapping);
-        notNullThen(this.statusSeriesMapping.get(HttpStatus.Series
-                .valueOf(statusCode)), errorMapping);
+        val errorMapping = new StatusErrorFunction(statusCode, responseBody);
+        notNullThen(this.statusErrorMapping.get(
+                HttpStatus.valueOf(statusCode)), errorMapping);
+        notNullThen(this.statusSeriesErrorMapping.get(
+                HttpStatus.Series.valueOf(statusCode)), errorMapping);
 
         return notNullThen(responseBody, ResponseBodyExtractor::string);
     }

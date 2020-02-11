@@ -1,14 +1,14 @@
 package com.github.charlemaznable.core.net.ohclient.testscan;
 
 import com.github.charlemaznable.core.net.ohclient.OhClient;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigIsolatedConnectionPool;
+import com.github.charlemaznable.core.net.common.IsolatedConnectionPool;
 
 @TestClientMapping
 @OhClient
-@OhConfigIsolatedConnectionPool
+@IsolatedConnectionPool
 public interface TestHttpClient2 {
 
-    @OhConfigIsolatedConnectionPool
+    @IsolatedConnectionPool
     String sample();
 
     default String sampleWrapper() {

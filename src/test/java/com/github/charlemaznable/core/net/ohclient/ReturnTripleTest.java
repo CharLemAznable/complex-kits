@@ -1,5 +1,7 @@
 package com.github.charlemaznable.core.net.ohclient;
 
+import com.github.charlemaznable.core.net.common.HttpStatus;
+import com.github.charlemaznable.core.net.common.Mapping;
 import lombok.AllArgsConstructor;
 import lombok.Cleanup;
 import lombok.Getter;
@@ -13,7 +15,6 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.apache.commons.lang3.tuple.Triple;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -85,7 +86,7 @@ public class ReturnTripleTest {
     }
 
     @OhClient
-    @OhMapping("${root}:41195")
+    @Mapping("${root}:41195")
     public interface TripleHttpClient {
 
         Triple<Integer, HttpStatus, Bean> sampleStatusCodeAndBean();

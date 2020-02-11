@@ -1,5 +1,7 @@
 package com.github.charlemaznable.core.net.ohclient;
 
+import com.github.charlemaznable.core.net.common.HttpStatus;
+import com.github.charlemaznable.core.net.common.Mapping;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +14,6 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import java.time.Duration;
 import java.util.concurrent.Future;
@@ -71,7 +72,7 @@ public class ReturnPairTest {
     }
 
     @OhClient
-    @OhMapping("${root}:41194")
+    @Mapping("${root}:41194")
     public interface PairHttpClient {
 
         Pair<Integer, Bean> sampleStatusAndBean();

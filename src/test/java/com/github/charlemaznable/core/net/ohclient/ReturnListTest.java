@@ -1,5 +1,7 @@
 package com.github.charlemaznable.core.net.ohclient;
 
+import com.github.charlemaznable.core.net.common.HttpStatus;
+import com.github.charlemaznable.core.net.common.Mapping;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +14,6 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import okio.BufferedSource;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import java.time.Duration;
 import java.util.List;
@@ -88,7 +89,7 @@ public class ReturnListTest {
     }
 
     @OhClient
-    @OhMapping("${root}:41192")
+    @Mapping("${root}:41192")
     public interface ListHttpClient {
 
         List<Bean> sampleListBean();

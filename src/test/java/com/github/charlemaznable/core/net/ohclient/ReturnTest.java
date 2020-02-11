@@ -1,6 +1,8 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.net.ohclient.config.OhDefaultErrorMappingDisabled;
+import com.github.charlemaznable.core.net.common.HttpStatus;
+import com.github.charlemaznable.core.net.common.DefaultErrorMappingDisabled;
+import com.github.charlemaznable.core.net.common.Mapping;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -12,7 +14,6 @@ import okhttp3.mockwebserver.RecordedRequest;
 import okio.BufferedSource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.ThrowingSupplier;
-import org.springframework.http.HttpStatus;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -158,9 +159,9 @@ public class ReturnTest {
         mockWebServer.shutdown();
     }
 
-    @OhDefaultErrorMappingDisabled
+    @DefaultErrorMappingDisabled
     @OhClient
-    @OhMapping("${root}:41190")
+    @Mapping("${root}:41190")
     public interface StatusCodeHttpClient {
 
         void sampleVoid();
@@ -171,22 +172,22 @@ public class ReturnTest {
 
         Future<Integer> sampleFutureStatusCode();
 
-        @OhMapping("sampleStatusCode")
+        @Mapping("sampleStatusCode")
         HttpStatus sampleStatus();
 
-        @OhMapping("sampleFutureStatusCode")
+        @Mapping("sampleFutureStatusCode")
         Future<HttpStatus> sampleFutureStatus();
 
-        @OhMapping("sampleStatusCode")
+        @Mapping("sampleStatusCode")
         HttpStatus.Series sampleStatusSeries();
 
-        @OhMapping("sampleFutureStatusCode")
+        @Mapping("sampleFutureStatusCode")
         Future<HttpStatus.Series> sampleFutureStatusSeries();
 
-        @OhMapping("sampleVoid")
+        @Mapping("sampleVoid")
         boolean sampleSuccess();
 
-        @OhMapping("sampleStatusCode")
+        @Mapping("sampleStatusCode")
         Future<Boolean> sampleFailure();
     }
 
@@ -194,7 +195,7 @@ public class ReturnTest {
     @Inherited
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    @OhMapping("${root}:41191/sample")
+    @Mapping("${root}:41191/sample")
     public @interface TestMapping {}
 
     @OhClient

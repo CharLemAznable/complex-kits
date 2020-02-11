@@ -1,31 +1,33 @@
 package com.github.charlemaznable.core.net.ohclient.internal;
 
 import com.github.charlemaznable.core.lang.LoadingCachee;
+import com.github.charlemaznable.core.net.common.AcceptCharset;
+import com.github.charlemaznable.core.net.common.ClientProxy;
+import com.github.charlemaznable.core.net.common.ClientProxy.ProxyProvider;
+import com.github.charlemaznable.core.net.common.ClientSSL;
+import com.github.charlemaznable.core.net.common.ClientSSL.HostnameVerifierProvider;
+import com.github.charlemaznable.core.net.common.ClientSSL.SSLSocketFactoryProvider;
+import com.github.charlemaznable.core.net.common.ClientSSL.X509TrustManagerProvider;
+import com.github.charlemaznable.core.net.common.ContentFormat;
+import com.github.charlemaznable.core.net.common.ContentFormat.ContentFormatter;
+import com.github.charlemaznable.core.net.common.DefaultErrorMappingDisabled;
+import com.github.charlemaznable.core.net.common.FixedContext;
+import com.github.charlemaznable.core.net.common.FixedHeader;
+import com.github.charlemaznable.core.net.common.FixedParameter;
+import com.github.charlemaznable.core.net.common.FixedPathVar;
+import com.github.charlemaznable.core.net.common.FixedValueProvider;
+import com.github.charlemaznable.core.net.common.HttpMethod;
+import com.github.charlemaznable.core.net.common.HttpStatus;
+import com.github.charlemaznable.core.net.common.IsolatedConnectionPool;
+import com.github.charlemaznable.core.net.common.Mapping;
+import com.github.charlemaznable.core.net.common.Mapping.UrlProvider;
+import com.github.charlemaznable.core.net.common.RequestMethod;
+import com.github.charlemaznable.core.net.common.StatusError;
+import com.github.charlemaznable.core.net.common.StatusErrorMapping;
+import com.github.charlemaznable.core.net.common.StatusSeriesErrorMapping;
 import com.github.charlemaznable.core.net.ohclient.OhClient;
-import com.github.charlemaznable.core.net.ohclient.OhMapping;
-import com.github.charlemaznable.core.net.ohclient.OhMapping.UrlProvider;
 import com.github.charlemaznable.core.net.ohclient.OhReq;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigAcceptCharset;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigContentFormat.ContentFormat;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigIsolatedConnectionPool;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigProxy;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigProxy.ProxyProvider;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigRequestMethod;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigSSL;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigSSL.HostnameVerifierProvider;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigSSL.SSLSocketFactoryProvider;
-import com.github.charlemaznable.core.net.ohclient.config.OhConfigSSL.X509TrustManagerProvider;
-import com.github.charlemaznable.core.net.ohclient.config.OhDefaultErrorMappingDisabled;
-import com.github.charlemaznable.core.net.ohclient.exception.OhError;
-import com.github.charlemaznable.core.net.ohclient.exception.OhException;
-import com.github.charlemaznable.core.net.ohclient.param.OhFixedContext;
-import com.github.charlemaznable.core.net.ohclient.param.OhFixedHeader;
-import com.github.charlemaznable.core.net.ohclient.param.OhFixedParameter;
-import com.github.charlemaznable.core.net.ohclient.param.OhFixedPathVar;
-import com.github.charlemaznable.core.net.ohclient.param.OhFixedValueProvider;
-import com.github.charlemaznable.core.net.ohclient.param.OhStatusMapping;
-import com.github.charlemaznable.core.net.ohclient.param.OhStatusSeriesMapping;
+import com.github.charlemaznable.core.net.ohclient.OhException;
 import com.google.common.cache.LoadingCache;
 import lombok.val;
 import net.sf.cglib.proxy.MethodInterceptor;
@@ -33,8 +35,6 @@ import net.sf.cglib.proxy.MethodProxy;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
@@ -56,8 +56,8 @@ import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static com.github.charlemaznable.core.lang.Mapp.of;
 import static com.github.charlemaznable.core.lang.Str.isNotBlank;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_ACCEPT_CHARSET;
-import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_CONTENT_FORMAT;
-import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_REQUEST_METHOD;
+import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_CONTENT_FORMATTER;
+import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_HTTP_METHOD;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.ohConnectionPool;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.ohSubstitutor;
 import static com.github.charlemaznable.core.spring.SpringContext.getBeanOrReflect;
@@ -79,26 +79,26 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
         Elf.checkOhClient(this.ohClass);
         this.baseUrl = Elf.checkBaseUrl(this.ohClass);
 
-        this.proxy = Elf.checkProxy(this.ohClass);
-        val configSSL = Elf.checkConfigSSL(this.ohClass);
-        if (null != configSSL) {
-            this.sslSocketFactory = Elf.checkSSLSocketFactory(this.ohClass, configSSL);
-            this.x509TrustManager = Elf.checkX509TrustManager(this.ohClass, configSSL);
-            this.hostnameVerifier = Elf.checkHostnameVerifier(this.ohClass, configSSL);
+        this.clientProxy = Elf.checkClientProxy(this.ohClass);
+        val clientSSL = Elf.checkClientSSL(this.ohClass);
+        if (null != clientSSL) {
+            this.sslSocketFactory = Elf.checkSSLSocketFactory(this.ohClass, clientSSL);
+            this.x509TrustManager = Elf.checkX509TrustManager(this.ohClass, clientSSL);
+            this.hostnameVerifier = Elf.checkHostnameVerifier(this.ohClass, clientSSL);
         }
         this.connectionPool = Elf.checkConnectionPool(this.ohClass);
         this.okHttpClient = Elf.buildOkHttpClient(this);
 
         this.acceptCharset = Elf.checkAcceptCharset(this.ohClass);
-        this.contentFormat = Elf.checkContentFormat(this.ohClass);
-        this.requestMethod = Elf.checkRequestMethod(this.ohClass);
+        this.contentFormatter = Elf.checkContentFormatter(this.ohClass);
+        this.httpMethod = Elf.checkHttpMethod(this.ohClass);
         this.headers = Elf.checkFixedHeaders(this.ohClass);
         this.pathVars = Elf.checkFixedPathVars(this.ohClass);
         this.parameters = Elf.checkFixedParameters(this.ohClass);
         this.contexts = Elf.checkFixedContexts(this.ohClass);
 
-        this.statusMapping = Elf.checkStatusMapping(this.ohClass);
-        this.statusSeriesMapping = Elf.checkStatusSeriesMapping(this.ohClass);
+        this.statusErrorMapping = Elf.checkStatusErrorMapping(this.ohClass);
+        this.statusSeriesErrorMapping = Elf.checkStatusSeriesErrorMapping(this.ohClass);
     }
 
     @Override
@@ -129,16 +129,16 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
         }
 
         static String checkBaseUrl(Class clazz) {
-            val ohMapping = findAnnotation(clazz, OhMapping.class);
-            if (null == ohMapping) return "";
-            val providerClass = ohMapping.urlProvider();
+            val mapping = findAnnotation(clazz, Mapping.class);
+            if (null == mapping) return "";
+            val providerClass = mapping.urlProvider();
             return ohSubstitutor.replace(UrlProvider.class == providerClass ?
-                    ohMapping.value() : getBeanOrReflect(providerClass).url(clazz));
+                    mapping.value() : getBeanOrReflect(providerClass).url(clazz));
         }
 
-        static Proxy checkProxy(Class clazz) {
-            val configProxy = findAnnotation(clazz, OhConfigProxy.class);
-            return notNullThen(configProxy, annotation -> {
+        static Proxy checkClientProxy(Class clazz) {
+            val clientProxy = findAnnotation(clazz, ClientProxy.class);
+            return notNullThen(clientProxy, annotation -> {
                 val providerClass = annotation.proxyProvider();
                 return ProxyProvider.class == providerClass ?
                         checkBlank(annotation.ip(), () -> null, s -> new Proxy(Proxy.Type.HTTP,
@@ -147,35 +147,35 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
             });
         }
 
-        static OhConfigSSL checkConfigSSL(Class clazz) {
-            return findAnnotation(clazz, OhConfigSSL.class);
+        static ClientSSL checkClientSSL(Class clazz) {
+            return findAnnotation(clazz, ClientSSL.class);
         }
 
-        static SSLSocketFactory checkSSLSocketFactory(Class clazz, OhConfigSSL configSSL) {
-            val providerClass = configSSL.sslSocketFactoryProvider();
+        static SSLSocketFactory checkSSLSocketFactory(Class clazz, ClientSSL clientSSL) {
+            val providerClass = clientSSL.sslSocketFactoryProvider();
             return SSLSocketFactoryProvider.class == providerClass ? null
                     : getBeanOrReflect(providerClass).sslSocketFactory(clazz);
         }
 
-        static X509TrustManager checkX509TrustManager(Class clazz, OhConfigSSL configSSL) {
-            val providerClass = configSSL.x509TrustManagerProvider();
+        static X509TrustManager checkX509TrustManager(Class clazz, ClientSSL clientSSL) {
+            val providerClass = clientSSL.x509TrustManagerProvider();
             return X509TrustManagerProvider.class == providerClass ? null
                     : getBeanOrReflect(providerClass).x509TrustManager(clazz);
         }
 
-        static HostnameVerifier checkHostnameVerifier(Class clazz, OhConfigSSL configSSL) {
-            val providerClass = configSSL.hostnameVerifierProvider();
+        static HostnameVerifier checkHostnameVerifier(Class clazz, ClientSSL clientSSL) {
+            val providerClass = clientSSL.hostnameVerifierProvider();
             return HostnameVerifierProvider.class == providerClass ? null
                     : getBeanOrReflect(providerClass).hostnameVerifier(clazz);
         }
 
         static ConnectionPool checkConnectionPool(Class clazz) {
-            val configIsolated = findAnnotation(clazz, OhConfigIsolatedConnectionPool.class);
-            return checkNull(configIsolated, () -> ohConnectionPool, x -> new ConnectionPool());
+            val isolated = findAnnotation(clazz, IsolatedConnectionPool.class);
+            return checkNull(isolated, () -> ohConnectionPool, x -> new ConnectionPool());
         }
 
         static OkHttpClient buildOkHttpClient(OhProxy proxy) {
-            return new OhReq().proxy(proxy.proxy)
+            return new OhReq().clientProxy(proxy.clientProxy)
                     .sslSocketFactory(proxy.sslSocketFactory)
                     .x509TrustManager(proxy.x509TrustManager)
                     .hostnameVerifier(proxy.hostnameVerifier)
@@ -184,75 +184,74 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
         }
 
         static Charset checkAcceptCharset(Class clazz) {
-            val configAcceptCharset = findAnnotation(clazz, OhConfigAcceptCharset.class);
-            return checkNull(configAcceptCharset, () -> DEFAULT_ACCEPT_CHARSET,
+            val acceptCharset = findAnnotation(clazz, AcceptCharset.class);
+            return checkNull(acceptCharset, () -> DEFAULT_ACCEPT_CHARSET,
                     annotation -> Charset.forName(annotation.value()));
         }
 
-        static ContentFormat checkContentFormat(Class clazz) {
-            val configContentFormat = findAnnotation(clazz, OhConfigContentFormat.class);
-            return checkNull(configContentFormat, () -> DEFAULT_CONTENT_FORMAT,
+        static ContentFormatter checkContentFormatter(Class clazz) {
+            val contentFormat = findAnnotation(clazz, ContentFormat.class);
+            return checkNull(contentFormat, () -> DEFAULT_CONTENT_FORMATTER,
                     annotation -> getBeanOrReflect(annotation.value()));
         }
 
-        static RequestMethod checkRequestMethod(Class clazz) {
-            val configRequestMethod = findAnnotation(clazz, OhConfigRequestMethod.class);
-            return checkNull(configRequestMethod, () -> DEFAULT_REQUEST_METHOD,
-                    OhConfigRequestMethod::value);
+        static HttpMethod checkHttpMethod(Class clazz) {
+            val requestMethod = findAnnotation(clazz, RequestMethod.class);
+            return checkNull(requestMethod, () -> DEFAULT_HTTP_METHOD, RequestMethod::value);
         }
 
         static List<Pair<String, String>> checkFixedHeaders(Class clazz) {
-            return newArrayList(findMergedRepeatableAnnotations(clazz, OhFixedHeader.class))
+            return newArrayList(findMergedRepeatableAnnotations(clazz, FixedHeader.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
                         val name = an.name();
                         val providerClass = an.valueProvider();
-                        return Pair.of(name, OhFixedValueProvider.class == providerClass ?
+                        return Pair.of(name, FixedValueProvider.class == providerClass ?
                                 an.value() : getBeanOrReflect(providerClass).value(clazz, name));
                     }).collect(Collectors.toList());
         }
 
         static List<Pair<String, String>> checkFixedPathVars(Class clazz) {
-            return newArrayList(findMergedRepeatableAnnotations(clazz, OhFixedPathVar.class))
+            return newArrayList(findMergedRepeatableAnnotations(clazz, FixedPathVar.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
                         val name = an.name();
                         val providerClass = an.valueProvider();
-                        return Pair.of(name, OhFixedValueProvider.class == providerClass ?
+                        return Pair.of(name, FixedValueProvider.class == providerClass ?
                                 an.value() : getBeanOrReflect(providerClass).value(clazz, name));
                     }).collect(Collectors.toList());
         }
 
         static List<Pair<String, Object>> checkFixedParameters(Class clazz) {
-            return newArrayList(findMergedRepeatableAnnotations(clazz, OhFixedParameter.class))
+            return newArrayList(findMergedRepeatableAnnotations(clazz, FixedParameter.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
                         val name = an.name();
                         val providerClass = an.valueProvider();
-                        return Pair.of(name, (Object) (OhFixedValueProvider.class == providerClass ?
+                        return Pair.of(name, (Object) (FixedValueProvider.class == providerClass ?
                                 an.value() : getBeanOrReflect(providerClass).value(clazz, name)));
                     }).collect(Collectors.toList());
         }
 
         static List<Pair<String, Object>> checkFixedContexts(Class clazz) {
-            return newArrayList(findMergedRepeatableAnnotations(clazz, OhFixedContext.class))
+            return newArrayList(findMergedRepeatableAnnotations(clazz, FixedContext.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
                         val name = an.name();
                         val providerClass = an.valueProvider();
-                        return Pair.of(name, (Object) (OhFixedValueProvider.class == providerClass ?
+                        return Pair.of(name, (Object) (FixedValueProvider.class == providerClass ?
                                 an.value() : getBeanOrReflect(providerClass).value(clazz, name)));
                     }).collect(Collectors.toList());
         }
 
-        static Map<HttpStatus, Class<? extends OhError>> checkStatusMapping(Class clazz) {
-            return newArrayList(findMergedRepeatableAnnotations(clazz, OhStatusMapping.class)).stream()
-                    .collect(Collectors.toMap(OhStatusMapping::status, OhStatusMapping::exception));
+        static Map<HttpStatus, Class<? extends StatusError>> checkStatusErrorMapping(Class clazz) {
+            return newArrayList(findMergedRepeatableAnnotations(clazz, StatusErrorMapping.class)).stream()
+                    .collect(Collectors.toMap(StatusErrorMapping::status, StatusErrorMapping::exception));
         }
 
-        static Map<HttpStatus.Series, Class<? extends OhError>> checkStatusSeriesMapping(Class clazz) {
-            val disabled = findAnnotation(clazz, OhDefaultErrorMappingDisabled.class);
-            Map<HttpStatus.Series, Class<? extends OhError>> result = checkNull(
-                    disabled, () -> of(HttpStatus.Series.CLIENT_ERROR, OhError.class,
-                            HttpStatus.Series.SERVER_ERROR, OhError.class), x -> newHashMap());
-            result.putAll(newArrayList(findMergedRepeatableAnnotations(clazz, OhStatusSeriesMapping.class)).stream()
-                    .collect(Collectors.toMap(OhStatusSeriesMapping::statusSeries, OhStatusSeriesMapping::exception)));
+        static Map<HttpStatus.Series, Class<? extends StatusError>> checkStatusSeriesErrorMapping(Class clazz) {
+            val defaultDisabled = findAnnotation(clazz, DefaultErrorMappingDisabled.class);
+            Map<HttpStatus.Series, Class<? extends StatusError>> result = checkNull(
+                    defaultDisabled, () -> of(HttpStatus.Series.CLIENT_ERROR, StatusError.class,
+                            HttpStatus.Series.SERVER_ERROR, StatusError.class), x -> newHashMap());
+            result.putAll(newArrayList(findMergedRepeatableAnnotations(clazz, StatusSeriesErrorMapping.class)).stream()
+                    .collect(Collectors.toMap(StatusSeriesErrorMapping::statusSeries, StatusSeriesErrorMapping::exception)));
             return result;
         }
     }
