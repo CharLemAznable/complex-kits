@@ -2,6 +2,8 @@ package com.github.charlemaznable.core.net.ohclient.internal;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.github.charlemaznable.core.lang.Str;
+import com.github.charlemaznable.core.net.common.CncRequest;
+import com.github.charlemaznable.core.net.common.CncResponse.CncResponseImpl;
 import com.github.charlemaznable.core.net.common.Context;
 import com.github.charlemaznable.core.net.common.Header;
 import com.github.charlemaznable.core.net.common.Parameter;
@@ -42,6 +44,7 @@ import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.log;
 
 public final class OhCall extends OhRoot {
 
+    Class responseClass = CncResponseImpl.class;
     String requestBodyRaw;
     Request request;
 
@@ -96,6 +99,11 @@ public final class OhCall extends OhRoot {
             this.x509TrustManager = (X509TrustManager) argument;
         } else if (HostnameVerifier.class.isAssignableFrom(parameterType)) {
             this.hostnameVerifier = (HostnameVerifier) argument;
+        } else if (CncRequest.class.isAssignableFrom(parameterType)) {
+            this.responseClass = checkNull(argument,
+                    () -> CncResponseImpl.class,
+                    xx -> ((CncRequest) xx).getResponseClass());
+            return false;
         } else {
             return false;
         }

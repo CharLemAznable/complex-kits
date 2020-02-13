@@ -1,6 +1,7 @@
 package com.github.charlemaznable.core.net.ohclient.internal;
 
 import com.github.charlemaznable.core.net.common.AcceptCharset;
+import com.github.charlemaznable.core.net.common.CncResponse;
 import com.github.charlemaznable.core.net.common.ContentFormat;
 import com.github.charlemaznable.core.net.common.ContentFormat.ContentFormatter;
 import com.github.charlemaznable.core.net.common.FixedContext;
@@ -44,6 +45,7 @@ import java.io.Reader;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.nio.charset.Charset;
@@ -70,6 +72,8 @@ import static org.springframework.core.annotation.AnnotatedElementUtils.findMerg
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 
 public final class OhMappingProxy extends OhRoot {
+
+    private static final String RETURN_GENERIC_ERROR = "Method return type generic Error";
 
     Class ohClass;
     Method ohMethod;
@@ -142,10 +146,16 @@ public final class OhMappingProxy extends OhRoot {
                     this.returnPair || this.returnTriple) {
                 // 如返回支持的泛型类型则抛出异常
                 // 不包括Map<K, V>
-                throw new OhException("Method return type generic Error");
+                throw new OhException(RETURN_GENERIC_ERROR);
+            } else if (genericReturnType instanceof TypeVariable) {
+                // 返回类型变量指定的类型时
+                // 检查是否为<T extend CncResponse>类型
+                checkTypeVariableBounds(genericReturnType);
+                this.returnTypes = newArrayList(CncResponse.class);
+                return;
             } else {
                 // 否则以方法返回类型作为实际返回类型
-                // 返回Map时, 直接解析返回值为Map
+                // 返回Map时, 可直接解析返回值为Map
                 this.returnTypes = newArrayList(returnType);
                 return;
             }
@@ -158,6 +168,11 @@ public final class OhMappingProxy extends OhRoot {
             // 返回Future类型, 则多处理一层泛型
             val futureTypeArgument = actualTypeArguments[0];
             if (!(futureTypeArgument instanceof ParameterizedType)) {
+                if (futureTypeArgument instanceof TypeVariable) {
+                    checkTypeVariableBounds(futureTypeArgument);
+                    this.returnTypes = newArrayList(CncResponse.class);
+                    return;
+                }
                 this.returnTypes = newArrayList((Class) futureTypeArgument);
                 return;
             }
@@ -172,19 +187,38 @@ public final class OhMappingProxy extends OhRoot {
         }
         if (this.returnCollection || this.returnPair || this.returnTriple) {
             // 以泛型参数类型作为返回值解析目标类型
-            this.returnTypes = newArrayList();
-            for (Type actualTypeArgument : actualTypeArguments) {
-                this.returnTypes.add((Class) actualTypeArgument);
-            }
+            this.returnTypes = processActualTypeArguments(actualTypeArguments);
         } else {
             // 以泛型类型作为返回值解析目标类型
             this.returnTypes = newArrayList(returnType);
         }
     }
 
+    private List<Class> processActualTypeArguments(Type[] actualTypeArguments) {
+        List<Class> result = newArrayList();
+        for (Type actualTypeArgument : actualTypeArguments) {
+            if (actualTypeArgument instanceof TypeVariable) {
+                checkTypeVariableBounds(actualTypeArgument);
+                result.add(CncResponse.class);
+                continue;
+            }
+            result.add((Class) actualTypeArgument);
+        }
+        return result;
+    }
+
+    private void checkTypeVariableBounds(Type type) {
+        val bounds = ((TypeVariable) type).getBounds();
+        if (bounds.length != 1 || !CncResponse.class
+                .isAssignableFrom((Class) bounds[0])) {
+            throw new OhException(RETURN_GENERIC_ERROR);
+        }
+    }
+
     @SneakyThrows
     private Object internalExecute(Object[] args) {
-        val response = new OhCall(this, args).execute();
+        val ohCall = new OhCall(this, args);
+        val response = ohCall.execute();
 
         val statusCode = response.code();
         val responseBody = notNullThen(response.body(), OhResponseBody::new);
@@ -195,7 +229,8 @@ public final class OhMappingProxy extends OhRoot {
         notNullThen(this.statusSeriesErrorMapping.get(
                 HttpStatus.Series.valueOf(statusCode)), errorMapping);
 
-        val responseObjs = processResponseBody(statusCode, responseBody);
+        val responseObjs = processResponseBody(
+                statusCode, responseBody, ohCall.responseClass);
         if (this.returnCollection) {
             val responseObj = responseObjs.get(0);
             if (responseObj instanceof Collection) {
@@ -223,10 +258,13 @@ public final class OhMappingProxy extends OhRoot {
         }
     }
 
-    private List<Object> processResponseBody(int statusCode, ResponseBody responseBody) {
+    private List<Object> processResponseBody(int statusCode,
+                                             ResponseBody responseBody,
+                                             Class responseClass) {
         List<Object> returnValues = newArrayList();
         for (val returnType : this.returnTypes) {
-            returnValues.add(processReturnTypeValue(statusCode, responseBody, returnType));
+            returnValues.add(processReturnTypeValue(statusCode, responseBody,
+                    CncResponse.class == returnType ? responseClass : returnType));
         }
         return returnValues;
     }
