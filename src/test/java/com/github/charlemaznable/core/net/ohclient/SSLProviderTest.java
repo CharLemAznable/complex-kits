@@ -1,12 +1,12 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.net.common.ClientSSL;
-import com.github.charlemaznable.core.net.common.ClientSSL.HostnameVerifierProvider;
-import com.github.charlemaznable.core.net.common.ClientSSL.SSLSocketFactoryProvider;
-import com.github.charlemaznable.core.net.common.ClientSSL.X509TrustManagerProvider;
-import com.github.charlemaznable.core.net.common.ClientSSLDisabled;
 import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.ProviderException;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSL;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSL.HostnameVerifierProvider;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSL.SSLSocketFactoryProvider;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSL.X509TrustManagerProvider;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSLDisabled;
 import lombok.SneakyThrows;
 import lombok.val;
 import okhttp3.OkHttpClient;

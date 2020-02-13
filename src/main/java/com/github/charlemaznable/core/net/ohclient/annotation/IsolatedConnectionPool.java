@@ -1,4 +1,4 @@
-package com.github.charlemaznable.core.net.common;
+package com.github.charlemaznable.core.net.ohclient.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -9,8 +9,7 @@ import java.lang.annotation.Target;
 
 @Documented
 @Inherited
-@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
+@Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-@ClientProxy
-public @interface ClientProxyDisabled {
+public @interface IsolatedConnectionPool {
 }

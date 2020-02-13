@@ -1,12 +1,6 @@
 package com.github.charlemaznable.core.net.ohclient.internal;
 
 import com.github.charlemaznable.core.net.common.AcceptCharset;
-import com.github.charlemaznable.core.net.common.ClientProxy;
-import com.github.charlemaznable.core.net.common.ClientProxy.ProxyProvider;
-import com.github.charlemaznable.core.net.common.ClientSSL;
-import com.github.charlemaznable.core.net.common.ClientSSL.HostnameVerifierProvider;
-import com.github.charlemaznable.core.net.common.ClientSSL.SSLSocketFactoryProvider;
-import com.github.charlemaznable.core.net.common.ClientSSL.X509TrustManagerProvider;
 import com.github.charlemaznable.core.net.common.ContentFormat;
 import com.github.charlemaznable.core.net.common.ContentFormat.ContentFormatter;
 import com.github.charlemaznable.core.net.common.FixedContext;
@@ -16,7 +10,6 @@ import com.github.charlemaznable.core.net.common.FixedPathVar;
 import com.github.charlemaznable.core.net.common.FixedValueProvider;
 import com.github.charlemaznable.core.net.common.HttpMethod;
 import com.github.charlemaznable.core.net.common.HttpStatus;
-import com.github.charlemaznable.core.net.common.IsolatedConnectionPool;
 import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.Mapping.UrlProvider;
 import com.github.charlemaznable.core.net.common.RequestMethod;
@@ -26,6 +19,13 @@ import com.github.charlemaznable.core.net.common.StatusErrorMapping;
 import com.github.charlemaznable.core.net.common.StatusSeriesErrorMapping;
 import com.github.charlemaznable.core.net.ohclient.OhException;
 import com.github.charlemaznable.core.net.ohclient.OhReq;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientProxy;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientProxy.ProxyProvider;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSL;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSL.HostnameVerifierProvider;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSL.SSLSocketFactoryProvider;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSL.X509TrustManagerProvider;
+import com.github.charlemaznable.core.net.ohclient.annotation.IsolatedConnectionPool;
 import lombok.SneakyThrows;
 import lombok.val;
 import lombok.var;
@@ -299,8 +299,9 @@ public final class OhMappingProxy extends OhRoot {
             return checkNull(clientProxy, () -> proxy.clientProxy, annotation -> {
                 val providerClass = annotation.proxyProvider();
                 return ProxyProvider.class == providerClass ?
-                        checkBlank(annotation.ip(), () -> null, s -> new Proxy(Proxy.Type.HTTP,
-                                new InetSocketAddress(annotation.ip(), annotation.port())))
+                        checkBlank(annotation.host(), () -> null,
+                                xx -> new Proxy(annotation.type(), new InetSocketAddress(
+                                        annotation.host(), annotation.port())))
                         : getBeanOrReflect(providerClass).proxy(clazz, method);
             });
         }

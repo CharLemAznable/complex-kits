@@ -1,4 +1,4 @@
-package com.github.charlemaznable.core.net.common;
+package com.github.charlemaznable.core.net.ohclient.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -11,6 +11,6 @@ import java.lang.annotation.Target;
 @Inherited
 @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@ClientSSL
-public @interface ClientSSLDisabled {
+@ClientProxy
+public @interface ClientProxyDisabled {
 }

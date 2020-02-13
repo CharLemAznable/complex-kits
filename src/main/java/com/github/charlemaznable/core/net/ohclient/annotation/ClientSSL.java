@@ -1,4 +1,6 @@
-package com.github.charlemaznable.core.net.common;
+package com.github.charlemaznable.core.net.ohclient.annotation;
+
+import com.github.charlemaznable.core.net.common.ProviderException;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;

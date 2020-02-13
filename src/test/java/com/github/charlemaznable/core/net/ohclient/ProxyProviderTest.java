@@ -1,10 +1,10 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.net.common.ClientProxy;
-import com.github.charlemaznable.core.net.common.ClientProxy.ProxyProvider;
-import com.github.charlemaznable.core.net.common.ClientProxyDisabled;
 import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.ProviderException;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientProxy;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientProxy.ProxyProvider;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientProxyDisabled;
 import lombok.SneakyThrows;
 import lombok.val;
 import okhttp3.OkHttpClient;
@@ -105,7 +105,7 @@ public class ProxyProviderTest {
 
     @OhClient
     @Mapping("${root}:41110")
-    @ClientProxy(ip = "127.0.0.1", port = 41111)
+    @ClientProxy(host = "127.0.0.1", port = 41111)
     public interface ProxyPlainHttpClient {
 
         String sample();
@@ -121,7 +121,7 @@ public class ProxyProviderTest {
 
     @OhClient
     @Mapping("${root}:41114")
-    @ClientProxy(ip = "127.0.0.1", port = 41115)
+    @ClientProxy(host = "127.0.0.1", port = 41115)
     public interface ProxyParamHttpClient {
 
         String sample(Proxy proxy);
@@ -141,7 +141,7 @@ public class ProxyProviderTest {
 
         String sampleDefault();
 
-        @ClientProxy(ip = "127.0.0.1", port = 41118)
+        @ClientProxy(host = "127.0.0.1", port = 41118)
         String samplePlain();
 
         @ClientProxy(proxyProvider = MethodProxyProvider.class)

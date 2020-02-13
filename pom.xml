@@ -63,8 +63,8 @@
         <dom4j.version>2.1.1</dom4j.version>
         <diamond-client.version>0.0.21</diamond-client.version>
         <annotations.version>18.0.0</annotations.version>
-        <okhttp.version>3.14.6</okhttp.version>
         <auto-service.version>1.0-rc6</auto-service.version>
+        <okhttp.version>3.14.6</okhttp.version>
 
         <lombok.version>1.18.12</lombok.version>
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
@@ -146,14 +146,14 @@
             <version>${annotations.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>${okhttp.version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service</artifactId>
             <version>${auto-service.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>${okhttp.version}</version>
         </dependency>
 
         <dependency>
