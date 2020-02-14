@@ -1,6 +1,6 @@
-package com.github.charlemaznable.core.net.common;
+package com.github.charlemaznable.core.net.ohclient.internal;
 
-import com.github.charlemaznable.core.net.ohclient.internal.ResponseBodyExtractor;
+import com.github.charlemaznable.core.net.common.StatusError;
 import lombok.AllArgsConstructor;
 import lombok.val;
 import okhttp3.ResponseBody;
