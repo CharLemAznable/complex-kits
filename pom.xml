@@ -65,6 +65,7 @@
         <annotations.version>18.0.0</annotations.version>
         <auto-service.version>1.0-rc6</auto-service.version>
         <okhttp.version>3.14.6</okhttp.version>
+        <vertx.version>3.8.5</vertx.version>
 
         <lombok.version>1.18.12</lombok.version>
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
@@ -155,6 +156,11 @@
             <artifactId>okhttp</artifactId>
             <version>${okhttp.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-web-client</artifactId>
+            <version>${vertx.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -209,6 +215,12 @@
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>mockwebserver</artifactId>
             <version>${okhttp.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-junit5</artifactId>
+            <version>${vertx.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

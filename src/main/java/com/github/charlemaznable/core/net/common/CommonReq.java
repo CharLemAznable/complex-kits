@@ -111,4 +111,9 @@ public abstract class CommonReq<T extends CommonReq> {
         }
         return parameterMap;
     }
+
+    protected String concatRequestQuery(String requestUrl, String query) {
+        if (isBlank(query)) return requestUrl;
+        return requestUrl + (requestUrl.contains("?") ? "&" : "?") + query;
+    }
 }

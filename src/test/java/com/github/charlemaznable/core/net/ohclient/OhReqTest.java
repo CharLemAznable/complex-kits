@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.net.ohclient;
 
+import com.github.charlemaznable.core.net.common.CommonReqTest;
 import com.github.charlemaznable.core.net.common.ContentFormat.FormContentFormatter;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.StatusError;
@@ -7,103 +8,49 @@ import com.github.charlemaznable.core.net.ohclient.OhResponseMappingTest.ClientE
 import com.github.charlemaznable.core.net.ohclient.OhResponseMappingTest.NotFoundException;
 import lombok.SneakyThrows;
 import lombok.val;
-import okhttp3.mockwebserver.Dispatcher;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 
 import static com.github.charlemaznable.core.lang.Mapp.of;
-import static com.github.charlemaznable.core.lang.Str.isNull;
-import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.ACCEPT_CHARSET;
-import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.CONTENT_TYPE;
-import static com.google.common.net.MediaType.FORM_DATA;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class OhReqTest {
+public class OhReqTest extends CommonReqTest {
 
     @SneakyThrows
     @Test
     public void testOhReq() {
-        val mockWebServer = new MockWebServer();
-        mockWebServer.setDispatcher(new Dispatcher() {
-            @Override
-            public MockResponse dispatch(RecordedRequest request) {
-                val requestUrl = request.getRequestUrl();
-                switch (requestUrl.encodedPath()) {
-                    case "/sample1":
-                        val acceptCharset = request.getHeader(ACCEPT_CHARSET);
-                        assertEquals(ISO_8859_1.name(), acceptCharset);
-                        val contentType = request.getHeader(CONTENT_TYPE);
-                        assertTrue(contentType.startsWith(FORM_DATA.toString()));
-                        assertNull(request.getHeader("AAA"));
-                        assertEquals("bbb", request.getHeader("BBB"));
-                        assertEquals("ccc", requestUrl.queryParameter("CCC"));
-                        assertEquals("GET", request.getMethod());
-                        return new MockResponse().setBody("Sample1");
-
-                    case "/sample2":
-                        assertEquals("BBB=bbb", request.getBody().readUtf8());
-                        assertEquals("POST", request.getMethod());
-                        return new MockResponse().setBody("Sample2");
-
-                    case "/sample3":
-                        assertEquals("ddd", requestUrl.queryParameter("DDD"));
-                        assertNull(requestUrl.queryParameter("AAA"));
-                        assertEquals("bbb", requestUrl.queryParameter("BBB"));
-                        assertNull(requestUrl.queryParameter("CCC"));
-                        assertEquals("GET", request.getMethod());
-                        return new MockResponse().setBody("Sample3");
-
-                    case "/sample4":
-                        assertEquals("CCC=ccc", request.getBody().readUtf8());
-                        assertEquals("POST", request.getMethod());
-                        return new MockResponse().setBody("Sample4");
-
-                    case "/sample5":
-                    case "/sample6":
-                        if (isNull(requestUrl.queryParameter("AAA"))) {
-                            return new MockResponse()
-                                    .setResponseCode(HttpStatus.NOT_FOUND.value())
-                                    .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
-                        } else {
-                            return new MockResponse()
-                                    .setResponseCode(HttpStatus.FORBIDDEN.value())
-                                    .setBody(HttpStatus.FORBIDDEN.getReasonPhrase());
-                        }
-                }
-                return new MockResponse()
-                        .setResponseCode(HttpStatus.NOT_FOUND.value())
-                        .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
-            }
-        });
-        mockWebServer.start(41103);
+        startMockWebServer(41103);
 
         val ohReq1 = new OhReq("http://127.0.0.1:41103/sample1")
-                .acceptCharset(ISO_8859_1).contentFormat(new FormContentFormatter())
-                .header("AAA", "aaa").headers(of("AAA", null, "BBB", "bbb"))
+                .acceptCharset(ISO_8859_1)
+                .contentFormat(new FormContentFormatter())
+                .header("AAA", "aaa")
+                .headers(of("AAA", null, "BBB", "bbb"))
                 .parameter("CCC", "ccc");
         assertEquals("Sample1", ohReq1.get());
 
-        val ohReq2 = new OhReq().req("http://127.0.0.1:41103/sample2")
-                .parameter("AAA", "aaa").parameters(of("AAA", null, "BBB", "bbb"));
+        val ohReq2 = new OhReq()
+                .req("http://127.0.0.1:41103/sample2")
+                .parameter("AAA", "aaa")
+                .parameters(of("AAA", null, "BBB", "bbb"));
         assertEquals("Sample2", ohReq2.post());
 
-        val ohReq3 = new OhReq("http://127.0.0.1:41103").req("sample3?DDD=ddd")
-                .parameter("AAA", "aaa").parameters(of("AAA", null, "BBB", "bbb"))
+        val ohReq3 = new OhReq("http://127.0.0.1:41103")
+                .req("sample3?DDD=ddd")
+                .parameter("AAA", "aaa")
+                .parameters(of("AAA", null, "BBB", "bbb"))
                 .requestBody("CCC=ccc");
         val future3 = ohReq3.getFuture();
         await().forever().pollDelay(Duration.ofMillis(100)).until(future3::isDone);
         assertEquals("Sample3", future3.get());
 
-        val ohReq4 = new OhReq("http://127.0.0.1:41103").req("sample4")
-                .parameter("AAA", "aaa").parameters(of("AAA", null, "BBB", "bbb"))
+        val ohReq4 = new OhReq("http://127.0.0.1:41103")
+                .req("sample4")
+                .parameter("AAA", "aaa")
+                .parameters(of("AAA", null, "BBB", "bbb"))
                 .requestBody("CCC=ccc");
         val future4 = ohReq4.postFuture();
         await().forever().pollDelay(Duration.ofMillis(100)).until(future4::isDone);
@@ -139,6 +86,6 @@ public class OhReqTest {
             assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), e.getMessage());
         }
 
-        mockWebServer.shutdown();
+        shutdownMockWebServer();
     }
 }

@@ -3,9 +3,9 @@ package com.github.charlemaznable.core.net.ohclient;
 import com.github.charlemaznable.core.net.common.CommonReq;
 import com.github.charlemaznable.core.net.common.HttpMethod;
 import com.github.charlemaznable.core.net.common.HttpStatus;
-import com.github.charlemaznable.core.net.ohclient.internal.StatusErrorFunction;
 import com.github.charlemaznable.core.net.ohclient.internal.OhResponseBody;
 import com.github.charlemaznable.core.net.ohclient.internal.ResponseBodyExtractor;
+import com.github.charlemaznable.core.net.ohclient.internal.StatusErrorFunction;
 import lombok.SneakyThrows;
 import lombok.val;
 import okhttp3.ConnectionPool;
@@ -25,7 +25,6 @@ import static com.github.charlemaznable.core.lang.Condition.checkNull;
 import static com.github.charlemaznable.core.lang.Condition.notNullThen;
 import static com.github.charlemaznable.core.lang.Condition.nullThen;
 import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
-import static com.github.charlemaznable.core.lang.Str.isBlank;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.ACCEPT_CHARSET;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.CONTENT_TYPE;
 import static java.util.concurrent.Executors.newCachedThreadPool;
@@ -110,9 +109,7 @@ public class OhReq extends CommonReq<OhReq> {
 
         requestBuilder.method(HttpMethod.GET.toString(), null);
         val addQuery = this.contentFormatter.format(parameterMap, newHashMap());
-        if (isBlank(addQuery)) requestBuilder.url(requestUrl);
-        else requestBuilder.url(requestUrl +
-                (requestUrl.contains("?") ? "&" : "?") + addQuery);
+        requestBuilder.url(concatRequestQuery(requestUrl, addQuery));
         return requestBuilder.build();
     }
 
