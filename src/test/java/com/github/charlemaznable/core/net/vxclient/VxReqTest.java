@@ -114,7 +114,7 @@ public class VxReqTest extends CommonReqTest {
                         .get(async -> test.verify(() -> {
                             assertTrue(async.cause() instanceof VxException);
                             f.complete();
-                        }))
+                        }), null)
 
         )).setHandler(result -> {
             shutdownMockWebServer();

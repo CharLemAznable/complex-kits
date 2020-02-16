@@ -147,7 +147,9 @@ public class VxReq extends CommonReq<VxReq> {
 
             val iterator = Iterators.forArray(handlers);
             while (iterator.hasNext()) {
-                iterator.next().handle(promise.future());
+                val nextHandler = iterator.next();
+                if (null == nextHandler) continue;
+                nextHandler.handle(promise.future());
             }
         };
     }
