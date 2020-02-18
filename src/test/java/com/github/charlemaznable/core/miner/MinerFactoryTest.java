@@ -17,6 +17,7 @@ import org.n3r.diamond.client.impl.MockDiamondServer;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Properties;
 
 import static com.github.charlemaznable.core.miner.MinerFactory.getMiner;
 import static org.joor.Reflect.onClass;
@@ -30,6 +31,8 @@ public class MinerFactoryTest {
     @BeforeAll
     public static void beforeClass() {
         MockDiamondServer.setUpMockServer();
+        MockDiamondServer.setConfigInfo("Env", "miner",
+                "prop=PROP\ndefault=DEFAULT");
     }
 
     @AfterAll
@@ -41,6 +44,8 @@ public class MinerFactoryTest {
     public void testConstruct() {
         assertThrows(ReflectException.class,
                 () -> onClass(MinerFactory.class).create().get());
+        assertThrows(ReflectException.class,
+                () -> onClass(MinerElf.class).create().get());
     }
 
     @Test
@@ -116,6 +121,22 @@ public class MinerFactoryTest {
         assertEquals(0, minerDefault.doubleValueDefault());
         assertEquals(0, minerDefault.byteValueDefault());
         assertEquals('\0', minerDefault.charValueDefault());
+
+        val minerDefaultData = getMiner(MinerDefaultData.class);
+        val properties = minerDefaultData.properties();
+        System.out.println(properties);
+
+        assertEquals("John", properties.getProperty("name"));
+        assertEquals("John Doe", properties.getProperty("full"));
+        assertEquals("John Doe Richard", properties.getProperty("long"));
+
+        assertEquals("yes", properties.getProperty("testMode"));
+        assertEquals("TRUE", properties.getProperty("testMode2"));
+
+        assertEquals("@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John Doe Richard)",
+                properties.getProperty("content"));
+        assertEquals("@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John) @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John Doe) @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John Doe Richard)",
+                properties.getProperty("list"));
     }
 
     @Test
@@ -227,6 +248,13 @@ public class MinerFactoryTest {
         byte byteValueDefault();
 
         char charValueDefault();
+    }
+
+    @MinerConfig
+    public interface MinerDefaultData {
+
+        @MinerConfig("DEFAULT_DATA")
+        Properties properties();
     }
 
     @MinerConfig("DEFAULT_DATA")

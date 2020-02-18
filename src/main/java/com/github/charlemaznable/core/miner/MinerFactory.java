@@ -26,11 +26,13 @@ import org.n3r.diamond.client.impl.DiamondUtils;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
+import java.util.Properties;
 
 import static com.github.charlemaznable.core.lang.ClzPath.classResourceAsSubstitutor;
 import static com.github.charlemaznable.core.lang.Condition.blankThen;
 import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static com.github.charlemaznable.core.lang.Str.isNotBlank;
+import static com.github.charlemaznable.core.miner.MinerElf.minerAsSubstitutor;
 import static com.github.charlemaznable.core.spring.SpringContext.getBeanOrReflect;
 import static com.google.common.cache.CacheLoader.from;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
@@ -41,10 +43,12 @@ public final class MinerFactory {
 
     private static LoadingCache<Class, Object> minerCache
             = LoadingCachee.simpleCache(from(MinerFactory::loadMiner));
-    private static StringSubstitutor minerSubstitutor;
+    private static StringSubstitutor minerMinerSubstitutor;
+    private static StringSubstitutor minerClassPathSubstitutor;
 
     static {
-        minerSubstitutor = classResourceAsSubstitutor("miner.env.props");
+        minerMinerSubstitutor = minerAsSubstitutor("Env", "miner");
+        minerClassPathSubstitutor = classResourceAsSubstitutor("miner.env.props");
     }
 
     private MinerFactory() {
@@ -85,14 +89,18 @@ public final class MinerFactory {
 
     private static <T> String checkMinerGroup(Class<T> clazz, MinerConfig minerConfig) {
         val providerClass = minerConfig.groupProvider();
-        return minerSubstitutor.replace(GroupProvider.class == providerClass ?
+        return substitute(GroupProvider.class == providerClass ?
                 minerConfig.group() : getBeanOrReflect(providerClass).group(clazz));
     }
 
     private static <T> String checkMinerDataId(Class<T> clazz, MinerConfig minerConfig) {
         val providerClass = minerConfig.dataIdProvider();
-        return minerSubstitutor.replace(DataIdProvider.class == providerClass ?
+        return substitute(DataIdProvider.class == providerClass ?
                 minerConfig.dataId() : getBeanOrReflect(providerClass).dataId(clazz));
+    }
+
+    private static String substitute(String source) {
+        return minerClassPathSubstitutor.replace(minerMinerSubstitutor.replace(source));
     }
 
     @NoArgsConstructor
@@ -129,15 +137,15 @@ public final class MinerFactory {
         private String checkMinerGroup(Method method, MinerConfig minerConfig) {
             if (null == minerConfig) return "";
             val providerClass = minerConfig.groupProvider();
-            return minerSubstitutor.replace(GroupProvider.class == providerClass ?
-                    minerConfig.group() : getBeanOrReflect(providerClass).group(minerClass, method));
+            return substitute(GroupProvider.class == providerClass ? minerConfig.group()
+                    : getBeanOrReflect(providerClass).group(minerClass, method));
         }
 
         private String checkMinerDataId(Method method, MinerConfig minerConfig) {
             if (null == minerConfig) return "";
             val providerClass = minerConfig.dataIdProvider();
-            return minerSubstitutor.replace(DataIdProvider.class == providerClass ?
-                    minerConfig.dataId() : getBeanOrReflect(providerClass).dataId(minerClass, method));
+            return substitute(DataIdProvider.class == providerClass ? minerConfig.dataId()
+                    : getBeanOrReflect(providerClass).dataId(minerClass, method));
         }
 
         private String checkMinerDefaultValue(Method method, MinerConfig minerConfig) {
@@ -145,13 +153,16 @@ public final class MinerFactory {
             val providerClass = minerConfig.defaultValueProvider();
             val defaultValue = DefaultValueProvider.class == providerClass ? minerConfig.defaultValue()
                     : getBeanOrReflect(providerClass).defaultValue(minerClass, method);
-            return minerSubstitutor.replace(blankThen(defaultValue, () -> null));
+            return substitute(blankThen(defaultValue, () -> null));
         }
 
         private Object convertType(String value, Method method) {
             var rt = Primitives.unwrap(method.getReturnType());
             if (rt == String.class) return value;
             if (rt.isPrimitive()) return parsePrimitive(rt, value);
+
+            if (Properties.class.isAssignableFrom(rt))
+                return parseProperties(value);
 
             val grt = method.getGenericReturnType();
             val isCollection = grt instanceof ParameterizedType
@@ -172,6 +183,10 @@ public final class MinerFactory {
             if (rt == byte.class) return Byte.parseByte(value);
             if (rt == char.class) return value.length() > 0 ? value.charAt(0) : '\0';
             return null;
+        }
+
+        private Properties parseProperties(String value) {
+            return DiamondUtils.parseStoneToProperties(value);
         }
 
         private Object parseObject(Class<?> rt, String value) {
