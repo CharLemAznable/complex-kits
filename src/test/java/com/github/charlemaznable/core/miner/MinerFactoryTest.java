@@ -7,6 +7,7 @@ import com.google.common.base.Splitter;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.apache.commons.text.StringSubstitutor;
 import org.joor.ReflectException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -19,6 +20,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Properties;
 
+import static com.github.charlemaznable.core.miner.MinerElf.minerAsSubstitutor;
 import static com.github.charlemaznable.core.miner.MinerFactory.getMiner;
 import static org.joor.Reflect.onClass;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -153,6 +155,10 @@ public class MinerFactoryTest {
 
     @Test
     public void testStoneProps() {
+        StringSubstitutor minerMinerSubstitutor =
+                onClass(MinerFactory.class).field("minerMinerSubstitutor").get();
+        minerMinerSubstitutor.setVariableResolver(
+                minerAsSubstitutor("Env", "miner").getStringLookup());
         MockDiamondServer.setConfigInfo("GROUPGroup", "DataDATA",
                 "name=John\nfull=${this.name} Doe\nlong=${this.full} Richard");
 
