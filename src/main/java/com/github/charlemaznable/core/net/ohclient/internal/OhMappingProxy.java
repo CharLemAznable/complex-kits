@@ -63,7 +63,7 @@ import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static com.github.charlemaznable.core.lang.Str.isBlank;
 import static com.github.charlemaznable.core.lang.Str.isNotBlank;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.ohExecutorService;
-import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.ohSubstitutor;
+import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.substitute;
 import static com.github.charlemaznable.core.spring.SpringContext.getBeanOrReflect;
 import static org.apache.commons.lang3.StringUtils.prependIfMissing;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
@@ -323,7 +323,7 @@ public final class OhMappingProxy extends OhRoot {
             val mapping = findAnnotation(method, Mapping.class);
             val url = checkNull(mapping, method::getName, annotation -> {
                 val providerClass = annotation.urlProvider();
-                return ohSubstitutor.replace(UrlProvider.class == providerClass ?
+                return substitute(UrlProvider.class == providerClass ?
                         annotation.value() : getBeanOrReflect(providerClass).url(clazz, method));
             });
             if (isBlank(url)) return proxy.baseUrl;

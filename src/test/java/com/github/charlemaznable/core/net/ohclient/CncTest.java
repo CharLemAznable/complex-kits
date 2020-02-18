@@ -5,6 +5,7 @@ import com.github.charlemaznable.core.net.common.CncResponse;
 import com.github.charlemaznable.core.net.common.CncResponse.CncResponseImpl;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
+import com.github.charlemaznable.core.net.ohclient.internal.OhDummy;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -14,24 +15,46 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.text.StringSubstitutor;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.n3r.diamond.client.impl.MockDiamondServer;
 
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.Future;
 
 import static com.github.charlemaznable.core.codec.Json.json;
+import static com.github.charlemaznable.core.miner.MinerElf.minerAsSubstitutor;
 import static com.github.charlemaznable.core.net.ohclient.OhFactory.getClient;
 import static org.awaitility.Awaitility.await;
+import static org.joor.Reflect.onClass;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CncTest {
 
+    @BeforeAll
+    public static void beforeClass() {
+        MockDiamondServer.setUpMockServer();
+        MockDiamondServer.setConfigInfo("Env", "ohclient",
+                "port=41200");
+    }
+
+    @AfterAll
+    public static void afterClass() {
+        MockDiamondServer.tearDownMockServer();
+    }
+
     @SneakyThrows
     @Test
     public void testCncClient() {
+        StringSubstitutor ohMinerSubstitutor =
+                onClass(OhDummy.class).field("ohMinerSubstitutor").get();
+        ohMinerSubstitutor.setVariableResolver(
+                minerAsSubstitutor("Env", "ohclient").getStringLookup());
         val mockWebServer = new MockWebServer();
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
@@ -73,7 +96,7 @@ public class CncTest {
     }
 
     @OhClient
-    @Mapping("${root}:41200")
+    @Mapping("${root}:${port}")
     public interface CncClient {
 
         <T extends CncResponse> T sample1(CncRequest<T> request);
@@ -101,7 +124,7 @@ public class CncTest {
     }
 
     @OhClient
-    @Mapping("${root}:41200")
+    @Mapping("${root}:${port}")
     public interface CncErrorClient {
 
         <T> T sample1();

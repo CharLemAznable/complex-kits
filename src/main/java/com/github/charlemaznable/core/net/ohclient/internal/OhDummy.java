@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.ExecutorService;
 
 import static com.github.charlemaznable.core.lang.ClzPath.classResourceAsSubstitutor;
+import static com.github.charlemaznable.core.miner.MinerElf.minerAsSubstitutor;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 
 @NoArgsConstructor
@@ -17,14 +18,20 @@ import static java.util.concurrent.Executors.newCachedThreadPool;
 public class OhDummy {
 
     static final Logger log = LoggerFactory.getLogger("OhClient");
-    static final StringSubstitutor ohSubstitutor;
+    static final StringSubstitutor ohMinerSubstitutor;
+    static final StringSubstitutor ohClassPathSubstitutor;
     static final ExecutorService ohExecutorService;
     static final ConnectionPool ohConnectionPool;
 
     static {
-        ohSubstitutor = classResourceAsSubstitutor("ohclient.env.props");
+        ohMinerSubstitutor = minerAsSubstitutor("Env", "ohclient");
+        ohClassPathSubstitutor = classResourceAsSubstitutor("ohclient.env.props");
         ohExecutorService = newCachedThreadPool();
         ohConnectionPool = new ConnectionPool();
+    }
+
+    static String substitute(String source) {
+        return ohClassPathSubstitutor.replace(ohMinerSubstitutor.replace(source));
     }
 
     @Override

@@ -59,7 +59,7 @@ import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DE
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_CONTENT_FORMATTER;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_HTTP_METHOD;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.ohConnectionPool;
-import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.ohSubstitutor;
+import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.substitute;
 import static com.github.charlemaznable.core.spring.SpringContext.getBeanOrReflect;
 import static com.google.common.cache.CacheLoader.from;
 import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedRepeatableAnnotations;
@@ -132,7 +132,7 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
             val mapping = findAnnotation(clazz, Mapping.class);
             if (null == mapping) return "";
             val providerClass = mapping.urlProvider();
-            return ohSubstitutor.replace(UrlProvider.class == providerClass ?
+            return substitute(UrlProvider.class == providerClass ?
                     mapping.value() : getBeanOrReflect(providerClass).url(clazz));
         }
 
