@@ -1,5 +1,7 @@
 package com.github.charlemaznable.core.codec;
 
+import com.github.charlemaznable.core.codec.nonsense.NonsenseOptions;
+import com.github.charlemaznable.core.codec.signature.SignatureOptions;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
@@ -18,7 +20,10 @@ public class NonsenseSignatureTest {
         demoSubBean.setValue("Hello, NS!");
         demoBean.setSub(demoSubBean);
 
-        val result = new NonsenseSignature().process(demoBean);
+        val result = new NonsenseSignature()
+                .nonsenseOptions(new NonsenseOptions())
+                .signatureOptions(new SignatureOptions())
+                .process(demoBean);
         val nonsense = result.get("nonsense").toString();
         assertTrue(nonsense.matches("[A-Za-z0-9]{16}"));
         val signature = result.get("signature").toString();
