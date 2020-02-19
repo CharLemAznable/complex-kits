@@ -7,7 +7,6 @@ import com.github.charlemaznable.core.crypto.SHAXWithRSA;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.val;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -198,9 +197,8 @@ public final class Signature {
     }
 
     public static boolean verify(Map<String, Object> source, SignatureOptions options) {
-        val signatureValue = toStr(source.remove(options.key()));
-        return options.verifyAlgorithm().test(
-                buildPlain(source, options), signatureValue);
+        return options.verifyAlgorithm().test(buildPlain(
+                source, options), toStr(source.get(options.key())));
     }
 
     ////////////////////////////////////////////////////////////////
@@ -216,6 +214,7 @@ public final class Signature {
         }
         Map<String, String> tempMap = options.keySortAsc()
                 ? new TreeMap<>(flatMap) : new TreeMap<>(flatMap).descendingMap();
+        tempMap.remove(options.key());
         return tempMap.entrySet().stream()
                 .filter(options.entryFilter())
                 .map(options.entryMapper())
