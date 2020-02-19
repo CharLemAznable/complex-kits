@@ -18,11 +18,18 @@ import static com.github.charlemaznable.core.codec.signature.Signature.signature
 import static com.github.charlemaznable.core.codec.signature.Signature.signatureDigestHex;
 import static com.github.charlemaznable.core.codec.signature.Signature.signatureSHAWithRSABase64;
 import static com.github.charlemaznable.core.codec.signature.Signature.signatureSHAWithRSAHex;
+import static com.github.charlemaznable.core.codec.signature.Signature.verify;
+import static com.github.charlemaznable.core.codec.signature.Signature.verifyDigestBase64;
+import static com.github.charlemaznable.core.codec.signature.Signature.verifyDigestHMACBase64;
+import static com.github.charlemaznable.core.codec.signature.Signature.verifyDigestHMACHex;
+import static com.github.charlemaznable.core.codec.signature.Signature.verifyDigestHex;
+import static com.github.charlemaznable.core.codec.signature.Signature.verifySHAWithRSABase64;
+import static com.github.charlemaznable.core.codec.signature.Signature.verifySHAWithRSAHex;
 import static com.github.charlemaznable.core.crypto.RSA.generateKeyPair;
 import static com.github.charlemaznable.core.crypto.RSA.getPrivateKeyString;
 import static com.github.charlemaznable.core.crypto.RSA.getPublicKeyString;
+import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static com.github.charlemaznable.core.lang.Rand.randAlphanumeric;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SignatureTest {
@@ -45,72 +52,88 @@ public class SignatureTest {
     @Test
     public void testSignature() {
         var signature = signature(SOURCE);
-        assertEquals(DEFAULT_KEY, signature.getKey());
-        assertEquals(Digest.SHA256.digestBase64(PLAIN), signature.getValue());
+        var verifySource = newHashMap(SOURCE);
+        verifySource.put(signature.getKey(), signature.getValue());
+        assertTrue(verify(verifySource));
 
         signature = signature(CUSTOM_KEY, SOURCE);
-        assertEquals(CUSTOM_KEY, signature.getKey());
-        assertEquals(Digest.SHA256.digestBase64(PLAIN), signature.getValue());
+        verifySource = newHashMap(SOURCE);
+        verifySource.put(signature.getKey(), signature.getValue());
+        assertTrue(verify(CUSTOM_KEY, verifySource));
 
-        signature = signature(SOURCE, new SignatureOptions().flatValue(false).keySortAsc(false));
-        assertEquals(DEFAULT_KEY, signature.getKey());
-        assertEquals(Digest.SHA256.digestBase64(PLAIN_DESC), signature.getValue());
+        val falseOptions = new SignatureOptions().flatValue(false).keySortAsc(false);
+        signature = signature(SOURCE, falseOptions);
+        verifySource = newHashMap(SOURCE);
+        verifySource.put(signature.getKey(), signature.getValue());
+        assertTrue(verify(verifySource, falseOptions));
     }
 
     @Test
     public void testSignatureDigest() {
         var signature = signatureDigestBase64(SOURCE, Digest.SHA512);
-        assertEquals(DEFAULT_KEY, signature.getKey());
-        assertEquals(Digest.SHA512.digestBase64(PLAIN), signature.getValue());
+        var verifySource = newHashMap(SOURCE);
+        verifySource.put(signature.getKey(), signature.getValue());
+        assertTrue(verifyDigestBase64(verifySource, Digest.SHA512));
 
         signature = signatureDigestBase64(CUSTOM_KEY, SOURCE, Digest.SHA512);
-        assertEquals(CUSTOM_KEY, signature.getKey());
-        assertEquals(Digest.SHA512.digestBase64(PLAIN), signature.getValue());
+        verifySource = newHashMap(SOURCE);
+        verifySource.put(signature.getKey(), signature.getValue());
+        assertTrue(verifyDigestBase64(CUSTOM_KEY, verifySource, Digest.SHA512));
 
         signature = signatureDigestHex(SOURCE, Digest.SHA512);
-        assertEquals(DEFAULT_KEY, signature.getKey());
-        assertEquals(Digest.SHA512.digestHex(PLAIN), signature.getValue());
+        verifySource = newHashMap(SOURCE);
+        verifySource.put(signature.getKey(), signature.getValue());
+        assertTrue(verifyDigestHex(verifySource, Digest.SHA512));
 
         signature = signatureDigestHex(CUSTOM_KEY, SOURCE, Digest.SHA512);
-        assertEquals(CUSTOM_KEY, signature.getKey());
-        assertEquals(Digest.SHA512.digestHex(PLAIN), signature.getValue());
+        verifySource = newHashMap(SOURCE);
+        verifySource.put(signature.getKey(), signature.getValue());
+        assertTrue(verifyDigestHex(CUSTOM_KEY, verifySource, Digest.SHA512));
     }
 
     @Test
     public void testSignatureDigestHMAC() {
         var signature = signatureDigestHMACBase64(SOURCE, DigestHMAC.SHA256, DIGEST_HMAC_KEY);
-        assertEquals(DEFAULT_KEY, signature.getKey());
-        assertEquals(DigestHMAC.SHA256.digestBase64(PLAIN, DIGEST_HMAC_KEY), signature.getValue());
+        var verifySource = newHashMap(SOURCE);
+        verifySource.put(signature.getKey(), signature.getValue());
+        assertTrue(verifyDigestHMACBase64(verifySource, DigestHMAC.SHA256, DIGEST_HMAC_KEY));
 
         signature = signatureDigestHMACBase64(CUSTOM_KEY, SOURCE, DigestHMAC.SHA256, DIGEST_HMAC_KEY);
-        assertEquals(CUSTOM_KEY, signature.getKey());
-        assertEquals(DigestHMAC.SHA256.digestBase64(PLAIN, DIGEST_HMAC_KEY), signature.getValue());
+        verifySource = newHashMap(SOURCE);
+        verifySource.put(signature.getKey(), signature.getValue());
+        assertTrue(verifyDigestHMACBase64(CUSTOM_KEY, verifySource, DigestHMAC.SHA256, DIGEST_HMAC_KEY));
 
         signature = signatureDigestHMACHex(SOURCE, DigestHMAC.SHA512, DIGEST_HMAC_KEY);
-        assertEquals(DEFAULT_KEY, signature.getKey());
-        assertEquals(DigestHMAC.SHA512.digestHex(PLAIN, DIGEST_HMAC_KEY), signature.getValue());
+        verifySource = newHashMap(SOURCE);
+        verifySource.put(signature.getKey(), signature.getValue());
+        assertTrue(verifyDigestHMACHex(verifySource, DigestHMAC.SHA512, DIGEST_HMAC_KEY));
 
         signature = signatureDigestHMACHex(CUSTOM_KEY, SOURCE, DigestHMAC.SHA512, DIGEST_HMAC_KEY);
-        assertEquals(CUSTOM_KEY, signature.getKey());
-        assertEquals(DigestHMAC.SHA512.digestHex(PLAIN, DIGEST_HMAC_KEY), signature.getValue());
+        verifySource = newHashMap(SOURCE);
+        verifySource.put(signature.getKey(), signature.getValue());
+        assertTrue(verifyDigestHMACHex(CUSTOM_KEY, verifySource, DigestHMAC.SHA512, DIGEST_HMAC_KEY));
     }
 
     @Test
     public void testSignatureSHAWithRSA() {
         var signature = signatureSHAWithRSABase64(SOURCE, SHAXWithRSA.SHA1_WITH_RSA, RSA_PRV_KEY);
-        assertEquals(DEFAULT_KEY, signature.getKey());
-        assertTrue(SHAXWithRSA.SHA1_WITH_RSA.verifyBase64(PLAIN, signature.getValue(), RSA_PUB_KEY));
+        var verifySource = newHashMap(SOURCE);
+        verifySource.put(signature.getKey(), signature.getValue());
+        assertTrue(verifySHAWithRSABase64(verifySource, SHAXWithRSA.SHA1_WITH_RSA, RSA_PUB_KEY));
 
         signature = signatureSHAWithRSABase64(CUSTOM_KEY, SOURCE, SHAXWithRSA.SHA1_WITH_RSA, RSA_PRV_KEY);
-        assertEquals(CUSTOM_KEY, signature.getKey());
-        assertTrue(SHAXWithRSA.SHA1_WITH_RSA.verifyBase64(PLAIN, signature.getValue(), RSA_PUB_KEY));
+        verifySource = newHashMap(SOURCE);
+        verifySource.put(signature.getKey(), signature.getValue());
+        assertTrue(verifySHAWithRSABase64(CUSTOM_KEY, verifySource, SHAXWithRSA.SHA1_WITH_RSA, RSA_PUB_KEY));
 
         signature = signatureSHAWithRSAHex(SOURCE, SHAXWithRSA.SHA256_WITH_RSA, RSA_PRV_KEY);
-        assertEquals(DEFAULT_KEY, signature.getKey());
-        assertTrue(SHAXWithRSA.SHA256_WITH_RSA.verifyHex(PLAIN, signature.getValue(), RSA_PUB_KEY));
+        verifySource = newHashMap(SOURCE);
+        verifySource.put(signature.getKey(), signature.getValue());
+        assertTrue(verifySHAWithRSAHex(verifySource, SHAXWithRSA.SHA256_WITH_RSA, RSA_PUB_KEY));
 
         signature = signatureSHAWithRSAHex(CUSTOM_KEY, SOURCE, SHAXWithRSA.SHA256_WITH_RSA, RSA_PRV_KEY);
-        assertEquals(CUSTOM_KEY, signature.getKey());
-        assertTrue(SHAXWithRSA.SHA256_WITH_RSA.verifyHex(PLAIN, signature.getValue(), RSA_PUB_KEY));
+        verifySource = newHashMap(SOURCE);
+        verifySource.put(signature.getKey(), signature.getValue());
+        assertTrue(verifySHAWithRSAHex(CUSTOM_KEY, verifySource, SHAXWithRSA.SHA256_WITH_RSA, RSA_PUB_KEY));
     }
 }

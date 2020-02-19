@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -28,6 +29,8 @@ public class SignatureOptions {
     private static final String DEFAULT_ENTRY_SEPARATOR = "&";
     private static final Function<String, String> DEFAULT_SIGN_ALGORITHM
             = Digest.SHA256::digestBase64;
+    private static final BiFunction<String, String, Boolean> DEFAULT_VERIFY_ALGORITHM
+            = (plain, sign) -> Digest.SHA256.digestBase64(plain).equals(sign);
 
     private String key = DEFAULT_KEY;
     private boolean flatValue = DEFAULT_FLAT_VALUE;
@@ -36,4 +39,5 @@ public class SignatureOptions {
     private Function<Map.Entry<String, String>, String> entryMapper = DEFAULT_ENTRY_MAPPER;
     private String entrySeparator = DEFAULT_ENTRY_SEPARATOR;
     private Function<String, String> signAlgorithm = DEFAULT_SIGN_ALGORITHM;
+    private BiFunction<String, String, Boolean> verifyAlgorithm = DEFAULT_VERIFY_ALGORITHM;
 }

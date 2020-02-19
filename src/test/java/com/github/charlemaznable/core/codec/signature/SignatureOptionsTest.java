@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.codec.signature;
 
 import com.github.charlemaznable.core.codec.Digest;
 import lombok.val;
+import lombok.var;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,13 +22,16 @@ public class SignatureOptionsTest {
         assertNotNull(options.entryFilter());
         assertNotNull(options.entryMapper());
         assertEquals("&", options.entrySeparator());
-        assertEquals(Digest.SHA256.digestBase64("Hello"), options.signAlgorithm().apply("Hello"));
+        var sign = options.signAlgorithm().apply("Hello");
+        assertEquals(Digest.SHA256.digestBase64("Hello"), sign);
+        assertTrue(options.verifyAlgorithm().apply("Hello", sign));
 
         options.key("sign").flatValue(false).keySortAsc(false)
                 .entryFilter(e -> true)
                 .entryMapper(e -> e.getKey() + ":" + e.getValue())
                 .entrySeparator("$")
-                .signAlgorithm(Digest.SHA512::digestHex);
+                .signAlgorithm(Digest.SHA512::digestHex)
+                .verifyAlgorithm((p, s) -> Digest.SHA512.digestHex(p).equalsIgnoreCase(s));
 
         assertEquals("sign", options.key());
         assertFalse(options.flatValue());
@@ -35,6 +39,8 @@ public class SignatureOptionsTest {
         assertNotNull(options.entryFilter());
         assertNotNull(options.entryMapper());
         assertEquals("$", options.entrySeparator());
-        assertEquals(Digest.SHA512.digestHex("World"), options.signAlgorithm().apply("World"));
+        sign = options.signAlgorithm().apply("World");
+        assertEquals(Digest.SHA512.digestHex("World"), sign);
+        assertTrue(options.verifyAlgorithm().apply("World", sign));
     }
 }

@@ -20,15 +20,18 @@ public class NonsenseSignatureTest {
         demoSubBean.setValue("Hello, NS!");
         demoBean.setSub(demoSubBean);
 
-        val result = new NonsenseSignature()
+        val ns = new NonsenseSignature()
                 .nonsenseOptions(new NonsenseOptions())
-                .signatureOptions(new SignatureOptions())
-                .process(demoBean);
+                .signatureOptions(new SignatureOptions());
+        val result = ns.sign(demoBean);
+
         val nonsense = result.get("nonsense").toString();
         assertTrue(nonsense.matches("[A-Za-z0-9]{16}"));
         val signature = result.get("signature").toString();
         val plain = "name=DEMO&nonsense=" + nonsense + "&sub.value=Hello, NS!";
         assertEquals(Digest.SHA256.digestBase64(plain), signature);
+
+        assertTrue(ns.verify(result));
     }
 
     @Getter
