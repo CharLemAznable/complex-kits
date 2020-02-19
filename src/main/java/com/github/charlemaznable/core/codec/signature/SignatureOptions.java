@@ -27,6 +27,8 @@ public class SignatureOptions {
     private static final Function<Map.Entry<String, String>, String> DEFAULT_ENTRY_MAPPER
             = e -> e.getKey() + "=" + e.getValue();
     private static final String DEFAULT_ENTRY_SEPARATOR = "&";
+    private static final Function<String, String> DEFAULT_PLAIN_PROCESSOR
+            = plain -> plain;
     private static final Function<String, String> DEFAULT_SIGN_ALGORITHM
             = Digest.SHA256::digestBase64;
     private static final BiPredicate<String, String> DEFAULT_VERIFY_ALGORITHM
@@ -38,6 +40,7 @@ public class SignatureOptions {
     private Predicate<Map.Entry<String, String>> entryFilter = DEFAULT_ENTRY_FILTER;
     private Function<Map.Entry<String, String>, String> entryMapper = DEFAULT_ENTRY_MAPPER;
     private String entrySeparator = DEFAULT_ENTRY_SEPARATOR;
+    private Function<String, String> plainProcessor = DEFAULT_PLAIN_PROCESSOR;
     private Function<String, String> signAlgorithm = DEFAULT_SIGN_ALGORITHM;
     private BiPredicate<String, String> verifyAlgorithm = DEFAULT_VERIFY_ALGORITHM;
 }

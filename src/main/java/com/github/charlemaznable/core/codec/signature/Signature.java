@@ -90,7 +90,7 @@ public final class Signature {
     public static Signature signatureDigestHMACBase64
             (Map<String, Object> source, DigestHMAC digestHMAC, byte[] digestKey) {
         return signature(source, new SignatureOptions()
-                .signAlgorithm(s -> digestHMAC.digestBase64(s, digestKey)));
+                .signAlgorithm(p -> digestHMAC.digestBase64(p, digestKey)));
     }
 
     public static boolean verifyDigestHMACBase64
@@ -102,7 +102,7 @@ public final class Signature {
     public static Signature signatureDigestHMACBase64
             (String key, Map<String, Object> source, DigestHMAC digestHMAC, byte[] digestKey) {
         return signature(source, new SignatureOptions().key(key)
-                .signAlgorithm(s -> digestHMAC.digestBase64(s, digestKey)));
+                .signAlgorithm(p -> digestHMAC.digestBase64(p, digestKey)));
     }
 
     public static boolean verifyDigestHMACBase64
@@ -116,7 +116,7 @@ public final class Signature {
     public static Signature signatureDigestHMACHex
             (Map<String, Object> source, DigestHMAC digestHMAC, byte[] digestKey) {
         return signature(source, new SignatureOptions()
-                .signAlgorithm(s -> digestHMAC.digestHex(s, digestKey)));
+                .signAlgorithm(p -> digestHMAC.digestHex(p, digestKey)));
     }
 
     public static boolean verifyDigestHMACHex
@@ -128,7 +128,7 @@ public final class Signature {
     public static Signature signatureDigestHMACHex
             (String key, Map<String, Object> source, DigestHMAC digestHMAC, byte[] digestKey) {
         return signature(source, new SignatureOptions().key(key)
-                .signAlgorithm(s -> digestHMAC.digestHex(s, digestKey)));
+                .signAlgorithm(p -> digestHMAC.digestHex(p, digestKey)));
     }
 
     public static boolean verifyDigestHMACHex
@@ -142,7 +142,7 @@ public final class Signature {
     public static Signature signatureSHAWithRSABase64
             (Map<String, Object> source, SHAXWithRSA shaxWithRSA, String privateKey) {
         return signature(source, new SignatureOptions()
-                .signAlgorithm(s -> shaxWithRSA.signBase64(s, privateKey)));
+                .signAlgorithm(p -> shaxWithRSA.signBase64(p, privateKey)));
     }
 
     public static boolean verifySHAWithRSABase64
@@ -154,7 +154,7 @@ public final class Signature {
     public static Signature signatureSHAWithRSABase64
             (String key, Map<String, Object> source, SHAXWithRSA shaxWithRSA, String privateKey) {
         return signature(source, new SignatureOptions().key(key)
-                .signAlgorithm(s -> shaxWithRSA.signBase64(s, privateKey)));
+                .signAlgorithm(p -> shaxWithRSA.signBase64(p, privateKey)));
     }
 
     public static boolean verifySHAWithRSABase64
@@ -168,7 +168,7 @@ public final class Signature {
     public static Signature signatureSHAWithRSAHex
             (Map<String, Object> source, SHAXWithRSA shaxWithRSA, String privateKey) {
         return signature(source, new SignatureOptions()
-                .signAlgorithm(s -> shaxWithRSA.signHex(s, privateKey)));
+                .signAlgorithm(p -> shaxWithRSA.signHex(p, privateKey)));
     }
 
     public static boolean verifySHAWithRSAHex
@@ -180,7 +180,7 @@ public final class Signature {
     public static Signature signatureSHAWithRSAHex
             (String key, Map<String, Object> source, SHAXWithRSA shaxWithRSA, String privateKey) {
         return signature(source, new SignatureOptions().key(key)
-                .signAlgorithm(s -> shaxWithRSA.signHex(s, privateKey)));
+                .signAlgorithm(p -> shaxWithRSA.signHex(p, privateKey)));
     }
 
     public static boolean verifySHAWithRSAHex
@@ -215,9 +215,10 @@ public final class Signature {
         Map<String, String> tempMap = options.keySortAsc()
                 ? new TreeMap<>(flatMap) : new TreeMap<>(flatMap).descendingMap();
         tempMap.remove(options.key());
-        return tempMap.entrySet().stream()
+        return options.plainProcessor().apply(tempMap
+                .entrySet().stream()
                 .filter(options.entryFilter())
                 .map(options.entryMapper())
-                .collect(Collectors.joining(options.entrySeparator()));
+                .collect(Collectors.joining(options.entrySeparator())));
     }
 }
