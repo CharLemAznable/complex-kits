@@ -24,7 +24,7 @@ public class SignatureOptionsTest {
         assertEquals("&", options.entrySeparator());
         var sign = options.signAlgorithm().apply("Hello");
         assertEquals(Digest.SHA256.digestBase64("Hello"), sign);
-        assertTrue(options.verifyAlgorithm().apply("Hello", sign));
+        assertTrue(options.verifyAlgorithm().test("Hello", sign));
 
         options.key("sign").flatValue(false).keySortAsc(false)
                 .entryFilter(e -> true)
@@ -41,6 +41,6 @@ public class SignatureOptionsTest {
         assertEquals("$", options.entrySeparator());
         sign = options.signAlgorithm().apply("World");
         assertEquals(Digest.SHA512.digestHex("World"), sign);
-        assertTrue(options.verifyAlgorithm().apply("World", sign));
+        assertTrue(options.verifyAlgorithm().test("World", sign));
     }
 }

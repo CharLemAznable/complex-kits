@@ -199,7 +199,7 @@ public final class Signature {
 
     public static boolean verify(Map<String, Object> source, SignatureOptions options) {
         val signatureValue = toStr(source.remove(options.key()));
-        return options.verifyAlgorithm().apply(
+        return options.verifyAlgorithm().test(
                 buildPlain(source, options), signatureValue);
     }
 
