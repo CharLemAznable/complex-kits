@@ -44,140 +44,136 @@ public class OhFactoryTest {
     @SneakyThrows
     @Test
     public void testAcceptCharset() {
-        val mockWebServer = new MockWebServer();
-        mockWebServer.setDispatcher(new Dispatcher() {
-            @Override
-            public MockResponse dispatch(RecordedRequest request) {
-                switch (request.getPath()) {
-                    case "/sample":
-                        val acceptCharset = request.getHeader(ACCEPT_CHARSET);
-                        assertEquals(ISO_8859_1.name(), acceptCharset);
-                        return new MockResponse().setBody(acceptCharset);
-                    case "/sample2":
-                        val acceptCharset2 = request.getHeader(ACCEPT_CHARSET);
-                        assertEquals(UTF_8.name(), acceptCharset2);
-                        return new MockResponse().setBody(acceptCharset2);
+        try (val mockWebServer = new MockWebServer()) {
+            mockWebServer.setDispatcher(new Dispatcher() {
+                @Override
+                public MockResponse dispatch(RecordedRequest request) {
+                    switch (request.getPath()) {
+                        case "/sample":
+                            val acceptCharset = request.getHeader(ACCEPT_CHARSET);
+                            assertEquals(ISO_8859_1.name(), acceptCharset);
+                            return new MockResponse().setBody(acceptCharset);
+                        case "/sample2":
+                            val acceptCharset2 = request.getHeader(ACCEPT_CHARSET);
+                            assertEquals(UTF_8.name(), acceptCharset2);
+                            return new MockResponse().setBody(acceptCharset2);
+                    }
+                    return new MockResponse()
+                            .setResponseCode(HttpStatus.NOT_FOUND.value())
+                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
-                return new MockResponse()
-                        .setResponseCode(HttpStatus.NOT_FOUND.value())
-                        .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
-            }
-        });
-        mockWebServer.start(41130);
+            });
+            mockWebServer.start(41130);
 
-        val httpClient = getClient(AcceptCharsetHttpClient.class);
-        assertEquals(ISO_8859_1.name(), httpClient.sample());
-        assertEquals(UTF_8.name(), httpClient.sample2());
+            val httpClient = getClient(AcceptCharsetHttpClient.class);
+            assertEquals(ISO_8859_1.name(), httpClient.sample());
+            assertEquals(UTF_8.name(), httpClient.sample2());
 
-        assertEquals("OhClient@" + httpClient.hashCode(), httpClient.toString());
-        assertEquals(httpClient, getClient(AcceptCharsetHttpClient.class));
-        assertEquals(httpClient.hashCode(), getClient(AcceptCharsetHttpClient.class).hashCode());
-
-        mockWebServer.shutdown();
+            assertEquals("OhClient@" + httpClient.hashCode(), httpClient.toString());
+            assertEquals(httpClient, getClient(AcceptCharsetHttpClient.class));
+            assertEquals(httpClient.hashCode(), getClient(AcceptCharsetHttpClient.class).hashCode());
+        }
     }
 
     @SneakyThrows
     @Test
     public void testContentFormat() {
-        val mockWebServer = new MockWebServer();
-        mockWebServer.setDispatcher(new Dispatcher() {
-            @Override
-            public MockResponse dispatch(RecordedRequest request) {
-                switch (request.getPath()) {
-                    case "/sample":
-                        val contentType = request.getHeader(CONTENT_TYPE);
-                        assertTrue(contentType.startsWith(FORM_DATA.toString()));
-                        val bodyString = request.getBody().readUtf8();
-                        return new MockResponse().setBody(bodyString);
-                    case "/sample2":
-                        val contentType2 = request.getHeader(CONTENT_TYPE);
-                        assertTrue(contentType2.startsWith(JSON_UTF_8.toString()));
-                        val bodyString2 = request.getBody().readUtf8();
-                        return new MockResponse().setBody(bodyString2);
-                    case "/sample3":
-                        val contentType3 = request.getHeader(CONTENT_TYPE);
-                        assertTrue(contentType3.startsWith(APPLICATION_XML_UTF_8.toString()));
-                        val bodyString3 = request.getBody().readUtf8();
-                        return new MockResponse().setBody(bodyString3);
+        try (val mockWebServer = new MockWebServer()) {
+            mockWebServer.setDispatcher(new Dispatcher() {
+                @Override
+                public MockResponse dispatch(RecordedRequest request) {
+                    switch (request.getPath()) {
+                        case "/sample":
+                            val contentType = request.getHeader(CONTENT_TYPE);
+                            assertTrue(contentType.startsWith(FORM_DATA.toString()));
+                            val bodyString = request.getBody().readUtf8();
+                            return new MockResponse().setBody(bodyString);
+                        case "/sample2":
+                            val contentType2 = request.getHeader(CONTENT_TYPE);
+                            assertTrue(contentType2.startsWith(JSON_UTF_8.toString()));
+                            val bodyString2 = request.getBody().readUtf8();
+                            return new MockResponse().setBody(bodyString2);
+                        case "/sample3":
+                            val contentType3 = request.getHeader(CONTENT_TYPE);
+                            assertTrue(contentType3.startsWith(APPLICATION_XML_UTF_8.toString()));
+                            val bodyString3 = request.getBody().readUtf8();
+                            return new MockResponse().setBody(bodyString3);
+                    }
+                    return new MockResponse()
+                            .setResponseCode(HttpStatus.NOT_FOUND.value())
+                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
-                return new MockResponse()
-                        .setResponseCode(HttpStatus.NOT_FOUND.value())
-                        .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
-            }
-        });
-        mockWebServer.start(41131);
+            });
+            mockWebServer.start(41131);
 
-        val httpClient = getClient(ContentFormatHttpClient.class);
-        assertEquals("", httpClient.sample());
-        assertEquals("{}", httpClient.sample2());
-        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<xml/>", httpClient.sample3());
+            val httpClient = getClient(ContentFormatHttpClient.class);
+            assertEquals("", httpClient.sample());
+            assertEquals("{}", httpClient.sample2());
+            assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<xml/>", httpClient.sample3());
 
-        assertEquals("OhClient@" + httpClient.hashCode(), httpClient.toString());
-        assertEquals(httpClient, getClient(ContentFormatHttpClient.class));
-        assertEquals(httpClient.hashCode(), getClient(ContentFormatHttpClient.class).hashCode());
-
-        mockWebServer.shutdown();
+            assertEquals("OhClient@" + httpClient.hashCode(), httpClient.toString());
+            assertEquals(httpClient, getClient(ContentFormatHttpClient.class));
+            assertEquals(httpClient.hashCode(), getClient(ContentFormatHttpClient.class).hashCode());
+        }
     }
 
     @SneakyThrows
     @Test
     public void testRequestMethod() {
-        val mockWebServer = new MockWebServer();
-        mockWebServer.setDispatcher(new Dispatcher() {
-            @Override
-            public MockResponse dispatch(RecordedRequest request) {
-                switch (request.getPath()) {
-                    case "/sample":
-                        val method = request.getMethod();
-                        assertEquals("POST", method);
-                        return new MockResponse().setBody(method);
-                    case "/sample2":
-                        val method2 = request.getMethod();
-                        assertEquals("GET", method2);
-                        return new MockResponse().setBody(method2);
+        try (val mockWebServer = new MockWebServer()) {
+            mockWebServer.setDispatcher(new Dispatcher() {
+                @Override
+                public MockResponse dispatch(RecordedRequest request) {
+                    switch (request.getPath()) {
+                        case "/sample":
+                            val method = request.getMethod();
+                            assertEquals("POST", method);
+                            return new MockResponse().setBody(method);
+                        case "/sample2":
+                            val method2 = request.getMethod();
+                            assertEquals("GET", method2);
+                            return new MockResponse().setBody(method2);
+                    }
+                    return new MockResponse()
+                            .setResponseCode(HttpStatus.NOT_FOUND.value())
+                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
-                return new MockResponse()
-                        .setResponseCode(HttpStatus.NOT_FOUND.value())
-                        .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
-            }
-        });
-        mockWebServer.start(41132);
+            });
+            mockWebServer.start(41132);
 
-        val httpClient = getClient(RequestMethodHttpClient.class);
-        assertEquals("POST", httpClient.sample());
-        assertEquals("GET", httpClient.sample2());
+            val httpClient = getClient(RequestMethodHttpClient.class);
+            assertEquals("POST", httpClient.sample());
+            assertEquals("GET", httpClient.sample2());
 
-        assertEquals("OhClient@" + httpClient.hashCode(), httpClient.toString());
-        assertEquals(httpClient, getClient(RequestMethodHttpClient.class));
-        assertEquals(httpClient.hashCode(), getClient(RequestMethodHttpClient.class).hashCode());
-
-        mockWebServer.shutdown();
+            assertEquals("OhClient@" + httpClient.hashCode(), httpClient.toString());
+            assertEquals(httpClient, getClient(RequestMethodHttpClient.class));
+            assertEquals(httpClient.hashCode(), getClient(RequestMethodHttpClient.class).hashCode());
+        }
     }
 
     @SneakyThrows
     @Test
     public void testExtendInterface() {
-        val mockWebServer = new MockWebServer();
-        mockWebServer.setDispatcher(new Dispatcher() {
-            @Override
-            public MockResponse dispatch(RecordedRequest request) {
-                switch (request.getPath()) {
-                    case "/sample":
-                        return new MockResponse().setBody("OK");
+        try (val mockWebServer = new MockWebServer()) {
+            mockWebServer.setDispatcher(new Dispatcher() {
+                @Override
+                public MockResponse dispatch(RecordedRequest request) {
+                    switch (request.getPath()) {
+                        case "/sample":
+                            return new MockResponse().setBody("OK");
+                    }
+                    return new MockResponse()
+                            .setResponseCode(HttpStatus.NOT_FOUND.value())
+                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
-                return new MockResponse()
-                        .setResponseCode(HttpStatus.NOT_FOUND.value())
-                        .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
-            }
-        });
-        mockWebServer.start(41133);
+            });
+            mockWebServer.start(41133);
 
-        val baseHttpClient = getClient(BaseHttpClient.class);
-        assertNotNull(baseHttpClient);
+            val baseHttpClient = getClient(BaseHttpClient.class);
+            assertNotNull(baseHttpClient);
 
-        assertThrows(OhException.class, () -> getClient(SubHttpClient.class));
-
-        mockWebServer.shutdown();
+            assertThrows(OhException.class, () -> getClient(SubHttpClient.class));
+        }
     }
 
     @AcceptCharset("ISO-8859-1")

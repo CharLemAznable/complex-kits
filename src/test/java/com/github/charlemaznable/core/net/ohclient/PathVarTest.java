@@ -23,31 +23,30 @@ public class PathVarTest {
     @SneakyThrows
     @Test
     public void testOhPathVar() {
-        val mockWebServer = new MockWebServer();
-        mockWebServer.setDispatcher(new Dispatcher() {
-            @Override
-            public MockResponse dispatch(RecordedRequest request) {
-                switch (request.getPath()) {
-                    case "/V1/V2":
-                        return new MockResponse().setBody("V2");
-                    case "/V1/V3":
-                        return new MockResponse().setBody("V3");
-                    case "/V1/V4":
-                        return new MockResponse().setBody("V4");
+        try (val mockWebServer = new MockWebServer()) {
+            mockWebServer.setDispatcher(new Dispatcher() {
+                @Override
+                public MockResponse dispatch(RecordedRequest request) {
+                    switch (request.getPath()) {
+                        case "/V1/V2":
+                            return new MockResponse().setBody("V2");
+                        case "/V1/V3":
+                            return new MockResponse().setBody("V3");
+                        case "/V1/V4":
+                            return new MockResponse().setBody("V4");
+                    }
+                    return new MockResponse()
+                            .setResponseCode(HttpStatus.NOT_FOUND.value())
+                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
-                return new MockResponse()
-                        .setResponseCode(HttpStatus.NOT_FOUND.value())
-                        .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
-            }
-        });
-        mockWebServer.start(41150);
+            });
+            mockWebServer.start(41150);
 
-        val httpClient = getClient(PathVarHttpClient.class);
-        assertEquals("V2", httpClient.sampleDefault());
-        assertEquals("V3", httpClient.sampleMapping());
-        assertEquals("V4", httpClient.samplePathVars("V4"));
-
-        mockWebServer.shutdown();
+            val httpClient = getClient(PathVarHttpClient.class);
+            assertEquals("V2", httpClient.sampleDefault());
+            assertEquals("V3", httpClient.sampleMapping());
+            assertEquals("V4", httpClient.samplePathVars("V4"));
+        }
     }
 
     @FixedPathVar(name = "P1", value = "V1")

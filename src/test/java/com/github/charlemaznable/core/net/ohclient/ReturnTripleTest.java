@@ -32,57 +32,56 @@ public class ReturnTripleTest {
     @SneakyThrows
     @Test
     public void testTriple() {
-        val mockWebServer = new MockWebServer();
-        mockWebServer.setDispatcher(new Dispatcher() {
-            @Override
-            public MockResponse dispatch(RecordedRequest request) {
-                switch (request.getPath()) {
-                    case "/sampleStatusCodeAndBean":
-                    case "/sampleFutureStatusCodeAndBean":
-                        return new MockResponse().setResponseCode(HttpStatus.OK.value())
-                                .setBody(json(new Bean("John")));
-                    case "/sampleRawStreamAndBean":
-                    case "/sampleFutureRawStreamAndBean":
-                        return new MockResponse().setResponseCode(HttpStatus.OK.value())
-                                .setBody(json(new Bean("Doe")));
+        try (val mockWebServer = new MockWebServer()) {
+            mockWebServer.setDispatcher(new Dispatcher() {
+                @Override
+                public MockResponse dispatch(RecordedRequest request) {
+                    switch (request.getPath()) {
+                        case "/sampleStatusCodeAndBean":
+                        case "/sampleFutureStatusCodeAndBean":
+                            return new MockResponse().setResponseCode(HttpStatus.OK.value())
+                                    .setBody(json(new Bean("John")));
+                        case "/sampleRawStreamAndBean":
+                        case "/sampleFutureRawStreamAndBean":
+                            return new MockResponse().setResponseCode(HttpStatus.OK.value())
+                                    .setBody(json(new Bean("Doe")));
+                    }
+                    return new MockResponse()
+                            .setResponseCode(HttpStatus.NOT_FOUND.value())
+                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
-                return new MockResponse()
-                        .setResponseCode(HttpStatus.NOT_FOUND.value())
-                        .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
+            });
+            mockWebServer.start(41195);
+            val httpClient = getClient(TripleHttpClient.class);
+
+            var triple = httpClient.sampleStatusCodeAndBean();
+            assertEquals(HttpStatus.OK.value(), triple.getLeft());
+            assertEquals(HttpStatus.OK, triple.getMiddle());
+            assertEquals("John", triple.getRight().getName());
+            val futureTriple = httpClient.sampleFutureStatusCodeAndBean();
+            await().forever().pollDelay(Duration.ofMillis(100)).until(futureTriple::isDone);
+            triple = futureTriple.get();
+            assertEquals(HttpStatus.OK.value(), triple.getLeft());
+            assertEquals(HttpStatus.OK, triple.getMiddle());
+            assertEquals("John", triple.getRight().getName());
+
+            var rawTriple = httpClient.sampleRawStreamAndBean();
+            @Cleanup val isr1 = new InputStreamReader(rawTriple.getLeft(), "UTF-8");
+            try (val bufferedReader = new BufferedReader(isr1)) {
+                assertEquals(json(new Bean("Doe")), bufferedReader.readLine());
             }
-        });
-        mockWebServer.start(41195);
-        val httpClient = getClient(TripleHttpClient.class);
-
-        var triple = httpClient.sampleStatusCodeAndBean();
-        assertEquals(HttpStatus.OK.value(), triple.getLeft());
-        assertEquals(HttpStatus.OK, triple.getMiddle());
-        assertEquals("John", triple.getRight().getName());
-        val futureTriple = httpClient.sampleFutureStatusCodeAndBean();
-        await().forever().pollDelay(Duration.ofMillis(100)).until(futureTriple::isDone);
-        triple = futureTriple.get();
-        assertEquals(HttpStatus.OK.value(), triple.getLeft());
-        assertEquals(HttpStatus.OK, triple.getMiddle());
-        assertEquals("John", triple.getRight().getName());
-
-        var rawTriple = httpClient.sampleRawStreamAndBean();
-        @Cleanup val isr1 = new InputStreamReader(rawTriple.getLeft(), "UTF-8");
-        try (val bufferedReader = new BufferedReader(isr1)) {
-            assertEquals(json(new Bean("Doe")), bufferedReader.readLine());
+            assertEquals(json(new Bean("Doe")), rawTriple.getMiddle());
+            assertEquals("Doe", rawTriple.getRight().getName());
+            val futureRawTriple = httpClient.sampleFutureRawStreamAndBean();
+            await().forever().pollDelay(Duration.ofMillis(100)).until(futureRawTriple::isDone);
+            rawTriple = futureRawTriple.get();
+            @Cleanup val isr2 = new InputStreamReader(rawTriple.getLeft(), "UTF-8");
+            try (val bufferedReader = new BufferedReader(isr2)) {
+                assertEquals(json(new Bean("Doe")), bufferedReader.readLine());
+            }
+            assertEquals(json(new Bean("Doe")), rawTriple.getMiddle());
+            assertEquals("Doe", rawTriple.getRight().getName());
         }
-        assertEquals(json(new Bean("Doe")), rawTriple.getMiddle());
-        assertEquals("Doe", rawTriple.getRight().getName());
-        val futureRawTriple = httpClient.sampleFutureRawStreamAndBean();
-        await().forever().pollDelay(Duration.ofMillis(100)).until(futureRawTriple::isDone);
-        rawTriple = futureRawTriple.get();
-        @Cleanup val isr2 = new InputStreamReader(rawTriple.getLeft(), "UTF-8");
-        try (val bufferedReader = new BufferedReader(isr2)) {
-            assertEquals(json(new Bean("Doe")), bufferedReader.readLine());
-        }
-        assertEquals(json(new Bean("Doe")), rawTriple.getMiddle());
-        assertEquals("Doe", rawTriple.getRight().getName());
-
-        mockWebServer.shutdown();
     }
 
     @OhClient

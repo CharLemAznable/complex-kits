@@ -26,43 +26,42 @@ public class HeaderTest {
     @SneakyThrows
     @Test
     public void testOhHeader() {
-        val mockWebServer = new MockWebServer();
-        mockWebServer.setDispatcher(new Dispatcher() {
-            @Override
-            public MockResponse dispatch(RecordedRequest request) {
-                switch (request.getPath()) {
-                    case "/sampleDefault":
-                        assertEquals("V1", request.getHeader("H1"));
-                        assertEquals("V2", request.getHeader("H2"));
-                        assertNull(request.getHeader("H3"));
-                        assertNull(request.getHeader("H4"));
-                        return new MockResponse().setBody("OK");
-                    case "/sampleMapping":
-                        assertEquals("V1", request.getHeader("H1"));
-                        assertNull(request.getHeader("H2"));
-                        assertEquals("V3", request.getHeader("H3"));
-                        assertNull(request.getHeader("H4"));
-                        return new MockResponse().setBody("OK");
-                    case "/sampleHeaders":
-                        assertEquals("V1", request.getHeader("H1"));
-                        assertNull(request.getHeader("H2"));
-                        assertNull(request.getHeader("H3"));
-                        assertEquals("V4", request.getHeader("H4"));
-                        return new MockResponse().setBody("OK");
+        try (val mockWebServer = new MockWebServer()) {
+            mockWebServer.setDispatcher(new Dispatcher() {
+                @Override
+                public MockResponse dispatch(RecordedRequest request) {
+                    switch (request.getPath()) {
+                        case "/sampleDefault":
+                            assertEquals("V1", request.getHeader("H1"));
+                            assertEquals("V2", request.getHeader("H2"));
+                            assertNull(request.getHeader("H3"));
+                            assertNull(request.getHeader("H4"));
+                            return new MockResponse().setBody("OK");
+                        case "/sampleMapping":
+                            assertEquals("V1", request.getHeader("H1"));
+                            assertNull(request.getHeader("H2"));
+                            assertEquals("V3", request.getHeader("H3"));
+                            assertNull(request.getHeader("H4"));
+                            return new MockResponse().setBody("OK");
+                        case "/sampleHeaders":
+                            assertEquals("V1", request.getHeader("H1"));
+                            assertNull(request.getHeader("H2"));
+                            assertNull(request.getHeader("H3"));
+                            assertEquals("V4", request.getHeader("H4"));
+                            return new MockResponse().setBody("OK");
+                    }
+                    return new MockResponse()
+                            .setResponseCode(HttpStatus.NOT_FOUND.value())
+                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
-                return new MockResponse()
-                        .setResponseCode(HttpStatus.NOT_FOUND.value())
-                        .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
-            }
-        });
-        mockWebServer.start(41140);
+            });
+            mockWebServer.start(41140);
 
-        val httpClient = getClient(HeaderHttpClient.class);
-        assertEquals("OK", httpClient.sampleDefault());
-        assertEquals("OK", httpClient.sampleMapping());
-        assertEquals("OK", httpClient.sampleHeaders(null, "V4"));
-
-        mockWebServer.shutdown();
+            val httpClient = getClient(HeaderHttpClient.class);
+            assertEquals("OK", httpClient.sampleDefault());
+            assertEquals("OK", httpClient.sampleMapping());
+            assertEquals("OK", httpClient.sampleHeaders(null, "V4"));
+        }
     }
 
     @SneakyThrows

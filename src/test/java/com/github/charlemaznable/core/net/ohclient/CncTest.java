@@ -55,44 +55,43 @@ public class CncTest {
                 onClass(OhDummy.class).field("ohMinerSubstitutor").get();
         ohMinerSubstitutor.setVariableResolver(
                 minerAsSubstitutor("Env", "ohclient").getStringLookup());
-        val mockWebServer = new MockWebServer();
-        mockWebServer.setDispatcher(new Dispatcher() {
-            @Override
-            public MockResponse dispatch(RecordedRequest request) {
-                val testResponse = new TestResponse();
-                testResponse.setContent("content");
-                return new MockResponse().setBody(json(testResponse));
-            }
-        });
-        mockWebServer.start(41200);
+        try (val mockWebServer = new MockWebServer()) {
+            mockWebServer.setDispatcher(new Dispatcher() {
+                @Override
+                public MockResponse dispatch(RecordedRequest request) {
+                    val testResponse = new TestResponse();
+                    testResponse.setContent("content");
+                    return new MockResponse().setBody(json(testResponse));
+                }
+            });
+            mockWebServer.start(41200);
 
-        val client = getClient(CncClient.class);
+            val client = getClient(CncClient.class);
 
-        val response = client.sample1(new TestRequest());
-        assertEquals("content", response.getContent());
-        val nullResponse = client.sample1(null);
-        assertTrue(nullResponse instanceof CncResponseImpl);
+            val response = client.sample1(new TestRequest());
+            assertEquals("content", response.getContent());
+            val nullResponse = client.sample1(null);
+            assertTrue(nullResponse instanceof CncResponseImpl);
 
-        val futureResponse = client.sample2(new TestRequest());
-        await().forever().pollDelay(Duration.ofMillis(100)).until(futureResponse::isDone);
-        assertEquals("content", futureResponse.get().getContent());
+            val futureResponse = client.sample2(new TestRequest());
+            await().forever().pollDelay(Duration.ofMillis(100)).until(futureResponse::isDone);
+            assertEquals("content", futureResponse.get().getContent());
 
-        val pair = client.sample3(new TestRequest());
-        assertEquals(HttpStatus.OK, pair.getLeft());
-        assertEquals("content", pair.getRight().getContent());
+            val pair = client.sample3(new TestRequest());
+            assertEquals(HttpStatus.OK, pair.getLeft());
+            assertEquals("content", pair.getRight().getContent());
 
-        val futurePair = client.sample4(new TestRequest());
-        await().forever().pollDelay(Duration.ofMillis(100)).until(futurePair::isDone);
-        assertEquals(HttpStatus.OK, futurePair.get().getLeft());
-        assertEquals("content", futurePair.get().getRight().getContent());
+            val futurePair = client.sample4(new TestRequest());
+            await().forever().pollDelay(Duration.ofMillis(100)).until(futurePair::isDone);
+            assertEquals(HttpStatus.OK, futurePair.get().getLeft());
+            assertEquals("content", futurePair.get().getRight().getContent());
 
-        val errorClient = getClient(CncErrorClient.class);
+            val errorClient = getClient(CncErrorClient.class);
 
-        assertThrows(OhException.class, errorClient::sample1);
-        assertThrows(OhException.class, () -> errorClient.sample2(null));
-        assertThrows(OhException.class, errorClient::sample3);
-
-        mockWebServer.shutdown();
+            assertThrows(OhException.class, errorClient::sample1);
+            assertThrows(OhException.class, () -> errorClient.sample2(null));
+            assertThrows(OhException.class, errorClient::sample3);
+        }
     }
 
     @OhClient

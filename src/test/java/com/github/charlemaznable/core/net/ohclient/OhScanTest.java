@@ -32,32 +32,31 @@ public class OhScanTest {
     @SneakyThrows
     @Test
     public void testOhClient() {
-        val mockWebServer = new MockWebServer();
-        mockWebServer.setDispatcher(new Dispatcher() {
-            @Override
-            public MockResponse dispatch(RecordedRequest request) {
-                switch (request.getPath()) {
-                    case "/sample":
-                        return new MockResponse().setBody("Sample");
+        try (val mockWebServer = new MockWebServer()) {
+            mockWebServer.setDispatcher(new Dispatcher() {
+                @Override
+                public MockResponse dispatch(RecordedRequest request) {
+                    switch (request.getPath()) {
+                        case "/sample":
+                            return new MockResponse().setBody("Sample");
+                    }
+                    return new MockResponse()
+                            .setResponseCode(HttpStatus.NOT_FOUND.value())
+                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
-                return new MockResponse()
-                        .setResponseCode(HttpStatus.NOT_FOUND.value())
-                        .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
-            }
-        });
-        mockWebServer.start(41102);
+            });
+            mockWebServer.start(41102);
 
-        val testHttpClient = testComponent.testHttpClient;
-        assertEquals("Sample", testHttpClient.sample());
-        assertEquals("{Sample}", testHttpClient.sampleWrapper());
+            val testHttpClient = testComponent.testHttpClient;
+            assertEquals("Sample", testHttpClient.sample());
+            assertEquals("{Sample}", testHttpClient.sampleWrapper());
 
-        val testHttpClient2 = SpringContext.getBean(TestHttpClient2.class);
-        assertEquals("Sample", testHttpClient2.sample());
-        assertEquals("[Sample]", testHttpClient2.sampleWrapper());
+            val testHttpClient2 = SpringContext.getBean(TestHttpClient2.class);
+            assertEquals("Sample", testHttpClient2.sample());
+            assertEquals("[Sample]", testHttpClient2.sampleWrapper());
 
-        val testHttpClient3 = SpringContext.getBean(TestHttpClient3.class);
-        assertNull(testHttpClient3);
-
-        mockWebServer.shutdown();
+            val testHttpClient3 = SpringContext.getBean(TestHttpClient3.class);
+            assertNull(testHttpClient3);
+        }
     }
 }

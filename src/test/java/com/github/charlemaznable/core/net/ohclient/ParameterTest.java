@@ -40,144 +40,142 @@ public class ParameterTest {
     @SneakyThrows
     @Test
     public void testOhParameterGet() {
-        val mockWebServer = new MockWebServer();
-        mockWebServer.setDispatcher(new Dispatcher() {
-            @Override
-            public MockResponse dispatch(RecordedRequest request) {
-                val requestUrl = request.getRequestUrl();
-                switch (requestUrl.encodedPath()) {
-                    case "/sampleDefault":
-                        assertNull(requestUrl.queryParameter("T0"));
-                        assertEquals("V1", requestUrl.queryParameter("T1"));
-                        assertEquals("V2", requestUrl.queryParameter("T2"));
-                        assertNull(requestUrl.queryParameter("T3"));
-                        assertNull(requestUrl.queryParameter("T4"));
-                        return new MockResponse().setBody("OK");
-                    case "/sampleMapping":
-                        assertEquals("V0", requestUrl.queryParameter("T0"));
-                        assertEquals("V1", requestUrl.queryParameter("T1"));
-                        assertNull(requestUrl.queryParameter("T2"));
-                        assertEquals("V3", requestUrl.queryParameter("T3"));
-                        assertNull(requestUrl.queryParameter("T4"));
-                        return new MockResponse().setBody("OK");
-                    case "/sampleParameters":
-                        assertEquals("V0", requestUrl.queryParameter("T0"));
-                        assertEquals("V1", requestUrl.queryParameter("T1"));
-                        assertNull(requestUrl.queryParameter("T2"));
-                        assertNull(requestUrl.queryParameter("T3"));
-                        assertEquals("V4", requestUrl.queryParameter("T4"));
-                        return new MockResponse().setBody("OK");
-                    case "/sampleBundle":
-                        assertEquals("V1", requestUrl.queryParameter("T1"));
-                        assertNull(requestUrl.queryParameter("T2"));
-                        assertNull(requestUrl.queryParameter("T3"));
-                        assertEquals("V4", requestUrl.queryParameter("T4"));
-                        return new MockResponse().setBody("OK");
-                    case "/sampleBundle2":
-                        assertEquals("V1", requestUrl.queryParameter("T1"));
-                        assertEquals("V2", requestUrl.queryParameter("T2"));
-                        assertNull(requestUrl.queryParameter("T3"));
-                        assertNull(requestUrl.queryParameter("T4"));
-                        return new MockResponse().setBody("OK");
+        try (val mockWebServer = new MockWebServer()) {
+            mockWebServer.setDispatcher(new Dispatcher() {
+                @Override
+                public MockResponse dispatch(RecordedRequest request) {
+                    val requestUrl = request.getRequestUrl();
+                    switch (requestUrl.encodedPath()) {
+                        case "/sampleDefault":
+                            assertNull(requestUrl.queryParameter("T0"));
+                            assertEquals("V1", requestUrl.queryParameter("T1"));
+                            assertEquals("V2", requestUrl.queryParameter("T2"));
+                            assertNull(requestUrl.queryParameter("T3"));
+                            assertNull(requestUrl.queryParameter("T4"));
+                            return new MockResponse().setBody("OK");
+                        case "/sampleMapping":
+                            assertEquals("V0", requestUrl.queryParameter("T0"));
+                            assertEquals("V1", requestUrl.queryParameter("T1"));
+                            assertNull(requestUrl.queryParameter("T2"));
+                            assertEquals("V3", requestUrl.queryParameter("T3"));
+                            assertNull(requestUrl.queryParameter("T4"));
+                            return new MockResponse().setBody("OK");
+                        case "/sampleParameters":
+                            assertEquals("V0", requestUrl.queryParameter("T0"));
+                            assertEquals("V1", requestUrl.queryParameter("T1"));
+                            assertNull(requestUrl.queryParameter("T2"));
+                            assertNull(requestUrl.queryParameter("T3"));
+                            assertEquals("V4", requestUrl.queryParameter("T4"));
+                            return new MockResponse().setBody("OK");
+                        case "/sampleBundle":
+                            assertEquals("V1", requestUrl.queryParameter("T1"));
+                            assertNull(requestUrl.queryParameter("T2"));
+                            assertNull(requestUrl.queryParameter("T3"));
+                            assertEquals("V4", requestUrl.queryParameter("T4"));
+                            return new MockResponse().setBody("OK");
+                        case "/sampleBundle2":
+                            assertEquals("V1", requestUrl.queryParameter("T1"));
+                            assertEquals("V2", requestUrl.queryParameter("T2"));
+                            assertNull(requestUrl.queryParameter("T3"));
+                            assertNull(requestUrl.queryParameter("T4"));
+                            return new MockResponse().setBody("OK");
+                    }
+                    return new MockResponse()
+                            .setResponseCode(HttpStatus.NOT_FOUND.value())
+                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
-                return new MockResponse()
-                        .setResponseCode(HttpStatus.NOT_FOUND.value())
-                        .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
-            }
-        });
-        mockWebServer.start(41160);
+            });
+            mockWebServer.start(41160);
 
-        val httpClient = getClient(GetParameterHttpClient.class);
-        assertEquals("OK", httpClient.sampleDefault());
-        assertEquals("OK", httpClient.sampleMapping());
-        assertEquals("OK", httpClient.sampleParameters(null, "V4"));
-        assertEquals("OK", httpClient.sampleBundle(new Bundle(null, null, "V4")));
-        assertEquals("OK", httpClient.sampleBundle2(null));
-
-        mockWebServer.shutdown();
+            val httpClient = getClient(GetParameterHttpClient.class);
+            assertEquals("OK", httpClient.sampleDefault());
+            assertEquals("OK", httpClient.sampleMapping());
+            assertEquals("OK", httpClient.sampleParameters(null, "V4"));
+            assertEquals("OK", httpClient.sampleBundle(new Bundle(null, null, "V4")));
+            assertEquals("OK", httpClient.sampleBundle2(null));
+        }
     }
 
     @SneakyThrows
     @Test
     public void testOhParameterPost() {
-        val mockWebServer = new MockWebServer();
-        mockWebServer.setDispatcher(new Dispatcher() {
-            @Override
-            public MockResponse dispatch(RecordedRequest request) {
-                val body = request.getBody().readUtf8();
-                switch (request.getPath()) {
-                    case "/sampleDefault":
-                        val defaultMap = Splitter.on("&")
-                                .withKeyValueSeparator("=").split(body);
-                        assertEquals("V1", defaultMap.get("T1"));
-                        assertEquals("V2", defaultMap.get("T2"));
-                        assertNull(defaultMap.get("T3"));
-                        assertNull(defaultMap.get("T4"));
-                        return new MockResponse().setBody("OK");
-                    case "/sampleMapping":
-                        val mappingMap = unJson(body);
-                        assertEquals("V1", mappingMap.get("T1"));
-                        assertNull(mappingMap.get("T2"));
-                        assertEquals("V3", mappingMap.get("T3"));
-                        assertNull(mappingMap.get("T4"));
-                        return new MockResponse().setBody("OK");
-                    case "/sampleParameters":
-                        val paramMap = unXml(body);
-                        assertEquals("V1", paramMap.get("T1"));
-                        assertNull(paramMap.get("T2"));
-                        assertNull(paramMap.get("T3"));
-                        assertEquals("V4", paramMap.get("T4"));
-                        return new MockResponse().setBody("OK");
-                    case "/sampleBundle":
-                        val bundleMap = Splitter.on("&")
-                                .withKeyValueSeparator("=").split(body);
-                        assertEquals("V1", bundleMap.get("T1"));
-                        assertNull(bundleMap.get("T2"));
-                        assertNull(bundleMap.get("T3"));
-                        assertEquals("V4", bundleMap.get("T4"));
-                        return new MockResponse().setBody("OK");
-                    case "/sampleBundle2":
-                        val bundleMap2 = Splitter.on("&")
-                                .withKeyValueSeparator("=").split(body);
-                        assertEquals("V1", bundleMap2.get("T1"));
-                        assertEquals("V2", bundleMap2.get("T2"));
-                        assertNull(bundleMap2.get("T3"));
-                        assertNull(bundleMap2.get("T4"));
-                        return new MockResponse().setBody("OK");
-                    case "/sampleRaw":
-                        val rawMap = Splitter.on("&")
-                                .withKeyValueSeparator("=").split(body);
-                        assertNull(rawMap.get("T1"));
-                        assertNull(rawMap.get("T2"));
-                        assertEquals("V3", rawMap.get("T3"));
-                        assertEquals("V4", rawMap.get("T4"));
-                        return new MockResponse().setBody("OK");
-                    case "/sampleRawError":
-                        val rawErrorMap = Splitter.on("&")
-                                .withKeyValueSeparator("=").split(body);
-                        assertEquals("V1", rawErrorMap.get("T1"));
-                        assertEquals("V2", rawErrorMap.get("T2"));
-                        assertNull(rawErrorMap.get("T3"));
-                        assertNull(rawErrorMap.get("T4"));
-                        return new MockResponse().setBody("OK");
+        try (val mockWebServer = new MockWebServer()) {
+            mockWebServer.setDispatcher(new Dispatcher() {
+                @Override
+                public MockResponse dispatch(RecordedRequest request) {
+                    val body = request.getBody().readUtf8();
+                    switch (request.getPath()) {
+                        case "/sampleDefault":
+                            val defaultMap = Splitter.on("&")
+                                    .withKeyValueSeparator("=").split(body);
+                            assertEquals("V1", defaultMap.get("T1"));
+                            assertEquals("V2", defaultMap.get("T2"));
+                            assertNull(defaultMap.get("T3"));
+                            assertNull(defaultMap.get("T4"));
+                            return new MockResponse().setBody("OK");
+                        case "/sampleMapping":
+                            val mappingMap = unJson(body);
+                            assertEquals("V1", mappingMap.get("T1"));
+                            assertNull(mappingMap.get("T2"));
+                            assertEquals("V3", mappingMap.get("T3"));
+                            assertNull(mappingMap.get("T4"));
+                            return new MockResponse().setBody("OK");
+                        case "/sampleParameters":
+                            val paramMap = unXml(body);
+                            assertEquals("V1", paramMap.get("T1"));
+                            assertNull(paramMap.get("T2"));
+                            assertNull(paramMap.get("T3"));
+                            assertEquals("V4", paramMap.get("T4"));
+                            return new MockResponse().setBody("OK");
+                        case "/sampleBundle":
+                            val bundleMap = Splitter.on("&")
+                                    .withKeyValueSeparator("=").split(body);
+                            assertEquals("V1", bundleMap.get("T1"));
+                            assertNull(bundleMap.get("T2"));
+                            assertNull(bundleMap.get("T3"));
+                            assertEquals("V4", bundleMap.get("T4"));
+                            return new MockResponse().setBody("OK");
+                        case "/sampleBundle2":
+                            val bundleMap2 = Splitter.on("&")
+                                    .withKeyValueSeparator("=").split(body);
+                            assertEquals("V1", bundleMap2.get("T1"));
+                            assertEquals("V2", bundleMap2.get("T2"));
+                            assertNull(bundleMap2.get("T3"));
+                            assertNull(bundleMap2.get("T4"));
+                            return new MockResponse().setBody("OK");
+                        case "/sampleRaw":
+                            val rawMap = Splitter.on("&")
+                                    .withKeyValueSeparator("=").split(body);
+                            assertNull(rawMap.get("T1"));
+                            assertNull(rawMap.get("T2"));
+                            assertEquals("V3", rawMap.get("T3"));
+                            assertEquals("V4", rawMap.get("T4"));
+                            return new MockResponse().setBody("OK");
+                        case "/sampleRawError":
+                            val rawErrorMap = Splitter.on("&")
+                                    .withKeyValueSeparator("=").split(body);
+                            assertEquals("V1", rawErrorMap.get("T1"));
+                            assertEquals("V2", rawErrorMap.get("T2"));
+                            assertNull(rawErrorMap.get("T3"));
+                            assertNull(rawErrorMap.get("T4"));
+                            return new MockResponse().setBody("OK");
+                    }
+                    return new MockResponse()
+                            .setResponseCode(HttpStatus.NOT_FOUND.value())
+                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
-                return new MockResponse()
-                        .setResponseCode(HttpStatus.NOT_FOUND.value())
-                        .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
-            }
-        });
-        mockWebServer.start(41161);
+            });
+            mockWebServer.start(41161);
 
-        val httpClient = getClient(PostParameterHttpClient.class);
-        assertEquals("OK", httpClient.sampleDefault());
-        assertEquals("OK", httpClient.sampleMapping());
-        assertEquals("OK", httpClient.sampleParameters(null, "V4"));
-        assertEquals("OK", httpClient.sampleBundle(new Bundle(null, null, "V4")));
-        assertEquals("OK", httpClient.sampleBundle2(null));
-        assertEquals("OK", httpClient.sampleRaw("T3=V3&T4=V4"));
-        assertEquals("OK", httpClient.sampleRawError(new Object()));
-
-        mockWebServer.shutdown();
+            val httpClient = getClient(PostParameterHttpClient.class);
+            assertEquals("OK", httpClient.sampleDefault());
+            assertEquals("OK", httpClient.sampleMapping());
+            assertEquals("OK", httpClient.sampleParameters(null, "V4"));
+            assertEquals("OK", httpClient.sampleBundle(new Bundle(null, null, "V4")));
+            assertEquals("OK", httpClient.sampleBundle2(null));
+            assertEquals("OK", httpClient.sampleRaw("T3=V3&T4=V4"));
+            assertEquals("OK", httpClient.sampleRawError(new Object()));
+        }
     }
 
     @FixedPathVar(name = "T0", value = "V0")

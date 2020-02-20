@@ -40,48 +40,47 @@ public class ContextTest {
     @SneakyThrows
     @Test
     public void testOhContext() {
-        val mockWebServer = new MockWebServer();
-        mockWebServer.setDispatcher(new Dispatcher() {
-            @Override
-            public MockResponse dispatch(RecordedRequest request) {
-                val body = unJson(request.getBody().readUtf8());
-                switch (request.getPath()) {
-                    case "/sampleDefault":
-                        assertEquals("CV1", body.get("C1"));
-                        assertEquals("CV2", body.get("C2"));
-                        assertNull(body.get("C3"));
-                        assertNull(body.get("C4"));
-                        return new MockResponse().setBody("OK");
-                    case "/sampleMapping":
-                        assertEquals("CV1", body.get("C1"));
-                        assertNull(body.get("C2"));
-                        assertEquals("CV3", body.get("C3"));
-                        assertNull(body.get("C4"));
-                        return new MockResponse().setBody("OK");
-                    case "/sampleContexts":
-                        assertEquals("CV1", body.get("C1"));
-                        assertNull(body.get("C2"));
-                        assertNull(body.get("C3"));
-                        assertEquals("CV4", body.get("C4"));
-                        return new MockResponse().setBody("OK");
+        try (val mockWebServer = new MockWebServer()) {
+            mockWebServer.setDispatcher(new Dispatcher() {
+                @Override
+                public MockResponse dispatch(RecordedRequest request) {
+                    val body = unJson(request.getBody().readUtf8());
+                    switch (request.getPath()) {
+                        case "/sampleDefault":
+                            assertEquals("CV1", body.get("C1"));
+                            assertEquals("CV2", body.get("C2"));
+                            assertNull(body.get("C3"));
+                            assertNull(body.get("C4"));
+                            return new MockResponse().setBody("OK");
+                        case "/sampleMapping":
+                            assertEquals("CV1", body.get("C1"));
+                            assertNull(body.get("C2"));
+                            assertEquals("CV3", body.get("C3"));
+                            assertNull(body.get("C4"));
+                            return new MockResponse().setBody("OK");
+                        case "/sampleContexts":
+                            assertEquals("CV1", body.get("C1"));
+                            assertNull(body.get("C2"));
+                            assertNull(body.get("C3"));
+                            assertEquals("CV4", body.get("C4"));
+                            return new MockResponse().setBody("OK");
+                    }
+                    return new MockResponse()
+                            .setResponseCode(HttpStatus.NOT_FOUND.value())
+                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
-                return new MockResponse()
-                        .setResponseCode(HttpStatus.NOT_FOUND.value())
-                        .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
-            }
-        });
-        mockWebServer.start(41170);
+            });
+            mockWebServer.start(41170);
 
-        val httpClient = getClient(ContextHttpClient.class);
-        assertEquals("OK", httpClient.sampleDefault());
-        assertEquals("OK", httpClient.sampleMapping());
-        assertEquals("OK", httpClient.sampleContexts(null, "V4"));
+            val httpClient = getClient(ContextHttpClient.class);
+            assertEquals("OK", httpClient.sampleDefault());
+            assertEquals("OK", httpClient.sampleMapping());
+            assertEquals("OK", httpClient.sampleContexts(null, "V4"));
 
-        assertEquals("OK", httpClient.sampleDefaultResponse().getResponse());
-        assertEquals("OK", httpClient.sampleMappingResponse().getResponse());
-        assertEquals("OK", httpClient.sampleContextsResponse(null, "V4").getResponse());
-
-        mockWebServer.shutdown();
+            assertEquals("OK", httpClient.sampleDefaultResponse().getResponse());
+            assertEquals("OK", httpClient.sampleMappingResponse().getResponse());
+            assertEquals("OK", httpClient.sampleContextsResponse(null, "V4").getResponse());
+        }
     }
 
     @RequestMethod(HttpMethod.POST)

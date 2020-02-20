@@ -31,49 +31,48 @@ public class ReturnMapTest {
     @SneakyThrows
     @Test
     public void testMap() {
-        val mockWebServer = new MockWebServer();
-        mockWebServer.setDispatcher(new Dispatcher() {
-            @Override
-            public MockResponse dispatch(RecordedRequest request) {
-                switch (request.getPath()) {
-                    case "/sampleMap":
-                        return new MockResponse().setResponseCode(HttpStatus.OK.value())
-                                .setBody(json(of("John", of("name", "Doe"))));
-                    case "/sampleFutureMap":
-                        return new MockResponse().setResponseCode(HttpStatus.OK.value())
-                                .setBody(xml(of("John", of("name", "Doe"))));
-                    case "/sampleMapNull":
-                    case "/sampleFutureMapNull":
-                        return new MockResponse().setResponseCode(HttpStatus.OK.value())
-                                .setBody("");
+        try (val mockWebServer = new MockWebServer()) {
+            mockWebServer.setDispatcher(new Dispatcher() {
+                @Override
+                public MockResponse dispatch(RecordedRequest request) {
+                    switch (request.getPath()) {
+                        case "/sampleMap":
+                            return new MockResponse().setResponseCode(HttpStatus.OK.value())
+                                    .setBody(json(of("John", of("name", "Doe"))));
+                        case "/sampleFutureMap":
+                            return new MockResponse().setResponseCode(HttpStatus.OK.value())
+                                    .setBody(xml(of("John", of("name", "Doe"))));
+                        case "/sampleMapNull":
+                        case "/sampleFutureMapNull":
+                            return new MockResponse().setResponseCode(HttpStatus.OK.value())
+                                    .setBody("");
+                    }
+                    return new MockResponse()
+                            .setResponseCode(HttpStatus.NOT_FOUND.value())
+                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
-                return new MockResponse()
-                        .setResponseCode(HttpStatus.NOT_FOUND.value())
-                        .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
-            }
-        });
-        mockWebServer.start(41193);
-        val httpClient = getClient(MapHttpClient.class);
+            });
+            mockWebServer.start(41193);
+            val httpClient = getClient(MapHttpClient.class);
 
-        var map = httpClient.sampleMap();
-        var beanMap = (Map) map.get("John");
-        assertEquals("Doe", beanMap.get("name"));
+            var map = httpClient.sampleMap();
+            var beanMap = (Map) map.get("John");
+            assertEquals("Doe", beanMap.get("name"));
 
-        var futureMap = httpClient.sampleFutureMap();
-        await().forever().pollDelay(Duration.ofMillis(100)).until(futureMap::isDone);
-        map = futureMap.get();
-        beanMap = (Map) map.get("John");
-        assertEquals("Doe", beanMap.get("name"));
+            var futureMap = httpClient.sampleFutureMap();
+            await().forever().pollDelay(Duration.ofMillis(100)).until(futureMap::isDone);
+            map = futureMap.get();
+            beanMap = (Map) map.get("John");
+            assertEquals("Doe", beanMap.get("name"));
 
-        map = httpClient.sampleMapNull();
-        assertNull(map);
+            map = httpClient.sampleMapNull();
+            assertNull(map);
 
-        futureMap = httpClient.sampleFutureMapNull();
-        await().forever().pollDelay(Duration.ofMillis(100)).until(futureMap::isDone);
-        map = futureMap.get();
-        assertNull(map);
-
-        mockWebServer.shutdown();
+            futureMap = httpClient.sampleFutureMapNull();
+            await().forever().pollDelay(Duration.ofMillis(100)).until(futureMap::isDone);
+            map = futureMap.get();
+            assertNull(map);
+        }
     }
 
     @OhClient

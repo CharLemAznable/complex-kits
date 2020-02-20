@@ -24,31 +24,29 @@ public class UrlConcatTest {
     @SneakyThrows
     @Test
     public void testUrlPlainConcat() {
-        val mockWebServer = startMockWebServer(41100);
+        try (val mockWebServer = startMockWebServer(41100)) {
 
-        val httpClient = getClient(UrlPlainHttpClient.class);
-        assertEquals("Root", httpClient.empty());
-        assertEquals("Root", httpClient.root());
-        assertEquals("Sample", httpClient.sample());
-        assertEquals("Sample", httpClient.sampleWithSlash());
-        assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), httpClient.notFound());
-
-        shutdownMockWebServer(mockWebServer);
+            val httpClient = getClient(UrlPlainHttpClient.class);
+            assertEquals("Root", httpClient.empty());
+            assertEquals("Root", httpClient.root());
+            assertEquals("Sample", httpClient.sample());
+            assertEquals("Sample", httpClient.sampleWithSlash());
+            assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), httpClient.notFound());
+        }
     }
 
     @SneakyThrows
     @Test
     public void testUrlProviderConcat() {
-        val mockWebServer = startMockWebServer(41101);
+        try (val mockWebServer = startMockWebServer(41101)) {
 
-        val httpClient = getClient(UrlProviderHttpClient.class);
-        assertEquals("Root", httpClient.empty());
-        assertEquals("Root", httpClient.root());
-        assertEquals("Sample", httpClient.sample());
-        assertEquals("Sample", httpClient.sampleWithSlash());
-        assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), httpClient.notFound());
-
-        shutdownMockWebServer(mockWebServer);
+            val httpClient = getClient(UrlProviderHttpClient.class);
+            assertEquals("Root", httpClient.empty());
+            assertEquals("Root", httpClient.root());
+            assertEquals("Sample", httpClient.sample());
+            assertEquals("Sample", httpClient.sampleWithSlash());
+            assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), httpClient.notFound());
+        }
     }
 
     @SneakyThrows
@@ -80,11 +78,6 @@ public class UrlConcatTest {
         });
         mockWebServer.start(port);
         return mockWebServer;
-    }
-
-    @SneakyThrows
-    private void shutdownMockWebServer(MockWebServer mockWebServer) {
-        mockWebServer.shutdown();
     }
 
     @DefaultErrorMappingDisabled

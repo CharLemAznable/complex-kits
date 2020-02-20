@@ -28,43 +28,42 @@ public class ReturnErrorTest {
     @SneakyThrows
     @Test
     public void testError() {
-        val mockWebServer = new MockWebServer();
-        mockWebServer.setDispatcher(new Dispatcher() {
-            @Override
-            public MockResponse dispatch(RecordedRequest request) {
-                switch (request.getPath()) {
-                    case "/sampleFuture":
-                    case "/sampleList":
-                        return new MockResponse().setResponseCode(HttpStatus.OK.value())
-                                .setBody(json(newArrayList("John", "Doe")));
-                    case "/sampleMapError":
-                        return new MockResponse().setResponseCode(HttpStatus.OK.value())
-                                .setBody("John Doe");
-                    case "/sampleMap":
-                    case "/samplePair":
-                    case "/sampleTriple":
-                        return new MockResponse().setResponseCode(HttpStatus.OK.value())
-                                .setBody(jsonOf("John", "Doe"));
+        try (val mockWebServer = new MockWebServer()) {
+            mockWebServer.setDispatcher(new Dispatcher() {
+                @Override
+                public MockResponse dispatch(RecordedRequest request) {
+                    switch (request.getPath()) {
+                        case "/sampleFuture":
+                        case "/sampleList":
+                            return new MockResponse().setResponseCode(HttpStatus.OK.value())
+                                    .setBody(json(newArrayList("John", "Doe")));
+                        case "/sampleMapError":
+                            return new MockResponse().setResponseCode(HttpStatus.OK.value())
+                                    .setBody("John Doe");
+                        case "/sampleMap":
+                        case "/samplePair":
+                        case "/sampleTriple":
+                            return new MockResponse().setResponseCode(HttpStatus.OK.value())
+                                    .setBody(jsonOf("John", "Doe"));
+                    }
+                    return new MockResponse()
+                            .setResponseCode(HttpStatus.NOT_FOUND.value())
+                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
-                return new MockResponse()
-                        .setResponseCode(HttpStatus.NOT_FOUND.value())
-                        .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
-            }
-        });
-        mockWebServer.start(41196);
-        val httpClient = getClient(ErrorHttpClient.class);
+            });
+            mockWebServer.start(41196);
+            val httpClient = getClient(ErrorHttpClient.class);
 
-        assertThrows(OhException.class, httpClient::sampleFuture);
-        assertThrows(OhException.class, httpClient::sampleList);
-        assertThrows(IllegalArgumentException.class, httpClient::sampleMapError);
+            assertThrows(OhException.class, httpClient::sampleFuture);
+            assertThrows(OhException.class, httpClient::sampleList);
+            assertThrows(IllegalArgumentException.class, httpClient::sampleMapError);
 
-        val map = httpClient.sampleMap();
-        assertEquals("Doe", map.get("John"));
+            val map = httpClient.sampleMap();
+            assertEquals("Doe", map.get("John"));
 
-        assertThrows(OhException.class, httpClient::samplePair);
-        assertThrows(OhException.class, httpClient::sampleTriple);
-
-        mockWebServer.shutdown();
+            assertThrows(OhException.class, httpClient::samplePair);
+            assertThrows(OhException.class, httpClient::sampleTriple);
+        }
     }
 
     @OhClient

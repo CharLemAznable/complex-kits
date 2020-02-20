@@ -23,94 +23,93 @@ public class OhResponseMappingTest {
     @SneakyThrows
     @Test
     public void testOhResponseMapping() {
-        val mockWebServer = new MockWebServer();
-        mockWebServer.setDispatcher(new Dispatcher() {
-            @Override
-            public MockResponse dispatch(RecordedRequest request) {
-                switch (request.getPath()) {
-                    case "/sampleNotFound":
-                        return new MockResponse()
-                                .setResponseCode(HttpStatus.NOT_FOUND.value())
-                                .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
-                    case "/sampleClientError":
-                        return new MockResponse()
-                                .setResponseCode(HttpStatus.FORBIDDEN.value())
-                                .setBody(HttpStatus.FORBIDDEN.getReasonPhrase());
-                    case "/sampleMappingNotFound":
-                        return new MockResponse()
-                                .setResponseCode(HttpStatus.NOT_FOUND.value())
-                                .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
-                    case "/sampleMappingClientError":
-                        return new MockResponse()
-                                .setResponseCode(HttpStatus.FORBIDDEN.value())
-                                .setBody(HttpStatus.FORBIDDEN.getReasonPhrase());
-                    case "/sampleServerError":
-                        return new MockResponse()
-                                .setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                                .setBody(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+        try (val mockWebServer = new MockWebServer()) {
+            mockWebServer.setDispatcher(new Dispatcher() {
+                @Override
+                public MockResponse dispatch(RecordedRequest request) {
+                    switch (request.getPath()) {
+                        case "/sampleNotFound":
+                            return new MockResponse()
+                                    .setResponseCode(HttpStatus.NOT_FOUND.value())
+                                    .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
+                        case "/sampleClientError":
+                            return new MockResponse()
+                                    .setResponseCode(HttpStatus.FORBIDDEN.value())
+                                    .setBody(HttpStatus.FORBIDDEN.getReasonPhrase());
+                        case "/sampleMappingNotFound":
+                            return new MockResponse()
+                                    .setResponseCode(HttpStatus.NOT_FOUND.value())
+                                    .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
+                        case "/sampleMappingClientError":
+                            return new MockResponse()
+                                    .setResponseCode(HttpStatus.FORBIDDEN.value())
+                                    .setBody(HttpStatus.FORBIDDEN.getReasonPhrase());
+                        case "/sampleServerError":
+                            return new MockResponse()
+                                    .setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                                    .setBody(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+                    }
+                    return new MockResponse().setBody("OK");
                 }
-                return new MockResponse().setBody("OK");
+            });
+            mockWebServer.start(41180);
+
+            val httpClient = getClient(MappingHttpClient.class);
+            assertThrows(NotFoundException.class, httpClient::sampleNotFound);
+            assertThrows(ClientErrorException.class, httpClient::sampleClientError);
+            assertThrows(NotFoundException2.class, httpClient::sampleMappingNotFound);
+            assertThrows(ClientErrorException2.class, httpClient::sampleMappingClientError);
+            assertThrows(StatusError.class, httpClient::sampleServerError);
+
+            val defaultHttpClient = getClient(DefaultMappingHttpClient.class);
+            try {
+                defaultHttpClient.sampleNotFound();
+            } catch (Exception e) {
+                assertEquals(StatusError.class, e.getClass());
+                StatusError er = (StatusError) e;
+                assertEquals(HttpStatus.NOT_FOUND.value(), er.getStatusCode());
+                assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), er.getMessage());
             }
-        });
-        mockWebServer.start(41180);
+            try {
+                defaultHttpClient.sampleClientError();
+            } catch (Exception e) {
+                assertEquals(StatusError.class, e.getClass());
+                StatusError er = (StatusError) e;
+                assertEquals(HttpStatus.FORBIDDEN.value(), er.getStatusCode());
+                assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), er.getMessage());
+            }
+            try {
+                defaultHttpClient.sampleMappingNotFound();
+            } catch (Exception e) {
+                assertEquals(StatusError.class, e.getClass());
+                StatusError er = (StatusError) e;
+                assertEquals(HttpStatus.NOT_FOUND.value(), er.getStatusCode());
+                assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), er.getMessage());
+            }
+            try {
+                defaultHttpClient.sampleMappingClientError();
+            } catch (Exception e) {
+                assertEquals(StatusError.class, e.getClass());
+                StatusError er = (StatusError) e;
+                assertEquals(HttpStatus.FORBIDDEN.value(), er.getStatusCode());
+                assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), er.getMessage());
+            }
+            try {
+                defaultHttpClient.sampleServerError();
+            } catch (Exception e) {
+                assertEquals(StatusError.class, e.getClass());
+                StatusError er = (StatusError) e;
+                assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), er.getStatusCode());
+                assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), er.getMessage());
+            }
 
-        val httpClient = getClient(MappingHttpClient.class);
-        assertThrows(NotFoundException.class, httpClient::sampleNotFound);
-        assertThrows(ClientErrorException.class, httpClient::sampleClientError);
-        assertThrows(NotFoundException2.class, httpClient::sampleMappingNotFound);
-        assertThrows(ClientErrorException2.class, httpClient::sampleMappingClientError);
-        assertThrows(StatusError.class, httpClient::sampleServerError);
-
-        val defaultHttpClient = getClient(DefaultMappingHttpClient.class);
-        try {
-            defaultHttpClient.sampleNotFound();
-        } catch (Exception e) {
-            assertEquals(StatusError.class, e.getClass());
-            StatusError er = (StatusError) e;
-            assertEquals(HttpStatus.NOT_FOUND.value(), er.getStatusCode());
-            assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), er.getMessage());
+            val disabledHttpClient = getClient(DisabledMappingHttpClient.class);
+            assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), disabledHttpClient.sampleNotFound());
+            assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), disabledHttpClient.sampleClientError());
+            assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), disabledHttpClient.sampleMappingNotFound());
+            assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), disabledHttpClient.sampleMappingClientError());
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), disabledHttpClient.sampleServerError());
         }
-        try {
-            defaultHttpClient.sampleClientError();
-        } catch (Exception e) {
-            assertEquals(StatusError.class, e.getClass());
-            StatusError er = (StatusError) e;
-            assertEquals(HttpStatus.FORBIDDEN.value(), er.getStatusCode());
-            assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), er.getMessage());
-        }
-        try {
-            defaultHttpClient.sampleMappingNotFound();
-        } catch (Exception e) {
-            assertEquals(StatusError.class, e.getClass());
-            StatusError er = (StatusError) e;
-            assertEquals(HttpStatus.NOT_FOUND.value(), er.getStatusCode());
-            assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), er.getMessage());
-        }
-        try {
-            defaultHttpClient.sampleMappingClientError();
-        } catch (Exception e) {
-            assertEquals(StatusError.class, e.getClass());
-            StatusError er = (StatusError) e;
-            assertEquals(HttpStatus.FORBIDDEN.value(), er.getStatusCode());
-            assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), er.getMessage());
-        }
-        try {
-            defaultHttpClient.sampleServerError();
-        } catch (Exception e) {
-            assertEquals(StatusError.class, e.getClass());
-            StatusError er = (StatusError) e;
-            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), er.getStatusCode());
-            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), er.getMessage());
-        }
-
-        val disabledHttpClient = getClient(DisabledMappingHttpClient.class);
-        assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), disabledHttpClient.sampleNotFound());
-        assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), disabledHttpClient.sampleClientError());
-        assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), disabledHttpClient.sampleMappingNotFound());
-        assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), disabledHttpClient.sampleMappingClientError());
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), disabledHttpClient.sampleServerError());
-
-        mockWebServer.shutdown();
     }
 
     @StatusErrorMapping(status = HttpStatus.NOT_FOUND,
