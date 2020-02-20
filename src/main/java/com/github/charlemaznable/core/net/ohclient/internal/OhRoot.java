@@ -3,6 +3,7 @@ package com.github.charlemaznable.core.net.ohclient.internal;
 import com.github.charlemaznable.core.net.common.ContentFormat.ContentFormatter;
 import com.github.charlemaznable.core.net.common.HttpMethod;
 import com.github.charlemaznable.core.net.common.HttpStatus;
+import com.github.charlemaznable.core.net.common.ResponseParse.ResponseParser;
 import com.github.charlemaznable.core.net.common.StatusError;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
@@ -35,4 +36,6 @@ class OhRoot {
 
     Map<HttpStatus, Class<? extends StatusError>> statusErrorMapping;
     Map<HttpStatus.Series, Class<? extends StatusError>> statusSeriesErrorMapping;
+
+    ResponseParser responseParser;
 }

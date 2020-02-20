@@ -28,6 +28,7 @@ import javax.net.ssl.X509TrustManager;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.Proxy;
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.alibaba.fastjson.JSON.toJSONString;
@@ -36,7 +37,6 @@ import static com.github.charlemaznable.core.lang.Condition.checkNull;
 import static com.github.charlemaznable.core.lang.Condition.notNullThen;
 import static com.github.charlemaznable.core.lang.Condition.nullThen;
 import static com.github.charlemaznable.core.lang.Listt.newArrayList;
-import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static com.github.charlemaznable.core.lang.Str.isBlank;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.ACCEPT_CHARSET;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.CONTENT_TYPE;
@@ -194,22 +194,14 @@ public final class OhCall extends OhRoot {
                     xx -> requestBuilder.header(header.getKey(), header.getValue()));
         }
 
-        Map<String, String> pathVarMap = newHashMap();
-        for (val pathVar : this.pathVars) {
-            pathVarMap.put(pathVar.getKey(), pathVar.getValue());
-        }
+        Map<String, String> pathVarMap = this.pathVars.stream().collect(
+                HashMap::new, (m, p) -> m.put(p.getKey(), p.getValue()), HashMap::putAll);
         val pathVarSubstitutor = new StringSubstitutor(pathVarMap, "{", "}");
         val requestUrl = pathVarSubstitutor.replace(url);
-
-        Map<String, Object> parameterMap = newHashMap();
-        for (val parameter : this.parameters) {
-            parameterMap.put(parameter.getKey(), parameter.getValue());
-        }
-
-        Map<String, Object> contextMap = newHashMap();
-        for (val context : this.contexts) {
-            contextMap.put(context.getKey(), context.getValue());
-        }
+        Map<String, Object> parameterMap = this.parameters.stream().collect(
+                HashMap::new, (m, p) -> m.put(p.getKey(), p.getValue()), HashMap::putAll);
+        Map<String, Object> contextMap = this.contexts.stream().collect(
+                HashMap::new, (m, p) -> m.put(p.getKey(), p.getValue()), HashMap::putAll);
 
         val requestMethod = this.httpMethod.toString();
         if (!HttpMethod.permitsRequestBody(requestMethod)) {

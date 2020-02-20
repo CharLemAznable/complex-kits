@@ -10,6 +10,10 @@ import com.github.charlemaznable.core.net.common.HttpMethod;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.RequestMethod;
+import com.github.charlemaznable.core.net.common.ResponseParse;
+import com.github.charlemaznable.core.net.common.ResponseParse.ResponseParser;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
@@ -73,11 +77,16 @@ public class ContextTest {
         assertEquals("OK", httpClient.sampleMapping());
         assertEquals("OK", httpClient.sampleContexts(null, "V4"));
 
+        assertEquals("OK", httpClient.sampleDefaultResponse().getResponse());
+        assertEquals("OK", httpClient.sampleMappingResponse().getResponse());
+        assertEquals("OK", httpClient.sampleContextsResponse(null, "V4").getResponse());
+
         mockWebServer.shutdown();
     }
 
     @RequestMethod(HttpMethod.POST)
     @ContentFormat(TestContextFormatter.class)
+    @ResponseParse(TestResponseParser.class)
     @FixedContext(name = "C1", value = "V1")
     @FixedContext(name = "C2", valueProvider = C2Provider.class)
     @Mapping("${root}:41170")
@@ -94,6 +103,21 @@ public class ContextTest {
         @FixedContext(name = "C3", value = "V3")
         String sampleContexts(@Context("C3") String v3,
                               @Context("C4") String v4);
+
+        @ContentFormat(TestContextFormatter.class)
+        @Mapping("/sampleDefault")
+        TestResponse sampleDefaultResponse();
+
+        @Mapping("/sampleMapping")
+        @FixedContext(name = "C2", valueProvider = C2Provider.class)
+        @FixedContext(name = "C3", value = "V3")
+        TestResponse sampleMappingResponse();
+
+        @Mapping("/sampleContexts")
+        @FixedContext(name = "C2", valueProvider = C2Provider.class)
+        @FixedContext(name = "C3", value = "V3")
+        TestResponse sampleContextsResponse(@Context("C3") String v3,
+                                            @Context("C4") String v4);
     }
 
     public static class C2Provider implements FixedValueProvider {
@@ -133,5 +157,26 @@ public class ContextTest {
             }
             return json(content);
         }
+    }
+
+    public static class TestResponseParser implements ResponseParser {
+
+        @Override
+        public Object parse(@Nonnull String responseContent,
+                            @Nonnull Class<?> returnType,
+                            @Nonnull Map<String, Object> contextMap) {
+            assertEquals("OK", responseContent);
+            assertEquals(TestResponse.class, returnType);
+            val testResponse = new TestResponse();
+            testResponse.setResponse(responseContent);
+            return testResponse;
+        }
+    }
+
+    @Getter
+    @Setter
+    public static class TestResponse {
+
+        private String response;
     }
 }

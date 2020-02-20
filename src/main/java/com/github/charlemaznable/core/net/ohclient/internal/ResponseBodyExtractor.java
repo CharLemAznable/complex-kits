@@ -7,6 +7,7 @@ import okio.BufferedSource;
 
 import java.io.InputStream;
 import java.io.Reader;
+import java.util.function.Function;
 
 import static com.github.charlemaznable.core.codec.Json.spec;
 import static com.github.charlemaznable.core.codec.Json.unJson;
@@ -43,9 +44,12 @@ public final class ResponseBodyExtractor {
         return responseBody.string();
     }
 
-    static Object object(ResponseBody responseBody, Class<?> returnType) {
+    static Object object(ResponseBody responseBody,
+                         Function<String, Object> customParser,
+                         Class<?> returnType) {
         val content = string(responseBody);
         if (isBlank(content)) return null;
+        if (null != customParser) return customParser.apply(content);
         if (content.startsWith("<")) return spec(unXml(content), returnType);
         if (content.startsWith("[")) return unJsonArray(content, returnType);
         if (content.startsWith("{")) return unJson(content, returnType);

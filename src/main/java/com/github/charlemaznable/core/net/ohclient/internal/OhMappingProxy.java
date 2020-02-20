@@ -14,6 +14,8 @@ import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.Mapping.UrlProvider;
 import com.github.charlemaznable.core.net.common.RequestMethod;
+import com.github.charlemaznable.core.net.common.ResponseParse;
+import com.github.charlemaznable.core.net.common.ResponseParse.ResponseParser;
 import com.github.charlemaznable.core.net.common.StatusError;
 import com.github.charlemaznable.core.net.common.StatusErrorMapping;
 import com.github.charlemaznable.core.net.common.StatusSeriesErrorMapping;
@@ -49,6 +51,7 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.nio.charset.Charset;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -117,6 +120,8 @@ public final class OhMappingProxy extends OhRoot {
 
         this.statusErrorMapping = Elf.checkStatusErrorMapping(this.ohMethod, proxy);
         this.statusSeriesErrorMapping = Elf.checkStatusSeriesErrorMapping(this.ohMethod, proxy);
+
+        this.responseParser = Elf.checkResponseParser(this.ohMethod, proxy);
 
         processReturnType(this.ohMethod);
     }
@@ -293,7 +298,12 @@ public final class OhMappingProxy extends OhRoot {
             return notNullThen(responseBody, ResponseBodyExtractor::string);
         } else {
             return notNullThen(responseBody, body ->
-                    ResponseBodyExtractor.object(body, returnType));
+                    ResponseBodyExtractor.object(body,
+                            notNullThen(this.responseParser, parser -> {
+                                Map<String, Object> contextMap = this.contexts.stream().collect(
+                                        HashMap::new, (m, p) -> m.put(p.getKey(), p.getValue()), HashMap::putAll);
+                                return content -> parser.parse(content, returnType, contextMap);
+                            }), returnType));
         }
     }
 
@@ -463,6 +473,12 @@ public final class OhMappingProxy extends OhRoot {
             result.putAll(newArrayList(findMergedRepeatableAnnotations(method, StatusSeriesErrorMapping.class)).stream()
                     .collect(Collectors.toMap(StatusSeriesErrorMapping::statusSeries, StatusSeriesErrorMapping::exception)));
             return result;
+        }
+
+        static ResponseParser checkResponseParser(Method method, OhProxy proxy) {
+            val responseParse = findAnnotation(method, ResponseParse.class);
+            return checkNull(responseParse, () -> proxy.responseParser,
+                    annotation -> getBeanOrReflect(annotation.value()));
         }
     }
 }

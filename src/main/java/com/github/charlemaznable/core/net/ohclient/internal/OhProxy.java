@@ -15,6 +15,8 @@ import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.Mapping.UrlProvider;
 import com.github.charlemaznable.core.net.common.RequestMethod;
+import com.github.charlemaznable.core.net.common.ResponseParse;
+import com.github.charlemaznable.core.net.common.ResponseParse.ResponseParser;
 import com.github.charlemaznable.core.net.common.StatusError;
 import com.github.charlemaznable.core.net.common.StatusErrorMapping;
 import com.github.charlemaznable.core.net.common.StatusSeriesErrorMapping;
@@ -99,6 +101,8 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
 
         this.statusErrorMapping = Elf.checkStatusErrorMapping(this.ohClass);
         this.statusSeriesErrorMapping = Elf.checkStatusSeriesErrorMapping(this.ohClass);
+
+        this.responseParser = Elf.checkResponseParser(this.ohClass);
     }
 
     @Override
@@ -254,6 +258,12 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
             result.putAll(newArrayList(findMergedRepeatableAnnotations(clazz, StatusSeriesErrorMapping.class)).stream()
                     .collect(Collectors.toMap(StatusSeriesErrorMapping::statusSeries, StatusSeriesErrorMapping::exception)));
             return result;
+        }
+
+        static ResponseParser checkResponseParser(Class clazz) {
+            val responseParse = findAnnotation(clazz, ResponseParse.class);
+            return checkNull(responseParse, () -> null,
+                    annotation -> getBeanOrReflect(annotation.value()));
         }
     }
 }
