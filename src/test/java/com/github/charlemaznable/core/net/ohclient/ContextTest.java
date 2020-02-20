@@ -104,15 +104,17 @@ public class ContextTest {
         String sampleContexts(@Context("C3") String v3,
                               @Context("C4") String v4);
 
-        @ContentFormat(TestContextFormatter.class)
+        @ResponseParse(TestResponseParser.class)
         @Mapping("/sampleDefault")
         TestResponse sampleDefaultResponse();
 
+        @ResponseParse(TestResponseParser.class)
         @Mapping("/sampleMapping")
         @FixedContext(name = "C2", valueProvider = C2Provider.class)
         @FixedContext(name = "C3", value = "V3")
         TestResponse sampleMappingResponse();
 
+        @ResponseParse(TestResponseParser.class)
         @Mapping("/sampleContexts")
         @FixedContext(name = "C2", valueProvider = C2Provider.class)
         @FixedContext(name = "C3", value = "V3")
