@@ -56,6 +56,10 @@ public class SpringContext implements ApplicationContextAware {
         return getBean(clazz, new CreateBeanSupplier<>(clazz));
     }
 
+    public static <T> T getBeanOrAutowire(Class<T> clazz, T bean) {
+        return getBean(clazz, new AutowireBeanSupplier<>(bean));
+    }
+
     public static <T> T getBean(Class<T> clazz) {
         return getBean(clazz, (T) null);
     }
@@ -82,6 +86,10 @@ public class SpringContext implements ApplicationContextAware {
 
     public static <T> T getBeanOrCreate(String beanName, Class<T> clazz) {
         return getBean(beanName, clazz, new CreateBeanWithNameSupplier<>(beanName, clazz));
+    }
+
+    public static <T> T getBeanOrAutowire(String beanName, Class<T> clazz, T bean) {
+        return getBean(beanName, clazz, new AutowireBeanSupplier<>(bean));
     }
 
     public static <T> T getBean(String beanName, Class<T> clazz) {
@@ -163,6 +171,17 @@ public class SpringContext implements ApplicationContextAware {
     }
 
     @AllArgsConstructor
+    static final class DefaultValueSupplier<T> implements Supplier<T> {
+
+        private T defaultValue;
+
+        @Override
+        public T get() {
+            return defaultValue;
+        }
+    }
+
+    @AllArgsConstructor
     static final class ReflectBeanSupplier<T> implements Supplier<T> {
 
         private Class<T> clazz;
@@ -197,13 +216,13 @@ public class SpringContext implements ApplicationContextAware {
     }
 
     @AllArgsConstructor
-    static final class DefaultValueSupplier<T> implements Supplier<T> {
+    static final class AutowireBeanSupplier<T> implements Supplier<T> {
 
-        private T defaultValue;
+        private T bean;
 
         @Override
         public T get() {
-            return defaultValue;
+            return autowireBean(bean);
         }
     }
 }

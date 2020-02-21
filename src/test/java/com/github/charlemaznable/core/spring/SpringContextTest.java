@@ -121,13 +121,15 @@ public class SpringContextTest {
         assertNull(createBeanC);
 
         val autowiredBean = new TestCreateClassC();
-        assertEquals(autowiredBean, TestSpringContext.autowireBean(autowiredBean));
+        assertEquals(autowiredBean, TestSpringContext.getBeanOrAutowire(TestCreateClassC.class, autowiredBean));
 
         createBeanC = TestSpringContext.getBean(TestCreateClassC.class);
         assertNotNull(createBeanC);
         createBeanC = TestSpringContext.getBean(TestCreateClassC.class.getName());
         assertNotNull(createBeanC);
         createBeanC = TestSpringContext.getBean(TestCreateClassC.class.getName(), TestCreateClassC.class);
+        assertNotNull(createBeanC);
+        createBeanC = TestSpringContext.getBeanOrAutowire(TestCreateClassC.class.getName(), TestCreateClassC.class, autowiredBean);
         assertNotNull(createBeanC);
 
         assertNotNull(createBeanC.testClass);
