@@ -187,5 +187,8 @@ public class SpringContextTest {
         testG = TestSpringContext.getBean(TestClassG.class);
         assertNotNull(testG);
         assertNotNull(testG.testClass);
+
+        assertNull(TestSpringContext.createBean(null));
+        assertNull(TestSpringContext.autowireBean(null));
     }
 }
