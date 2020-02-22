@@ -2,6 +2,8 @@ package com.github.charlemaznable.core.spring;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Synchronized;
 import lombok.val;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -15,8 +17,11 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 import java.lang.annotation.Annotation;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
+import static com.github.charlemaznable.core.lang.Condition.checkNull;
 import static com.github.charlemaznable.core.lang.Condition.notNullThen;
+import static com.github.charlemaznable.core.lang.Condition.nullThen;
 import static com.github.charlemaznable.core.lang.Str.isEmpty;
 import static com.github.charlemaznable.core.spring.ComplexBeanNameGenerator.getBeanClassName;
 import static org.joor.Reflect.onClass;
@@ -28,12 +33,25 @@ public class SpringContext implements ApplicationContextAware {
     private static ApplicationContext applicationContext;
     private static DefaultListableBeanFactory defaultListableBeanFactory;
 
+    ////////////////////////////////////////////////////////////////
+
+    public static <T> T getBeanOrAutowire(String beanName, T defaultValue) {
+        // 默认值: 方法返回前注入上下文
+        return getBeanOrAutowire(beanName, new FixedSupplier<>(defaultValue));
+    }
+
+    public static <T> T getBeanOrAutowire(String beanName, Supplier<T> defaultSupplier) {
+        // 默认值: 方法返回前注入上下文
+        return getBean(beanName, new WrapperSupplier<>(
+                defaultSupplier, new AutowireWrapper<>(beanName)));
+    }
+
     public static <T> T getBean(String beanName) {
         return getBean(beanName, (T) null);
     }
 
     public static <T> T getBean(String beanName, T defaultValue) {
-        return getBean(beanName, new DefaultValueSupplier<>(defaultValue));
+        return getBean(beanName, new FixedSupplier<>(defaultValue));
     }
 
     public static <T> T getBean(String beanName, Supplier<T> defaultSupplier) {
@@ -48,16 +66,27 @@ public class SpringContext implements ApplicationContextAware {
         return notNullThen(defaultSupplier, Supplier::get);
     }
 
+    ////////////////////////////////////////////////////////////////
+
     public static <T> T getBeanOrReflect(Class<T> clazz) {
-        return getBean(clazz, new ReflectBeanSupplier<>(clazz));
+        // 默认值: 反射创建实例, 不注入上下文
+        return getBean(clazz, new ReflectSupplier<>(clazz));
     }
 
     public static <T> T getBeanOrCreate(Class<T> clazz) {
-        return getBean(clazz, new CreateBeanSupplier<>(clazz));
+        // 默认值: 由上下文创建实例, 同时注入
+        return getBean(clazz, new CreateSupplier<>(clazz));
     }
 
-    public static <T> T getBeanOrAutowire(Class<T> clazz, T bean) {
-        return getBean(clazz, new AutowireBeanSupplier<>(bean));
+    public static <T> T getBeanOrAutowire(Class<T> clazz, T defaultValue) {
+        // 默认值: 方法返回前注入上下文
+        return getBeanOrAutowire(clazz, new FixedSupplier<>(defaultValue));
+    }
+
+    public static <T> T getBeanOrAutowire(Class<T> clazz, Supplier<T> defaultSupplier) {
+        // 默认值: 方法返回前注入上下文
+        return getBean(clazz, new WrapperSupplier<>(
+                defaultSupplier, new AutowireWrapper<>()));
     }
 
     public static <T> T getBean(Class<T> clazz) {
@@ -65,7 +94,7 @@ public class SpringContext implements ApplicationContextAware {
     }
 
     public static <T> T getBean(Class<T> clazz, T defaultValue) {
-        return getBean(clazz, new DefaultValueSupplier<>(defaultValue));
+        return getBean(clazz, new FixedSupplier<>(defaultValue));
     }
 
     public static <T> T getBean(Class<T> clazz, Supplier<T> defaultSupplier) {
@@ -80,16 +109,27 @@ public class SpringContext implements ApplicationContextAware {
         return notNullThen(defaultSupplier, Supplier::get);
     }
 
+    ////////////////////////////////////////////////////////////////
+
     public static <T> T getBeanOrReflect(String beanName, Class<T> clazz) {
-        return getBean(beanName, clazz, new ReflectBeanSupplier<>(clazz));
+        // 默认值: 反射创建实例, 不注入上下文
+        return getBean(beanName, clazz, new ReflectSupplier<>(clazz));
     }
 
     public static <T> T getBeanOrCreate(String beanName, Class<T> clazz) {
-        return getBean(beanName, clazz, new CreateBeanWithNameSupplier<>(beanName, clazz));
+        // 默认值: 由上下文创建实例, 同时注入
+        return getBean(beanName, clazz, new CreateSupplier<>(beanName, clazz));
     }
 
-    public static <T> T getBeanOrAutowire(String beanName, Class<T> clazz, T bean) {
-        return getBean(beanName, clazz, new AutowireBeanSupplier<>(bean));
+    public static <T> T getBeanOrAutowire(String beanName, Class<T> clazz, T defaultValue) {
+        // 默认值: 方法返回前注入上下文
+        return getBeanOrAutowire(beanName, clazz, new FixedSupplier<>(defaultValue));
+    }
+
+    public static <T> T getBeanOrAutowire(String beanName, Class<T> clazz, Supplier<T> defaultSupplier) {
+        // 默认值: 方法返回前注入上下文
+        return getBean(beanName, clazz, new WrapperSupplier<>(
+                defaultSupplier, new AutowireWrapper<>(beanName)));
     }
 
     public static <T> T getBean(String beanName, Class<T> clazz) {
@@ -97,7 +137,7 @@ public class SpringContext implements ApplicationContextAware {
     }
 
     public static <T> T getBean(String beanName, Class<T> clazz, T defaultValue) {
-        return getBean(beanName, clazz, new DefaultValueSupplier<>(defaultValue));
+        return getBean(beanName, clazz, new FixedSupplier<>(defaultValue));
     }
 
     public static <T> T getBean(String beanName, Class<T> clazz, Supplier<T> defaultSupplier) {
@@ -114,6 +154,8 @@ public class SpringContext implements ApplicationContextAware {
         return notNullThen(defaultSupplier, Supplier::get);
     }
 
+    ////////////////////////////////////////////////////////////////
+
     public static String[] getBeanNamesForType(Class<?> clazz) {
         if (applicationContext == null) return new String[0];
         if (clazz == null) return new String[0];
@@ -126,37 +168,46 @@ public class SpringContext implements ApplicationContextAware {
         return applicationContext.getBeanNamesForAnnotation(annotation);
     }
 
+    ////////////////////////////////////////////////////////////////
+
     public static <T> T createBean(Class<T> clazz) {
-        val beanDefinition = BeanDefinitionBuilder
-                .genericBeanDefinition(clazz).getBeanDefinition();
-        defaultListableBeanFactory.registerBeanDefinition(
-                getBeanClassName(beanDefinition), beanDefinition);
-        defaultListableBeanFactory.clearMetadataCache();
-        return getBean(clazz);
+        return createBean(null, clazz);
     }
 
     public static <T> T createBean(String beanName, Class<T> clazz) {
+        if (applicationContext == null) return null;
+
         val beanDefinition = BeanDefinitionBuilder
                 .genericBeanDefinition(clazz).getBeanDefinition();
+        val registerBeanName = nullThen(beanName,
+                () -> getBeanClassName(beanDefinition));
         defaultListableBeanFactory.registerBeanDefinition(
-                beanName, beanDefinition);
+                registerBeanName, beanDefinition);
         defaultListableBeanFactory.clearMetadataCache();
-        return getBean(beanName, clazz);
+        return getBean(registerBeanName, clazz);
     }
+
+    ////////////////////////////////////////////////////////////////
 
     @CanIgnoreReturnValue
     public static <T> T autowireBean(T bean) {
-        val beanDefinition = BeanDefinitionBuilder
-                .genericBeanDefinition(bean.getClass()).getBeanDefinition();
-        return autowireBean(getBeanClassName(beanDefinition), bean);
+        return autowireBean(null, bean);
     }
 
     @CanIgnoreReturnValue
     public static <T> T autowireBean(String beanName, T bean) {
+        if (applicationContext == null) return bean;
+
+        val beanDefinition = BeanDefinitionBuilder
+                .genericBeanDefinition(bean.getClass()).getBeanDefinition();
+        val registerBeanName = nullThen(beanName,
+                () -> getBeanClassName(beanDefinition));
         defaultListableBeanFactory.autowireBean(bean);
-        defaultListableBeanFactory.registerSingleton(beanName, bean);
+        defaultListableBeanFactory.registerSingleton(registerBeanName, bean);
         return bean;
     }
+
+    ////////////////////////////////////////////////////////////////
 
     @Synchronized
     static void updateApplicationContext(@Nonnull ApplicationContext context) {
@@ -170,19 +221,46 @@ public class SpringContext implements ApplicationContextAware {
         SpringContext.updateApplicationContext(context);
     }
 
-    @AllArgsConstructor
-    static final class DefaultValueSupplier<T> implements Supplier<T> {
+    ////////////////////////////////////////////////////////////////
 
-        private T defaultValue;
+    @AllArgsConstructor
+    static final class FixedSupplier<T> implements Supplier<T> {
+
+        private T value;
 
         @Override
         public T get() {
-            return defaultValue;
+            return value;
         }
     }
 
     @AllArgsConstructor
-    static final class ReflectBeanSupplier<T> implements Supplier<T> {
+    static final class WrapperSupplier<T> implements Supplier<T> {
+
+        private Supplier<T> supplier;
+        private UnaryOperator<T> wrapper;
+
+        @Override
+        public T get() {
+            return notNullThen(supplier, s -> checkNull(
+                    wrapper, s, w -> w.apply(s.get())));
+        }
+    }
+
+    @NoArgsConstructor
+    @AllArgsConstructor
+    static final class AutowireWrapper<T> implements UnaryOperator<T> {
+
+        private String beanName;
+
+        @Override
+        public T apply(T value) {
+            return notNullThen(value, t -> autowireBean(beanName, t));
+        }
+    }
+
+    @AllArgsConstructor
+    static final class ReflectSupplier<T> implements Supplier<T> {
 
         private Class<T> clazz;
 
@@ -192,37 +270,16 @@ public class SpringContext implements ApplicationContextAware {
         }
     }
 
+    @RequiredArgsConstructor
     @AllArgsConstructor
-    static final class CreateBeanSupplier<T> implements Supplier<T> {
-
-        private Class<T> clazz;
-
-        @Override
-        public T get() {
-            return createBean(clazz);
-        }
-    }
-
-    @AllArgsConstructor
-    static final class CreateBeanWithNameSupplier<T> implements Supplier<T> {
+    static final class CreateSupplier<T> implements Supplier<T> {
 
         private String beanName;
-        private Class<T> clazz;
+        private final Class<T> clazz;
 
         @Override
         public T get() {
             return createBean(beanName, clazz);
-        }
-    }
-
-    @AllArgsConstructor
-    static final class AutowireBeanSupplier<T> implements Supplier<T> {
-
-        private T bean;
-
-        @Override
-        public T get() {
-            return autowireBean(bean);
         }
     }
 }
