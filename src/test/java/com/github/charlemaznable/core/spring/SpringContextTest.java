@@ -91,6 +91,8 @@ public class SpringContextTest {
         assertEquals("TestMultiClassA", multiBeanNames[0]);
         assertEquals("TestMultiClassB", multiBeanNames[1]);
 
+        multiBeanNames = TestSpringContext.getBeanNamesForAnnotation(null);
+        assertEquals(0, multiBeanNames.length);
         multiBeanNames = TestSpringContext.getBeanNamesForAnnotation(TestAnnotation.class);
         Arrays.sort(multiBeanNames);
         assertEquals(2, multiBeanNames.length);
