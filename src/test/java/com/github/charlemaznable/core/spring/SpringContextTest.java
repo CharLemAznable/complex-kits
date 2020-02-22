@@ -9,8 +9,6 @@ import com.github.charlemaznable.core.spring.testClass.TestClassD;
 import com.github.charlemaznable.core.spring.testClass.TestClassE;
 import com.github.charlemaznable.core.spring.testClass.TestClassF;
 import com.github.charlemaznable.core.spring.testClass.TestClassG;
-import com.github.charlemaznable.core.spring.testClass.TestClassH;
-import com.github.charlemaznable.core.spring.testClass.TestClassI;
 import com.github.charlemaznable.core.spring.testClass.TestConfiguration;
 import com.github.charlemaznable.core.spring.testClass.TestMultiClass;
 import com.github.charlemaznable.core.spring.testClass.TestSpringContext;
@@ -189,23 +187,5 @@ public class SpringContextTest {
         testG = TestSpringContext.getBean(TestClassG.class);
         assertNotNull(testG);
         assertNotNull(testG.testClass);
-
-        TestClassH testH = TestSpringContext.getBean(TestClassH.class);
-        assertNull(testH);
-        testH = TestSpringContext.getBeanOrReflectAutowire(TestClassH.class);
-        assertNotNull(testH);
-        assertNotNull(testH.testClass);
-        testH = TestSpringContext.getBean(TestClassH.class);
-        assertNotNull(testH);
-        assertNotNull(testH.testClass);
-
-        TestClassI testI = TestSpringContext.getBean("TestClassI", TestClassI.class);
-        assertNull(testI);
-        testI = TestSpringContext.getBeanOrReflectAutowire("TestClassI", TestClassI.class);
-        assertNotNull(testI);
-        assertNotNull(testI.testClass);
-        testI = TestSpringContext.getBean("TestClassI", TestClassI.class);
-        assertNotNull(testI);
-        assertNotNull(testI.testClass);
     }
 }

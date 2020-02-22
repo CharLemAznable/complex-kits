@@ -9,8 +9,6 @@ import com.github.charlemaznable.core.spring.testClass.TestClassD;
 import com.github.charlemaznable.core.spring.testClass.TestClassE;
 import com.github.charlemaznable.core.spring.testClass.TestClassF;
 import com.github.charlemaznable.core.spring.testClass.TestClassG;
-import com.github.charlemaznable.core.spring.testClass.TestClassH;
-import com.github.charlemaznable.core.spring.testClass.TestClassI;
 import lombok.val;
 import lombok.var;
 import org.junit.jupiter.api.Test;
@@ -54,7 +52,8 @@ public class SpringContextErrorTest {
         testB = SpringContext.getBean(TestClassB.class);
         assertNull(testB);
         testB = SpringContext.getBeanOrCreate(TestClassB.class);
-        assertNull(testB);
+        assertNotNull(testB);
+        assertNull(testB.testClass);
         testB = SpringContext.getBean(TestClassB.class);
         assertNull(testB);
 
@@ -79,7 +78,8 @@ public class SpringContextErrorTest {
         testD = SpringContext.getBean("TestClassD", TestClassD.class);
         assertNull(testD);
         testD = SpringContext.getBeanOrCreate("TestClassD", TestClassD.class);
-        assertNull(testD);
+        assertNotNull(testD);
+        assertNull(testD.testClass);
         testD = SpringContext.getBean("TestClassD", TestClassD.class);
         assertNull(testD);
 
@@ -99,7 +99,8 @@ public class SpringContextErrorTest {
         TestClassF testF = SpringContext.getBean(TestClassF.class);
         assertNull(testF);
         testF = SpringContext.createBean(TestClassF.class);
-        assertNull(testF);
+        assertNotNull(testF);
+        assertNull(testF.testClass);
         testF = SpringContext.getBean(TestClassF.class);
         assertNull(testF);
 
@@ -110,22 +111,6 @@ public class SpringContextErrorTest {
         assertNull(testG.testClass);
         testG = SpringContext.getBean(TestClassG.class);
         assertNull(testG);
-
-        TestClassH testH = SpringContext.getBean(TestClassH.class);
-        assertNull(testH);
-        testH = SpringContext.getBeanOrReflectAutowire(TestClassH.class);
-        assertNotNull(testH);
-        assertNull(testH.testClass);
-        testH = SpringContext.getBean(TestClassH.class);
-        assertNull(testH);
-
-        TestClassI testI = SpringContext.getBean("TestClassI", TestClassI.class);
-        assertNull(testI);
-        testI = SpringContext.getBeanOrReflectAutowire("TestClassI", TestClassI.class);
-        assertNotNull(testI);
-        assertNull(testI.testClass);
-        testI = SpringContext.getBean("TestClassI", TestClassI.class);
-        assertNull(testI);
 
         SpringContextClass.set("applicationContext", applicationContext);
     }

@@ -73,23 +73,21 @@ public class SpringContext implements ApplicationContextAware {
         return getBean(clazz, new ReflectSupplier<>(clazz));
     }
 
-    public static <T> T getBeanOrReflectAutowire(Class<T> clazz) {
-        // 默认值: 反射创建实例, 并注入上下文
-        return getBeanOrAutowire(clazz, new ReflectSupplier<>(clazz));
-    }
-
     public static <T> T getBeanOrCreate(Class<T> clazz) {
         // 默认值: 由上下文创建实例, 同时注入
+        //         若上下文不存在, 则反射创建实例
         return getBean(clazz, new CreateSupplier<>(clazz));
     }
 
     public static <T> T getBeanOrAutowire(Class<T> clazz, T defaultValue) {
         // 默认值: 方法返回前注入上下文
+        //         若上下文不存在, 则直接返回
         return getBeanOrAutowire(clazz, new FixedSupplier<>(defaultValue));
     }
 
     public static <T> T getBeanOrAutowire(Class<T> clazz, Supplier<T> defaultSupplier) {
         // 默认值: 方法返回前注入上下文
+        //         若上下文不存在, 则直接返回
         return getBean(clazz, new WrapperSupplier<>(
                 defaultSupplier, new AutowireWrapper<>()));
     }
@@ -121,23 +119,21 @@ public class SpringContext implements ApplicationContextAware {
         return getBean(beanName, clazz, new ReflectSupplier<>(clazz));
     }
 
-    public static <T> T getBeanOrReflectAutowire(String beanName, Class<T> clazz) {
-        // 默认值: 反射创建实例, 并注入上下文
-        return getBeanOrAutowire(beanName, clazz, new ReflectSupplier<>(clazz));
-    }
-
     public static <T> T getBeanOrCreate(String beanName, Class<T> clazz) {
         // 默认值: 由上下文创建实例, 同时注入
+        //         若上下文不存在, 则反射创建实例
         return getBean(beanName, clazz, new CreateSupplier<>(beanName, clazz));
     }
 
     public static <T> T getBeanOrAutowire(String beanName, Class<T> clazz, T defaultValue) {
         // 默认值: 方法返回前注入上下文
+        //         若上下文不存在, 则直接返回
         return getBeanOrAutowire(beanName, clazz, new FixedSupplier<>(defaultValue));
     }
 
     public static <T> T getBeanOrAutowire(String beanName, Class<T> clazz, Supplier<T> defaultSupplier) {
         // 默认值: 方法返回前注入上下文
+        //         若上下文不存在, 则直接返回
         return getBean(beanName, clazz, new WrapperSupplier<>(
                 defaultSupplier, new AutowireWrapper<>(beanName)));
     }
@@ -185,7 +181,9 @@ public class SpringContext implements ApplicationContextAware {
     }
 
     public static <T> T createBean(String beanName, Class<T> clazz) {
-        if (applicationContext == null) return null;
+        if (clazz == null) return null;
+        if (applicationContext == null)
+            return onClass(clazz).create().get();
 
         val beanDefinition = BeanDefinitionBuilder
                 .genericBeanDefinition(clazz).getBeanDefinition();
@@ -207,6 +205,7 @@ public class SpringContext implements ApplicationContextAware {
     @CanIgnoreReturnValue
     public static <T> T autowireBean(String beanName, T bean) {
         if (applicationContext == null) return bean;
+        if (bean == null) return null;
 
         val beanDefinition = BeanDefinitionBuilder
                 .genericBeanDefinition(bean.getClass()).getBeanDefinition();
@@ -276,7 +275,7 @@ public class SpringContext implements ApplicationContextAware {
 
         @Override
         public T get() {
-            return onClass(clazz).create().get();
+            return notNullThen(clazz, c -> onClass(c).create().get());
         }
     }
 
@@ -289,7 +288,7 @@ public class SpringContext implements ApplicationContextAware {
 
         @Override
         public T get() {
-            return createBean(beanName, clazz);
+            return notNullThen(clazz, c -> createBean(beanName, c));
         }
     }
 }
