@@ -9,7 +9,7 @@ public interface TestMiner {
 
     String full();
 
-    @MinerConfig("long")
+    @MinerConfig(dataIdProvider = TestMinerDataIdProvider.class)
     String longName();
 
     String abc(String defaultValue);

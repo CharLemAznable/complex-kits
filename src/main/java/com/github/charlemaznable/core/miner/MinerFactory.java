@@ -33,7 +33,7 @@ import static com.github.charlemaznable.core.lang.Condition.blankThen;
 import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static com.github.charlemaznable.core.lang.Str.isNotBlank;
 import static com.github.charlemaznable.core.miner.MinerElf.minerAsSubstitutor;
-import static com.github.charlemaznable.core.spring.SpringContext.getBeanOrReflect;
+import static com.github.charlemaznable.core.spring.SpringContext.getBeanOrCreate;
 import static com.google.common.cache.CacheLoader.from;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
@@ -89,14 +89,14 @@ public final class MinerFactory {
 
     private static <T> String checkMinerGroup(Class<T> clazz, MinerConfig minerConfig) {
         val providerClass = minerConfig.groupProvider();
-        return substitute(GroupProvider.class == providerClass ?
-                minerConfig.group() : getBeanOrReflect(providerClass).group(clazz));
+        return substitute(GroupProvider.class == providerClass ? minerConfig.group()
+                : getBeanOrCreate(providerClass).group(clazz));
     }
 
     private static <T> String checkMinerDataId(Class<T> clazz, MinerConfig minerConfig) {
         val providerClass = minerConfig.dataIdProvider();
-        return substitute(DataIdProvider.class == providerClass ?
-                minerConfig.dataId() : getBeanOrReflect(providerClass).dataId(clazz));
+        return substitute(DataIdProvider.class == providerClass ? minerConfig.dataId()
+                : getBeanOrCreate(providerClass).dataId(clazz));
     }
 
     private static String substitute(String source) {
@@ -138,21 +138,21 @@ public final class MinerFactory {
             if (null == minerConfig) return "";
             val providerClass = minerConfig.groupProvider();
             return substitute(GroupProvider.class == providerClass ? minerConfig.group()
-                    : getBeanOrReflect(providerClass).group(minerClass, method));
+                    : getBeanOrCreate(providerClass).group(minerClass, method));
         }
 
         private String checkMinerDataId(Method method, MinerConfig minerConfig) {
             if (null == minerConfig) return "";
             val providerClass = minerConfig.dataIdProvider();
             return substitute(DataIdProvider.class == providerClass ? minerConfig.dataId()
-                    : getBeanOrReflect(providerClass).dataId(minerClass, method));
+                    : getBeanOrCreate(providerClass).dataId(minerClass, method));
         }
 
         private String checkMinerDefaultValue(Method method, MinerConfig minerConfig) {
             if (null == minerConfig) return null;
             val providerClass = minerConfig.defaultValueProvider();
             val defaultValue = DefaultValueProvider.class == providerClass ? minerConfig.defaultValue()
-                    : getBeanOrReflect(providerClass).defaultValue(minerClass, method);
+                    : getBeanOrCreate(providerClass).defaultValue(minerClass, method);
             return substitute(blankThen(defaultValue, () -> null));
         }
 

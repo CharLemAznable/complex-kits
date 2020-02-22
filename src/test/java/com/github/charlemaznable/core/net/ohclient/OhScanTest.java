@@ -50,6 +50,7 @@ public class OhScanTest {
             val testHttpClient = testComponent.testHttpClient;
             assertEquals("Sample", testHttpClient.sample());
             assertEquals("{Sample}", testHttpClient.sampleWrapper());
+            assertEquals("Sample", testHttpClient.sampleWrap());
 
             val testHttpClient2 = SpringContext.getBean(TestHttpClient2.class);
             assertEquals("Sample", testHttpClient2.sample());

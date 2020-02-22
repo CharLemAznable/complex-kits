@@ -67,7 +67,7 @@ import static com.github.charlemaznable.core.lang.Str.isBlank;
 import static com.github.charlemaznable.core.lang.Str.isNotBlank;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.ohExecutorService;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.substitute;
-import static com.github.charlemaznable.core.spring.SpringContext.getBeanOrReflect;
+import static com.github.charlemaznable.core.spring.SpringContext.getBeanOrCreate;
 import static org.apache.commons.lang3.StringUtils.prependIfMissing;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedRepeatableAnnotations;
@@ -334,7 +334,7 @@ public final class OhMappingProxy extends OhRoot {
             val url = checkNull(mapping, method::getName, annotation -> {
                 val providerClass = annotation.urlProvider();
                 return substitute(UrlProvider.class == providerClass ?
-                        annotation.value() : getBeanOrReflect(providerClass).url(clazz, method));
+                        annotation.value() : getBeanOrCreate(providerClass).url(clazz, method));
             });
             if (isBlank(url)) return proxy.baseUrl;
             if (isBlank(proxy.baseUrl)) return url;
@@ -349,7 +349,7 @@ public final class OhMappingProxy extends OhRoot {
                         checkBlank(annotation.host(), () -> null,
                                 xx -> new Proxy(annotation.type(), new InetSocketAddress(
                                         annotation.host(), annotation.port())))
-                        : getBeanOrReflect(providerClass).proxy(clazz, method);
+                        : getBeanOrCreate(providerClass).proxy(clazz, method);
             });
         }
 
@@ -360,19 +360,19 @@ public final class OhMappingProxy extends OhRoot {
         static SSLSocketFactory checkSSLSocketFactory(Class clazz, Method method, ClientSSL clientSSL) {
             val providerClass = clientSSL.sslSocketFactoryProvider();
             return SSLSocketFactoryProvider.class == providerClass ? null
-                    : getBeanOrReflect(providerClass).sslSocketFactory(clazz, method);
+                    : getBeanOrCreate(providerClass).sslSocketFactory(clazz, method);
         }
 
         static X509TrustManager checkX509TrustManager(Class clazz, Method method, ClientSSL clientSSL) {
             val providerClass = clientSSL.x509TrustManagerProvider();
             return X509TrustManagerProvider.class == providerClass ? null
-                    : getBeanOrReflect(providerClass).x509TrustManager(clazz, method);
+                    : getBeanOrCreate(providerClass).x509TrustManager(clazz, method);
         }
 
         static HostnameVerifier checkHostnameVerifier(Class clazz, Method method, ClientSSL clientSSL) {
             val providerClass = clientSSL.hostnameVerifierProvider();
             return HostnameVerifierProvider.class == providerClass ? null
-                    : getBeanOrReflect(providerClass).hostnameVerifier(clazz, method);
+                    : getBeanOrCreate(providerClass).hostnameVerifier(clazz, method);
         }
 
         static ConnectionPool checkConnectionPool(Method method, OhProxy proxy) {
@@ -405,7 +405,7 @@ public final class OhMappingProxy extends OhRoot {
         static ContentFormatter checkContentFormatter(Method method, OhProxy proxy) {
             val contentFormat = findAnnotation(method, ContentFormat.class);
             return checkNull(contentFormat, () -> proxy.contentFormatter,
-                    annotation -> getBeanOrReflect(annotation.value()));
+                    annotation -> getBeanOrCreate(annotation.value()));
         }
 
         static HttpMethod checkHttpMethod(Method method, OhProxy proxy) {
@@ -420,7 +420,7 @@ public final class OhMappingProxy extends OhRoot {
                         val name = an.name();
                         val providerClass = an.valueProvider();
                         return Pair.of(name, FixedValueProvider.class == providerClass ?
-                                an.value() : getBeanOrReflect(providerClass).value(clazz, method, name));
+                                an.value() : getBeanOrCreate(providerClass).value(clazz, method, name));
                     }).collect(Collectors.toList()));
             return result;
         }
@@ -432,7 +432,7 @@ public final class OhMappingProxy extends OhRoot {
                         val name = an.name();
                         val providerClass = an.valueProvider();
                         return Pair.of(name, FixedValueProvider.class == providerClass ?
-                                an.value() : getBeanOrReflect(providerClass).value(clazz, method, name));
+                                an.value() : getBeanOrCreate(providerClass).value(clazz, method, name));
                     }).collect(Collectors.toList()));
             return result;
         }
@@ -444,7 +444,7 @@ public final class OhMappingProxy extends OhRoot {
                         val name = an.name();
                         val providerClass = an.valueProvider();
                         return Pair.of(name, (Object) (FixedValueProvider.class == providerClass ?
-                                an.value() : getBeanOrReflect(providerClass).value(clazz, method, name)));
+                                an.value() : getBeanOrCreate(providerClass).value(clazz, method, name)));
                     }).collect(Collectors.toList()));
             return result;
         }
@@ -456,7 +456,7 @@ public final class OhMappingProxy extends OhRoot {
                         val name = an.name();
                         val providerClass = an.valueProvider();
                         return Pair.of(name, (Object) (FixedValueProvider.class == providerClass ?
-                                an.value() : getBeanOrReflect(providerClass).value(clazz, method, name)));
+                                an.value() : getBeanOrCreate(providerClass).value(clazz, method, name)));
                     }).collect(Collectors.toList()));
             return result;
         }
@@ -478,7 +478,7 @@ public final class OhMappingProxy extends OhRoot {
         static ResponseParser checkResponseParser(Method method, OhProxy proxy) {
             val responseParse = findAnnotation(method, ResponseParse.class);
             return checkNull(responseParse, () -> proxy.responseParser,
-                    annotation -> getBeanOrReflect(annotation.value()));
+                    annotation -> getBeanOrCreate(annotation.value()));
         }
     }
 }

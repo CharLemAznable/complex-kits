@@ -13,4 +13,7 @@ public interface TestHttpClient {
     default String sampleWrapper() {
         return "{" + sample() + "}";
     }
+
+    @Mapping(urlProvider = TestSampleWrapUrlProvider.class)
+    String sampleWrap();
 }

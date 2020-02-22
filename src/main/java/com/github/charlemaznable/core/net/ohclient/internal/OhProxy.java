@@ -62,7 +62,7 @@ import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DE
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_HTTP_METHOD;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.ohConnectionPool;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.substitute;
-import static com.github.charlemaznable.core.spring.SpringContext.getBeanOrReflect;
+import static com.github.charlemaznable.core.spring.SpringContext.getBeanOrCreate;
 import static com.google.common.cache.CacheLoader.from;
 import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedRepeatableAnnotations;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
@@ -137,7 +137,7 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
             if (null == mapping) return "";
             val providerClass = mapping.urlProvider();
             return substitute(UrlProvider.class == providerClass ?
-                    mapping.value() : getBeanOrReflect(providerClass).url(clazz));
+                    mapping.value() : getBeanOrCreate(providerClass).url(clazz));
         }
 
         static Proxy checkClientProxy(Class clazz) {
@@ -148,7 +148,7 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
                         checkBlank(annotation.host(), () -> null,
                                 xx -> new Proxy(annotation.type(), new InetSocketAddress(
                                         annotation.host(), annotation.port())))
-                        : getBeanOrReflect(providerClass).proxy(clazz);
+                        : getBeanOrCreate(providerClass).proxy(clazz);
             });
         }
 
@@ -159,19 +159,19 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
         static SSLSocketFactory checkSSLSocketFactory(Class clazz, ClientSSL clientSSL) {
             val providerClass = clientSSL.sslSocketFactoryProvider();
             return SSLSocketFactoryProvider.class == providerClass ? null
-                    : getBeanOrReflect(providerClass).sslSocketFactory(clazz);
+                    : getBeanOrCreate(providerClass).sslSocketFactory(clazz);
         }
 
         static X509TrustManager checkX509TrustManager(Class clazz, ClientSSL clientSSL) {
             val providerClass = clientSSL.x509TrustManagerProvider();
             return X509TrustManagerProvider.class == providerClass ? null
-                    : getBeanOrReflect(providerClass).x509TrustManager(clazz);
+                    : getBeanOrCreate(providerClass).x509TrustManager(clazz);
         }
 
         static HostnameVerifier checkHostnameVerifier(Class clazz, ClientSSL clientSSL) {
             val providerClass = clientSSL.hostnameVerifierProvider();
             return HostnameVerifierProvider.class == providerClass ? null
-                    : getBeanOrReflect(providerClass).hostnameVerifier(clazz);
+                    : getBeanOrCreate(providerClass).hostnameVerifier(clazz);
         }
 
         static ConnectionPool checkConnectionPool(Class clazz) {
@@ -197,7 +197,7 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
         static ContentFormatter checkContentFormatter(Class clazz) {
             val contentFormat = findAnnotation(clazz, ContentFormat.class);
             return checkNull(contentFormat, () -> DEFAULT_CONTENT_FORMATTER,
-                    annotation -> getBeanOrReflect(annotation.value()));
+                    annotation -> getBeanOrCreate(annotation.value()));
         }
 
         static HttpMethod checkHttpMethod(Class clazz) {
@@ -211,7 +211,7 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
                         val name = an.name();
                         val providerClass = an.valueProvider();
                         return Pair.of(name, FixedValueProvider.class == providerClass ?
-                                an.value() : getBeanOrReflect(providerClass).value(clazz, name));
+                                an.value() : getBeanOrCreate(providerClass).value(clazz, name));
                     }).collect(Collectors.toList());
         }
 
@@ -221,7 +221,7 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
                         val name = an.name();
                         val providerClass = an.valueProvider();
                         return Pair.of(name, FixedValueProvider.class == providerClass ?
-                                an.value() : getBeanOrReflect(providerClass).value(clazz, name));
+                                an.value() : getBeanOrCreate(providerClass).value(clazz, name));
                     }).collect(Collectors.toList());
         }
 
@@ -231,7 +231,7 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
                         val name = an.name();
                         val providerClass = an.valueProvider();
                         return Pair.of(name, (Object) (FixedValueProvider.class == providerClass ?
-                                an.value() : getBeanOrReflect(providerClass).value(clazz, name)));
+                                an.value() : getBeanOrCreate(providerClass).value(clazz, name)));
                     }).collect(Collectors.toList());
         }
 
@@ -241,7 +241,7 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
                         val name = an.name();
                         val providerClass = an.valueProvider();
                         return Pair.of(name, (Object) (FixedValueProvider.class == providerClass ?
-                                an.value() : getBeanOrReflect(providerClass).value(clazz, name)));
+                                an.value() : getBeanOrCreate(providerClass).value(clazz, name)));
                     }).collect(Collectors.toList());
         }
 
@@ -263,7 +263,7 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
         static ResponseParser checkResponseParser(Class clazz) {
             val responseParse = findAnnotation(clazz, ResponseParse.class);
             return checkNull(responseParse, () -> null,
-                    annotation -> getBeanOrReflect(annotation.value()));
+                    annotation -> getBeanOrCreate(annotation.value()));
         }
     }
 }
