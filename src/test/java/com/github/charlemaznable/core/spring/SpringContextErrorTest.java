@@ -9,10 +9,13 @@ import com.github.charlemaznable.core.spring.testClass.TestClassD;
 import com.github.charlemaznable.core.spring.testClass.TestClassE;
 import com.github.charlemaznable.core.spring.testClass.TestClassF;
 import com.github.charlemaznable.core.spring.testClass.TestClassG;
-import com.github.charlemaznable.core.spring.testClass.TestSpringContext;
+import com.github.charlemaznable.core.spring.testClass.TestClassH;
+import com.github.charlemaznable.core.spring.testClass.TestClassI;
+import lombok.val;
 import lombok.var;
 import org.junit.jupiter.api.Test;
 
+import static org.joor.Reflect.onClass;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -21,6 +24,10 @@ public class SpringContextErrorTest {
 
     @Test
     public void testSpringContextError() {
+        val SpringContextClass = onClass(SpringContext.class);
+        val applicationContext = SpringContextClass.field("applicationContext").get();
+        SpringContextClass.set("applicationContext", null);
+
         var multiBeanNames = SpringContext.getBeanNamesForType(TestClass.class);
         assertEquals(0, multiBeanNames.length);
         multiBeanNames = SpringContext.getBeanNamesForAnnotation(TestAnnotation.class);
@@ -39,69 +46,87 @@ public class SpringContextErrorTest {
         testA = SpringContext.getBean("TestClassA");
         assertNull(testA);
 
-        TestClassB testB = TestSpringContext.getBean(TestClassB.class);
+        TestClassB testB = SpringContext.getBean(TestClassB.class);
         assertNull(testB);
-        testB = TestSpringContext.getBeanOrReflect(TestClassB.class);
+        testB = SpringContext.getBeanOrReflect(TestClassB.class);
         assertNotNull(testB);
         assertNull(testB.testClass);
-        testB = TestSpringContext.getBean(TestClassB.class);
+        testB = SpringContext.getBean(TestClassB.class);
         assertNull(testB);
-        testB = TestSpringContext.getBeanOrCreate(TestClassB.class);
+        testB = SpringContext.getBeanOrCreate(TestClassB.class);
         assertNull(testB);
-        testB = TestSpringContext.getBean(TestClassB.class);
+        testB = SpringContext.getBean(TestClassB.class);
         assertNull(testB);
 
-        TestClassC testC = TestSpringContext.getBean(TestClassC.class);
+        TestClassC testC = SpringContext.getBean(TestClassC.class);
         assertNull(testC);
-        testC = TestSpringContext.getBean(TestClassC.class, new TestClassC());
+        testC = SpringContext.getBean(TestClassC.class, new TestClassC());
         assertNotNull(testC);
         assertNull(testC.testClass);
-        testC = TestSpringContext.getBean(TestClassC.class);
+        testC = SpringContext.getBean(TestClassC.class);
         assertNull(testC);
-        testC = TestSpringContext.getBeanOrAutowire(TestClassC.class, new TestClassC());
+        testC = SpringContext.getBeanOrAutowire(TestClassC.class, new TestClassC());
         assertNotNull(testC);
         assertNull(testC.testClass);
-        testC = TestSpringContext.getBean(TestClassC.class);
+        testC = SpringContext.getBean(TestClassC.class);
         assertNull(testC);
 
-        TestClassD testD = TestSpringContext.getBean("TestClassD", TestClassD.class);
+        TestClassD testD = SpringContext.getBean("TestClassD", TestClassD.class);
         assertNull(testD);
-        testD = TestSpringContext.getBeanOrReflect("TestClassD", TestClassD.class);
+        testD = SpringContext.getBeanOrReflect("TestClassD", TestClassD.class);
         assertNotNull(testD);
         assertNull(testD.testClass);
-        testD = TestSpringContext.getBean("TestClassD", TestClassD.class);
+        testD = SpringContext.getBean("TestClassD", TestClassD.class);
         assertNull(testD);
-        testD = TestSpringContext.getBeanOrCreate("TestClassD", TestClassD.class);
+        testD = SpringContext.getBeanOrCreate("TestClassD", TestClassD.class);
         assertNull(testD);
-        testD = TestSpringContext.getBean("TestClassD", TestClassD.class);
+        testD = SpringContext.getBean("TestClassD", TestClassD.class);
         assertNull(testD);
 
-        TestClassE testE = TestSpringContext.getBean("TestClassE", TestClassE.class);
+        TestClassE testE = SpringContext.getBean("TestClassE", TestClassE.class);
         assertNull(testE);
-        testE = TestSpringContext.getBean("TestClassE", TestClassE.class, new TestClassE());
+        testE = SpringContext.getBean("TestClassE", TestClassE.class, new TestClassE());
         assertNotNull(testE);
         assertNull(testE.testClass);
-        testE = TestSpringContext.getBean("TestClassE", TestClassE.class);
+        testE = SpringContext.getBean("TestClassE", TestClassE.class);
         assertNull(testE);
-        testE = TestSpringContext.getBeanOrAutowire("TestClassE", TestClassE.class, new TestClassE());
+        testE = SpringContext.getBeanOrAutowire("TestClassE", TestClassE.class, new TestClassE());
         assertNotNull(testE);
         assertNull(testE.testClass);
-        testE = TestSpringContext.getBean("TestClassE", TestClassE.class);
+        testE = SpringContext.getBean("TestClassE", TestClassE.class);
         assertNull(testE);
 
-        TestClassF testF = TestSpringContext.getBean(TestClassF.class);
+        TestClassF testF = SpringContext.getBean(TestClassF.class);
         assertNull(testF);
-        testF = TestSpringContext.createBean(TestClassF.class);
+        testF = SpringContext.createBean(TestClassF.class);
         assertNull(testF);
-        testF = TestSpringContext.getBean(TestClassF.class);
+        testF = SpringContext.getBean(TestClassF.class);
         assertNull(testF);
 
-        TestClassG testG = TestSpringContext.getBean(TestClassG.class);
+        TestClassG testG = SpringContext.getBean(TestClassG.class);
         assertNull(testG);
-        testG = TestSpringContext.autowireBean(new TestClassG());
+        testG = SpringContext.autowireBean(new TestClassG());
         assertNotNull(testG);
         assertNull(testG.testClass);
-        testG = TestSpringContext.getBean(TestClassG.class);
+        testG = SpringContext.getBean(TestClassG.class);
         assertNull(testG);
+
+        TestClassH testH = SpringContext.getBean(TestClassH.class);
+        assertNull(testH);
+        testH = SpringContext.getBeanOrReflectAutowire(TestClassH.class);
+        assertNotNull(testH);
+        assertNull(testH.testClass);
+        testH = SpringContext.getBean(TestClassH.class);
+        assertNull(testH);
+
+        TestClassI testI = SpringContext.getBean("TestClassI", TestClassI.class);
+        assertNull(testI);
+        testI = SpringContext.getBeanOrReflectAutowire("TestClassI", TestClassI.class);
+        assertNotNull(testI);
+        assertNull(testI.testClass);
+        testI = SpringContext.getBean("TestClassI", TestClassI.class);
+        assertNull(testI);
+
+        SpringContextClass.set("applicationContext", applicationContext);
     }
 }

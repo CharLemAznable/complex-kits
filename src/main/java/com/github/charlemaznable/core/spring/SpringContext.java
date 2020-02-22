@@ -73,6 +73,11 @@ public class SpringContext implements ApplicationContextAware {
         return getBean(clazz, new ReflectSupplier<>(clazz));
     }
 
+    public static <T> T getBeanOrReflectAutowire(Class<T> clazz) {
+        // 默认值: 反射创建实例, 并注入上下文
+        return getBeanOrAutowire(clazz, new ReflectSupplier<>(clazz));
+    }
+
     public static <T> T getBeanOrCreate(Class<T> clazz) {
         // 默认值: 由上下文创建实例, 同时注入
         return getBean(clazz, new CreateSupplier<>(clazz));
@@ -114,6 +119,11 @@ public class SpringContext implements ApplicationContextAware {
     public static <T> T getBeanOrReflect(String beanName, Class<T> clazz) {
         // 默认值: 反射创建实例, 不注入上下文
         return getBean(beanName, clazz, new ReflectSupplier<>(clazz));
+    }
+
+    public static <T> T getBeanOrReflectAutowire(String beanName, Class<T> clazz) {
+        // 默认值: 反射创建实例, 不注入上下文
+        return getBeanOrAutowire(beanName, clazz, new ReflectSupplier<>(clazz));
     }
 
     public static <T> T getBeanOrCreate(String beanName, Class<T> clazz) {
