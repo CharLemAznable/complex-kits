@@ -122,7 +122,7 @@ public class SpringContext implements ApplicationContextAware {
     }
 
     public static <T> T getBeanOrReflectAutowire(String beanName, Class<T> clazz) {
-        // 默认值: 反射创建实例, 不注入上下文
+        // 默认值: 反射创建实例, 并注入上下文
         return getBeanOrAutowire(beanName, clazz, new ReflectSupplier<>(clazz));
     }
 
