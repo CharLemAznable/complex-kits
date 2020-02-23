@@ -6,7 +6,7 @@ import com.github.charlemaznable.core.miner.testClass.TestMinerDataId;
 import com.github.charlemaznable.core.miner.testClass.TestMinerDataIdProvider;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
-import lombok.val;
+import lombok.var;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -46,7 +46,15 @@ public class MinerGuiceTest {
         MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA",
                 "name=John\nfull=${this.name} Doe\nlong=${this.full} Richard");
 
-        val minerDefault = injector.getInstance(TestMiner.class);
+        var minerDefault = injector.getInstance(TestMiner.class);
+        assertNotNull(minerDefault);
+        assertEquals("John", minerDefault.name());
+        assertEquals("John Doe", minerDefault.full());
+        assertEquals("John Doe Richard", minerDefault.longName());
+        assertEquals("xyz", minerDefault.abc("xyz"));
+        assertNull(minerDefault.abc(null));
+
+        minerDefault = minerInjector.getMiner(TestMiner.class);
         assertNotNull(minerDefault);
         assertEquals("John", minerDefault.name());
         assertEquals("John Doe", minerDefault.full());
