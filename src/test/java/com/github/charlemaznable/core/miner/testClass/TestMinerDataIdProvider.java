@@ -1,8 +1,10 @@
 package com.github.charlemaznable.core.miner.testClass;
 
 import com.github.charlemaznable.core.miner.MinerConfig.DataIdProvider;
+import com.google.inject.Inject;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 
 import static com.github.charlemaznable.core.lang.Condition.checkNull;
@@ -14,11 +16,12 @@ public class TestMinerDataIdProvider implements DataIdProvider {
 
     @Autowired(required = false)
     public TestMinerDataIdProvider() {
-        this.testMinerDataId = null;
+        this(null);
     }
 
+    @Inject
     @Autowired(required = false)
-    public TestMinerDataIdProvider(TestMinerDataId testMinerDataId) {
+    public TestMinerDataIdProvider(@Nullable TestMinerDataId testMinerDataId) {
         this.testMinerDataId = testMinerDataId;
     }
 

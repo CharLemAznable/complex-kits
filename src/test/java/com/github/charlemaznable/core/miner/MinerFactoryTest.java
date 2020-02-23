@@ -126,7 +126,6 @@ public class MinerFactoryTest {
 
         val minerDefaultData = getMiner(MinerDefaultData.class);
         val properties = minerDefaultData.properties();
-        System.out.println(properties);
 
         assertEquals("John", properties.getProperty("name"));
         assertEquals("John Doe", properties.getProperty("full"));

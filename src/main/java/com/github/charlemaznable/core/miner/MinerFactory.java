@@ -1,11 +1,13 @@
 package com.github.charlemaznable.core.miner;
 
 import com.github.charlemaznable.core.lang.EasyEnhancer;
+import com.github.charlemaznable.core.lang.Factory;
 import com.github.charlemaznable.core.lang.LoadingCachee;
 import com.github.charlemaznable.core.lang.Str;
 import com.github.charlemaznable.core.miner.MinerConfig.DataIdProvider;
 import com.github.charlemaznable.core.miner.MinerConfig.DefaultValueProvider;
 import com.github.charlemaznable.core.miner.MinerConfig.GroupProvider;
+import com.github.charlemaznable.core.spring.SpringContext;
 import com.google.common.cache.LoadingCache;
 import com.google.common.primitives.Primitives;
 import lombok.AllArgsConstructor;
@@ -31,9 +33,9 @@ import java.util.Properties;
 import static com.github.charlemaznable.core.lang.ClzPath.classResourceAsSubstitutor;
 import static com.github.charlemaznable.core.lang.Condition.blankThen;
 import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
+import static com.github.charlemaznable.core.lang.Condition.nullThen;
 import static com.github.charlemaznable.core.lang.Str.isNotBlank;
 import static com.github.charlemaznable.core.miner.MinerElf.minerAsSubstitutor;
-import static com.github.charlemaznable.core.spring.SpringContext.getBeanOrCreate;
 import static com.google.common.cache.CacheLoader.from;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
@@ -41,10 +43,9 @@ import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 @SuppressWarnings("unchecked")
 public final class MinerFactory {
 
-    private static LoadingCache<Class, Object> minerCache
-            = LoadingCachee.simpleCache(from(MinerFactory::loadMiner));
     private static StringSubstitutor minerMinerSubstitutor;
     private static StringSubstitutor minerClassPathSubstitutor;
+    private static MinerLoader springMinerLoader = new MinerLoader();
 
     static {
         minerMinerSubstitutor = minerAsSubstitutor("Env", "miner");
@@ -56,51 +57,75 @@ public final class MinerFactory {
     }
 
     public static <T> T getMiner(Class<T> minerClass) {
-        return (T) LoadingCachee.get(minerCache, minerClass);
+        return springMinerLoader.getMiner(minerClass);
     }
 
-    private static <T> Object loadMiner(Class<T> minerClass) {
-        ensureClassIsAnInterface(minerClass);
-        val minerConfig = checkMinerConfig(minerClass);
-
-        val group = checkMinerGroup(minerClass, minerConfig);
-        val minerable = new Miner(blankThen(group, () -> "DEFAULT_GROUP"));
-        val dataId = checkMinerDataId(minerClass, minerConfig);
-        val minerProxy = new MinerProxy(minerClass,
-                isNotBlank(dataId) ? minerable.getMiner(dataId) : minerable);
-
-        return EasyEnhancer.create(MinerDummy.class,
-                new Class[]{minerClass, Minerable.class},
-                method -> {
-                    if (method.isDefault()) return 1;
-                    return 0;
-                }, new Callback[]{minerProxy, NoOp.INSTANCE}, null);
-    }
-
-    private static <T> void ensureClassIsAnInterface(Class<T> clazz) {
-        if (clazz.isInterface()) return;
-        throw new MinerConfigException(clazz + " is not An Interface");
-    }
-
-    private static <T> MinerConfig checkMinerConfig(Class<T> clazz) {
-        return checkNotNull(getAnnotation(clazz, MinerConfig.class),
-                new MinerConfigException(clazz + " has no MinerConfig"));
-    }
-
-    private static <T> String checkMinerGroup(Class<T> clazz, MinerConfig minerConfig) {
-        val providerClass = minerConfig.groupProvider();
-        return substitute(GroupProvider.class == providerClass ? minerConfig.group()
-                : getBeanOrCreate(providerClass).group(clazz));
-    }
-
-    private static <T> String checkMinerDataId(Class<T> clazz, MinerConfig minerConfig) {
-        val providerClass = minerConfig.dataIdProvider();
-        return substitute(DataIdProvider.class == providerClass ? minerConfig.dataId()
-                : getBeanOrCreate(providerClass).dataId(clazz));
+    public static MinerLoader minerLoader(Factory providerFactory) {
+        return new MinerLoader(providerFactory);
     }
 
     private static String substitute(String source) {
         return minerClassPathSubstitutor.replace(minerMinerSubstitutor.replace(source));
+    }
+
+    public static class MinerLoader {
+
+        private final Factory providerFactory;
+        private LoadingCache<Class, Object> minerCache
+                = LoadingCachee.simpleCache(from(this::loadMiner));
+
+        private MinerLoader() {
+            this(null);
+        }
+
+        private MinerLoader(Factory providerFactory) {
+            this.providerFactory = nullThen(providerFactory,
+                    () -> SpringContext::getBeanOrCreate);
+        }
+
+        public <T> T getMiner(Class<T> minerClass) {
+            return (T) LoadingCachee.get(minerCache, minerClass);
+        }
+
+        private <T> Object loadMiner(Class<T> minerClass) {
+            ensureClassIsAnInterface(minerClass);
+            val minerConfig = checkMinerConfig(minerClass);
+
+            val group = checkMinerGroup(minerClass, minerConfig);
+            val minerable = new Miner(blankThen(group, () -> "DEFAULT_GROUP"));
+            val dataId = checkMinerDataId(minerClass, minerConfig);
+            val minerProxy = new MinerProxy(minerClass, isNotBlank(dataId)
+                    ? minerable.getMiner(dataId) : minerable, providerFactory);
+
+            return EasyEnhancer.create(MinerDummy.class,
+                    new Class[]{minerClass, Minerable.class},
+                    method -> {
+                        if (method.isDefault()) return 1;
+                        return 0;
+                    }, new Callback[]{minerProxy, NoOp.INSTANCE}, null);
+        }
+
+        private <T> void ensureClassIsAnInterface(Class<T> clazz) {
+            if (clazz.isInterface()) return;
+            throw new MinerConfigException(clazz + " is not An Interface");
+        }
+
+        private <T> MinerConfig checkMinerConfig(Class<T> clazz) {
+            return checkNotNull(getAnnotation(clazz, MinerConfig.class),
+                    new MinerConfigException(clazz + " has no MinerConfig"));
+        }
+
+        private <T> String checkMinerGroup(Class<T> clazz, MinerConfig minerConfig) {
+            val providerClass = minerConfig.groupProvider();
+            return substitute(GroupProvider.class == providerClass ? minerConfig.group()
+                    : providerFactory.build(providerClass).group(clazz));
+        }
+
+        private <T> String checkMinerDataId(Class<T> clazz, MinerConfig minerConfig) {
+            val providerClass = minerConfig.dataIdProvider();
+            return substitute(DataIdProvider.class == providerClass ? minerConfig.dataId()
+                    : providerFactory.build(providerClass).dataId(clazz));
+        }
     }
 
     @NoArgsConstructor
@@ -111,8 +136,9 @@ public final class MinerFactory {
     @AllArgsConstructor
     private static class MinerProxy implements MethodInterceptor {
 
-        private Class minerClass;
-        private Minerable minerable;
+        private final Class minerClass;
+        private final Minerable minerable;
+        private final Factory providerFactory;
 
         @Override
         public Object intercept(Object o, Method method, Object[] args,
@@ -138,21 +164,21 @@ public final class MinerFactory {
             if (null == minerConfig) return "";
             val providerClass = minerConfig.groupProvider();
             return substitute(GroupProvider.class == providerClass ? minerConfig.group()
-                    : getBeanOrCreate(providerClass).group(minerClass, method));
+                    : providerFactory.build(providerClass).group(minerClass, method));
         }
 
         private String checkMinerDataId(Method method, MinerConfig minerConfig) {
             if (null == minerConfig) return "";
             val providerClass = minerConfig.dataIdProvider();
             return substitute(DataIdProvider.class == providerClass ? minerConfig.dataId()
-                    : getBeanOrCreate(providerClass).dataId(minerClass, method));
+                    : providerFactory.build(providerClass).dataId(minerClass, method));
         }
 
         private String checkMinerDefaultValue(Method method, MinerConfig minerConfig) {
             if (null == minerConfig) return null;
             val providerClass = minerConfig.defaultValueProvider();
             val defaultValue = DefaultValueProvider.class == providerClass ? minerConfig.defaultValue()
-                    : getBeanOrCreate(providerClass).defaultValue(minerClass, method);
+                    : providerFactory.build(providerClass).defaultValue(minerClass, method);
             return substitute(blankThen(defaultValue, () -> null));
         }
 
