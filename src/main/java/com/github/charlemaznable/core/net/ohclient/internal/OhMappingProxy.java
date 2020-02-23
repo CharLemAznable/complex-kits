@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.net.ohclient.internal;
 
+import com.github.charlemaznable.core.lang.Factory;
 import com.github.charlemaznable.core.net.common.AcceptCharset;
 import com.github.charlemaznable.core.net.common.CncResponse;
 import com.github.charlemaznable.core.net.common.ContentFormat;
@@ -67,7 +68,6 @@ import static com.github.charlemaznable.core.lang.Str.isBlank;
 import static com.github.charlemaznable.core.lang.Str.isNotBlank;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.ohExecutorService;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.substitute;
-import static com.github.charlemaznable.core.spring.SpringContext.getBeanOrCreate;
 import static org.apache.commons.lang3.StringUtils.prependIfMissing;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedRepeatableAnnotations;
@@ -79,6 +79,7 @@ public final class OhMappingProxy extends OhRoot {
 
     Class ohClass;
     Method ohMethod;
+    Factory providerFactory;
     String requestUrl;
 
     boolean returnFuture; // Future<V>
@@ -88,20 +89,23 @@ public final class OhMappingProxy extends OhRoot {
     boolean returnTriple; // Triple<L, M, R>
     List<Class> returnTypes;
 
-    OhMappingProxy(Class ohClass, Method ohMethod, OhProxy proxy) {
+    OhMappingProxy(Class ohClass, Method ohMethod, Factory providerFactory, OhProxy proxy) {
         this.ohClass = ohClass;
         this.ohMethod = ohMethod;
-        this.requestUrl = Elf.checkRequestUrl(this.ohClass, this.ohMethod, proxy);
+        this.providerFactory = providerFactory;
+        this.requestUrl = Elf.checkRequestUrl(this.ohClass,
+                this.ohMethod, this.providerFactory, proxy);
 
-        this.clientProxy = Elf.checkClientProxy(this.ohClass, this.ohMethod, proxy);
+        this.clientProxy = Elf.checkClientProxy(this.ohClass,
+                this.ohMethod, this.providerFactory, proxy);
         val clientSSL = Elf.checkClientSSL(this.ohMethod);
         if (null != clientSSL) {
-            this.sslSocketFactory = Elf.checkSSLSocketFactory(
-                    this.ohClass, this.ohMethod, clientSSL);
-            this.x509TrustManager = Elf.checkX509TrustManager(
-                    this.ohClass, this.ohMethod, clientSSL);
-            this.hostnameVerifier = Elf.checkHostnameVerifier(
-                    this.ohClass, this.ohMethod, clientSSL);
+            this.sslSocketFactory = Elf.checkSSLSocketFactory(this.ohClass,
+                    this.ohMethod, this.providerFactory, clientSSL);
+            this.x509TrustManager = Elf.checkX509TrustManager(this.ohClass,
+                    this.ohMethod, this.providerFactory, clientSSL);
+            this.hostnameVerifier = Elf.checkHostnameVerifier(this.ohClass,
+                    this.ohMethod, this.providerFactory, clientSSL);
         } else {
             this.sslSocketFactory = proxy.sslSocketFactory;
             this.x509TrustManager = proxy.x509TrustManager;
@@ -111,17 +115,23 @@ public final class OhMappingProxy extends OhRoot {
         this.okHttpClient = Elf.buildOkHttpClient(this, proxy);
 
         this.acceptCharset = Elf.checkAcceptCharset(this.ohMethod, proxy);
-        this.contentFormatter = Elf.checkContentFormatter(this.ohMethod, proxy);
+        this.contentFormatter = Elf.checkContentFormatter(
+                this.ohMethod, this.providerFactory, proxy);
         this.httpMethod = Elf.checkHttpMethod(this.ohMethod, proxy);
-        this.headers = Elf.checkFixedHeaders(this.ohClass, this.ohMethod, proxy);
-        this.pathVars = Elf.checkFixedPathVars(this.ohClass, this.ohMethod, proxy);
-        this.parameters = Elf.checkFixedParameters(this.ohClass, this.ohMethod, proxy);
-        this.contexts = Elf.checkFixedContexts(this.ohClass, this.ohMethod, proxy);
+        this.headers = Elf.checkFixedHeaders(this.ohClass,
+                this.ohMethod, this.providerFactory, proxy);
+        this.pathVars = Elf.checkFixedPathVars(this.ohClass,
+                this.ohMethod, this.providerFactory, proxy);
+        this.parameters = Elf.checkFixedParameters(this.ohClass,
+                this.ohMethod, this.providerFactory, proxy);
+        this.contexts = Elf.checkFixedContexts(this.ohClass,
+                this.ohMethod, this.providerFactory, proxy);
 
         this.statusErrorMapping = Elf.checkStatusErrorMapping(this.ohMethod, proxy);
         this.statusSeriesErrorMapping = Elf.checkStatusSeriesErrorMapping(this.ohMethod, proxy);
 
-        this.responseParser = Elf.checkResponseParser(this.ohMethod, proxy);
+        this.responseParser = Elf.checkResponseParser(
+                this.ohMethod, this.providerFactory, proxy);
 
         processReturnType(this.ohMethod);
     }
@@ -329,19 +339,21 @@ public final class OhMappingProxy extends OhRoot {
             throw new UnsupportedOperationException();
         }
 
-        static String checkRequestUrl(Class clazz, Method method, OhProxy proxy) {
+        static String checkRequestUrl(Class clazz, Method method,
+                                      Factory providerFactory, OhProxy proxy) {
             val mapping = findAnnotation(method, Mapping.class);
             val url = checkNull(mapping, method::getName, annotation -> {
                 val providerClass = annotation.urlProvider();
-                return substitute(UrlProvider.class == providerClass ?
-                        annotation.value() : getBeanOrCreate(providerClass).url(clazz, method));
+                return substitute(UrlProvider.class == providerClass ? annotation.value()
+                        : providerFactory.build(providerClass).url(clazz, method));
             });
             if (isBlank(url)) return proxy.baseUrl;
             if (isBlank(proxy.baseUrl)) return url;
             return removeEnd(proxy.baseUrl, "/") + prependIfMissing(url, "/");
         }
 
-        static Proxy checkClientProxy(Class clazz, Method method, OhProxy proxy) {
+        static Proxy checkClientProxy(Class clazz, Method method,
+                                      Factory providerFactory, OhProxy proxy) {
             val clientProxy = findAnnotation(method, ClientProxy.class);
             return checkNull(clientProxy, () -> proxy.clientProxy, annotation -> {
                 val providerClass = annotation.proxyProvider();
@@ -349,7 +361,7 @@ public final class OhMappingProxy extends OhRoot {
                         checkBlank(annotation.host(), () -> null,
                                 xx -> new Proxy(annotation.type(), new InetSocketAddress(
                                         annotation.host(), annotation.port())))
-                        : getBeanOrCreate(providerClass).proxy(clazz, method);
+                        : providerFactory.build(providerClass).proxy(clazz, method);
             });
         }
 
@@ -357,22 +369,25 @@ public final class OhMappingProxy extends OhRoot {
             return findAnnotation(method, ClientSSL.class);
         }
 
-        static SSLSocketFactory checkSSLSocketFactory(Class clazz, Method method, ClientSSL clientSSL) {
+        static SSLSocketFactory checkSSLSocketFactory(Class clazz, Method method,
+                                                      Factory providerFactory, ClientSSL clientSSL) {
             val providerClass = clientSSL.sslSocketFactoryProvider();
             return SSLSocketFactoryProvider.class == providerClass ? null
-                    : getBeanOrCreate(providerClass).sslSocketFactory(clazz, method);
+                    : providerFactory.build(providerClass).sslSocketFactory(clazz, method);
         }
 
-        static X509TrustManager checkX509TrustManager(Class clazz, Method method, ClientSSL clientSSL) {
+        static X509TrustManager checkX509TrustManager(Class clazz, Method method,
+                                                      Factory providerFactory, ClientSSL clientSSL) {
             val providerClass = clientSSL.x509TrustManagerProvider();
             return X509TrustManagerProvider.class == providerClass ? null
-                    : getBeanOrCreate(providerClass).x509TrustManager(clazz, method);
+                    : providerFactory.build(providerClass).x509TrustManager(clazz, method);
         }
 
-        static HostnameVerifier checkHostnameVerifier(Class clazz, Method method, ClientSSL clientSSL) {
+        static HostnameVerifier checkHostnameVerifier(Class clazz, Method method,
+                                                      Factory providerFactory, ClientSSL clientSSL) {
             val providerClass = clientSSL.hostnameVerifierProvider();
             return HostnameVerifierProvider.class == providerClass ? null
-                    : getBeanOrCreate(providerClass).hostnameVerifier(clazz, method);
+                    : providerFactory.build(providerClass).hostnameVerifier(clazz, method);
         }
 
         static ConnectionPool checkConnectionPool(Method method, OhProxy proxy) {
@@ -402,10 +417,11 @@ public final class OhMappingProxy extends OhRoot {
                     annotation -> Charset.forName(annotation.value()));
         }
 
-        static ContentFormatter checkContentFormatter(Method method, OhProxy proxy) {
+        static ContentFormatter checkContentFormatter(
+                Method method, Factory providerFactory, OhProxy proxy) {
             val contentFormat = findAnnotation(method, ContentFormat.class);
             return checkNull(contentFormat, () -> proxy.contentFormatter,
-                    annotation -> getBeanOrCreate(annotation.value()));
+                    annotation -> providerFactory.build(annotation.value()));
         }
 
         static HttpMethod checkHttpMethod(Method method, OhProxy proxy) {
@@ -413,72 +429,83 @@ public final class OhMappingProxy extends OhRoot {
             return checkNull(requestMethod, () -> proxy.httpMethod, RequestMethod::value);
         }
 
-        static List<Pair<String, String>> checkFixedHeaders(Class clazz, Method method, OhProxy proxy) {
+        static List<Pair<String, String>> checkFixedHeaders(Class clazz, Method method,
+                                                            Factory providerFactory, OhProxy proxy) {
             val result = newArrayList(proxy.headers);
             result.addAll(newArrayList(findMergedRepeatableAnnotations(method, FixedHeader.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
                         val name = an.name();
                         val providerClass = an.valueProvider();
-                        return Pair.of(name, FixedValueProvider.class == providerClass ?
-                                an.value() : getBeanOrCreate(providerClass).value(clazz, method, name));
+                        return Pair.of(name, FixedValueProvider.class == providerClass ? an.value()
+                                : providerFactory.build(providerClass).value(clazz, method, name));
                     }).collect(Collectors.toList()));
             return result;
         }
 
-        static List<Pair<String, String>> checkFixedPathVars(Class clazz, Method method, OhProxy proxy) {
+        static List<Pair<String, String>> checkFixedPathVars(Class clazz, Method method,
+                                                             Factory providerFactory, OhProxy proxy) {
             val result = newArrayList(proxy.pathVars);
             result.addAll(newArrayList(findMergedRepeatableAnnotations(method, FixedPathVar.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
                         val name = an.name();
                         val providerClass = an.valueProvider();
-                        return Pair.of(name, FixedValueProvider.class == providerClass ?
-                                an.value() : getBeanOrCreate(providerClass).value(clazz, method, name));
+                        return Pair.of(name, FixedValueProvider.class == providerClass ? an.value()
+                                : providerFactory.build(providerClass).value(clazz, method, name));
                     }).collect(Collectors.toList()));
             return result;
         }
 
-        static List<Pair<String, Object>> checkFixedParameters(Class clazz, Method method, OhProxy proxy) {
+        static List<Pair<String, Object>> checkFixedParameters(Class clazz, Method method,
+                                                               Factory providerFactory, OhProxy proxy) {
             val result = newArrayList(proxy.parameters);
             result.addAll(newArrayList(findMergedRepeatableAnnotations(method, FixedParameter.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
                         val name = an.name();
                         val providerClass = an.valueProvider();
-                        return Pair.of(name, (Object) (FixedValueProvider.class == providerClass ?
-                                an.value() : getBeanOrCreate(providerClass).value(clazz, method, name)));
+                        return Pair.of(name, (Object) (FixedValueProvider.class == providerClass ? an.value()
+                                : providerFactory.build(providerClass).value(clazz, method, name)));
                     }).collect(Collectors.toList()));
             return result;
         }
 
-        static List<Pair<String, Object>> checkFixedContexts(Class clazz, Method method, OhProxy proxy) {
+        static List<Pair<String, Object>> checkFixedContexts(Class clazz, Method method,
+                                                             Factory providerFactory, OhProxy proxy) {
             val result = newArrayList(proxy.contexts);
             result.addAll(newArrayList(findMergedRepeatableAnnotations(method, FixedContext.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
                         val name = an.name();
                         val providerClass = an.valueProvider();
-                        return Pair.of(name, (Object) (FixedValueProvider.class == providerClass ?
-                                an.value() : getBeanOrCreate(providerClass).value(clazz, method, name)));
+                        return Pair.of(name, (Object) (FixedValueProvider.class == providerClass ? an.value()
+                                : providerFactory.build(providerClass).value(clazz, method, name)));
                     }).collect(Collectors.toList()));
             return result;
         }
 
-        static Map<HttpStatus, Class<? extends StatusError>> checkStatusErrorMapping(Method method, OhProxy proxy) {
+        static Map<HttpStatus, Class<? extends StatusError>>
+        checkStatusErrorMapping(Method method, OhProxy proxy) {
             val result = newHashMap(proxy.statusErrorMapping);
-            result.putAll(newArrayList(findMergedRepeatableAnnotations(method, StatusErrorMapping.class)).stream()
-                    .collect(Collectors.toMap(StatusErrorMapping::status, StatusErrorMapping::exception)));
+            result.putAll(newArrayList(findMergedRepeatableAnnotations(
+                    method, StatusErrorMapping.class)).stream()
+                    .collect(Collectors.toMap(StatusErrorMapping::status,
+                            StatusErrorMapping::exception)));
             return result;
         }
 
-        static Map<HttpStatus.Series, Class<? extends StatusError>> checkStatusSeriesErrorMapping(Method method, OhProxy proxy) {
+        static Map<HttpStatus.Series, Class<? extends StatusError>>
+        checkStatusSeriesErrorMapping(Method method, OhProxy proxy) {
             val result = newHashMap(proxy.statusSeriesErrorMapping);
-            result.putAll(newArrayList(findMergedRepeatableAnnotations(method, StatusSeriesErrorMapping.class)).stream()
-                    .collect(Collectors.toMap(StatusSeriesErrorMapping::statusSeries, StatusSeriesErrorMapping::exception)));
+            result.putAll(newArrayList(findMergedRepeatableAnnotations(
+                    method, StatusSeriesErrorMapping.class)).stream()
+                    .collect(Collectors.toMap(StatusSeriesErrorMapping::statusSeries,
+                            StatusSeriesErrorMapping::exception)));
             return result;
         }
 
-        static ResponseParser checkResponseParser(Method method, OhProxy proxy) {
+        static ResponseParser checkResponseParser(
+                Method method, Factory providerFactory, OhProxy proxy) {
             val responseParse = findAnnotation(method, ResponseParse.class);
             return checkNull(responseParse, () -> proxy.responseParser,
-                    annotation -> getBeanOrCreate(annotation.value()));
+                    annotation -> providerFactory.build(annotation.value()));
         }
     }
 }

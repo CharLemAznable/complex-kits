@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TestConfiguration.class)
-public class OhScanTest {
+public class OhSpringTest {
 
     @Autowired
     private TestComponent testComponent;
