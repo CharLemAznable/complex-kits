@@ -40,7 +40,6 @@ import static com.google.common.cache.CacheLoader.from;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
-@SuppressWarnings("unchecked")
 public final class MinerFactory {
 
     private static StringSubstitutor minerMinerSubstitutor;
@@ -68,11 +67,12 @@ public final class MinerFactory {
         return minerClassPathSubstitutor.replace(minerMinerSubstitutor.replace(source));
     }
 
+    @SuppressWarnings("unchecked")
     public static class MinerLoader {
 
-        private final Factory providerFactory;
         private LoadingCache<Class, Object> minerCache
                 = LoadingCachee.simpleCache(from(this::loadMiner));
+        private Factory providerFactory;
 
         private MinerLoader() {
             this(null);
@@ -136,9 +136,9 @@ public final class MinerFactory {
     @AllArgsConstructor
     private static class MinerProxy implements MethodInterceptor {
 
-        private final Class minerClass;
-        private final Minerable minerable;
-        private final Factory providerFactory;
+        private Class minerClass;
+        private Minerable minerable;
+        private Factory providerFactory;
 
         @Override
         public Object intercept(Object o, Method method, Object[] args,

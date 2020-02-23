@@ -3,9 +3,11 @@ package com.github.charlemaznable.core.miner;
 import com.github.charlemaznable.core.miner.testClass.TestMiner;
 import com.github.charlemaznable.core.miner.testClass.TestMiner2;
 import com.github.charlemaznable.core.miner.testClass.TestMinerDataId;
+import com.github.charlemaznable.core.miner.testClass.TestMinerDataIdImpl;
 import com.github.charlemaznable.core.miner.testClass.TestMinerDataIdProvider;
 import com.google.inject.AbstractModule;
-import com.google.inject.Injector;
+import com.google.inject.Guice;
+import lombok.val;
 import lombok.var;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -20,20 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MinerGuiceTest {
 
-    private static MinerInjector minerInjector;
-    private static Injector injector;
-
     @BeforeAll
     public static void beforeAll() {
         MockDiamondServer.setUpMockServer();
-        minerInjector = new MinerInjector(new AbstractModule() {
-            @Override
-            public void configure() {
-                bind(TestMinerDataId.class).in(SINGLETON);
-                bind(TestMinerDataIdProvider.class).in(SINGLETON);
-            }
-        });
-        injector = minerInjector.injectMiner(TestMiner.class);
     }
 
     @AfterAll
@@ -45,6 +36,14 @@ public class MinerGuiceTest {
     public void testMiner() {
         MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA",
                 "name=John\nfull=${this.name} Doe\nlong=${this.full} Richard");
+        val minerInjector = new MinerInjector(new AbstractModule() {
+            @Override
+            public void configure() {
+                bind(TestMinerDataId.class).to(TestMinerDataIdImpl.class).in(SINGLETON);
+                bind(TestMinerDataIdProvider.class).in(SINGLETON);
+            }
+        });
+        var injector = minerInjector.injectMiner(TestMiner.class);
 
         var minerDefault = injector.getInstance(TestMiner.class);
         assertNotNull(minerDefault);
@@ -64,5 +63,26 @@ public class MinerGuiceTest {
 
         assertThrows(MinerConfigException.class, () ->
                 minerInjector.getMiner(TestMiner2.class));
+
+        val minerInjector2 = new MinerInjector();
+        injector = Guice.createInjector(minerInjector2.minerModule(TestMiner.class));
+        minerDefault = injector.getInstance(TestMiner.class);
+        assertNotNull(minerDefault);
+        assertEquals("John", minerDefault.name());
+        assertEquals("John Doe", minerDefault.full());
+        assertNull(minerDefault.longName());
+        assertEquals("xyz", minerDefault.abc("xyz"));
+        assertNull(minerDefault.abc(null));
+
+        minerDefault = minerInjector2.getMiner(TestMiner.class);
+        assertNotNull(minerDefault);
+        assertEquals("John", minerDefault.name());
+        assertEquals("John Doe", minerDefault.full());
+        assertNull(minerDefault.longName());
+        assertEquals("xyz", minerDefault.abc("xyz"));
+        assertNull(minerDefault.abc(null));
+
+        assertThrows(MinerConfigException.class, () ->
+                minerInjector2.getMiner(TestMiner2.class));
     }
 }
