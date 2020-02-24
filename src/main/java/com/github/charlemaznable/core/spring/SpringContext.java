@@ -19,6 +19,7 @@ import java.lang.annotation.Annotation;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
+import static com.github.charlemaznable.core.lang.Clz.isConcrete;
 import static com.github.charlemaznable.core.lang.Condition.checkNull;
 import static com.github.charlemaznable.core.lang.Condition.notNullThen;
 import static com.github.charlemaznable.core.lang.Condition.nullThen;
@@ -182,8 +183,10 @@ public class SpringContext implements ApplicationContextAware {
 
     public static <T> T createBean(String beanName, Class<T> clazz) {
         if (clazz == null) return null;
-        if (applicationContext == null)
+        if (applicationContext == null) {
+            if (!isConcrete(clazz)) return null;
             return onClass(clazz).create().get();
+        }
 
         val beanDefinition = BeanDefinitionBuilder
                 .genericBeanDefinition(clazz).getBeanDefinition();
@@ -275,7 +278,10 @@ public class SpringContext implements ApplicationContextAware {
 
         @Override
         public T get() {
-            return notNullThen(clazz, c -> onClass(c).create().get());
+            return notNullThen(clazz, c -> {
+                if (!isConcrete(c)) return null;
+                return onClass(c).create().get();
+            });
         }
     }
 

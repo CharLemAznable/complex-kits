@@ -14,6 +14,11 @@ public class TestMinerDataIdProvider implements DataIdProvider {
 
     private final TestMinerDataId testMinerDataId;
 
+    @Autowired(required = false)
+    public TestMinerDataIdProvider() {
+        this(null);
+    }
+
     @Inject
     @Autowired(required = false)
     public TestMinerDataIdProvider(@Nullable TestMinerDataId testMinerDataId) {

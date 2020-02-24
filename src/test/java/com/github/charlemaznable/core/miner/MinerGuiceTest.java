@@ -76,7 +76,8 @@ public class MinerGuiceTest {
         assertEquals("Joe", minerDefault.name());
         assertEquals("Joe Doe", minerDefault.full());
         val finalMinerDefault1 = minerDefault;
-        assertThrows(ConfigurationException.class, finalMinerDefault1::longName);
+        assertThrows(ConfigurationException.class,
+                finalMinerDefault1::longName);
         assertNull(minerDefault.longWrap());
         assertEquals("xyz", minerDefault.abc("xyz"));
         assertNull(minerDefault.abc(null));
