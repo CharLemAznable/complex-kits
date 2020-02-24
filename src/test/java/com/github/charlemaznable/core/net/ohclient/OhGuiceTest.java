@@ -6,6 +6,7 @@ import com.github.charlemaznable.core.net.ohclient.testscan.TestComponent;
 import com.github.charlemaznable.core.net.ohclient.testscan.TestHttpClient;
 import com.github.charlemaznable.core.net.ohclient.testscan.TestHttpClient2;
 import com.github.charlemaznable.core.net.ohclient.testscan.TestHttpClient3;
+import com.github.charlemaznable.core.net.ohclient.testscan.TestHttpClientNone;
 import com.github.charlemaznable.core.net.ohclient.testscan.TestSampleUrlProvider;
 import com.google.inject.AbstractModule;
 import com.google.inject.ConfigurationException;
@@ -34,7 +35,7 @@ public class OhGuiceTest {
         val minerModule = minerInjector.createModule(TestSampleUrlProvider.class);
         val ohInjector = new OhInjector(minerModule);
         var injector = ohInjector.createInjector(
-                TestHttpClient.class, TestHttpClient2.class, TestHttpClient3.class);
+                TestHttpClient.class, TestHttpClient2.class, TestHttpClient3.class, TestHttpClientNone.class);
 
         try (val mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
@@ -62,6 +63,9 @@ public class OhGuiceTest {
             assertEquals("[Guice]", testHttpClient2.sampleWrapper());
 
             assertNull(injector.getInstance(TestHttpClient3.class));
+
+            assertThrows(ConfigurationException.class, () ->
+                    injector.getInstance(TestHttpClientNone.class));
         }
     }
 

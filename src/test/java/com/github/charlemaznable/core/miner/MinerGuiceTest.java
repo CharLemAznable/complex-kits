@@ -4,6 +4,7 @@ import com.github.charlemaznable.core.miner.testClass.TestMiner;
 import com.github.charlemaznable.core.miner.testClass.TestMiner2;
 import com.github.charlemaznable.core.miner.testClass.TestMinerDataId;
 import com.github.charlemaznable.core.miner.testClass.TestMinerDataIdImpl;
+import com.github.charlemaznable.core.miner.testClass.TestMinerNone;
 import com.google.inject.AbstractModule;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Guice;
@@ -45,7 +46,8 @@ public class MinerGuiceTest {
                 bind(TestMinerDataId.class).to(TestMinerDataIdImpl.class).in(SINGLETON);
             }
         });
-        var injector = minerInjector.createInjector(TestMiner.class, TestMiner2.class);
+        val injector = minerInjector.createInjector(
+                TestMiner.class, TestMiner2.class, TestMinerNone.class);
 
         var minerDefault = injector.getInstance(TestMiner.class);
         assertNotNull(minerDefault);
@@ -58,14 +60,18 @@ public class MinerGuiceTest {
 
         assertNull(injector.getInstance(TestMiner2.class));
 
+        assertThrows(ConfigurationException.class, () ->
+                injector.getInstance(TestMinerNone.class));
+
         val minerInjector2 = new MinerInjector(newArrayList(new AbstractModule() {
             @Override
             protected void configure() {
                 bind(TestMiner2.class).in(SINGLETON);
             }
         }));
-        injector = Guice.createInjector(minerInjector2.createModule(TestMinerSub.class, TestMiner2.class));
-        minerDefault = injector.getInstance(TestMiner.class);
+        val injector2 = Guice.createInjector(minerInjector2.createModule(
+                TestMinerSub.class, TestMiner2.class, TestMinerNone.class));
+        minerDefault = injector2.getInstance(TestMiner.class);
         assertNotNull(minerDefault);
         assertEquals("Joe", minerDefault.name());
         assertEquals("Joe Doe", minerDefault.full());
@@ -75,7 +81,10 @@ public class MinerGuiceTest {
         assertEquals("xyz", minerDefault.abc("xyz"));
         assertNull(minerDefault.abc(null));
 
-        assertNotNull(injector.getInstance(TestMiner2.class));
+        assertNotNull(injector2.getInstance(TestMiner2.class));
+
+        assertThrows(ConfigurationException.class, () ->
+                injector2.getInstance(TestMinerNone.class));
     }
 
     @MinerConfig("SUB_DATA")
