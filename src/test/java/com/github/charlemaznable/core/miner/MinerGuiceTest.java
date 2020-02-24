@@ -37,13 +37,15 @@ public class MinerGuiceTest {
     public void testMiner() {
         MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA",
                 "name=John\nfull=${this.name} Doe\nlong=${this.full} Richard");
+        MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "SUB_DATA",
+                "name=Joe\nfull=${this.name} Doe\nlong=${this.full} Richard");
         val minerInjector = new MinerInjector(new AbstractModule() {
             @Override
             public void configure() {
                 bind(TestMinerDataId.class).to(TestMinerDataIdImpl.class).in(SINGLETON);
             }
         });
-        var injector = minerInjector.createInjector(TestMiner.class);
+        var injector = minerInjector.createInjector(TestMiner.class, TestMiner2.class);
 
         var minerDefault = injector.getInstance(TestMiner.class);
         assertNotNull(minerDefault);
@@ -54,41 +56,29 @@ public class MinerGuiceTest {
         assertEquals("xyz", minerDefault.abc("xyz"));
         assertNull(minerDefault.abc(null));
 
-        minerDefault = minerInjector.getMiner(TestMiner.class);
-        assertNotNull(minerDefault);
-        assertEquals("John", minerDefault.name());
-        assertEquals("John Doe", minerDefault.full());
-        assertEquals("John Doe Richard", minerDefault.longName());
-        assertEquals("John Doe Richard", minerDefault.longWrap());
-        assertEquals("xyz", minerDefault.abc("xyz"));
-        assertNull(minerDefault.abc(null));
+        assertNull(injector.getInstance(TestMiner2.class));
 
-        assertThrows(MinerConfigException.class, () ->
-                minerInjector.getMiner(TestMiner2.class));
-
-        val minerInjector2 = new MinerInjector(newArrayList());
-        injector = Guice.createInjector(minerInjector2.createModule(TestMiner.class));
+        val minerInjector2 = new MinerInjector(newArrayList(new AbstractModule() {
+            @Override
+            protected void configure() {
+                bind(TestMiner2.class).in(SINGLETON);
+            }
+        }));
+        injector = Guice.createInjector(minerInjector2.createModule(TestMinerSub.class, TestMiner2.class));
         minerDefault = injector.getInstance(TestMiner.class);
         assertNotNull(minerDefault);
-        assertEquals("John", minerDefault.name());
-        assertEquals("John Doe", minerDefault.full());
+        assertEquals("Joe", minerDefault.name());
+        assertEquals("Joe Doe", minerDefault.full());
         val finalMinerDefault1 = minerDefault;
         assertThrows(ConfigurationException.class, finalMinerDefault1::longName);
         assertNull(minerDefault.longWrap());
         assertEquals("xyz", minerDefault.abc("xyz"));
         assertNull(minerDefault.abc(null));
 
-        minerDefault = minerInjector2.getMiner(TestMiner.class);
-        assertNotNull(minerDefault);
-        assertEquals("John", minerDefault.name());
-        assertEquals("John Doe", minerDefault.full());
-        val finalMinerDefault2 = minerDefault;
-        assertThrows(ConfigurationException.class, finalMinerDefault2      ::longName);
-        assertNull(minerDefault.longWrap());
-        assertEquals("xyz", minerDefault.abc("xyz"));
-        assertNull(minerDefault.abc(null));
+        assertNotNull(injector.getInstance(TestMiner2.class));
+    }
 
-        assertThrows(MinerConfigException.class, () ->
-                minerInjector2.getMiner(TestMiner2.class));
+    @MinerConfig("SUB_DATA")
+    public interface TestMinerSub extends TestMiner {
     }
 }

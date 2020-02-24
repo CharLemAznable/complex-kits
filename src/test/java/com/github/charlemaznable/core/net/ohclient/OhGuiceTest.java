@@ -7,6 +7,7 @@ import com.github.charlemaznable.core.net.ohclient.testscan.TestHttpClient;
 import com.github.charlemaznable.core.net.ohclient.testscan.TestHttpClient2;
 import com.github.charlemaznable.core.net.ohclient.testscan.TestHttpClient3;
 import com.github.charlemaznable.core.net.ohclient.testscan.TestSampleUrlProvider;
+import com.google.inject.AbstractModule;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Guice;
 import lombok.SneakyThrows;
@@ -19,7 +20,9 @@ import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.Test;
 
 import static com.github.charlemaznable.core.lang.Listt.newArrayList;
+import static com.google.inject.Scopes.SINGLETON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class OhGuiceTest {
@@ -27,11 +30,11 @@ public class OhGuiceTest {
     @SneakyThrows
     @Test
     public void testOhClient() {
-        val minerInjector = new MinerInjector(Guice.createInjector());
+        val minerInjector = new MinerInjector();
         val minerModule = minerInjector.createModule(TestSampleUrlProvider.class);
         val ohInjector = new OhInjector(minerModule);
         var injector = ohInjector.createInjector(
-                TestHttpClient.class, TestHttpClient2.class);
+                TestHttpClient.class, TestHttpClient2.class, TestHttpClient3.class);
 
         try (val mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
@@ -54,29 +57,25 @@ public class OhGuiceTest {
             assertEquals("{Guice}", testHttpClient.sampleWrapper());
             assertEquals("Guice", testHttpClient.sampleWrap());
 
-            var testHttpClient2 = injector.getInstance(TestHttpClient2.class);
+            val testHttpClient2 = injector.getInstance(TestHttpClient2.class);
             assertEquals("Guice", testHttpClient2.sample());
             assertEquals("[Guice]", testHttpClient2.sampleWrapper());
 
-            testHttpClient2 = ohInjector.getClient(TestHttpClient2.class);
-            assertEquals("Guice", testHttpClient2.sample());
-            assertEquals("[Guice]", testHttpClient2.sampleWrapper());
-
-            assertThrows(OhException.class, () ->
-                    ohInjector.getClient(TestHttpClient3.class));
+            assertNull(injector.getInstance(TestHttpClient3.class));
         }
     }
 
     @SneakyThrows
     @Test
     public void testOhClientError() {
-        val ohInjector1 = new OhInjector(newArrayList());
-        var injector1 = Guice.createInjector(ohInjector1.createModule(
-                TestHttpClient.class, TestHttpClient2.class));
-
-        val ohInjector2 = new OhInjector(Guice.createInjector());
-        var injector2 = Guice.createInjector(ohInjector2.createModule(
-                TestHttpClient.class, TestHttpClient2.class));
+        val ohInjector = new OhInjector(newArrayList(new AbstractModule() {
+            @Override
+            protected void configure() {
+                bind(TestHttpClient3.class).in(SINGLETON);
+            }
+        }));
+        var injector = Guice.createInjector(ohInjector.createModule(
+                TestHttpClient.class, TestHttpClient2.class, TestHttpClient3.class));
 
         try (val mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
@@ -93,13 +92,10 @@ public class OhGuiceTest {
             });
             mockWebServer.start(41102);
 
-            val testComponent1 = injector1.getInstance(TestComponent.class);
-            val testHttpClient1 = testComponent1.testHttpClient;
-            assertThrows(ConfigurationException.class, testHttpClient1::sample);
-
-            val testComponent2 = injector2.getInstance(TestComponent.class);
-            val testHttpClient2 = testComponent2.testHttpClient;
-            assertEquals("GuiceError", testHttpClient2.sampleWrap());
+            val testComponent = injector.getInstance(TestComponent.class);
+            val testHttpClient = testComponent.testHttpClient;
+            assertThrows(ConfigurationException.class, testHttpClient::sample);
+            assertEquals("GuiceError", testHttpClient.sampleWrap());
         }
     }
 }

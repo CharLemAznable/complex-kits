@@ -3,11 +3,12 @@ package com.github.charlemaznable.core.miner;
 import com.github.charlemaznable.core.guice.CommonInjector;
 import com.github.charlemaznable.core.guice.InjectorFactory;
 import com.github.charlemaznable.core.miner.MinerFactory.MinerLoader;
-import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Provider;
 
 import static com.github.charlemaznable.core.miner.MinerFactory.minerLoader;
+import static java.util.Objects.isNull;
+import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
 public final class MinerInjector extends CommonInjector {
 
@@ -21,13 +22,14 @@ public final class MinerInjector extends CommonInjector {
         super(modules);
     }
 
-    public MinerInjector(Injector injector) {
-        super(injector);
-    }
-
     @Override
     public void initialize(InjectorFactory injectorFactory) {
         this.minerLoader = minerLoader(injectorFactory);
+    }
+
+    @Override
+    public boolean isNonCandidateClass(Class clazz) {
+        return isNull(getAnnotation(clazz, MinerConfig.class));
     }
 
     @Override
