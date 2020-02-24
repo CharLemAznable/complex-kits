@@ -4,8 +4,8 @@ import com.github.charlemaznable.core.miner.testClass.TestMiner;
 import com.github.charlemaznable.core.miner.testClass.TestMiner2;
 import com.github.charlemaznable.core.miner.testClass.TestMinerDataId;
 import com.github.charlemaznable.core.miner.testClass.TestMinerDataIdImpl;
-import com.github.charlemaznable.core.miner.testClass.TestMinerDataIdProvider;
 import com.google.inject.AbstractModule;
+import com.google.inject.ConfigurationException;
 import com.google.inject.Guice;
 import lombok.val;
 import lombok.var;
@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.n3r.diamond.client.impl.MockDiamondServer;
 
+import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 import static com.google.inject.Scopes.SINGLETON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -40,16 +41,16 @@ public class MinerGuiceTest {
             @Override
             public void configure() {
                 bind(TestMinerDataId.class).to(TestMinerDataIdImpl.class).in(SINGLETON);
-                bind(TestMinerDataIdProvider.class).in(SINGLETON);
             }
         });
-        var injector = minerInjector.injectMiner(TestMiner.class);
+        var injector = minerInjector.createInjector(TestMiner.class);
 
         var minerDefault = injector.getInstance(TestMiner.class);
         assertNotNull(minerDefault);
         assertEquals("John", minerDefault.name());
         assertEquals("John Doe", minerDefault.full());
         assertEquals("John Doe Richard", minerDefault.longName());
+        assertEquals("John Doe Richard", minerDefault.longWrap());
         assertEquals("xyz", minerDefault.abc("xyz"));
         assertNull(minerDefault.abc(null));
 
@@ -58,19 +59,22 @@ public class MinerGuiceTest {
         assertEquals("John", minerDefault.name());
         assertEquals("John Doe", minerDefault.full());
         assertEquals("John Doe Richard", minerDefault.longName());
+        assertEquals("John Doe Richard", minerDefault.longWrap());
         assertEquals("xyz", minerDefault.abc("xyz"));
         assertNull(minerDefault.abc(null));
 
         assertThrows(MinerConfigException.class, () ->
                 minerInjector.getMiner(TestMiner2.class));
 
-        val minerInjector2 = new MinerInjector();
-        injector = Guice.createInjector(minerInjector2.minerModule(TestMiner.class));
+        val minerInjector2 = new MinerInjector(newArrayList());
+        injector = Guice.createInjector(minerInjector2.createModule(TestMiner.class));
         minerDefault = injector.getInstance(TestMiner.class);
         assertNotNull(minerDefault);
         assertEquals("John", minerDefault.name());
         assertEquals("John Doe", minerDefault.full());
-        assertNull(minerDefault.longName());
+        val finalMinerDefault1 = minerDefault;
+        assertThrows(ConfigurationException.class, finalMinerDefault1::longName);
+        assertNull(minerDefault.longWrap());
         assertEquals("xyz", minerDefault.abc("xyz"));
         assertNull(minerDefault.abc(null));
 
@@ -78,7 +82,9 @@ public class MinerGuiceTest {
         assertNotNull(minerDefault);
         assertEquals("John", minerDefault.name());
         assertEquals("John Doe", minerDefault.full());
-        assertNull(minerDefault.longName());
+        val finalMinerDefault2 = minerDefault;
+        assertThrows(ConfigurationException.class, finalMinerDefault2      ::longName);
+        assertNull(minerDefault.longWrap());
         assertEquals("xyz", minerDefault.abc("xyz"));
         assertNull(minerDefault.abc(null));
 

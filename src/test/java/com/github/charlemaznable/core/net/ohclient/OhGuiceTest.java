@@ -7,6 +7,7 @@ import com.github.charlemaznable.core.net.ohclient.testscan.TestHttpClient;
 import com.github.charlemaznable.core.net.ohclient.testscan.TestHttpClient2;
 import com.github.charlemaznable.core.net.ohclient.testscan.TestHttpClient3;
 import com.github.charlemaznable.core.net.ohclient.testscan.TestSampleUrlProvider;
+import com.google.inject.ConfigurationException;
 import com.google.inject.Guice;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -17,6 +18,7 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.Test;
 
+import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -25,10 +27,10 @@ public class OhGuiceTest {
     @SneakyThrows
     @Test
     public void testOhClient() {
-        val minerInjector = new MinerInjector();
-        val minerModule = minerInjector.minerModule(TestSampleUrlProvider.class);
+        val minerInjector = new MinerInjector(Guice.createInjector());
+        val minerModule = minerInjector.createModule(TestSampleUrlProvider.class);
         val ohInjector = new OhInjector(minerModule);
-        var injector = ohInjector.injectOhClient(
+        var injector = ohInjector.createInjector(
                 TestHttpClient.class, TestHttpClient2.class);
 
         try (val mockWebServer = new MockWebServer()) {
@@ -68,8 +70,12 @@ public class OhGuiceTest {
     @SneakyThrows
     @Test
     public void testOhClientError() {
-        val ohInjector = new OhInjector();
-        var injector = Guice.createInjector(ohInjector.ohModule(
+        val ohInjector1 = new OhInjector(newArrayList());
+        var injector1 = Guice.createInjector(ohInjector1.createModule(
+                TestHttpClient.class, TestHttpClient2.class));
+
+        val ohInjector2 = new OhInjector(Guice.createInjector());
+        var injector2 = Guice.createInjector(ohInjector2.createModule(
                 TestHttpClient.class, TestHttpClient2.class));
 
         try (val mockWebServer = new MockWebServer()) {
@@ -87,9 +93,13 @@ public class OhGuiceTest {
             });
             mockWebServer.start(41102);
 
-            val testComponent = injector.getInstance(TestComponent.class);
-            val testHttpClient = testComponent.testHttpClient;
-            assertEquals("GuiceError", testHttpClient.sampleWrap());
+            val testComponent1 = injector1.getInstance(TestComponent.class);
+            val testHttpClient1 = testComponent1.testHttpClient;
+            assertThrows(ConfigurationException.class, testHttpClient1::sample);
+
+            val testComponent2 = injector2.getInstance(TestComponent.class);
+            val testHttpClient2 = testComponent2.testHttpClient;
+            assertEquals("GuiceError", testHttpClient2.sampleWrap());
         }
     }
 }

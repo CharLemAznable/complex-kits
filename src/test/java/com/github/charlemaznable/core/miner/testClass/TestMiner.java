@@ -9,8 +9,11 @@ public interface TestMiner {
 
     String full();
 
-    @MinerConfig(dataIdProvider = TestMinerDataIdProvider.class)
+    @MinerConfig(dataIdProvider = TestMinerDataId.class)
     String longName();
+
+    @MinerConfig(dataIdProvider = TestMinerDataIdProvider.class)
+    String longWrap();
 
     String abc(String defaultValue);
 }

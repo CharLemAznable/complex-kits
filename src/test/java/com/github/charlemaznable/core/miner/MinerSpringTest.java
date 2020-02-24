@@ -41,6 +41,7 @@ public class MinerSpringTest {
         assertEquals("John", minerDefault.name());
         assertEquals("John Doe", minerDefault.full());
         assertEquals("John Doe Richard", minerDefault.longName());
+        assertEquals("John Doe Richard", minerDefault.longWrap());
         assertEquals("xyz", minerDefault.abc("xyz"));
         assertNull(minerDefault.abc(null));
 

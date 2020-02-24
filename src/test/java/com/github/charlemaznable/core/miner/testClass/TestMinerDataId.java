@@ -1,6 +1,6 @@
 package com.github.charlemaznable.core.miner.testClass;
 
-public interface TestMinerDataId {
+import com.github.charlemaznable.core.miner.MinerConfig.DataIdProvider;
 
-    String getDataId();
+public interface TestMinerDataId extends DataIdProvider {
 }

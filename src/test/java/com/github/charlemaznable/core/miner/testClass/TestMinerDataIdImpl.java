@@ -1,11 +1,14 @@
 package com.github.charlemaznable.core.miner.testClass;
 
-import lombok.Getter;
 import org.springframework.stereotype.Component;
+
+import java.lang.reflect.Method;
 
 @Component
 public class TestMinerDataIdImpl implements TestMinerDataId {
 
-    @Getter
-    private String dataId = "long";
+    @Override
+    public String dataId(Class<?> minerClass, Method method) {
+        return "long";
+    }
 }

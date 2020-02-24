@@ -27,6 +27,7 @@ public class TestMinerDataIdProvider implements DataIdProvider {
 
     @Override
     public String dataId(Class<?> minerClass, Method method) {
-        return checkNull(this.testMinerDataId, () -> "error", TestMinerDataId::getDataId);
+        return checkNull(this.testMinerDataId, () -> "error",
+                testMinerDataId -> testMinerDataId.dataId(minerClass, method));
     }
 }
