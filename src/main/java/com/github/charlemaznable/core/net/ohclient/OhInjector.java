@@ -10,7 +10,7 @@ import static com.github.charlemaznable.core.net.ohclient.OhFactory.ohLoader;
 import static java.util.Objects.nonNull;
 import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
-public class OhInjector extends CommonInjector {
+public final class OhInjector extends CommonInjector {
 
     private OhLoader ohLoader;
 

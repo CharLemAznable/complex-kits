@@ -10,7 +10,7 @@ import static com.github.charlemaznable.core.miner.MinerFactory.minerLoader;
 import static java.util.Objects.nonNull;
 import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
-public class MinerInjector extends CommonInjector {
+public final class MinerInjector extends CommonInjector {
 
     private MinerLoader minerLoader;
 
