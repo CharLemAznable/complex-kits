@@ -10,8 +10,6 @@ import com.google.inject.util.Modules;
 import com.google.inject.util.Providers;
 import lombok.val;
 
-import java.util.Arrays;
-
 import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 
 public abstract class CommonInjector {
@@ -20,7 +18,7 @@ public abstract class CommonInjector {
     protected InjectorFactory injectorFactory;
 
     public CommonInjector(Module... baseModules) {
-        this(Arrays.asList(baseModules));
+        this(newArrayList(baseModules));
     }
 
     public CommonInjector(Iterable<? extends Module> baseModules) {
@@ -36,7 +34,7 @@ public abstract class CommonInjector {
     public abstract <T> Provider<T> createProvider(Class<T> clazz);
 
     public Module createModule(Class... classes) {
-        return createModule(Arrays.asList(classes));
+        return createModule(newArrayList(classes));
     }
 
     @SuppressWarnings("unchecked")
@@ -67,7 +65,7 @@ public abstract class CommonInjector {
     }
 
     public Injector createInjector(Class... classes) {
-        return createInjector(Arrays.asList(classes));
+        return createInjector(newArrayList(classes));
     }
 
     public Injector createInjector(Iterable<Class> classes) {
