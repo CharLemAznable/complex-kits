@@ -38,9 +38,9 @@ public final class OhFactory {
     @SuppressWarnings("unchecked")
     public static class OhLoader {
 
+        private Factory factory;
         private LoadingCache<Class, Object> ohCache
                 = LoadingCachee.simpleCache(from(this::loadClient));
-        private Factory factory;
 
         OhLoader(Factory factory) {
             this.factory = checkNotNull(factory);

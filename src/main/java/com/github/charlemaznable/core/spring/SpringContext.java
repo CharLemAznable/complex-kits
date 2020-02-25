@@ -123,7 +123,7 @@ public class SpringContext implements ApplicationContextAware {
     public static <T> T getBeanOrCreate(String beanName, Class<T> clazz) {
         // 默认值: 由上下文创建实例, 同时注入
         //         若上下文不存在, 则反射创建实例
-        return getBean(beanName, clazz, new CreateSupplier<>(beanName, clazz));
+        return getBean(beanName, clazz, new CreateSupplier<>(clazz, beanName));
     }
 
     public static <T> T getBeanOrAutowire(String beanName, Class<T> clazz, T defaultValue) {
@@ -288,8 +288,8 @@ public class SpringContext implements ApplicationContextAware {
     @AllArgsConstructor
     static final class CreateSupplier<T> implements Supplier<T> {
 
-        private String beanName;
         private final Class<T> clazz;
+        private String beanName;
 
         @Override
         public T get() {

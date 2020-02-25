@@ -74,9 +74,9 @@ public final class MinerFactory {
     @SuppressWarnings("unchecked")
     public static class MinerLoader {
 
+        private Factory factory;
         private LoadingCache<Class, Object> minerCache
                 = LoadingCachee.simpleCache(from(this::loadMiner));
-        private Factory factory;
 
         MinerLoader(Factory factory) {
             this.factory = checkNotNull(factory);

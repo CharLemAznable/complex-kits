@@ -97,6 +97,24 @@ public enum HttpStatus {
         this.reasonPhrase = reasonPhrase;
     }
 
+    public static HttpStatus valueOf(int statusCode) {
+        HttpStatus status = resolve(statusCode);
+        if (status == null) {
+            throw new IllegalArgumentException("No matching constant for [" + statusCode + "]");
+        }
+        return status;
+    }
+
+    @Nullable
+    public static HttpStatus resolve(int statusCode) {
+        for (HttpStatus status : values()) {
+            if (status.value == statusCode) {
+                return status;
+            }
+        }
+        return null;
+    }
+
     public int value() {
         return this.value;
     }
@@ -138,24 +156,6 @@ public enum HttpStatus {
         return this.value + " " + name();
     }
 
-    public static HttpStatus valueOf(int statusCode) {
-        HttpStatus status = resolve(statusCode);
-        if (status == null) {
-            throw new IllegalArgumentException("No matching constant for [" + statusCode + "]");
-        }
-        return status;
-    }
-
-    @Nullable
-    public static HttpStatus resolve(int statusCode) {
-        for (HttpStatus status : values()) {
-            if (status.value == statusCode) {
-                return status;
-            }
-        }
-        return null;
-    }
-
     public enum Series {
 
         INFORMATIONAL(1),
@@ -168,10 +168,6 @@ public enum HttpStatus {
 
         Series(int value) {
             this.value = value;
-        }
-
-        public int value() {
-            return this.value;
         }
 
         public static Series valueOf(HttpStatus status) {
@@ -195,6 +191,10 @@ public enum HttpStatus {
                 }
             }
             return null;
+        }
+
+        public int value() {
+            return this.value;
         }
     }
 }

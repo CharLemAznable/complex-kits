@@ -110,21 +110,6 @@ public class CncTest {
         <T extends CncResponse> Future<Pair<HttpStatus, T>> sample4(CncRequest<T> request);
     }
 
-    public static class TestRequest implements CncRequest<TestResponse> {
-
-        @Override
-        public Class<TestResponse> getResponseClass() {
-            return TestResponse.class;
-        }
-    }
-
-    public static class TestResponse implements CncResponse {
-
-        @Getter
-        @Setter
-        private String content;
-    }
-
     @OhClient
     @Mapping("${root}:${port}")
     public interface CncErrorClient {
@@ -142,4 +127,19 @@ public class CncTest {
     }
 
     public interface OtherResponse {}
+
+    public static class TestRequest implements CncRequest<TestResponse> {
+
+        @Override
+        public Class<TestResponse> getResponseClass() {
+            return TestResponse.class;
+        }
+    }
+
+    public static class TestResponse implements CncResponse {
+
+        @Getter
+        @Setter
+        private String content;
+    }
 }

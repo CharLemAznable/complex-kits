@@ -279,20 +279,6 @@ public class MinerFactoryTest {
     @MinerConfig("DEFAULT_DATA")
     public interface MinerableDefault extends Minerable {}
 
-    @Data
-    public static class MinerContentBean implements ParamsAppliable {
-
-        private String name;
-
-        @Override
-        public void applyParams(String[] strings) {
-            if (strings.length > 0) this.name = strings[0];
-        }
-    }
-
-    @MinerConfig
-    class StoneConcrete {}
-
     interface StoneNone {}
 
     @MinerConfig(
@@ -314,48 +300,6 @@ public class MinerFactoryTest {
                 defaultValueProvider = TestDefaultValueProvider.class
         )
         String prop();
-    }
-
-    public static class TestGroupProvider implements GroupProvider {
-
-        @Override
-        public String group(Class<?> minerClass) {
-            assertEquals(StoneProps.class, minerClass);
-            return "${group}Group";
-        }
-
-        @Override
-        public String group(Class<?> minerClass, Method method) {
-            assertEquals(StoneProps.class, minerClass);
-            assertEquals("prop", method.getName());
-            return "";
-        }
-    }
-
-    public static class TestDataIdProvider implements DataIdProvider {
-
-        @Override
-        public String dataId(Class<?> minerClass) {
-            assertEquals(StoneProps.class, minerClass);
-            return "Data${data}";
-        }
-
-        @Override
-        public String dataId(Class<?> minerClass, Method method) {
-            assertEquals(StoneProps.class, minerClass);
-            assertEquals("prop", method.getName());
-            return "Prop${prop}";
-        }
-    }
-
-    public static class TestDefaultValueProvider implements DefaultValueProvider {
-
-        @Override
-        public String defaultValue(Class<?> minerClass, Method method) {
-            assertEquals(StoneProps.class, minerClass);
-            assertEquals("prop", method.getName());
-            return "${default}Default";
-        }
     }
 
     @MinerConfig(
@@ -408,6 +352,59 @@ public class MinerFactoryTest {
         String prop();
     }
 
+    @Data
+    public static class MinerContentBean implements ParamsAppliable {
+
+        private String name;
+
+        @Override
+        public void applyParams(String[] strings) {
+            if (strings.length > 0) this.name = strings[0];
+        }
+    }
+
+    public static class TestGroupProvider implements GroupProvider {
+
+        @Override
+        public String group(Class<?> minerClass) {
+            assertEquals(StoneProps.class, minerClass);
+            return "${group}Group";
+        }
+
+        @Override
+        public String group(Class<?> minerClass, Method method) {
+            assertEquals(StoneProps.class, minerClass);
+            assertEquals("prop", method.getName());
+            return "";
+        }
+    }
+
+    public static class TestDataIdProvider implements DataIdProvider {
+
+        @Override
+        public String dataId(Class<?> minerClass) {
+            assertEquals(StoneProps.class, minerClass);
+            return "Data${data}";
+        }
+
+        @Override
+        public String dataId(Class<?> minerClass, Method method) {
+            assertEquals(StoneProps.class, minerClass);
+            assertEquals("prop", method.getName());
+            return "Prop${prop}";
+        }
+    }
+
+    public static class TestDefaultValueProvider implements DefaultValueProvider {
+
+        @Override
+        public String defaultValue(Class<?> minerClass, Method method) {
+            assertEquals(StoneProps.class, minerClass);
+            assertEquals("prop", method.getName());
+            return "${default}Default";
+        }
+    }
+
     public static class ErrorGroupProvider implements GroupProvider {}
 
     public static class ErrorDataIdProvider implements DataIdProvider {}
@@ -439,4 +436,7 @@ public class MinerFactoryTest {
             return "Prop${prop}";
         }
     }
+
+    @MinerConfig
+    class StoneConcrete {}
 }
