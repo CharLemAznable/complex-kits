@@ -23,6 +23,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.n3r.diamond.client.impl.MockDiamondServer;
 
+import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -90,7 +91,7 @@ public class OhGuiceTest {
     @SneakyThrows
     @Test
     public void testOhClientError() {
-        val ohInjector = new OhInjector();
+        val ohInjector = new OhInjector(emptyList());
         var injector = Guice.createInjector(ohInjector.createModule(
                 TestHttpClient.class, TestHttpClientIsolated.class,
                 TestHttpClientConcrete.class, TestHttpClientNone.class));

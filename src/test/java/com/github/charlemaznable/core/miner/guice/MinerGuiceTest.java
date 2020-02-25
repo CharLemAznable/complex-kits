@@ -123,4 +123,46 @@ public class MinerGuiceTest {
         assertThrows(MinerConfigException.class,
                 () -> minerInjector.getMiner(TestMinerNone.class));
     }
+
+    @Test
+    public void testMinerSub() {
+        MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA",
+                "name=John\nfull=${this.name} Doe\nlong=${this.full} Richard");
+        MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "SUB_DATA",
+                "name=Joe\nfull=${this.name} Doe\nlong=${this.full} Richard");
+        val minerInjector = new MinerInjector(new AbstractModule() {
+            @Override
+            public void configure() {
+                bind(TestMinerDataId.class).toProvider(Providers.of(new TestMinerDataId() {
+                    @Override
+                    public String dataId(Class<?> minerClass, Method method) {
+                        return "long";
+                    }
+                }));
+            }
+        });
+        val injector = minerInjector.createInjector(TestMinerSub.class);
+
+        val testMiner = injector.getInstance(TestMiner.class);
+        assertNotNull(testMiner);
+        assertEquals("Joe", testMiner.name());
+        assertEquals("Joe Doe", testMiner.full());
+        assertEquals("Joe Doe Richard", testMiner.longName());
+        assertEquals("Joe Doe Richard", testMiner.longWrap());
+        assertEquals("xyz", testMiner.abc("xyz"));
+        assertNull(testMiner.abc(null));
+        assertEquals("guiceguice&springspring&guiceguice",
+                testMiner.defaultInContext());
+
+        val testMinerSub = injector.getInstance(TestMinerSub.class);
+        assertNotNull(testMinerSub);
+        assertEquals("Joe", testMinerSub.name());
+        assertEquals("Joe Doe", testMinerSub.full());
+        assertEquals("Joe Doe Richard", testMinerSub.longName());
+        assertEquals("Joe Doe Richard", testMinerSub.longWrap());
+        assertEquals("xyz", testMinerSub.abc("xyz"));
+        assertNull(testMinerSub.abc(null));
+        assertEquals("guiceguice&springspring&guiceguice",
+                testMinerSub.defaultInContext());
+    }
 }
