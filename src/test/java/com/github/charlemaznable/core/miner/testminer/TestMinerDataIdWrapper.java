@@ -14,13 +14,12 @@ public class TestMinerDataIdWrapper implements DataIdProvider {
 
     private final TestMinerDataId testMinerDataId;
 
-    @Autowired(required = false)
     public TestMinerDataIdWrapper() {
         this(null);
     }
 
     @Inject
-    @Autowired(required = false)
+    @Autowired
     public TestMinerDataIdWrapper(@Nullable TestMinerDataId testMinerDataId) {
         this.testMinerDataId = nullThen(testMinerDataId, () -> new TestMinerDataId() {
             @Override

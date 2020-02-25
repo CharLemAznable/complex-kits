@@ -14,13 +14,12 @@ public class TestSampleUrlProviderWrapper implements UrlProvider {
 
     private TestSampleUrlProvider provider;
 
-    @Autowired(required = false)
     public TestSampleUrlProviderWrapper() {
         this(null);
     }
 
     @Inject
-    @Autowired(required = false)
+    @Autowired
     public TestSampleUrlProviderWrapper(@Nullable TestSampleUrlProvider provider) {
         this.provider = nullThen(provider, () -> () -> "sampleError");
     }
