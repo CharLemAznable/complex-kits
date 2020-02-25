@@ -31,7 +31,7 @@ public abstract class CommonInjector {
 
     public abstract void initialize(InjectorFactory injectorFactory);
 
-    public abstract boolean isNonCandidateClass(Class clazz);
+    public abstract boolean isCandidateClass(Class clazz);
 
     public abstract <T> Provider<T> createProvider(Class<T> clazz);
 
@@ -46,21 +46,21 @@ public abstract class CommonInjector {
             @Override
             protected void configure() {
                 for (Class clazz : classSet) {
-                    if (isNonCandidateClass(clazz)) continue;
-                    if (!clazz.isInterface()) {
+                    if (!clazz.isInterface() || !isCandidateClass(clazz)) {
                         bind(clazz).toProvider(Providers.of(null));
                     } else {
-                        bindThenTraverse(clazz, createProvider(clazz));
+                        bindProviderTraverse(clazz, createProvider(clazz));
                     }
                 }
             }
 
-            private void bindThenTraverse(Class clazz, Provider provider) {
+            private void bindProviderTraverse(Class clazz, Provider provider) {
                 bind(clazz).toProvider(provider);
                 val interfaces = clazz.getInterfaces();
                 for (val interfacee : interfaces) {
-                    if (isNonCandidateClass(interfacee)) continue;
-                    bindThenTraverse(interfacee, provider);
+                    if (isCandidateClass(interfacee)) {
+                        bind(interfacee).toProvider(provider);
+                    }
                 }
             }
         }).with(this.baseModules);

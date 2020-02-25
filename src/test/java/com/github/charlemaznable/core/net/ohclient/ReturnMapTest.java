@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.net.ohclient;
 
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
+import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,13 +21,15 @@ import java.util.concurrent.Future;
 
 import static com.github.charlemaznable.core.codec.Json.json;
 import static com.github.charlemaznable.core.codec.Xml.xml;
+import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
 import static com.github.charlemaznable.core.lang.Mapp.of;
-import static com.github.charlemaznable.core.net.ohclient.OhFactory.getClient;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ReturnMapTest {
+
+    private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
     @SneakyThrows
     @Test
@@ -53,7 +56,7 @@ public class ReturnMapTest {
                 }
             });
             mockWebServer.start(41193);
-            val httpClient = getClient(MapHttpClient.class);
+            val httpClient = ohLoader.getClient(MapHttpClient.class);
 
             var map = httpClient.sampleMap();
             var beanMap = (Map) map.get("John");

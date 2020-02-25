@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.net.ohclient;
 
 import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.ProviderException;
+import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSL;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSL.HostnameVerifierProvider;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSL.SSLSocketFactoryProvider;
@@ -28,7 +29,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.security.cert.X509Certificate;
 
-import static com.github.charlemaznable.core.net.ohclient.OhFactory.getClient;
+import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
 import static org.joor.Reflect.on;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -37,9 +38,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SuppressWarnings("UnusedReturnValue")
 public class SSLProviderTest {
 
+    private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
+
     @Test
     public void testSSLDef() {
-        val httpClient = getClient(SSLDefHttpClient.class);
+        val httpClient = ohLoader.getClient(SSLDefHttpClient.class);
         val callback = on(httpClient).field("CGLIB$CALLBACK_0").get();
         OkHttpClient okHttpClient = on(callback).field("okHttpClient").get();
         assertTrue(okHttpClient.sslSocketFactory() instanceof TestSSLSocketFactory);
@@ -48,7 +51,7 @@ public class SSLProviderTest {
 
     @Test
     public void testSSLAll() {
-        val httpClient = getClient(SSLAllHttpClient.class);
+        val httpClient = ohLoader.getClient(SSLAllHttpClient.class);
         val callback = on(httpClient).field("CGLIB$CALLBACK_0").get();
         OkHttpClient okHttpClient = on(callback).field("okHttpClient").get();
         assertTrue(okHttpClient.sslSocketFactory() instanceof TestSSLSocketFactory);
@@ -58,7 +61,7 @@ public class SSLProviderTest {
     @SneakyThrows
     @Test
     public void testSSLDefParam() {
-        val httpClient = getClient(SSLDefParamHttpClient.class);
+        val httpClient = ohLoader.getClient(SSLDefParamHttpClient.class);
         val sslSocketFactory = new TestSSLSocketFactory();
         val hostnameVerifier = new TestHostnameVerifier();
         try {
@@ -76,7 +79,7 @@ public class SSLProviderTest {
     @SneakyThrows
     @Test
     public void testSSLAllParam() {
-        val httpClient = getClient(SSLAllParamHttpClient.class);
+        val httpClient = ohLoader.getClient(SSLAllParamHttpClient.class);
         val sslSocketFactory = new TestSSLSocketFactory();
         val x509TrustManager = new TestX509TrustManager();
         val hostnameVerifier = new TestHostnameVerifier();
@@ -95,7 +98,7 @@ public class SSLProviderTest {
     @SneakyThrows
     @Test
     public void testMethodSSL() {
-        val httpClient = getClient(MethodSSLHttpClient.class);
+        val httpClient = ohLoader.getClient(MethodSSLHttpClient.class);
         try {
             httpClient.sample();
         } catch (Exception e) {
@@ -116,7 +119,7 @@ public class SSLProviderTest {
     @SneakyThrows
     @Test
     public void testDisabledSSL() {
-        val httpClient = getClient(DisableSSLHttpClient.class);
+        val httpClient = ohLoader.getClient(DisableSSLHttpClient.class);
         try {
             httpClient.sample();
         } catch (Exception e) {
@@ -133,13 +136,13 @@ public class SSLProviderTest {
     @Test
     public void testErrorSSL() {
         assertThrows(ProviderException.class, () ->
-                getClient(ErrorSSLHttpClient1.class));
+                ohLoader.getClient(ErrorSSLHttpClient1.class));
         assertThrows(ProviderException.class, () ->
-                getClient(ErrorSSLHttpClient2.class));
+                ohLoader.getClient(ErrorSSLHttpClient2.class));
         assertThrows(ProviderException.class, () ->
-                getClient(ErrorSSLHttpClient3.class));
+                ohLoader.getClient(ErrorSSLHttpClient3.class));
 
-        val httpClient = getClient(ErrorSSLHttpClient4.class);
+        val httpClient = ohLoader.getClient(ErrorSSLHttpClient4.class);
         assertThrows(ProviderException.class, httpClient::error1);
         assertThrows(ProviderException.class, httpClient::error2);
         assertThrows(ProviderException.class, httpClient::error3);

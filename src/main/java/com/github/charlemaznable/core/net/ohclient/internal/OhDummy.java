@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.net.ohclient.internal;
 
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import okhttp3.ConnectionPool;
 import org.apache.commons.text.StringSubstitutor;
@@ -14,7 +13,6 @@ import static com.github.charlemaznable.core.miner.MinerElf.minerAsSubstitutor;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 
 @NoArgsConstructor
-@EqualsAndHashCode
 public class OhDummy {
 
     static final Logger log = LoggerFactory.getLogger("OhClient");
@@ -32,6 +30,16 @@ public class OhDummy {
 
     static String substitute(String source) {
         return ohClassPathSubstitutor.replace(ohMinerSubstitutor.replace(source));
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof OhDummy && hashCode() == obj.hashCode();
+    }
+
+    @Override
+    public int hashCode() {
+        return System.identityHashCode(this);
     }
 
     @Override

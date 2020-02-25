@@ -6,6 +6,7 @@ import com.github.charlemaznable.core.net.common.Header;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.ProviderException;
+import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import lombok.SneakyThrows;
 import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
@@ -16,12 +17,14 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
-import static com.github.charlemaznable.core.net.ohclient.OhFactory.getClient;
+import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class HeaderTest {
+
+    private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
     @SneakyThrows
     @Test
@@ -57,7 +60,7 @@ public class HeaderTest {
             });
             mockWebServer.start(41140);
 
-            val httpClient = getClient(HeaderHttpClient.class);
+            val httpClient = ohLoader.getClient(HeaderHttpClient.class);
             assertEquals("OK", httpClient.sampleDefault());
             assertEquals("OK", httpClient.sampleMapping());
             assertEquals("OK", httpClient.sampleHeaders(null, "V4"));
@@ -68,9 +71,9 @@ public class HeaderTest {
     @Test
     public void testErrorOhHeader() {
         assertThrows(ProviderException.class, () ->
-                getClient(ErrorFixedHttpClient1.class));
+                ohLoader.getClient(ErrorFixedHttpClient1.class));
 
-        val httpClient = getClient(ErrorFixedHttpClient2.class);
+        val httpClient = ohLoader.getClient(ErrorFixedHttpClient2.class);
         assertThrows(ProviderException.class, httpClient::sample);
     }
 

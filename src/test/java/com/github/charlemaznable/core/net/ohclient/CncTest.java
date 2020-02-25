@@ -5,6 +5,7 @@ import com.github.charlemaznable.core.net.common.CncResponse;
 import com.github.charlemaznable.core.net.common.CncResponse.CncResponseImpl;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
+import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import com.github.charlemaznable.core.net.ohclient.internal.OhDummy;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,8 +27,8 @@ import java.util.Map;
 import java.util.concurrent.Future;
 
 import static com.github.charlemaznable.core.codec.Json.json;
+import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
 import static com.github.charlemaznable.core.miner.MinerElf.minerAsSubstitutor;
-import static com.github.charlemaznable.core.net.ohclient.OhFactory.getClient;
 import static org.awaitility.Awaitility.await;
 import static org.joor.Reflect.onClass;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,15 +37,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CncTest {
 
+    private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
+
     @BeforeAll
-    public static void beforeClass() {
+    public static void beforeAll() {
         MockDiamondServer.setUpMockServer();
         MockDiamondServer.setConfigInfo("Env", "ohclient",
                 "port=41200");
     }
 
     @AfterAll
-    public static void afterClass() {
+    public static void afterAll() {
         MockDiamondServer.tearDownMockServer();
     }
 
@@ -66,7 +69,7 @@ public class CncTest {
             });
             mockWebServer.start(41200);
 
-            val client = getClient(CncClient.class);
+            val client = ohLoader.getClient(CncClient.class);
 
             val response = client.sample1(new TestRequest());
             assertEquals("content", response.getContent());
@@ -86,7 +89,7 @@ public class CncTest {
             assertEquals(HttpStatus.OK, futurePair.get().getLeft());
             assertEquals("content", futurePair.get().getRight().getContent());
 
-            val errorClient = getClient(CncErrorClient.class);
+            val errorClient = ohLoader.getClient(CncErrorClient.class);
 
             assertThrows(OhException.class, errorClient::sample1);
             assertThrows(OhException.class, () -> errorClient.sample2(null));

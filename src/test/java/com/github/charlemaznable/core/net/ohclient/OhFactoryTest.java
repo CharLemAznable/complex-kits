@@ -9,6 +9,7 @@ import com.github.charlemaznable.core.net.common.HttpMethod;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.RequestMethod;
+import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import lombok.SneakyThrows;
 import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
@@ -18,7 +19,7 @@ import okhttp3.mockwebserver.RecordedRequest;
 import org.joor.ReflectException;
 import org.junit.jupiter.api.Test;
 
-import static com.github.charlemaznable.core.net.ohclient.OhFactory.getClient;
+import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.ACCEPT_CHARSET;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.CONTENT_TYPE;
 import static com.google.common.net.MediaType.APPLICATION_XML_UTF_8;
@@ -34,11 +35,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class OhFactoryTest {
 
+    private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
+
     @Test
     public void testOhFactory() {
         assertThrows(ReflectException.class, () -> onClass(OhFactory.class).create().get());
 
-        assertThrows(OhException.class, () -> getClient(TestNotInterface.class));
+        assertThrows(OhException.class, () -> ohLoader.getClient(TestNotInterface.class));
     }
 
     @SneakyThrows
@@ -65,13 +68,13 @@ public class OhFactoryTest {
             });
             mockWebServer.start(41130);
 
-            val httpClient = getClient(AcceptCharsetHttpClient.class);
+            val httpClient = ohLoader.getClient(AcceptCharsetHttpClient.class);
             assertEquals(ISO_8859_1.name(), httpClient.sample());
             assertEquals(UTF_8.name(), httpClient.sample2());
 
-            assertEquals("OhClient@" + httpClient.hashCode(), httpClient.toString());
-            assertEquals(httpClient, getClient(AcceptCharsetHttpClient.class));
-            assertEquals(httpClient.hashCode(), getClient(AcceptCharsetHttpClient.class).hashCode());
+            assertEquals("OhClient@" + Integer.toHexString(httpClient.hashCode()), httpClient.toString());
+            assertEquals(httpClient, ohLoader.getClient(AcceptCharsetHttpClient.class));
+            assertEquals(httpClient.hashCode(), ohLoader.getClient(AcceptCharsetHttpClient.class).hashCode());
         }
     }
 
@@ -106,14 +109,14 @@ public class OhFactoryTest {
             });
             mockWebServer.start(41131);
 
-            val httpClient = getClient(ContentFormatHttpClient.class);
+            val httpClient = ohLoader.getClient(ContentFormatHttpClient.class);
             assertEquals("", httpClient.sample());
             assertEquals("{}", httpClient.sample2());
             assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<xml/>", httpClient.sample3());
 
-            assertEquals("OhClient@" + httpClient.hashCode(), httpClient.toString());
-            assertEquals(httpClient, getClient(ContentFormatHttpClient.class));
-            assertEquals(httpClient.hashCode(), getClient(ContentFormatHttpClient.class).hashCode());
+            assertEquals("OhClient@" + Integer.toHexString(httpClient.hashCode()), httpClient.toString());
+            assertEquals(httpClient, ohLoader.getClient(ContentFormatHttpClient.class));
+            assertEquals(httpClient.hashCode(), ohLoader.getClient(ContentFormatHttpClient.class).hashCode());
         }
     }
 
@@ -141,13 +144,13 @@ public class OhFactoryTest {
             });
             mockWebServer.start(41132);
 
-            val httpClient = getClient(RequestMethodHttpClient.class);
+            val httpClient = ohLoader.getClient(RequestMethodHttpClient.class);
             assertEquals("POST", httpClient.sample());
             assertEquals("GET", httpClient.sample2());
 
-            assertEquals("OhClient@" + httpClient.hashCode(), httpClient.toString());
-            assertEquals(httpClient, getClient(RequestMethodHttpClient.class));
-            assertEquals(httpClient.hashCode(), getClient(RequestMethodHttpClient.class).hashCode());
+            assertEquals("OhClient@" + Integer.toHexString(httpClient.hashCode()), httpClient.toString());
+            assertEquals(httpClient, ohLoader.getClient(RequestMethodHttpClient.class));
+            assertEquals(httpClient.hashCode(), ohLoader.getClient(RequestMethodHttpClient.class).hashCode());
         }
     }
 
@@ -169,10 +172,10 @@ public class OhFactoryTest {
             });
             mockWebServer.start(41133);
 
-            val baseHttpClient = getClient(BaseHttpClient.class);
+            val baseHttpClient = ohLoader.getClient(BaseHttpClient.class);
             assertNotNull(baseHttpClient);
 
-            assertThrows(OhException.class, () -> getClient(SubHttpClient.class));
+            assertThrows(OhException.class, () -> ohLoader.getClient(SubHttpClient.class));
         }
     }
 

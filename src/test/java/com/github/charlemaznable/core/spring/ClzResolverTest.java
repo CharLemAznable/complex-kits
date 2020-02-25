@@ -1,9 +1,9 @@
 package com.github.charlemaznable.core.spring;
 
-import com.github.charlemaznable.core.spring.testClass.TestAnnotation;
-import com.github.charlemaznable.core.spring.testClass.TestClass;
-import com.github.charlemaznable.core.spring.testClass.TestSpringContext;
-import com.github.charlemaznable.core.spring.testClass.TestSubSpringContext;
+import com.github.charlemaznable.core.spring.testcontext.TestAnnotation;
+import com.github.charlemaznable.core.spring.testcontext.TestClass;
+import com.github.charlemaznable.core.spring.testcontext.TestSpringContext;
+import com.github.charlemaznable.core.spring.testcontext.TestSubSpringContext;
 import lombok.val;
 import lombok.var;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ public class ClzResolverTest {
 
     @Test
     public void testClzResolver() {
-        val basePackage = "com.github.charlemaznable.core.spring.testClass";
+        val basePackage = "com.github.charlemaznable.core.spring.testcontext";
 
         val classes = getClasses(basePackage);
         int countTestClass = 0;

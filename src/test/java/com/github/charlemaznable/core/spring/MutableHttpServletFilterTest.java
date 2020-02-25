@@ -38,7 +38,7 @@ public class MutableHttpServletFilterTest {
     private MutableHttpServletFilter mutableHttpServletFilter;
 
     @BeforeAll
-    public void setup() {
+    public void beforeAll() {
         mockMvc = MockMvcBuilders.standaloneSetup(mutableHttpServletFilterController)
                 .addMappedInterceptors(new String[]{"/**"}, mutableHttpServletFilterInterceptor)
                 .addFilters(mutableHttpServletFilter).build();

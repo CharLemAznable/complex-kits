@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.miner;
 
+import com.github.charlemaznable.core.context.FactoryContext;
 import com.github.charlemaznable.core.lang.EasyEnhancer;
 import com.github.charlemaznable.core.lang.Factory;
 import com.github.charlemaznable.core.lang.LoadingCachee;
@@ -7,13 +8,10 @@ import com.github.charlemaznable.core.lang.Str;
 import com.github.charlemaznable.core.miner.MinerConfig.DataIdProvider;
 import com.github.charlemaznable.core.miner.MinerConfig.DefaultValueProvider;
 import com.github.charlemaznable.core.miner.MinerConfig.GroupProvider;
-import com.github.charlemaznable.core.spring.SpringContext;
 import com.google.common.cache.LoadingCache;
 import com.google.common.primitives.Primitives;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import lombok.val;
 import lombok.var;
 import net.sf.cglib.proxy.Callback;
@@ -30,10 +28,10 @@ import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.Properties;
 
+import static com.github.charlemaznable.core.context.FactoryContext.SpringFactory.springFactory;
 import static com.github.charlemaznable.core.lang.ClzPath.classResourceAsSubstitutor;
 import static com.github.charlemaznable.core.lang.Condition.blankThen;
 import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
-import static com.github.charlemaznable.core.lang.Condition.nullThen;
 import static com.github.charlemaznable.core.lang.Str.isNotBlank;
 import static com.github.charlemaznable.core.miner.MinerElf.minerAsSubstitutor;
 import static com.google.common.cache.CacheLoader.from;
@@ -44,7 +42,8 @@ public final class MinerFactory {
 
     private static StringSubstitutor minerMinerSubstitutor;
     private static StringSubstitutor minerClassPathSubstitutor;
-    private static MinerLoader springMinerLoader = new MinerLoader();
+    private static LoadingCache<Factory, MinerLoader> minerLoaderCache
+            = LoadingCachee.simpleCache(from(MinerLoader::new));
 
     static {
         minerMinerSubstitutor = minerAsSubstitutor("Env", "miner");
@@ -56,15 +55,20 @@ public final class MinerFactory {
     }
 
     public static <T> T getMiner(Class<T> minerClass) {
-        return springMinerLoader.getMiner(minerClass);
+        return minerLoader(FactoryContext.get()).getMiner(minerClass);
     }
 
-    public static MinerLoader minerLoader(Factory providerFactory) {
-        return new MinerLoader(providerFactory);
+    public static MinerLoader springMinerLoader() {
+        return minerLoader(springFactory());
+    }
+
+    public static MinerLoader minerLoader(Factory factory) {
+        return LoadingCachee.get(minerLoaderCache, factory);
     }
 
     private static String substitute(String source) {
-        return minerClassPathSubstitutor.replace(minerMinerSubstitutor.replace(source));
+        return minerClassPathSubstitutor.replace(
+                minerMinerSubstitutor.replace(source));
     }
 
     @SuppressWarnings("unchecked")
@@ -72,15 +76,10 @@ public final class MinerFactory {
 
         private LoadingCache<Class, Object> minerCache
                 = LoadingCachee.simpleCache(from(this::loadMiner));
-        private Factory providerFactory;
+        private Factory factory;
 
-        private MinerLoader() {
-            this(null);
-        }
-
-        private MinerLoader(Factory providerFactory) {
-            this.providerFactory = nullThen(providerFactory,
-                    () -> SpringContext::getBeanOrCreate);
+        MinerLoader(Factory factory) {
+            this.factory = checkNotNull(factory);
         }
 
         public <T> T getMiner(Class<T> minerClass) {
@@ -95,7 +94,7 @@ public final class MinerFactory {
             val minerable = new Miner(blankThen(group, () -> "DEFAULT_GROUP"));
             val dataId = checkMinerDataId(minerClass, minerConfig);
             val minerProxy = new MinerProxy(minerClass, isNotBlank(dataId)
-                    ? minerable.getMiner(dataId) : minerable, providerFactory);
+                    ? minerable.getMiner(dataId) : minerable, factory);
 
             return EasyEnhancer.create(MinerDummy.class,
                     new Class[]{minerClass, Minerable.class},
@@ -118,31 +117,48 @@ public final class MinerFactory {
         private <T> String checkMinerGroup(Class<T> clazz, MinerConfig minerConfig) {
             val providerClass = minerConfig.groupProvider();
             return substitute(GroupProvider.class == providerClass ? minerConfig.group()
-                    : providerFactory.build(providerClass).group(clazz));
+                    : FactoryContext.apply(factory, providerClass, p -> p.group(clazz)));
         }
 
         private <T> String checkMinerDataId(Class<T> clazz, MinerConfig minerConfig) {
             val providerClass = minerConfig.dataIdProvider();
             return substitute(DataIdProvider.class == providerClass ? minerConfig.dataId()
-                    : providerFactory.build(providerClass).dataId(clazz));
+                    : FactoryContext.apply(factory, providerClass, p -> p.dataId(clazz)));
         }
     }
 
     @NoArgsConstructor
-    @EqualsAndHashCode
-    @ToString
-    private static class MinerDummy {}
+    private static class MinerDummy {
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof MinerDummy && hashCode() == obj.hashCode();
+        }
+
+        @Override
+        public int hashCode() {
+            return System.identityHashCode(this);
+        }
+
+        @Override
+        public String toString() {
+            return "Miner@" + Integer.toHexString(hashCode());
+        }
+    }
 
     @AllArgsConstructor
     private static class MinerProxy implements MethodInterceptor {
 
         private Class minerClass;
         private Minerable minerable;
-        private Factory providerFactory;
+        private Factory factory;
 
         @Override
         public Object intercept(Object o, Method method, Object[] args,
                                 MethodProxy methodProxy) throws Throwable {
+            if (method.getDeclaringClass().equals(MinerDummy.class)) {
+                return methodProxy.invokeSuper(o, args);
+            }
             if (method.getDeclaringClass().equals(Minerable.class)) {
                 return method.invoke(minerable, args);
             }
@@ -164,21 +180,21 @@ public final class MinerFactory {
             if (null == minerConfig) return "";
             val providerClass = minerConfig.groupProvider();
             return substitute(GroupProvider.class == providerClass ? minerConfig.group()
-                    : providerFactory.build(providerClass).group(minerClass, method));
+                    : FactoryContext.apply(factory, providerClass, p -> p.group(minerClass, method)));
         }
 
         private String checkMinerDataId(Method method, MinerConfig minerConfig) {
             if (null == minerConfig) return "";
             val providerClass = minerConfig.dataIdProvider();
             return substitute(DataIdProvider.class == providerClass ? minerConfig.dataId()
-                    : providerFactory.build(providerClass).dataId(minerClass, method));
+                    : FactoryContext.apply(factory, providerClass, p -> p.dataId(minerClass, method)));
         }
 
         private String checkMinerDefaultValue(Method method, MinerConfig minerConfig) {
             if (null == minerConfig) return null;
             val providerClass = minerConfig.defaultValueProvider();
-            val defaultValue = DefaultValueProvider.class == providerClass ? minerConfig.defaultValue()
-                    : providerFactory.build(providerClass).defaultValue(minerClass, method);
+            String defaultValue = DefaultValueProvider.class == providerClass ? minerConfig.defaultValue()
+                    : FactoryContext.apply(factory, providerClass, p -> p.defaultValue(minerClass, method));
             return substitute(blankThen(defaultValue, () -> null));
         }
 

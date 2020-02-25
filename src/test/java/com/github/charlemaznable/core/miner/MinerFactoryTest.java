@@ -3,6 +3,7 @@ package com.github.charlemaznable.core.miner;
 import com.github.charlemaznable.core.miner.MinerConfig.DataIdProvider;
 import com.github.charlemaznable.core.miner.MinerConfig.DefaultValueProvider;
 import com.github.charlemaznable.core.miner.MinerConfig.GroupProvider;
+import com.github.charlemaznable.core.miner.MinerFactory.MinerLoader;
 import com.google.common.base.Splitter;
 import lombok.Data;
 import lombok.SneakyThrows;
@@ -20,25 +21,28 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Properties;
 
+import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
 import static com.github.charlemaznable.core.miner.MinerElf.minerAsSubstitutor;
-import static com.github.charlemaznable.core.miner.MinerFactory.getMiner;
 import static org.joor.Reflect.onClass;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MinerFactoryTest {
 
+    private static MinerLoader minerLoader = MinerFactory.minerLoader(reflectFactory());
+
     @BeforeAll
-    public static void beforeClass() {
+    public static void beforeAll() {
         MockDiamondServer.setUpMockServer();
         MockDiamondServer.setConfigInfo("Env", "miner",
                 "prop=PROP\ndefault=DEFAULT");
     }
 
     @AfterAll
-    public static void afterClass() {
+    public static void afterAll() {
         MockDiamondServer.tearDownMockServer();
     }
 
@@ -55,11 +59,18 @@ public class MinerFactoryTest {
         MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "stone.data", "abc");
         MockDiamondServer.setConfigInfo("stone.group", "stone.data", "xyz");
 
-        val stoneDefault = getMiner(StoneDefault.class);
+        val stoneDefault = minerLoader.getMiner(StoneDefault.class);
         assertEquals("abc", stoneDefault.abc());
         assertEquals("xyz", stoneDefault.xyz());
 
-        assertThrows(MinerConfigException.class, () -> getMiner(StoneError.class));
+        assertEquals("Miner@" + Integer.toHexString(stoneDefault.hashCode()), stoneDefault.toString());
+        assertEquals(stoneDefault, stoneDefault);
+
+        assertThrows(MinerConfigException.class,
+                () -> minerLoader.getMiner(StoneConcrete.class));
+
+        assertThrows(MinerConfigException.class,
+                () -> minerLoader.getMiner(StoneNone.class));
     }
 
     @SneakyThrows
@@ -73,7 +84,7 @@ public class MinerFactoryTest {
                         "@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.full}) " +
                         "@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.long})");
 
-        val minerDefault = getMiner(MinerDefault.class);
+        val minerDefault = minerLoader.getMiner(MinerDefault.class);
         assertNotNull(minerDefault);
 
         assertEquals("John", minerDefault.name());
@@ -124,7 +135,7 @@ public class MinerFactoryTest {
         assertEquals(0, minerDefault.byteValueDefault());
         assertEquals('\0', minerDefault.charValueDefault());
 
-        val minerDefaultData = getMiner(MinerDefaultData.class);
+        val minerDefaultData = minerLoader.getMiner(MinerDefaultData.class);
         val properties = minerDefaultData.properties();
 
         assertEquals("John", properties.getProperty("name"));
@@ -138,6 +149,9 @@ public class MinerFactoryTest {
                 properties.getProperty("content"));
         assertEquals("@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John) @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John Doe) @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John Doe Richard)",
                 properties.getProperty("list"));
+
+        assertNotEquals(minerDefault.hashCode(), minerDefaultData.hashCode());
+        assertNotEquals(minerDefault, minerDefaultData);
     }
 
     @Test
@@ -145,7 +159,7 @@ public class MinerFactoryTest {
         MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA",
                 "name=John\nfull=${this.name} Doe\nlong=${this.full} Richard");
 
-        val minerableDefault = getMiner(MinerableDefault.class);
+        val minerableDefault = minerLoader.getMiner(MinerableDefault.class);
         assertNotNull(minerableDefault);
         assertEquals("John", minerableDefault.getString("name"));
         assertEquals("John Doe", minerableDefault.getString("full"));
@@ -161,20 +175,20 @@ public class MinerFactoryTest {
         MockDiamondServer.setConfigInfo("GROUPGroup", "DataDATA",
                 "name=John\nfull=${this.name} Doe\nlong=${this.full} Richard");
 
-        val stoneProps = getMiner(StoneProps.class);
+        val stoneProps = minerLoader.getMiner(StoneProps.class);
         assertNotNull(stoneProps);
         assertEquals("John", stoneProps.name());
         assertEquals("John Doe", stoneProps.full());
         assertEquals("John Doe Richard", stoneProps.longName());
         assertEquals("DEFAULTDefault", stoneProps.prop());
 
-        assertThrows(MinerConfigException.class, () -> getMiner(ProvideError1.class));
-        assertThrows(MinerConfigException.class, () -> getMiner(ProvideError2.class));
-        val error3 = getMiner(ProvideError3.class);
+        assertThrows(MinerConfigException.class, () -> minerLoader.getMiner(ProvideError1.class));
+        assertThrows(MinerConfigException.class, () -> minerLoader.getMiner(ProvideError2.class));
+        val error3 = minerLoader.getMiner(ProvideError3.class);
         assertThrows(MinerConfigException.class, error3::prop);
-        val error4 = getMiner(ProvideError4.class);
+        val error4 = minerLoader.getMiner(ProvideError4.class);
         assertThrows(MinerConfigException.class, error4::prop);
-        val error5 = getMiner(ProvideError5.class);
+        val error5 = minerLoader.getMiner(ProvideError5.class);
         assertThrows(MinerConfigException.class, error5::prop);
     }
 
@@ -277,7 +291,9 @@ public class MinerFactoryTest {
     }
 
     @MinerConfig
-    class StoneError {}
+    class StoneConcrete {}
+
+    interface StoneNone {}
 
     @MinerConfig(
             groupProvider = TestGroupProvider.class,

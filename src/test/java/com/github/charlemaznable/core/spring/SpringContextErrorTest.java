@@ -1,14 +1,14 @@
 package com.github.charlemaznable.core.spring;
 
-import com.github.charlemaznable.core.spring.testClass.TestAnnotation;
-import com.github.charlemaznable.core.spring.testClass.TestClass;
-import com.github.charlemaznable.core.spring.testClass.TestClassA;
-import com.github.charlemaznable.core.spring.testClass.TestClassB;
-import com.github.charlemaznable.core.spring.testClass.TestClassC;
-import com.github.charlemaznable.core.spring.testClass.TestClassD;
-import com.github.charlemaznable.core.spring.testClass.TestClassE;
-import com.github.charlemaznable.core.spring.testClass.TestClassF;
-import com.github.charlemaznable.core.spring.testClass.TestClassG;
+import com.github.charlemaznable.core.spring.testcontext.TestAnnotation;
+import com.github.charlemaznable.core.spring.testcontext.TestClass;
+import com.github.charlemaznable.core.spring.testcontext.TestClassA;
+import com.github.charlemaznable.core.spring.testcontext.TestClassB;
+import com.github.charlemaznable.core.spring.testcontext.TestClassC;
+import com.github.charlemaznable.core.spring.testcontext.TestClassD;
+import com.github.charlemaznable.core.spring.testcontext.TestClassE;
+import com.github.charlemaznable.core.spring.testcontext.TestClassF;
+import com.github.charlemaznable.core.spring.testcontext.TestClassG;
 import lombok.val;
 import lombok.var;
 import org.junit.jupiter.api.Test;

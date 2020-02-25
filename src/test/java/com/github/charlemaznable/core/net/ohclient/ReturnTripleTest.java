@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.net.ohclient;
 
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
+import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import lombok.AllArgsConstructor;
 import lombok.Cleanup;
 import lombok.Getter;
@@ -23,11 +24,13 @@ import java.time.Duration;
 import java.util.concurrent.Future;
 
 import static com.github.charlemaznable.core.codec.Json.json;
-import static com.github.charlemaznable.core.net.ohclient.OhFactory.getClient;
+import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ReturnTripleTest {
+
+    private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
     @SneakyThrows
     @Test
@@ -52,7 +55,7 @@ public class ReturnTripleTest {
                 }
             });
             mockWebServer.start(41195);
-            val httpClient = getClient(TripleHttpClient.class);
+            val httpClient = ohLoader.getClient(TripleHttpClient.class);
 
             var triple = httpClient.sampleStatusCodeAndBean();
             assertEquals(HttpStatus.OK.value(), triple.getLeft());

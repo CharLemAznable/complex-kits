@@ -7,7 +7,7 @@ import com.google.inject.Module;
 import com.google.inject.Provider;
 
 import static com.github.charlemaznable.core.miner.MinerFactory.minerLoader;
-import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
 public final class MinerInjector extends CommonInjector {
@@ -28,8 +28,8 @@ public final class MinerInjector extends CommonInjector {
     }
 
     @Override
-    public boolean isNonCandidateClass(Class clazz) {
-        return isNull(getAnnotation(clazz, MinerConfig.class));
+    public boolean isCandidateClass(Class clazz) {
+        return nonNull(getAnnotation(clazz, MinerConfig.class));
     }
 
     @Override

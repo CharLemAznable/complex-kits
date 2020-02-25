@@ -3,6 +3,7 @@ package com.github.charlemaznable.core.net.ohclient;
 import com.github.charlemaznable.core.net.common.DefaultErrorMappingDisabled;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
+import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -29,7 +30,7 @@ import java.time.Duration;
 import java.util.concurrent.Future;
 
 import static com.github.charlemaznable.core.codec.Bytes.string;
-import static com.github.charlemaznable.core.net.ohclient.OhFactory.getClient;
+import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,6 +39,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ReturnTest {
+
+    private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
     @SneakyThrows
     @Test
@@ -65,7 +68,7 @@ public class ReturnTest {
                 }
             });
             mockWebServer.start(41190);
-            val httpClient = getClient(StatusCodeHttpClient.class);
+            val httpClient = ohLoader.getClient(StatusCodeHttpClient.class);
 
             assertDoesNotThrow(httpClient::sampleVoid);
             val futureVoid = httpClient.sampleFutureVoid();
@@ -113,7 +116,7 @@ public class ReturnTest {
                 }
             });
             mockWebServer.start(41191);
-            val httpClient = getClient(ResponseBodyHttpClient.class);
+            val httpClient = ohLoader.getClient(ResponseBodyHttpClient.class);
 
             assertNotNull(httpClient.sampleResponseBody());
             val futureResponseBody = httpClient.sampleFutureResponseBody();

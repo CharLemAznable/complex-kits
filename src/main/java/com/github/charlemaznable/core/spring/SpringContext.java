@@ -182,9 +182,8 @@ public class SpringContext implements ApplicationContextAware {
     }
 
     public static <T> T createBean(String beanName, Class<T> clazz) {
-        if (clazz == null) return null;
+        if (clazz == null || !isConcrete(clazz)) return null;
         if (applicationContext == null) {
-            if (!isConcrete(clazz)) return null;
             return onClass(clazz).create().get();
         }
 

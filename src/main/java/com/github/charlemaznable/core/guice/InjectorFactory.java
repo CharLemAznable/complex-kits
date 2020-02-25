@@ -17,7 +17,7 @@ public class InjectorFactory implements Factory {
         try {
             return injector.getInstance(clazz);
         } catch (Exception e) {
-            if (!isConcrete(clazz)) throw e;
+            if (!isConcrete(clazz)) return null;
             return onClass(clazz).create().get();
         }
     }

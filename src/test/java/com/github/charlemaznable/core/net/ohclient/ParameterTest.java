@@ -15,6 +15,7 @@ import com.github.charlemaznable.core.net.common.Parameter;
 import com.github.charlemaznable.core.net.common.ParameterBundle;
 import com.github.charlemaznable.core.net.common.RequestBodyRaw;
 import com.github.charlemaznable.core.net.common.RequestMethod;
+import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import com.google.common.base.Splitter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,11 +32,13 @@ import java.lang.reflect.Method;
 
 import static com.github.charlemaznable.core.codec.Json.unJson;
 import static com.github.charlemaznable.core.codec.Xml.unXml;
-import static com.github.charlemaznable.core.net.ohclient.OhFactory.getClient;
+import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ParameterTest {
+
+    private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
     @SneakyThrows
     @Test
@@ -87,7 +90,7 @@ public class ParameterTest {
             });
             mockWebServer.start(41160);
 
-            val httpClient = getClient(GetParameterHttpClient.class);
+            val httpClient = ohLoader.getClient(GetParameterHttpClient.class);
             assertEquals("OK", httpClient.sampleDefault());
             assertEquals("OK", httpClient.sampleMapping());
             assertEquals("OK", httpClient.sampleParameters(null, "V4"));
@@ -167,7 +170,7 @@ public class ParameterTest {
             });
             mockWebServer.start(41161);
 
-            val httpClient = getClient(PostParameterHttpClient.class);
+            val httpClient = ohLoader.getClient(PostParameterHttpClient.class);
             assertEquals("OK", httpClient.sampleDefault());
             assertEquals("OK", httpClient.sampleMapping());
             assertEquals("OK", httpClient.sampleParameters(null, "V4"));

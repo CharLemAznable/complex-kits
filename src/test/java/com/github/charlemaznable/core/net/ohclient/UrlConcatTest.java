@@ -5,6 +5,7 @@ import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.Mapping.UrlProvider;
 import com.github.charlemaznable.core.net.common.ProviderException;
+import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import lombok.SneakyThrows;
 import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
@@ -15,18 +16,20 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
-import static com.github.charlemaznable.core.net.ohclient.OhFactory.getClient;
+import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class UrlConcatTest {
+
+    private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
     @SneakyThrows
     @Test
     public void testUrlPlainConcat() {
         try (val mockWebServer = startMockWebServer(41100)) {
 
-            val httpClient = getClient(UrlPlainHttpClient.class);
+            val httpClient = ohLoader.getClient(UrlPlainHttpClient.class);
             assertEquals("Root", httpClient.empty());
             assertEquals("Root", httpClient.root());
             assertEquals("Sample", httpClient.sample());
@@ -40,7 +43,7 @@ public class UrlConcatTest {
     public void testUrlProviderConcat() {
         try (val mockWebServer = startMockWebServer(41101)) {
 
-            val httpClient = getClient(UrlProviderHttpClient.class);
+            val httpClient = ohLoader.getClient(UrlProviderHttpClient.class);
             assertEquals("Root", httpClient.empty());
             assertEquals("Root", httpClient.root());
             assertEquals("Sample", httpClient.sample());
@@ -53,9 +56,9 @@ public class UrlConcatTest {
     @Test
     public void testErrorUrl() {
         assertThrows(ProviderException.class, () ->
-                getClient(ErrorUrlHttpClient1.class));
+                ohLoader.getClient(ErrorUrlHttpClient1.class));
 
-        val httpClient = getClient(ErrorUrlHttpClient2.class);
+        val httpClient = ohLoader.getClient(ErrorUrlHttpClient2.class);
         assertThrows(ProviderException.class, httpClient::sample);
     }
 

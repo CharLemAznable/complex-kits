@@ -5,6 +5,7 @@ import com.github.charlemaznable.core.net.common.FixedValueProvider;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.PathVar;
+import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import lombok.SneakyThrows;
 import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
@@ -15,10 +16,12 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
-import static com.github.charlemaznable.core.net.ohclient.OhFactory.getClient;
+import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PathVarTest {
+
+    private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
     @SneakyThrows
     @Test
@@ -42,7 +45,7 @@ public class PathVarTest {
             });
             mockWebServer.start(41150);
 
-            val httpClient = getClient(PathVarHttpClient.class);
+            val httpClient = ohLoader.getClient(PathVarHttpClient.class);
             assertEquals("V2", httpClient.sampleDefault());
             assertEquals("V3", httpClient.sampleMapping());
             assertEquals("V4", httpClient.samplePathVars("V4"));

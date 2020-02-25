@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.net.ohclient;
 
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
+import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import lombok.SneakyThrows;
 import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
@@ -18,12 +19,14 @@ import java.util.concurrent.Future;
 
 import static com.github.charlemaznable.core.codec.Json.json;
 import static com.github.charlemaznable.core.codec.Json.jsonOf;
+import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
 import static com.github.charlemaznable.core.lang.Listt.newArrayList;
-import static com.github.charlemaznable.core.net.ohclient.OhFactory.getClient;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ReturnErrorTest {
+
+    private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
     @SneakyThrows
     @Test
@@ -52,7 +55,7 @@ public class ReturnErrorTest {
                 }
             });
             mockWebServer.start(41196);
-            val httpClient = getClient(ErrorHttpClient.class);
+            val httpClient = ohLoader.getClient(ErrorHttpClient.class);
 
             assertThrows(OhException.class, httpClient::sampleFuture);
             assertThrows(OhException.class, httpClient::sampleList);

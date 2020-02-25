@@ -1,5 +1,7 @@
 package com.github.charlemaznable.core.net;
 
+import com.github.charlemaznable.core.net.httptest.HttpTestConfiguration;
+import com.github.charlemaznable.core.net.httptest.HttpTestController;
 import lombok.SneakyThrows;
 import lombok.val;
 import lombok.var;
@@ -33,7 +35,7 @@ public class HttpTest {
     private HttpTestController httpTestController;
 
     @BeforeAll
-    public void setup() {
+    public void beforeAll() {
         mockMvc = MockMvcBuilders.standaloneSetup(httpTestController).build();
     }
 

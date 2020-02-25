@@ -12,6 +12,7 @@ import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.RequestMethod;
 import com.github.charlemaznable.core.net.common.ResponseParse;
 import com.github.charlemaznable.core.net.common.ResponseParse.ResponseParser;
+import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -28,14 +29,16 @@ import java.util.Map;
 
 import static com.github.charlemaznable.core.codec.Json.json;
 import static com.github.charlemaznable.core.codec.Json.unJson;
+import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
 import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static com.github.charlemaznable.core.lang.Str.toStr;
-import static com.github.charlemaznable.core.net.ohclient.OhFactory.getClient;
 import static com.google.common.net.MediaType.JSON_UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ContextTest {
+
+    private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
     @SneakyThrows
     @Test
@@ -72,7 +75,7 @@ public class ContextTest {
             });
             mockWebServer.start(41170);
 
-            val httpClient = getClient(ContextHttpClient.class);
+            val httpClient = ohLoader.getClient(ContextHttpClient.class);
             assertEquals("OK", httpClient.sampleDefault());
             assertEquals("OK", httpClient.sampleMapping());
             assertEquals("OK", httpClient.sampleContexts(null, "V4"));

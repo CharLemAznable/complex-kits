@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.net.ohclient;
 
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
+import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,12 +21,14 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 import static com.github.charlemaznable.core.codec.Json.json;
+import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
 import static com.github.charlemaznable.core.lang.Listt.newArrayList;
-import static com.github.charlemaznable.core.net.ohclient.OhFactory.getClient;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ReturnListTest {
+
+    private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
     @SneakyThrows
     @Test
@@ -53,7 +56,7 @@ public class ReturnListTest {
                 }
             });
             mockWebServer.start(41192);
-            val httpClient = getClient(ListHttpClient.class);
+            val httpClient = ohLoader.getClient(ListHttpClient.class);
 
             var beans = httpClient.sampleListBean();
             var bean1 = beans.get(0);

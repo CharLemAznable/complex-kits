@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.net.ohclient;
 
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
+import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,11 +20,13 @@ import java.time.Duration;
 import java.util.concurrent.Future;
 
 import static com.github.charlemaznable.core.codec.Json.json;
-import static com.github.charlemaznable.core.net.ohclient.OhFactory.getClient;
+import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ReturnPairTest {
+
+    private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
     @SneakyThrows
     @Test
@@ -48,7 +51,7 @@ public class ReturnPairTest {
                 }
             });
             mockWebServer.start(41194);
-            val httpClient = getClient(PairHttpClient.class);
+            val httpClient = ohLoader.getClient(PairHttpClient.class);
 
             var pair = httpClient.sampleStatusAndBean();
             assertEquals(HttpStatus.OK.value(), pair.getKey());

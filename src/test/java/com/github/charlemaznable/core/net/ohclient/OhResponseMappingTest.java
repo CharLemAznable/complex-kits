@@ -6,6 +6,7 @@ import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.StatusError;
 import com.github.charlemaznable.core.net.common.StatusErrorMapping;
 import com.github.charlemaznable.core.net.common.StatusSeriesErrorMapping;
+import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import lombok.SneakyThrows;
 import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
@@ -14,11 +15,13 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.Test;
 
-import static com.github.charlemaznable.core.net.ohclient.OhFactory.getClient;
+import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class OhResponseMappingTest {
+
+    private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
     @SneakyThrows
     @Test
@@ -54,14 +57,14 @@ public class OhResponseMappingTest {
             });
             mockWebServer.start(41180);
 
-            val httpClient = getClient(MappingHttpClient.class);
+            val httpClient = ohLoader.getClient(MappingHttpClient.class);
             assertThrows(NotFoundException.class, httpClient::sampleNotFound);
             assertThrows(ClientErrorException.class, httpClient::sampleClientError);
             assertThrows(NotFoundException2.class, httpClient::sampleMappingNotFound);
             assertThrows(ClientErrorException2.class, httpClient::sampleMappingClientError);
             assertThrows(StatusError.class, httpClient::sampleServerError);
 
-            val defaultHttpClient = getClient(DefaultMappingHttpClient.class);
+            val defaultHttpClient = ohLoader.getClient(DefaultMappingHttpClient.class);
             try {
                 defaultHttpClient.sampleNotFound();
             } catch (Exception e) {
@@ -103,7 +106,7 @@ public class OhResponseMappingTest {
                 assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), er.getMessage());
             }
 
-            val disabledHttpClient = getClient(DisabledMappingHttpClient.class);
+            val disabledHttpClient = ohLoader.getClient(DisabledMappingHttpClient.class);
             assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), disabledHttpClient.sampleNotFound());
             assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), disabledHttpClient.sampleClientError());
             assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), disabledHttpClient.sampleMappingNotFound());

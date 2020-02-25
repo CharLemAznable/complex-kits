@@ -1,32 +1,38 @@
 package com.github.charlemaznable.core.net.ohclient;
 
+import com.github.charlemaznable.core.context.FactoryContext;
 import com.github.charlemaznable.core.lang.EasyEnhancer;
 import com.github.charlemaznable.core.lang.Factory;
 import com.github.charlemaznable.core.lang.LoadingCachee;
 import com.github.charlemaznable.core.net.ohclient.internal.OhDummy;
 import com.github.charlemaznable.core.net.ohclient.internal.OhProxy;
-import com.github.charlemaznable.core.spring.SpringContext;
 import com.google.common.cache.LoadingCache;
 import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.NoOp;
 
-import static com.github.charlemaznable.core.lang.Condition.nullThen;
+import static com.github.charlemaznable.core.context.FactoryContext.SpringFactory.springFactory;
+import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static com.google.common.cache.CacheLoader.from;
 
 public final class OhFactory {
 
-    private static OhLoader springOhLoader = new OhLoader();
+    private static LoadingCache<Factory, OhLoader> ohLoaderCache
+            = LoadingCachee.simpleCache(from(OhLoader::new));
 
     private OhFactory() {
         throw new UnsupportedOperationException();
     }
 
     public static <T> T getClient(Class<T> ohClass) {
-        return springOhLoader.getClient(ohClass);
+        return ohLoader(FactoryContext.get()).getClient(ohClass);
     }
 
-    public static OhLoader ohLoader(Factory providerFactory) {
-        return new OhLoader(providerFactory);
+    public static OhLoader springOhLoader() {
+        return ohLoader(springFactory());
+    }
+
+    public static OhLoader ohLoader(Factory factory) {
+        return LoadingCachee.get(ohLoaderCache, factory);
     }
 
     @SuppressWarnings("unchecked")
@@ -34,15 +40,10 @@ public final class OhFactory {
 
         private LoadingCache<Class, Object> ohCache
                 = LoadingCachee.simpleCache(from(this::loadClient));
-        private Factory providerFactory;
+        private Factory factory;
 
-        private OhLoader() {
-            this(null);
-        }
-
-        private OhLoader(Factory providerFactory) {
-            this.providerFactory = nullThen(providerFactory,
-                    () -> SpringContext::getBeanOrCreate);
+        OhLoader(Factory factory) {
+            this.factory = checkNotNull(factory);
         }
 
         public <T> T getClient(Class<T> ohClass) {
@@ -57,7 +58,7 @@ public final class OhFactory {
                         if (method.isDefault()) return 1;
                         return 0;
                     }, new Callback[]{
-                            new OhProxy(ohClass, providerFactory),
+                            new OhProxy(ohClass, factory),
                             NoOp.INSTANCE}, null);
         }
 
