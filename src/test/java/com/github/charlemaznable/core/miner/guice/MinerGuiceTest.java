@@ -24,6 +24,20 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MinerGuiceTest {
 
+    private static final String DEFAULT_GROUP = "DEFAULT_GROUP";
+    private static final String DEFAULT_DATA = "DEFAULT_DATA";
+    private static final String SUB_DATA = "SUB_DATA";
+    private static final String DEFAULT_CONTENT = "name=John\nfull=${this.name} Doe\nlong=${this.full} Richard";
+    private static final String SUB_CONTENT = "name=Joe\nfull=${this.name} Doe\nlong=${this.full} Richard";
+    private static final String NAME = "John";
+    private static final String FULL = "John Doe";
+    private static final String LONG = "John Doe Richard";
+    private static final String XYZ = "xyz";
+    private static final String SUB_NAME = "Joe";
+    private static final String SUB_FULL = "Joe Doe";
+    private static final String SUB_LONG = "Joe Doe Richard";
+    private static final String GUICE_CONTEXT = "guiceguice&springspring&guiceguice";
+
     @BeforeAll
     public static void beforeAll() {
         MockDiamondServer.setUpMockServer();
@@ -36,8 +50,7 @@ public class MinerGuiceTest {
 
     @Test
     public void testMiner() {
-        MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA",
-                "name=John\nfull=${this.name} Doe\nlong=${this.full} Richard");
+        MockDiamondServer.setConfigInfo(DEFAULT_GROUP, DEFAULT_DATA, DEFAULT_CONTENT);
         val minerInjector = new MinerInjector(new AbstractModule() {
             @Override
             public void configure() {
@@ -54,22 +67,20 @@ public class MinerGuiceTest {
 
         val testMiner = injector.getInstance(TestMiner.class);
         assertNotNull(testMiner);
-        assertEquals("John", testMiner.name());
-        assertEquals("John Doe", testMiner.full());
-        assertEquals("John Doe Richard", testMiner.longName());
-        assertEquals("John Doe Richard", testMiner.longWrap());
-        assertEquals("xyz", testMiner.abc("xyz"));
+        assertEquals(NAME, testMiner.name());
+        assertEquals(FULL, testMiner.full());
+        assertEquals(LONG, testMiner.longName());
+        assertEquals(LONG, testMiner.longWrap());
+        assertEquals(XYZ, testMiner.abc(XYZ));
         assertNull(testMiner.abc(null));
-        assertEquals("guiceguice&springspring&guiceguice",
-                testMiner.defaultInContext());
-        assertEquals("John", testMiner.name());
-        assertEquals("John Doe", testMiner.full());
-        assertEquals("John Doe Richard", testMiner.longName());
-        assertEquals("John Doe Richard", testMiner.longWrap());
-        assertEquals("xyz", testMiner.abc("xyz"));
+        assertEquals(GUICE_CONTEXT, testMiner.defaultInContext());
+        assertEquals(NAME, testMiner.name());
+        assertEquals(FULL, testMiner.full());
+        assertEquals(LONG, testMiner.longName());
+        assertEquals(LONG, testMiner.longWrap());
+        assertEquals(XYZ, testMiner.abc(XYZ));
         assertNull(testMiner.abc(null));
-        assertEquals("guiceguice&springspring&guiceguice",
-                testMiner.defaultInContext());
+        assertEquals(GUICE_CONTEXT, testMiner.defaultInContext());
 
         val testMinerConcrete = injector.getInstance(TestMinerConcrete.class);
         assertNull(testMinerConcrete);
@@ -80,19 +91,18 @@ public class MinerGuiceTest {
 
     @Test
     public void testMinerError() {
-        MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA",
-                "name=John\nfull=${this.name} Doe\nlong=${this.full} Richard");
+        MockDiamondServer.setConfigInfo(DEFAULT_GROUP, DEFAULT_DATA, DEFAULT_CONTENT);
         val minerInjector = new MinerInjector(emptyList());
         val injector = minerInjector.createInjector(
                 TestMiner.class, TestMinerConcrete.class, TestMinerNone.class);
 
         val testMiner = injector.getInstance(TestMiner.class);
         assertNotNull(testMiner);
-        assertEquals("John", testMiner.name());
-        assertEquals("John Doe", testMiner.full());
+        assertEquals(NAME, testMiner.name());
+        assertEquals(FULL, testMiner.full());
         assertThrows(NullPointerException.class, testMiner::longName);
         assertNull(testMiner.longWrap());
-        assertEquals("xyz", testMiner.abc("xyz"));
+        assertEquals(XYZ, testMiner.abc(XYZ));
         assertNull(testMiner.abc(null));
 
         val testMinerConcrete = injector.getInstance(TestMinerConcrete.class);
@@ -104,17 +114,16 @@ public class MinerGuiceTest {
 
     @Test
     public void testMinerNaked() {
-        MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA",
-                "name=John\nfull=${this.name} Doe\nlong=${this.full} Richard");
+        MockDiamondServer.setConfigInfo(DEFAULT_GROUP, DEFAULT_DATA, DEFAULT_CONTENT);
         val minerInjector = new MinerInjector();
 
         val testMiner = minerInjector.getMiner(TestMiner.class);
         assertNotNull(testMiner);
-        assertEquals("John", testMiner.name());
-        assertEquals("John Doe", testMiner.full());
+        assertEquals(NAME, testMiner.name());
+        assertEquals(FULL, testMiner.full());
         assertThrows(NullPointerException.class, testMiner::longName);
         assertNull(testMiner.longWrap());
-        assertEquals("xyz", testMiner.abc("xyz"));
+        assertEquals(XYZ, testMiner.abc(XYZ));
         assertNull(testMiner.abc(null));
 
         assertThrows(MinerConfigException.class,
@@ -126,10 +135,8 @@ public class MinerGuiceTest {
 
     @Test
     public void testMinerSub() {
-        MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA",
-                "name=John\nfull=${this.name} Doe\nlong=${this.full} Richard");
-        MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "SUB_DATA",
-                "name=Joe\nfull=${this.name} Doe\nlong=${this.full} Richard");
+        MockDiamondServer.setConfigInfo(DEFAULT_GROUP, DEFAULT_DATA, DEFAULT_CONTENT);
+        MockDiamondServer.setConfigInfo(DEFAULT_GROUP, SUB_DATA, SUB_CONTENT);
         val minerInjector = new MinerInjector(new AbstractModule() {
             @Override
             public void configure() {
@@ -145,24 +152,22 @@ public class MinerGuiceTest {
 
         val testMiner = injector.getInstance(TestMiner.class);
         assertNotNull(testMiner);
-        assertEquals("Joe", testMiner.name());
-        assertEquals("Joe Doe", testMiner.full());
-        assertEquals("Joe Doe Richard", testMiner.longName());
-        assertEquals("Joe Doe Richard", testMiner.longWrap());
-        assertEquals("xyz", testMiner.abc("xyz"));
+        assertEquals(SUB_NAME, testMiner.name());
+        assertEquals(SUB_FULL, testMiner.full());
+        assertEquals(SUB_LONG, testMiner.longName());
+        assertEquals(SUB_LONG, testMiner.longWrap());
+        assertEquals(XYZ, testMiner.abc(XYZ));
         assertNull(testMiner.abc(null));
-        assertEquals("guiceguice&springspring&guiceguice",
-                testMiner.defaultInContext());
+        assertEquals(GUICE_CONTEXT, testMiner.defaultInContext());
 
         val testMinerSub = injector.getInstance(TestMinerSub.class);
         assertNotNull(testMinerSub);
-        assertEquals("Joe", testMinerSub.name());
-        assertEquals("Joe Doe", testMinerSub.full());
-        assertEquals("Joe Doe Richard", testMinerSub.longName());
-        assertEquals("Joe Doe Richard", testMinerSub.longWrap());
-        assertEquals("xyz", testMinerSub.abc("xyz"));
+        assertEquals(SUB_NAME, testMinerSub.name());
+        assertEquals(SUB_FULL, testMinerSub.full());
+        assertEquals(SUB_LONG, testMinerSub.longName());
+        assertEquals(SUB_LONG, testMinerSub.longWrap());
+        assertEquals(XYZ, testMinerSub.abc(XYZ));
         assertNull(testMinerSub.abc(null));
-        assertEquals("guiceguice&springspring&guiceguice",
-                testMinerSub.defaultInContext());
+        assertEquals(GUICE_CONTEXT, testMinerSub.defaultInContext());
     }
 }
