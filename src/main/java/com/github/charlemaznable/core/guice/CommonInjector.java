@@ -6,7 +6,6 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Provider;
-import com.google.inject.util.Modules;
 import com.google.inject.util.Providers;
 import lombok.val;
 
@@ -14,7 +13,7 @@ import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 
 public abstract class CommonInjector {
 
-    protected Iterable<? extends Module> baseModules;
+    protected Module baseModule;
     protected InjectorFactory injectorFactory;
 
     public CommonInjector(Module... baseModules) {
@@ -22,8 +21,8 @@ public abstract class CommonInjector {
     }
 
     public CommonInjector(Iterable<? extends Module> baseModules) {
-        this.baseModules = ImmutableSet.copyOf(newArrayList(baseModules));
-        this.injectorFactory = new InjectorFactory(Guice.createInjector(this.baseModules));
+        this.baseModule = Modulee.combine(newArrayList(baseModules));
+        this.injectorFactory = new InjectorFactory(Guice.createInjector(this.baseModule));
         initialize(this.injectorFactory);
     }
 
@@ -40,7 +39,7 @@ public abstract class CommonInjector {
     @SuppressWarnings("unchecked")
     public Module createModule(Iterable<Class> classes) {
         val classSet = ImmutableSet.copyOf(newArrayList(classes));
-        return Modules.override(new AbstractModule() {
+        return Modulee.override(this.baseModule, new AbstractModule() {
             @Override
             protected void configure() {
                 for (Class clazz : classSet) {
@@ -61,7 +60,7 @@ public abstract class CommonInjector {
                     }
                 }
             }
-        }).with(this.baseModules);
+        });
     }
 
     public Injector createInjector(Class... classes) {
