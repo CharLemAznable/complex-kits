@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.net.ohclient.guice;
 
+import com.github.charlemaznable.core.guice.InjectorFactory;
 import com.github.charlemaznable.core.miner.MinerInjector;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.ohclient.OhException;
@@ -10,6 +11,7 @@ import com.github.charlemaznable.core.net.ohclient.testclient.TestHttpClientConc
 import com.github.charlemaznable.core.net.ohclient.testclient.TestHttpClientIsolated;
 import com.github.charlemaznable.core.net.ohclient.testclient.TestHttpClientNone;
 import com.github.charlemaznable.core.net.ohclient.testclient.TestSampleUrlProvider;
+import com.google.inject.ConfigurationException;
 import com.google.inject.Guice;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -179,6 +181,11 @@ public class OhGuiceTest {
 
             assertThrows(OhException.class,
                     () -> ohInjector.getClient(TestHttpClientNone.class));
+
+            val injector = ohInjector.createInjector();
+            assertThrows(ConfigurationException.class, () ->
+                    injector.getInstance(TestHttpClient.class));
+            assertNull(new InjectorFactory(injector).build(TestHttpClient.class));
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.miner.guice;
 
+import com.github.charlemaznable.core.guice.InjectorFactory;
 import com.github.charlemaznable.core.miner.MinerConfigException;
 import com.github.charlemaznable.core.miner.MinerInjector;
 import com.github.charlemaznable.core.miner.testminer.TestMiner;
@@ -7,6 +8,7 @@ import com.github.charlemaznable.core.miner.testminer.TestMinerConcrete;
 import com.github.charlemaznable.core.miner.testminer.TestMinerDataId;
 import com.github.charlemaznable.core.miner.testminer.TestMinerNone;
 import com.google.inject.AbstractModule;
+import com.google.inject.ConfigurationException;
 import com.google.inject.util.Providers;
 import lombok.val;
 import org.junit.jupiter.api.AfterAll;
@@ -131,6 +133,11 @@ public class MinerGuiceTest {
 
         assertThrows(MinerConfigException.class,
                 () -> minerInjector.getMiner(TestMinerNone.class));
+
+        val injector = minerInjector.createInjector();
+        assertThrows(ConfigurationException.class, () ->
+                injector.getInstance(TestMiner.class));
+        assertNull(new InjectorFactory(injector).build(TestMiner.class));
     }
 
     @Test

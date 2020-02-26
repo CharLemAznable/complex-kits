@@ -35,6 +35,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class OhFactoryTest {
 
+    private static final String SAMPLE = "/sample";
+    private static final String SAMPLE2 = "/sample2";
+    private static final String STRING_PREFIX = "OhClient@";
     private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
     @Test
@@ -52,18 +55,19 @@ public class OhFactoryTest {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
                     switch (request.getPath()) {
-                        case "/sample":
+                        case SAMPLE:
                             val acceptCharset = request.getHeader(ACCEPT_CHARSET);
                             assertEquals(ISO_8859_1.name(), acceptCharset);
                             return new MockResponse().setBody(acceptCharset);
-                        case "/sample2":
+                        case SAMPLE2:
                             val acceptCharset2 = request.getHeader(ACCEPT_CHARSET);
                             assertEquals(UTF_8.name(), acceptCharset2);
                             return new MockResponse().setBody(acceptCharset2);
+                        default:
+                            return new MockResponse()
+                                    .setResponseCode(HttpStatus.NOT_FOUND.value())
+                                    .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                     }
-                    return new MockResponse()
-                            .setResponseCode(HttpStatus.NOT_FOUND.value())
-                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
             });
             mockWebServer.start(41130);
@@ -72,7 +76,7 @@ public class OhFactoryTest {
             assertEquals(ISO_8859_1.name(), httpClient.sample());
             assertEquals(UTF_8.name(), httpClient.sample2());
 
-            assertEquals("OhClient@" + Integer.toHexString(httpClient.hashCode()), httpClient.toString());
+            assertEquals(STRING_PREFIX + Integer.toHexString(httpClient.hashCode()), httpClient.toString());
             assertEquals(httpClient, ohLoader.getClient(AcceptCharsetHttpClient.class));
             assertEquals(httpClient.hashCode(), ohLoader.getClient(AcceptCharsetHttpClient.class).hashCode());
         }
@@ -86,12 +90,12 @@ public class OhFactoryTest {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
                     switch (request.getPath()) {
-                        case "/sample":
+                        case SAMPLE:
                             val contentType = request.getHeader(CONTENT_TYPE);
                             assertTrue(contentType.startsWith(FORM_DATA.toString()));
                             val bodyString = request.getBody().readUtf8();
                             return new MockResponse().setBody(bodyString);
-                        case "/sample2":
+                        case SAMPLE2:
                             val contentType2 = request.getHeader(CONTENT_TYPE);
                             assertTrue(contentType2.startsWith(JSON_UTF_8.toString()));
                             val bodyString2 = request.getBody().readUtf8();
@@ -101,10 +105,11 @@ public class OhFactoryTest {
                             assertTrue(contentType3.startsWith(APPLICATION_XML_UTF_8.toString()));
                             val bodyString3 = request.getBody().readUtf8();
                             return new MockResponse().setBody(bodyString3);
+                        default:
+                            return new MockResponse()
+                                    .setResponseCode(HttpStatus.NOT_FOUND.value())
+                                    .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                     }
-                    return new MockResponse()
-                            .setResponseCode(HttpStatus.NOT_FOUND.value())
-                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
             });
             mockWebServer.start(41131);
@@ -114,7 +119,7 @@ public class OhFactoryTest {
             assertEquals("{}", httpClient.sample2());
             assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<xml/>", httpClient.sample3());
 
-            assertEquals("OhClient@" + Integer.toHexString(httpClient.hashCode()), httpClient.toString());
+            assertEquals(STRING_PREFIX + Integer.toHexString(httpClient.hashCode()), httpClient.toString());
             assertEquals(httpClient, ohLoader.getClient(ContentFormatHttpClient.class));
             assertEquals(httpClient.hashCode(), ohLoader.getClient(ContentFormatHttpClient.class).hashCode());
         }
@@ -128,18 +133,19 @@ public class OhFactoryTest {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
                     switch (request.getPath()) {
-                        case "/sample":
+                        case SAMPLE:
                             val method = request.getMethod();
                             assertEquals("POST", method);
                             return new MockResponse().setBody(method);
-                        case "/sample2":
+                        case SAMPLE2:
                             val method2 = request.getMethod();
                             assertEquals("GET", method2);
                             return new MockResponse().setBody(method2);
+                        default:
+                            return new MockResponse()
+                                    .setResponseCode(HttpStatus.NOT_FOUND.value())
+                                    .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                     }
-                    return new MockResponse()
-                            .setResponseCode(HttpStatus.NOT_FOUND.value())
-                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
             });
             mockWebServer.start(41132);
@@ -148,7 +154,7 @@ public class OhFactoryTest {
             assertEquals("POST", httpClient.sample());
             assertEquals("GET", httpClient.sample2());
 
-            assertEquals("OhClient@" + Integer.toHexString(httpClient.hashCode()), httpClient.toString());
+            assertEquals(STRING_PREFIX + Integer.toHexString(httpClient.hashCode()), httpClient.toString());
             assertEquals(httpClient, ohLoader.getClient(RequestMethodHttpClient.class));
             assertEquals(httpClient.hashCode(), ohLoader.getClient(RequestMethodHttpClient.class).hashCode());
         }
@@ -161,13 +167,13 @@ public class OhFactoryTest {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
-                    switch (request.getPath()) {
-                        case "/sample":
-                            return new MockResponse().setBody("OK");
+                    if (SAMPLE.equals(request.getPath())) {
+                        return new MockResponse().setBody("OK");
+                    } else {
+                        return new MockResponse()
+                                .setResponseCode(HttpStatus.NOT_FOUND.value())
+                                .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                     }
-                    return new MockResponse()
-                            .setResponseCode(HttpStatus.NOT_FOUND.value())
-                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
             });
             mockWebServer.start(41133);
@@ -222,5 +228,10 @@ public class OhFactoryTest {
 
     public interface SubHttpClient extends BaseHttpClient {}
 
-    public static class TestNotInterface {}
+    public static class TestNotInterface {
+
+        public void test() {
+            // empty
+        }
+    }
 }

@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SuppressWarnings("UnusedReturnValue")
 public class SSLProviderTest {
 
+    private static final String FAILED = "Failed to connect to /127.0.0.1:41124";
     private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
     @Test
@@ -102,17 +103,17 @@ public class SSLProviderTest {
         try {
             httpClient.sample();
         } catch (Exception e) {
-            assertEquals("Failed to connect to /127.0.0.1:41124", e.getMessage());
+            assertEquals(FAILED, e.getMessage());
         }
         try {
             httpClient.sampleDef();
         } catch (Exception e) {
-            assertEquals("Failed to connect to /127.0.0.1:41124", e.getMessage());
+            assertEquals(FAILED, e.getMessage());
         }
         try {
             httpClient.sampleAll();
         } catch (Exception e) {
-            assertEquals("Failed to connect to /127.0.0.1:41124", e.getMessage());
+            assertEquals(FAILED, e.getMessage());
         }
     }
 
@@ -123,12 +124,12 @@ public class SSLProviderTest {
         try {
             httpClient.sample();
         } catch (Exception e) {
-            assertEquals("Failed to connect to /127.0.0.1:41124", e.getMessage());
+            assertEquals(FAILED, e.getMessage());
         }
         try {
             httpClient.sampleDisabled();
         } catch (Exception e) {
-            assertEquals("Failed to connect to /127.0.0.1:41124", e.getMessage());
+            assertEquals(FAILED, e.getMessage());
         }
     }
 
@@ -338,12 +339,12 @@ public class SSLProviderTest {
 
         @Override
         public void checkClientTrusted(X509Certificate[] x509Certificates, String s) {
-
+            // empty
         }
 
         @Override
         public void checkServerTrusted(X509Certificate[] x509Certificates, String s) {
-
+            // empty
         }
 
         @Override

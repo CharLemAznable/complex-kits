@@ -68,10 +68,11 @@ public abstract class CommonReqTest {
                                     .setResponseCode(HttpStatus.FORBIDDEN.value())
                                     .setBody(HttpStatus.FORBIDDEN.getReasonPhrase());
                         }
+                    default:
+                        return new MockResponse()
+                                .setResponseCode(HttpStatus.NOT_FOUND.value())
+                                .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
-                return new MockResponse()
-                        .setResponseCode(HttpStatus.NOT_FOUND.value())
-                        .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
             }
         });
         mockWebServer.start(port);

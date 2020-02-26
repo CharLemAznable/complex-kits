@@ -22,6 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class UrlConcatTest {
 
+    private static final String ROOT = "Root";
+    private static final String SAMPLE = "Sample";
     private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
     @SneakyThrows
@@ -30,10 +32,10 @@ public class UrlConcatTest {
         try (val mockWebServer = startMockWebServer(41100)) {
 
             val httpClient = ohLoader.getClient(UrlPlainHttpClient.class);
-            assertEquals("Root", httpClient.empty());
-            assertEquals("Root", httpClient.root());
-            assertEquals("Sample", httpClient.sample());
-            assertEquals("Sample", httpClient.sampleWithSlash());
+            assertEquals(ROOT, httpClient.empty());
+            assertEquals(ROOT, httpClient.root());
+            assertEquals(SAMPLE, httpClient.sample());
+            assertEquals(SAMPLE, httpClient.sampleWithSlash());
             assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), httpClient.notFound());
         }
     }
@@ -44,10 +46,10 @@ public class UrlConcatTest {
         try (val mockWebServer = startMockWebServer(41101)) {
 
             val httpClient = ohLoader.getClient(UrlProviderHttpClient.class);
-            assertEquals("Root", httpClient.empty());
-            assertEquals("Root", httpClient.root());
-            assertEquals("Sample", httpClient.sample());
-            assertEquals("Sample", httpClient.sampleWithSlash());
+            assertEquals(ROOT, httpClient.empty());
+            assertEquals(ROOT, httpClient.root());
+            assertEquals(SAMPLE, httpClient.sample());
+            assertEquals(SAMPLE, httpClient.sampleWithSlash());
             assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), httpClient.notFound());
         }
     }
@@ -70,13 +72,14 @@ public class UrlConcatTest {
             public MockResponse dispatch(RecordedRequest request) {
                 switch (request.getPath()) {
                     case "/":
-                        return new MockResponse().setBody("Root");
+                        return new MockResponse().setBody(ROOT);
                     case "/sample":
-                        return new MockResponse().setBody("Sample");
+                        return new MockResponse().setBody(SAMPLE);
+                    default:
+                        return new MockResponse()
+                                .setResponseCode(HttpStatus.NOT_FOUND.value())
+                                .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
-                return new MockResponse()
-                        .setResponseCode(HttpStatus.NOT_FOUND.value())
-                        .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
             }
         });
         mockWebServer.start(port);

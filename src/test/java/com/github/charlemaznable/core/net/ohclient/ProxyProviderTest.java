@@ -31,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SuppressWarnings("UnusedReturnValue")
 public class ProxyProviderTest {
 
+    private static final String LOCAL_HOST = "127.0.0.1";
     private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
     @Test
@@ -39,7 +40,7 @@ public class ProxyProviderTest {
         val callback = on(httpClient).field("CGLIB$CALLBACK_0").get();
         OkHttpClient okHttpClient = on(callback).field("okHttpClient").get();
         val address = (InetSocketAddress) checkNotNull(okHttpClient.proxy()).address();
-        assertEquals("127.0.0.1", address.getAddress().getHostAddress());
+        assertEquals(LOCAL_HOST, address.getAddress().getHostAddress());
         assertEquals(41111, address.getPort());
     }
 
@@ -49,7 +50,7 @@ public class ProxyProviderTest {
         val callback = on(httpClient).field("CGLIB$CALLBACK_0").get();
         OkHttpClient okHttpClient = on(callback).field("okHttpClient").get();
         val address = (InetSocketAddress) checkNotNull(okHttpClient.proxy()).address();
-        assertEquals("127.0.0.1", address.getAddress().getHostAddress());
+        assertEquals(LOCAL_HOST, address.getAddress().getHostAddress());
         assertEquals(41113, address.getPort());
     }
 
@@ -57,7 +58,7 @@ public class ProxyProviderTest {
     @Test
     public void testProxyParam() {
         val httpClient = ohLoader.getClient(ProxyParamHttpClient.class);
-        val proxyParam = new Proxy(Type.HTTP, new InetSocketAddress("127.0.0.1", 41115));
+        val proxyParam = new Proxy(Type.HTTP, new InetSocketAddress(LOCAL_HOST, 41115));
         try {
             httpClient.sample(proxyParam);
         } catch (Exception e) {
@@ -172,7 +173,7 @@ public class ProxyProviderTest {
 
         @Override
         public Proxy proxy(Class<?> clazz) {
-            return new Proxy(Type.HTTP, new InetSocketAddress("127.0.0.1", 41113));
+            return new Proxy(Type.HTTP, new InetSocketAddress(LOCAL_HOST, 41113));
         }
     }
 
@@ -180,12 +181,12 @@ public class ProxyProviderTest {
 
         @Override
         public Proxy proxy(Class<?> clazz) {
-            return new Proxy(Type.HTTP, new InetSocketAddress("127.0.0.1", 41117));
+            return new Proxy(Type.HTTP, new InetSocketAddress(LOCAL_HOST, 41117));
         }
 
         @Override
         public Proxy proxy(Class<?> clazz, Method method) {
-            return new Proxy(Type.HTTP, new InetSocketAddress("127.0.0.1", 41118));
+            return new Proxy(Type.HTTP, new InetSocketAddress(LOCAL_HOST, 41118));
         }
     }
 

@@ -82,10 +82,11 @@ public class ParameterTest {
                             assertNull(requestUrl.queryParameter("T3"));
                             assertNull(requestUrl.queryParameter("T4"));
                             return new MockResponse().setBody("OK");
+                        default:
+                            return new MockResponse()
+                                    .setResponseCode(HttpStatus.NOT_FOUND.value())
+                                    .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                     }
-                    return new MockResponse()
-                            .setResponseCode(HttpStatus.NOT_FOUND.value())
-                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
             });
             mockWebServer.start(41160);
@@ -162,10 +163,11 @@ public class ParameterTest {
                             assertNull(rawErrorMap.get("T3"));
                             assertNull(rawErrorMap.get("T4"));
                             return new MockResponse().setBody("OK");
+                        default:
+                            return new MockResponse()
+                                    .setResponseCode(HttpStatus.NOT_FOUND.value())
+                                    .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                     }
-                    return new MockResponse()
-                            .setResponseCode(HttpStatus.NOT_FOUND.value())
-                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
             });
             mockWebServer.start(41161);

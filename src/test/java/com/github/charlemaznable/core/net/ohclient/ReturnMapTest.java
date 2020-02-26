@@ -49,10 +49,11 @@ public class ReturnMapTest {
                         case "/sampleFutureMapNull":
                             return new MockResponse().setResponseCode(HttpStatus.OK.value())
                                     .setBody("");
+                        default:
+                            return new MockResponse()
+                                    .setResponseCode(HttpStatus.NOT_FOUND.value())
+                                    .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                     }
-                    return new MockResponse()
-                            .setResponseCode(HttpStatus.NOT_FOUND.value())
-                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
             });
             mockWebServer.start(41193);

@@ -44,10 +44,11 @@ public class ReturnPairTest {
                         case "/sampleFutureRawAndBean":
                             return new MockResponse().setResponseCode(HttpStatus.OK.value())
                                     .setBody(json(new Bean("Doe")));
+                        default:
+                            return new MockResponse()
+                                    .setResponseCode(HttpStatus.NOT_FOUND.value())
+                                    .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                     }
-                    return new MockResponse()
-                            .setResponseCode(HttpStatus.NOT_FOUND.value())
-                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
             });
             mockWebServer.start(41194);

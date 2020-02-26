@@ -42,10 +42,11 @@ public class OhSpringErrorTest {
                             return new MockResponse().setBody("SampleError");
                         case "/sampleError":
                             return new MockResponse().setBody("Sample");
+                        default:
+                            return new MockResponse()
+                                    .setResponseCode(HttpStatus.NOT_FOUND.value())
+                                    .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                     }
-                    return new MockResponse()
-                            .setResponseCode(HttpStatus.NOT_FOUND.value())
-                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
             });
             mockWebServer.start(41102);

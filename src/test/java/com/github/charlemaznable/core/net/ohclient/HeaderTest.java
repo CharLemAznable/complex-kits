@@ -52,10 +52,11 @@ public class HeaderTest {
                             assertNull(request.getHeader("H3"));
                             assertEquals("V4", request.getHeader("H4"));
                             return new MockResponse().setBody("OK");
+                        default:
+                            return new MockResponse()
+                                    .setResponseCode(HttpStatus.NOT_FOUND.value())
+                                    .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                     }
-                    return new MockResponse()
-                            .setResponseCode(HttpStatus.NOT_FOUND.value())
-                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
             });
             mockWebServer.start(41140);

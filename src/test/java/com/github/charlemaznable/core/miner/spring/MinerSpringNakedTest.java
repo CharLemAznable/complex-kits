@@ -6,38 +6,27 @@ import com.github.charlemaznable.core.miner.testminer.TestMinerConcrete;
 import com.github.charlemaznable.core.miner.testminer.TestMinerNone;
 import com.github.charlemaznable.core.spring.SpringContext;
 import lombok.val;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.n3r.diamond.client.impl.MockDiamondServer;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static com.github.charlemaznable.core.miner.MinerFactory.getMiner;
-import static com.github.charlemaznable.core.miner.MinerFactory.springMinerLoader;
-import static org.joor.Reflect.on;
 import static org.joor.Reflect.onClass;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = MinerSpringNakedConfiguration.class)
 public class MinerSpringNakedTest {
-
-    @BeforeAll
-    public static void beforeAll() {
-        on(springMinerLoader()).field("minerCache").call("invalidateAll");
-        MockDiamondServer.setUpMockServer();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        MockDiamondServer.tearDownMockServer();
-    }
 
     @Test
     public void testMinerNaked() {
-        val SpringContextClass = onClass(SpringContext.class);
-        val applicationContext = SpringContextClass.field("applicationContext").get();
-        SpringContextClass.set("applicationContext", null);
         MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA",
                 "name=John\nfull=${this.name} Doe\nlong=${this.full} Richard");
 
@@ -56,6 +45,10 @@ public class MinerSpringNakedTest {
         assertThrows(MinerConfigException.class,
                 () -> getMiner(TestMinerNone.class));
 
-        SpringContextClass.set("applicationContext", applicationContext);
+        ApplicationContext applicationContext = onClass(SpringContext.class)
+                .field("applicationContext").get();
+        assertThrows(NoSuchBeanDefinitionException.class, () ->
+                applicationContext.getBean(TestMiner.class));
+        assertNull(SpringContext.getBeanOrCreate(TestMiner.class));
     }
 }

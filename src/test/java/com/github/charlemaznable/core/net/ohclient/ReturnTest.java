@@ -61,10 +61,11 @@ public class ReturnTest {
                             return new MockResponse()
                                     .setResponseCode(HttpStatus.NOT_IMPLEMENTED.value())
                                     .setBody(HttpStatus.NOT_IMPLEMENTED.getReasonPhrase());
+                        default:
+                            return new MockResponse()
+                                    .setResponseCode(HttpStatus.NOT_FOUND.value())
+                                    .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                     }
-                    return new MockResponse()
-                            .setResponseCode(HttpStatus.NOT_FOUND.value())
-                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
             });
             mockWebServer.start(41190);
@@ -104,15 +105,15 @@ public class ReturnTest {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
-                    switch (request.getPath()) {
-                        case "/sample":
-                            return new MockResponse()
-                                    .setResponseCode(HttpStatus.OK.value())
-                                    .setBody(HttpStatus.OK.getReasonPhrase());
+                    if ("/sample".equals(request.getPath())) {
+                        return new MockResponse()
+                                .setResponseCode(HttpStatus.OK.value())
+                                .setBody(HttpStatus.OK.getReasonPhrase());
+                    } else {
+                        return new MockResponse()
+                                .setResponseCode(HttpStatus.NOT_FOUND.value())
+                                .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                     }
-                    return new MockResponse()
-                            .setResponseCode(HttpStatus.NOT_FOUND.value())
-                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
             });
             mockWebServer.start(41191);

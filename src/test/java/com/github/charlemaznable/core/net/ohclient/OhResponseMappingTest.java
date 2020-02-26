@@ -51,8 +51,9 @@ public class OhResponseMappingTest {
                             return new MockResponse()
                                     .setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                                     .setBody(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+                        default:
+                            return new MockResponse().setBody("OK");
                     }
-                    return new MockResponse().setBody("OK");
                 }
             });
             mockWebServer.start(41180);

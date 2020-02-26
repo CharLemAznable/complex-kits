@@ -67,10 +67,11 @@ public class ContextTest {
                             assertNull(body.get("C3"));
                             assertEquals("CV4", body.get("C4"));
                             return new MockResponse().setBody("OK");
+                        default:
+                            return new MockResponse()
+                                    .setResponseCode(HttpStatus.NOT_FOUND.value())
+                                    .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                     }
-                    return new MockResponse()
-                            .setResponseCode(HttpStatus.NOT_FOUND.value())
-                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
             });
             mockWebServer.start(41170);

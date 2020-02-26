@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CncTest {
 
+    private static final String CONTENT = "content";
     private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
     @BeforeAll
@@ -63,7 +64,7 @@ public class CncTest {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
                     val testResponse = new TestResponse();
-                    testResponse.setContent("content");
+                    testResponse.setContent(CONTENT);
                     return new MockResponse().setBody(json(testResponse));
                 }
             });
@@ -72,22 +73,22 @@ public class CncTest {
             val client = ohLoader.getClient(CncClient.class);
 
             val response = client.sample1(new TestRequest());
-            assertEquals("content", response.getContent());
+            assertEquals(CONTENT, response.getContent());
             val nullResponse = client.sample1(null);
             assertTrue(nullResponse instanceof CncResponseImpl);
 
             val futureResponse = client.sample2(new TestRequest());
             await().forever().pollDelay(Duration.ofMillis(100)).until(futureResponse::isDone);
-            assertEquals("content", futureResponse.get().getContent());
+            assertEquals(CONTENT, futureResponse.get().getContent());
 
             val pair = client.sample3(new TestRequest());
             assertEquals(HttpStatus.OK, pair.getLeft());
-            assertEquals("content", pair.getRight().getContent());
+            assertEquals(CONTENT, pair.getRight().getContent());
 
             val futurePair = client.sample4(new TestRequest());
             await().forever().pollDelay(Duration.ofMillis(100)).until(futurePair::isDone);
             assertEquals(HttpStatus.OK, futurePair.get().getLeft());
-            assertEquals("content", futurePair.get().getRight().getContent());
+            assertEquals(CONTENT, futurePair.get().getRight().getContent());
 
             val errorClient = ohLoader.getClient(CncErrorClient.class);
 

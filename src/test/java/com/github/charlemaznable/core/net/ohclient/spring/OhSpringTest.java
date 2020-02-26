@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @ContextConfiguration(classes = OhSpringConfiguration.class)
 public class OhSpringTest {
 
+    private static final String SAMPLE = "Sample";
     @Autowired
     private TestComponent testComponent;
 
@@ -38,29 +39,30 @@ public class OhSpringTest {
                 public MockResponse dispatch(RecordedRequest request) {
                     switch (request.getPath()) {
                         case "/sample":
-                            return new MockResponse().setBody("Sample");
+                            return new MockResponse().setBody(SAMPLE);
                         case "/SpringSpring-SpringSpring-GuiceGuice":
                             return new MockResponse().setBody("Done");
+                        default:
+                            return new MockResponse()
+                                    .setResponseCode(HttpStatus.NOT_FOUND.value())
+                                    .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                     }
-                    return new MockResponse()
-                            .setResponseCode(HttpStatus.NOT_FOUND.value())
-                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
             });
             mockWebServer.start(41102);
 
             val testHttpClient = testComponent.getTestHttpClient();
-            assertEquals("Sample", testHttpClient.sample());
+            assertEquals(SAMPLE, testHttpClient.sample());
             assertEquals("{Sample}", testHttpClient.sampleWrapper());
-            assertEquals("Sample", testHttpClient.sampleWrap());
+            assertEquals(SAMPLE, testHttpClient.sampleWrap());
             assertEquals("Done", testHttpClient.sampleByContext());
-            assertEquals("Sample", testHttpClient.sample());
+            assertEquals(SAMPLE, testHttpClient.sample());
             assertEquals("{Sample}", testHttpClient.sampleWrapper());
-            assertEquals("Sample", testHttpClient.sampleWrap());
+            assertEquals(SAMPLE, testHttpClient.sampleWrap());
             assertEquals("Done", testHttpClient.sampleByContext());
 
             val testHttpClientIsolated = SpringContext.getBean(TestHttpClientIsolated.class);
-            assertEquals("Sample", testHttpClientIsolated.sample());
+            assertEquals(SAMPLE, testHttpClientIsolated.sample());
             assertEquals("[Sample]", testHttpClientIsolated.sampleWrapper());
 
             val testHttpClientConcrete = SpringContext.getBean(TestHttpClientConcrete.class);

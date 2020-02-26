@@ -13,40 +13,27 @@ import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.n3r.diamond.client.impl.MockDiamondServer;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static com.github.charlemaznable.core.miner.MinerFactory.springMinerLoader;
 import static com.github.charlemaznable.core.net.ohclient.OhFactory.getClient;
-import static com.github.charlemaznable.core.net.ohclient.OhFactory.springOhLoader;
-import static org.joor.Reflect.on;
 import static org.joor.Reflect.onClass;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = OhSpringNakedConfiguration.class)
 public class OhSpringNakedTest {
-
-    @BeforeAll
-    public static void beforeAll() {
-        on(springMinerLoader()).field("minerCache").call("invalidateAll");
-        on(springOhLoader()).field("ohCache").call("invalidateAll");
-        MockDiamondServer.setUpMockServer();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        MockDiamondServer.tearDownMockServer();
-    }
 
     @SneakyThrows
     @Test
     public void testOhClientNaked() {
-        val SpringContextClass = onClass(SpringContext.class);
-        val applicationContext = SpringContextClass.field("applicationContext").get();
-        SpringContextClass.set("applicationContext", null);
-
         try (val mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
@@ -56,10 +43,11 @@ public class OhSpringNakedTest {
                             return new MockResponse().setBody("SampleError");
                         case "/sampleError":
                             return new MockResponse().setBody("SampleNoError");
+                        default:
+                            return new MockResponse()
+                                    .setResponseCode(HttpStatus.NOT_FOUND.value())
+                                    .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                     }
-                    return new MockResponse()
-                            .setResponseCode(HttpStatus.NOT_FOUND.value())
-                            .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
                 }
             });
             mockWebServer.start(41102);
@@ -78,8 +66,12 @@ public class OhSpringNakedTest {
 
             assertThrows(OhException.class,
                     () -> getClient(TestHttpClientNone.class));
-        }
 
-        SpringContextClass.set("applicationContext", applicationContext);
+            ApplicationContext applicationContext = onClass(SpringContext.class)
+                    .field("applicationContext").get();
+            assertThrows(NoSuchBeanDefinitionException.class, () ->
+                    applicationContext.getBean(TestHttpClient.class));
+            assertNull(SpringContext.getBeanOrCreate(TestHttpClient.class));
+        }
     }
 }
