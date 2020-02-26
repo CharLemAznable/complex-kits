@@ -1,4 +1,4 @@
 package com.github.charlemaznable.core.miner.testminer;
 
-public interface TestSpringScanAnchor {
+public interface TestMinerScanAnchor {
 }

@@ -1,7 +1,7 @@
 package com.github.charlemaznable.core.net.ohclient.spring;
 
 import com.github.charlemaznable.core.net.ohclient.OhScan;
-import com.github.charlemaznable.core.net.ohclient.testclient.TestSpringScanAnchor;
+import com.github.charlemaznable.core.net.ohclient.testclient.TestClientScanAnchor;
 import com.github.charlemaznable.core.spring.ComplexComponentScan;
 import com.github.charlemaznable.core.spring.ComplexImport;
 import org.n3r.diamond.client.impl.MockDiamondServer;
@@ -14,8 +14,8 @@ import static com.github.charlemaznable.core.net.ohclient.OhFactory.springOhLoad
 import static org.joor.Reflect.on;
 
 @ComplexImport
-@ComplexComponentScan(basePackageClasses = TestSpringScanAnchor.class)
-@OhScan(basePackageClasses = TestSpringScanAnchor.class)
+@ComplexComponentScan(basePackageClasses = TestClientScanAnchor.class)
+@OhScan(basePackageClasses = TestClientScanAnchor.class)
 public class OhSpringErrorConfiguration {
 
     @PostConstruct

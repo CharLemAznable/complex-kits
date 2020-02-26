@@ -2,7 +2,7 @@ package com.github.charlemaznable.core.miner.spring;
 
 import com.github.charlemaznable.core.miner.MinerScan;
 import com.github.charlemaznable.core.miner.testminer.TestMinerDataId;
-import com.github.charlemaznable.core.miner.testminer.TestSpringScanAnchor;
+import com.github.charlemaznable.core.miner.testminer.TestMinerScanAnchor;
 import com.github.charlemaznable.core.spring.ComplexImport;
 import org.n3r.diamond.client.impl.MockDiamondServer;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +17,7 @@ import static org.joor.Reflect.on;
 
 @Configuration
 @ComplexImport
-@MinerScan(basePackageClasses = TestSpringScanAnchor.class)
+@MinerScan(basePackageClasses = TestMinerScanAnchor.class)
 public class MinerSpringConfiguration {
 
     @Bean
