@@ -105,9 +105,9 @@ public abstract class VxReqCommonTest extends CommonReqTest {
                                     assertTrue(async.cause() instanceof VxException);
                                     f.complete();
                                 }), null))
-        )).setHandler(event -> {
+        )).setHandler(result -> {
             shutdownMockWebServer();
-            test.assertComplete(event.result());
+            test.<CompositeFuture>completing().handle(result);
         });
     }
 
