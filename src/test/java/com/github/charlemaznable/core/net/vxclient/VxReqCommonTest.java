@@ -7,10 +7,7 @@ import com.github.charlemaznable.core.net.common.StatusError;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
-import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 import static com.github.charlemaznable.core.lang.Mapp.of;
@@ -18,10 +15,8 @@ import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(VertxExtension.class)
-public class VxReqTest extends CommonReqTest {
+public abstract class VxReqCommonTest extends CommonReqTest {
 
-    @Test
     public void testVxReq(Vertx vertx, VertxTestContext test) {
         startMockWebServer(9300);
 
