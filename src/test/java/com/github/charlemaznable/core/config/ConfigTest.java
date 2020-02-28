@@ -1,10 +1,12 @@
 package com.github.charlemaznable.core.config;
 
 import com.github.charlemaznable.core.config.ex.ConfigNotFoundException;
+import com.github.charlemaznable.core.config.ex.ConfigValueFormatException;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -40,11 +42,22 @@ public class ConfigTest {
         assertThrows(ConfigNotFoundException.class, () -> Config.getFloat("float2"));
         assertThrows(ConfigNotFoundException.class, () -> Config.getDouble("double2"));
 
+        assertThrows(ConfigValueFormatException.class, () -> Config.getInt("int3"));
+        assertThrows(ConfigValueFormatException.class, () -> Config.getLong("long3"));
+        assertThrows(ConfigValueFormatException.class, () -> Config.getFloat("float3"));
+        assertThrows(ConfigValueFormatException.class, () -> Config.getDouble("double3"));
+
         assertEquals(1, Config.getInt("int2", 1));
         assertEquals(2L, Config.getLong("long2", 2L));
         assertTrue(Config.getBool("bool2", true));
         assertEquals(3F, Config.getFloat("float2", 3F));
         assertEquals(4D, Config.getDouble("double2", 4D));
+
+        assertEquals(1, Config.getInt("int3", 1));
+        assertEquals(2L, Config.getLong("long3", 2L));
+        assertFalse(Config.getBool("bool3", true));
+        assertEquals(3F, Config.getFloat("float3", 3F));
+        assertEquals(4D, Config.getDouble("double3", 4D));
 
         val bean1 = Config.getBean("bean1", ConfigBean.class);
         assertEquals("value1", bean1.getKey1());
