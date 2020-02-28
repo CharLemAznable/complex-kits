@@ -38,7 +38,7 @@ public abstract class VxReqCommonTest extends CommonReqTest {
                                         assertEquals("Sample2", async.result())), f)),
                 Future.<String>future(f ->
                         new VxReq(vertx, "http://127.0.0.1:9300")
-                                .req("sample3?DDD=ddd")
+                                .req("/sample3?DDD=ddd")
                                 .parameter("AAA", "aaa")
                                 .parameters(of("AAA", null, "BBB", "bbb"))
                                 .requestBody("CCC=ccc")
@@ -46,7 +46,7 @@ public abstract class VxReqCommonTest extends CommonReqTest {
                                         assertEquals("Sample3", async.result())), f)),
                 Future.<String>future(f ->
                         new VxReq(vertx, "http://127.0.0.1:9300")
-                                .req("sample4")
+                                .req("/sample4")
                                 .parameter("AAA", "aaa")
                                 .parameters(of("AAA", null, "BBB", "bbb"))
                                 .requestBody("CCC=ccc")

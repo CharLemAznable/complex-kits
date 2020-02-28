@@ -22,6 +22,6 @@ public class TestSampleUrlProviderContext implements UrlProvider {
 
     @Override
     public String url(Class<?> clazz, Method method) {
-        return current.thread() + "-" + spring.thread() + "-" + guice.thread();
+        return "/" + current.thread() + "-" + spring.thread() + "-" + guice.thread();
     }
 }

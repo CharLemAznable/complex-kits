@@ -21,7 +21,7 @@ public class TestSampleUrlProviderWrapper implements UrlProvider {
     @Inject
     @Autowired
     public TestSampleUrlProviderWrapper(@Nullable TestSampleUrlProvider provider) {
-        this.provider = nullThen(provider, () -> () -> "sampleError");
+        this.provider = nullThen(provider, () -> () -> "/sampleError");
     }
 
     @Override

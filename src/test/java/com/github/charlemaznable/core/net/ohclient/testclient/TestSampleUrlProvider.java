@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
 @MinerConfig("DEFAULT_DATA")
 public interface TestSampleUrlProvider extends UrlProvider {
 
-    @MinerConfig(defaultValue = "sample")
+    @MinerConfig(defaultValue = "/sample")
     String sample();
 
     @Override

@@ -174,22 +174,22 @@ public class ReturnTest {
 
         Future<Integer> sampleFutureStatusCode();
 
-        @Mapping("sampleStatusCode")
+        @Mapping("/sampleStatusCode")
         HttpStatus sampleStatus();
 
-        @Mapping("sampleFutureStatusCode")
+        @Mapping("/sampleFutureStatusCode")
         Future<HttpStatus> sampleFutureStatus();
 
-        @Mapping("sampleStatusCode")
+        @Mapping("/sampleStatusCode")
         HttpStatus.Series sampleStatusSeries();
 
-        @Mapping("sampleFutureStatusCode")
+        @Mapping("/sampleFutureStatusCode")
         Future<HttpStatus.Series> sampleFutureStatusSeries();
 
-        @Mapping("sampleVoid")
+        @Mapping("/sampleVoid")
         boolean sampleSuccess();
 
-        @Mapping("sampleStatusCode")
+        @Mapping("/sampleStatusCode")
         Future<Boolean> sampleFailure();
     }
 

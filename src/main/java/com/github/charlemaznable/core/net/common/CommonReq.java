@@ -14,8 +14,6 @@ import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static com.github.charlemaznable.core.lang.Str.isBlank;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_ACCEPT_CHARSET;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_CONTENT_FORMATTER;
-import static org.apache.commons.lang3.StringUtils.prependIfMissing;
-import static org.apache.commons.lang3.StringUtils.removeEnd;
 
 @SuppressWarnings("unchecked")
 public abstract class CommonReq<T extends CommonReq> {
@@ -101,7 +99,7 @@ public abstract class CommonReq<T extends CommonReq> {
     protected String concatRequestUrl() {
         if (isBlank(this.reqPath)) return this.baseUrl;
         if (isBlank(this.baseUrl)) return this.reqPath;
-        return removeEnd(this.baseUrl, "/") + prependIfMissing(this.reqPath, "/");
+        return this.baseUrl + this.reqPath;
     }
 
     protected Map<String, Object> fetchParameterMap() {

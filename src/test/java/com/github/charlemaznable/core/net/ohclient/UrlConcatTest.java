@@ -140,7 +140,7 @@ public class UrlConcatTest {
 
         @Override
         public String url(Class<?> clazz) {
-            return "http://127.0.0.1:41101/";
+            return "http://127.0.0.1:41101";
         }
 
         @Override

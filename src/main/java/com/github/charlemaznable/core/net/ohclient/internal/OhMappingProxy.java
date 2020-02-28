@@ -70,8 +70,6 @@ import static com.github.charlemaznable.core.lang.Str.isNotBlank;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.ohExecutorService;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.substitute;
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang3.StringUtils.prependIfMissing;
-import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedRepeatableAnnotations;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 
@@ -347,14 +345,14 @@ public final class OhMappingProxy extends OhRoot {
         static String checkRequestUrl(Class clazz, Method method,
                                       Factory factory, OhProxy proxy) {
             val mapping = findAnnotation(method, Mapping.class);
-            val url = checkNull(mapping, method::getName, annotation -> {
+            val url = checkNull(mapping, () -> "/" + method.getName(), annotation -> {
                 val providerClass = annotation.urlProvider();
                 return substitute(UrlProvider.class == providerClass ? annotation.value()
                         : FactoryContext.apply(factory, providerClass, p -> p.url(clazz, method)));
             });
             if (isBlank(url)) return proxy.baseUrl;
             if (isBlank(proxy.baseUrl)) return url;
-            return removeEnd(proxy.baseUrl, "/") + prependIfMissing(url, "/");
+            return proxy.baseUrl + url;
         }
 
         static Proxy checkClientProxy(Class clazz, Method method,

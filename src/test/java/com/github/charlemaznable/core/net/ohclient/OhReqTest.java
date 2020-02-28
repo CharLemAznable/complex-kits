@@ -39,7 +39,7 @@ public class OhReqTest extends CommonReqTest {
         assertEquals("Sample2", ohReq2.post());
 
         val ohReq3 = new OhReq("http://127.0.0.1:41103")
-                .req("sample3?DDD=ddd")
+                .req("/sample3?DDD=ddd")
                 .parameter("AAA", "aaa")
                 .parameters(of("AAA", null, "BBB", "bbb"))
                 .requestBody("CCC=ccc");
@@ -48,7 +48,7 @@ public class OhReqTest extends CommonReqTest {
         assertEquals("Sample3", future3.get());
 
         val ohReq4 = new OhReq("http://127.0.0.1:41103")
-                .req("sample4")
+                .req("/sample4")
                 .parameter("AAA", "aaa")
                 .parameters(of("AAA", null, "BBB", "bbb"))
                 .requestBody("CCC=ccc");
