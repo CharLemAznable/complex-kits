@@ -11,5 +11,5 @@ import java.lang.annotation.Target;
 @Inherited
 @Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ParameterBundle {
+public @interface Bundle {
 }

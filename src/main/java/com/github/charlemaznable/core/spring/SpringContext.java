@@ -25,6 +25,7 @@ import static com.github.charlemaznable.core.lang.Condition.notNullThen;
 import static com.github.charlemaznable.core.lang.Condition.nullThen;
 import static com.github.charlemaznable.core.lang.Str.isEmpty;
 import static com.github.charlemaznable.core.spring.ComplexBeanNameGenerator.getBeanClassName;
+import static java.util.Objects.isNull;
 import static org.joor.Reflect.onClass;
 
 @SuppressWarnings("unchecked")
@@ -56,7 +57,7 @@ public class SpringContext implements ApplicationContextAware {
     }
 
     public static <T> T getBean(String beanName, Supplier<T> defaultSupplier) {
-        if (applicationContext == null) return notNullThen(defaultSupplier, Supplier::get);
+        if (isNull(applicationContext)) return notNullThen(defaultSupplier, Supplier::get);
         if (isEmpty(beanName)) return notNullThen(defaultSupplier, Supplier::get);
 
         try {
@@ -102,8 +103,8 @@ public class SpringContext implements ApplicationContextAware {
     }
 
     public static <T> T getBean(Class<T> clazz, Supplier<T> defaultSupplier) {
-        if (applicationContext == null) return notNullThen(defaultSupplier, Supplier::get);
-        if (clazz == null) return notNullThen(defaultSupplier, Supplier::get);
+        if (isNull(applicationContext)) return notNullThen(defaultSupplier, Supplier::get);
+        if (isNull(clazz)) return notNullThen(defaultSupplier, Supplier::get);
 
         try {
             return applicationContext.getBean(clazz);
@@ -148,10 +149,10 @@ public class SpringContext implements ApplicationContextAware {
     }
 
     public static <T> T getBean(String beanName, Class<T> clazz, Supplier<T> defaultSupplier) {
-        if (applicationContext == null) return notNullThen(defaultSupplier, Supplier::get);
-        if (isEmpty(beanName) && clazz == null) return notNullThen(defaultSupplier, Supplier::get);
+        if (isNull(applicationContext)) return notNullThen(defaultSupplier, Supplier::get);
+        if (isEmpty(beanName) && isNull(clazz)) return notNullThen(defaultSupplier, Supplier::get);
         if (isEmpty(beanName)) return getBean(clazz, defaultSupplier);
-        if (clazz == null) return getBean(beanName, defaultSupplier);
+        if (isNull(clazz)) return getBean(beanName, defaultSupplier);
 
         try {
             return applicationContext.getBean(beanName, clazz);
@@ -164,14 +165,14 @@ public class SpringContext implements ApplicationContextAware {
     ////////////////////////////////////////////////////////////////
 
     public static String[] getBeanNamesForType(Class<?> clazz) {
-        if (applicationContext == null) return new String[0];
-        if (clazz == null) return new String[0];
+        if (isNull(applicationContext)) return new String[0];
+        if (isNull(clazz)) return new String[0];
         return applicationContext.getBeanNamesForType(clazz);
     }
 
     public static String[] getBeanNamesForAnnotation(Class<? extends Annotation> annotation) {
-        if (applicationContext == null) return new String[0];
-        if (annotation == null) return new String[0];
+        if (isNull(applicationContext)) return new String[0];
+        if (isNull(annotation)) return new String[0];
         return applicationContext.getBeanNamesForAnnotation(annotation);
     }
 
@@ -182,8 +183,8 @@ public class SpringContext implements ApplicationContextAware {
     }
 
     public static <T> T createBean(String beanName, Class<T> clazz) {
-        if (clazz == null || !isConcrete(clazz)) return null;
-        if (applicationContext == null) {
+        if (isNull(clazz) || !isConcrete(clazz)) return null;
+        if (isNull(applicationContext)) {
             return onClass(clazz).create().get();
         }
 
@@ -206,8 +207,8 @@ public class SpringContext implements ApplicationContextAware {
 
     @CanIgnoreReturnValue
     public static <T> T autowireBean(String beanName, T bean) {
-        if (applicationContext == null) return bean;
-        if (bean == null) return null;
+        if (isNull(applicationContext)) return bean;
+        if (isNull(bean)) return null;
 
         val beanDefinition = BeanDefinitionBuilder
                 .genericBeanDefinition(bean.getClass()).getBeanDefinition();

@@ -12,6 +12,7 @@ import static com.github.charlemaznable.core.lang.Listt.isNotEmpty;
 import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static com.github.charlemaznable.core.lang.Str.toStr;
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public abstract class Textable {
@@ -34,7 +35,7 @@ public abstract class Textable {
                     excludedKeys().contains(key)) ||
                     isEmpty(value)) continue;
 
-            result.put(key, processor == null ?
+            result.put(key, isNull(processor) ?
                     value : processor.process(value));
         }
 

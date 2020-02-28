@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 
 import static com.github.charlemaznable.core.lang.Condition.checkNull;
 import static java.lang.reflect.Modifier.isAbstract;
+import static java.util.Objects.isNull;
 import static org.joor.Reflect.wrapper;
 
 public final class Clz {
@@ -61,7 +62,7 @@ public final class Clz {
     }
 
     public static Class<?>[] types(Object... values) {
-        if (values == null) return new Class[0];
+        if (isNull(values)) return new Class[0];
 
         val result = new Class[values.length];
         for (int i = 0; i < values.length; i++) {

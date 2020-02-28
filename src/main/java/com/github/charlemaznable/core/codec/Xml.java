@@ -22,6 +22,8 @@ import java.util.StringTokenizer;
 import static com.github.charlemaznable.core.lang.Listt.isNotEmpty;
 import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 import static com.github.charlemaznable.core.lang.Mapp.of;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static org.dom4j.DocumentHelper.createDocument;
 import static org.dom4j.DocumentHelper.createElement;
 import static org.dom4j.io.OutputFormat.createCompactFormat;
@@ -83,7 +85,7 @@ public final class Xml {
             val source = new InputSource(new StringReader(text));
             source.setEncoding(encoding);
             val result = reader.read(source);
-            if (result.getXMLEncoding() == null) {
+            if (isNull(result.getXMLEncoding())) {
                 result.setXMLEncoding(encoding);
             }
             return result;
@@ -144,7 +146,7 @@ public final class Xml {
         @SuppressWarnings("unchecked")
         private static void parseElementWithChildren(LinkedHashMap<String, Object> map, Element elem, List mapList, boolean parseAttr) {
             val m = element2Map(elem, parseAttr);
-            if (map.get(elem.getName()) != null) {
+            if (nonNull(map.get(elem.getName()))) {
                 val obj = map.get(elem.getName());
                 if (!(obj instanceof List)) {
                     mapList = newArrayList();
@@ -174,7 +176,7 @@ public final class Xml {
                 }
             }
 
-            if (map.get(elem.getName()) != null) {
+            if (nonNull(map.get(elem.getName()))) {
                 val obj = map.get(elem.getName());
                 mapList = obj instanceof List ?
                         (List) obj : newArrayList(obj);
@@ -239,7 +241,7 @@ public final class Xml {
                         val subElement = body.addElement(key);
                         map2Element((Map) value, subElement);
                     } else {
-                        if (null == value) continue;
+                        if (isNull(value)) continue;
                         body.addElement(key).addCDATA(value.toString());
                     }
                 }

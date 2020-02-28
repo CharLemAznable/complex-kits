@@ -3,6 +3,7 @@ package com.github.charlemaznable.core.codec;
 import java.nio.charset.Charset;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Objects.isNull;
 
 public final class Bytes {
 
@@ -23,7 +24,7 @@ public final class Bytes {
     }
 
     public static byte[] bytes(String str, Charset charset) {
-        return str == null ? null : str.getBytes(charset);
+        return isNull(str) ? null : str.getBytes(charset);
     }
 
     public static String string(byte[] bytes, Charset charset) {

@@ -26,6 +26,8 @@ import static com.github.charlemaznable.core.net.Url.encode;
 import static java.lang.String.format;
 import static java.net.HttpURLConnection.setFollowRedirects;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.tuple.Pair.of;
 
 @Slf4j
@@ -69,7 +71,7 @@ public final class HttpReq {
     }
 
     public HttpReq cookie(String value) {
-        if (value == null) return this;
+        if (isNull(value)) return this;
         return prop("Cookie", value);
     }
 
@@ -95,7 +97,7 @@ public final class HttpReq {
     }
 
     public HttpReq requestBody(String requestBody) {
-        if (requestBody != null) {
+        if (nonNull(requestBody)) {
             if (params.length() > 0) params.append('&');
             params.append(requestBody);
         }
@@ -121,7 +123,7 @@ public final class HttpReq {
         HttpURLConnection http = null;
         try {
             // Post请求的url，与get不同的是不需要带参数
-            val url = baseUrl + (req == null ? "" : req);
+            val url = baseUrl + (isNull(req) ? "" : req);
 
             http = commonSettings(url);
             postSettings(http);
@@ -137,14 +139,14 @@ public final class HttpReq {
             log.error("post error {}", e.getMessage());
             return null;
         } finally {
-            if (http != null) http.disconnect();
+            if (nonNull(http)) http.disconnect();
         }
     }
 
     public String get() {
         HttpURLConnection http = null;
         try {
-            val url = baseUrl + (req == null ? "" : req)
+            val url = baseUrl + (isNull(req) ? "" : req)
                     + (params.length() > 0 ? ("?" + params) : "");
 
             http = commonSettings(url);
@@ -157,14 +159,14 @@ public final class HttpReq {
             log.error("get error {}", e.getMessage());
             return null;
         } finally {
-            if (http != null) http.disconnect();
+            if (nonNull(http)) http.disconnect();
         }
     }
 
     private HttpURLConnection commonSettings(String urlString) throws IOException {
         setFollowRedirects(true);
         val url = new URL(urlString);
-        val http = (HttpURLConnection) (null == this.proxy ?
+        val http = (HttpURLConnection) (isNull(this.proxy) ?
                 url.openConnection() : url.openConnection(this.proxy));
         http.setRequestProperty("Accept-Charset", this.charset.name());
         http.setConnectTimeout(60 * 1000);
@@ -192,10 +194,10 @@ public final class HttpReq {
     private void setSSL(HttpURLConnection http) {
         if (!(http instanceof HttpsURLConnection)) return;
 
-        if (sslSocketFactory != null)
+        if (nonNull(sslSocketFactory))
             ((HttpsURLConnection) http).setSSLSocketFactory(sslSocketFactory);
 
-        if (hostnameVerifier != null)
+        if (nonNull(hostnameVerifier))
             ((HttpsURLConnection) http).setHostnameVerifier(hostnameVerifier);
     }
 
@@ -223,7 +225,7 @@ public final class HttpReq {
     }
 
     private Charset parseCharset(String contentType) {
-        if (contentType == null) return this.charset;
+        if (isNull(contentType)) return this.charset;
 
         String charsetName = null;
         for (val param : contentType.replace(" ", "").split(";")) {
@@ -233,8 +235,7 @@ public final class HttpReq {
             }
         }
 
-        return charsetName == null ?
-                this.charset : Charset.forName(charsetName);
+        return isNull(charsetName) ? this.charset : Charset.forName(charsetName);
     }
 
     private String readResponseBody(HttpURLConnection http, Charset charset) throws IOException {
@@ -243,7 +244,7 @@ public final class HttpReq {
 
     private String readErrorResponseBody(String url, HttpURLConnection http, int status, Charset charset) throws IOException {
         val errorStream = http.getErrorStream();
-        if (errorStream != null) {
+        if (nonNull(errorStream)) {
             val error = readInputStreamToString(errorStream, charset);
             return (url + ", STATUS CODE =" + status + ", headers=" + json(http.getHeaderFields()) + "\n\n" + error);
         } else {

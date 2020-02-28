@@ -69,6 +69,7 @@ import static com.github.charlemaznable.core.lang.Str.isBlank;
 import static com.github.charlemaznable.core.lang.Str.isNotBlank;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.ohExecutorService;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.substitute;
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.prependIfMissing;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedRepeatableAnnotations;
@@ -101,7 +102,7 @@ public final class OhMappingProxy extends OhRoot {
         this.clientProxy = Elf.checkClientProxy(
                 this.ohClass, this.ohMethod, this.factory, proxy);
         val clientSSL = Elf.checkClientSSL(this.ohMethod);
-        if (null != clientSSL) {
+        if (nonNull(clientSSL)) {
             this.sslSocketFactory = Elf.checkSSLSocketFactory(
                     this.ohClass, this.ohMethod, this.factory, clientSSL);
             this.x509TrustManager = Elf.checkX509TrustManager(

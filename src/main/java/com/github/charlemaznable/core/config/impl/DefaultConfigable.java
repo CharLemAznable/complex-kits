@@ -8,6 +8,7 @@ import java.util.Properties;
 
 import static com.github.charlemaznable.core.codec.Base64.unBase64;
 import static com.github.charlemaznable.core.crypto.AES.decrypt;
+import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.startsWith;
 import static org.apache.commons.lang3.StringUtils.trim;
@@ -42,7 +43,7 @@ public class DefaultConfigable extends BaseConfigable {
     @Override
     public final String getStr(String key) {
         var property = properties.getProperty(key);
-        if (property == null) return null;
+        if (isNull(property)) return null;
 
         // ${key}会在properties中定义了key时进行替换，否则保持原样
         property = replace(property, properties);

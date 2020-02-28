@@ -14,6 +14,7 @@ import static com.github.charlemaznable.core.codec.Json.unJson;
 import static com.github.charlemaznable.core.codec.Json.unJsonArray;
 import static com.github.charlemaznable.core.codec.Xml.unXml;
 import static com.github.charlemaznable.core.lang.Str.isBlank;
+import static java.util.Objects.nonNull;
 
 public final class ResponseBodyExtractor {
 
@@ -49,7 +50,7 @@ public final class ResponseBodyExtractor {
                          Class<?> returnType) {
         val content = string(responseBody);
         if (isBlank(content)) return null;
-        if (null != customParser) return customParser.apply(content);
+        if (nonNull(customParser)) return customParser.apply(content);
         if (content.startsWith("<")) return spec(unXml(content), returnType);
         if (content.startsWith("[")) return unJsonArray(content, returnType);
         if (content.startsWith("{")) return unJson(content, returnType);

@@ -3,6 +3,8 @@ package com.github.charlemaznable.core.codec;
 import lombok.val;
 import lombok.var;
 
+import static java.util.Objects.isNull;
+
 public final class BaseX {
 
     private int base;
@@ -52,7 +54,7 @@ public final class BaseX {
     }
 
     public byte[] decode(String value) {
-        if (value == null || value.trim().isEmpty()) return new byte[0];
+        if (isNull(value) || value.trim().isEmpty()) return new byte[0];
 
         val digits = new int[value.length()];
         var digitpos = 0;

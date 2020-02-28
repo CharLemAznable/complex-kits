@@ -17,6 +17,8 @@ import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static java.lang.Character.isWhitespace;
 import static java.lang.System.getProperty;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 public final class IniReader {
 
@@ -43,7 +45,7 @@ public final class IniReader {
 
         var line = bufferedReader.readLine();
 
-        for (; line != null; line = bufferedReader.readLine()) {
+        for (; nonNull(line); line = bufferedReader.readLine()) {
             ++lineNumber;
             line = line.trim();
             if (!checkLine(line)) continue;
@@ -94,7 +96,7 @@ public final class IniReader {
                 propertyValue.append(LINE_SEPARATOR);
                 value = reader.readLine();
             }
-        } while (lineContinues && value != null);
+        } while (lineContinues && nonNull(value));
 
         return propertyValue.toString();
     }
@@ -226,12 +228,12 @@ public final class IniReader {
     private void createValueNodes(String key, String value) {
         val lastSection = sections.get(sections.size() - 1);
         var sectionProps = properties.get(lastSection);
-        if (sectionProps == null) {
+        if (isNull(sectionProps)) {
             sectionProps = new Properties();
             properties.put(lastSection, sectionProps);
         } else {
             val oldValue = (String) sectionProps.get(key);
-            if (oldValue != null)
+            if (nonNull(oldValue))
                 putIncKeyAndValue(sectionProps, key, oldValue);
         }
 
@@ -278,7 +280,7 @@ public final class IniReader {
     }
 
     public Properties getSection(String name) {
-        if (name == null) return properties.get("");
+        if (isNull(name)) return properties.get("");
 
         return properties.get(name);
     }

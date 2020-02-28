@@ -16,6 +16,8 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import static java.util.Objects.isNull;
+
 public final class SpringClassPathScanner extends ClassPathBeanDefinitionScanner {
 
     private final Class factoryBeanClass;
@@ -68,7 +70,7 @@ public final class SpringClassPathScanner extends ClassPathBeanDefinitionScanner
 
     @Override
     protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
-        return null == isCandidateClass || isCandidateClass.test(beanDefinition.getMetadata());
+        return isNull(isCandidateClass) || isCandidateClass.test(beanDefinition.getMetadata());
     }
 
     @Override

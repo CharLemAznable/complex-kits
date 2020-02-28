@@ -18,6 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import static com.github.charlemaznable.core.lang.Condition.nullThen;
+import static java.util.Objects.nonNull;
 
 /**
  * 对象池代理工具
@@ -56,7 +57,7 @@ public final class PoolProxy {
                 return (T) EasyEnhancer.create(poolObjectClass,
                         new ObjectPoolProxy<>(pool), args);
             } finally {
-                if (poolObject != null) pool.returnObject(poolObject);
+                if (nonNull(poolObject)) pool.returnObject(poolObject);
             }
         }
     }
@@ -108,7 +109,7 @@ public final class PoolProxy {
             } catch (InvocationTargetException e) {
                 throw e.getCause();
             } finally {
-                if (poolObject != null)
+                if (nonNull(poolObject))
                     pool.returnObject(poolObject);
             }
         }

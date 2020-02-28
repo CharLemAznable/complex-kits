@@ -15,6 +15,8 @@ import java.util.function.Predicate;
 import static com.github.charlemaznable.core.lang.Clz.isAssignable;
 import static com.github.charlemaznable.core.lang.ClzPath.findClass;
 import static java.util.Arrays.stream;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.core.io.support.ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX;
 import static org.springframework.util.ClassUtils.convertClassNameToResourcePath;
@@ -73,7 +75,7 @@ public final class ClzResolver {
     }
 
     private static boolean testResolvedClass(Class<?> clazz, Predicate<Class<?>> classPredicate) {
-        return null != clazz && (null == classPredicate || classPredicate.test(clazz));
+        return nonNull(clazz) && (isNull(classPredicate) || classPredicate.test(clazz));
     }
 
     @SneakyThrows

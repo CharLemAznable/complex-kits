@@ -14,6 +14,7 @@ import java.nio.charset.Charset;
 
 import static com.github.charlemaznable.core.codec.Bytes.bytes;
 import static com.github.charlemaznable.core.codec.Bytes.string;
+import static java.util.Objects.isNull;
 
 public final class MutableHttpServletResponse extends HttpServletResponseWrapper {
 
@@ -33,7 +34,7 @@ public final class MutableHttpServletResponse extends HttpServletResponseWrapper
 
     @Override
     public PrintWriter getWriter() {
-        if (this.printWriter == null) {
+        if (isNull(this.printWriter)) {
             this.printWriter = new PrintWriter(this.byteArrayOutputStream);
         }
         return this.printWriter;

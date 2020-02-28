@@ -1,6 +1,6 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.github.charlemaznable.core.net.common.Bundle;
 import com.github.charlemaznable.core.net.common.ContentFormat;
 import com.github.charlemaznable.core.net.common.ContentFormat.FormContentFormatter;
 import com.github.charlemaznable.core.net.common.ContentFormat.JsonContentFormatter;
@@ -12,7 +12,6 @@ import com.github.charlemaznable.core.net.common.HttpMethod;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.Parameter;
-import com.github.charlemaznable.core.net.common.ParameterBundle;
 import com.github.charlemaznable.core.net.common.RequestBodyRaw;
 import com.github.charlemaznable.core.net.common.RequestMethod;
 import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
@@ -75,6 +74,8 @@ public class ParameterTest {
                             assertNull(requestUrl.queryParameter("T2"));
                             assertNull(requestUrl.queryParameter("T3"));
                             assertEquals("V4", requestUrl.queryParameter("T4"));
+                            assertEquals("V5", requestUrl.queryParameter("t5"));
+                            assertEquals("V6", requestUrl.queryParameter("t6"));
                             return new MockResponse().setBody("OK");
                         case "/sampleBundle2":
                             assertEquals("V1", requestUrl.queryParameter("T1"));
@@ -95,7 +96,7 @@ public class ParameterTest {
             assertEquals("OK", httpClient.sampleDefault());
             assertEquals("OK", httpClient.sampleMapping());
             assertEquals("OK", httpClient.sampleParameters(null, "V4"));
-            assertEquals("OK", httpClient.sampleBundle(new Bundle(null, null, "V4")));
+            assertEquals("OK", httpClient.sampleBundle(new TestBundle(null, null, "V4", "V5")));
             assertEquals("OK", httpClient.sampleBundle2(null));
         }
     }
@@ -138,6 +139,8 @@ public class ParameterTest {
                             assertNull(bundleMap.get("T2"));
                             assertNull(bundleMap.get("T3"));
                             assertEquals("V4", bundleMap.get("T4"));
+                            assertEquals("V5", bundleMap.get("t5"));
+                            assertEquals("V6", bundleMap.get("t6"));
                             return new MockResponse().setBody("OK");
                         case "/sampleBundle2":
                             val bundleMap2 = Splitter.on("&")
@@ -176,7 +179,7 @@ public class ParameterTest {
             assertEquals("OK", httpClient.sampleDefault());
             assertEquals("OK", httpClient.sampleMapping());
             assertEquals("OK", httpClient.sampleParameters(null, "V4"));
-            assertEquals("OK", httpClient.sampleBundle(new Bundle(null, null, "V4")));
+            assertEquals("OK", httpClient.sampleBundle(new TestBundle(null, null, "V4", "V5")));
             assertEquals("OK", httpClient.sampleBundle2(null));
             assertEquals("OK", httpClient.sampleRaw("T3=V3&T4=V4"));
             assertEquals("OK", httpClient.sampleRawError(new Object()));
@@ -203,9 +206,9 @@ public class ParameterTest {
         String sampleParameters(@Parameter("T3") String v3,
                                 @Parameter("T4") String v4);
 
-        String sampleBundle(@ParameterBundle Bundle bundle);
+        String sampleBundle(@Bundle TestBundle bundle);
 
-        String sampleBundle2(@ParameterBundle Bundle bundle);
+        String sampleBundle2(@Bundle TestBundle bundle);
     }
 
     @FixedParameter(name = "T1", value = "V1")
@@ -229,9 +232,9 @@ public class ParameterTest {
         String sampleParameters(@Parameter("T3") String v3,
                                 @Parameter("T4") String v4);
 
-        String sampleBundle(@ParameterBundle Bundle bundle);
+        String sampleBundle(@Bundle TestBundle bundle);
 
-        String sampleBundle2(@ParameterBundle Bundle bundle);
+        String sampleBundle2(@Bundle TestBundle bundle);
 
         String sampleRaw(@RequestBodyRaw String raw);
 
@@ -251,16 +254,24 @@ public class ParameterTest {
         }
     }
 
+    @Getter
+    @Setter
+    public static class BaseBundle {
+
+        private String t6 = "V6";
+    }
+
     @AllArgsConstructor
     @Getter
     @Setter
-    public static class Bundle {
+    public static class TestBundle extends BaseBundle {
 
-        @JSONField(name = "T2")
+        @Parameter("T2")
         private String t2;
-        @JSONField(name = "T3")
+        @Parameter("T3")
         private String t3;
-        @JSONField(name = "T4")
+        @Parameter("T4")
         private String t4;
+        private String t5;
     }
 }

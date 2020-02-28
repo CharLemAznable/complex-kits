@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
+import static java.util.Objects.isNull;
 
 public final class DateFormatter {
 
@@ -19,7 +20,7 @@ public final class DateFormatter {
 
     public String transToFormat(String dateString, String toPattern) {
         val parsed = parse(dateString);
-        if (null == parsed) return null;
+        if (isNull(parsed)) return null;
         return new SimpleDateFormat(toPattern).format(parse(dateString));
     }
 

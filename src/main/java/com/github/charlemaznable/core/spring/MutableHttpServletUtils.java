@@ -11,6 +11,8 @@ import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static java.util.Objects.isNull;
+
 public final class MutableHttpServletUtils {
 
     private MutableHttpServletUtils() {}
@@ -39,80 +41,80 @@ public final class MutableHttpServletUtils {
 
     public static void setRequestBody(HttpServletRequest request, String body) {
         val mutableRequest = mutableRequest(request);
-        if (null == mutableRequest) return;
+        if (isNull(mutableRequest)) return;
         mutableRequest.setRequestBody(body);
     }
 
     public static void setRequestParameter(HttpServletRequest request, String name, Object value) {
         val mutableRequest = mutableRequest(request);
-        if (null == mutableRequest) return;
+        if (isNull(mutableRequest)) return;
         mutableRequest.setParameter(name, value);
     }
 
     public static void setRequestParameterMap(HttpServletRequest request, Map<String, Object> params) {
         val mutableRequest = mutableRequest(request);
-        if (null == mutableRequest) return;
+        if (isNull(mutableRequest)) return;
         mutableRequest.setParameterMap(params);
     }
 
     public static byte[] getResponseContent(HttpServletResponse response) {
         val mutableResponse = mutableResponse(response);
-        if (null == mutableResponse) return new byte[0];
+        if (isNull(mutableResponse)) return new byte[0];
         return mutableResponse.getContent();
     }
 
     public static void setResponseContent(HttpServletResponse response, byte[] content) {
         val mutableResponse = mutableResponse(response);
-        if (null == mutableResponse) return;
+        if (isNull(mutableResponse)) return;
         mutableResponse.setContent(content);
     }
 
     public static void appendResponseContent(HttpServletResponse response, byte[] content) {
         val mutableResponse = mutableResponse(response);
-        if (null == mutableResponse) return;
+        if (isNull(mutableResponse)) return;
         mutableResponse.appendContent(content);
     }
 
     public static String getResponseContentAsString(HttpServletResponse response) {
         val mutableResponse = mutableResponse(response);
-        if (null == mutableResponse) return null;
+        if (isNull(mutableResponse)) return null;
         return mutableResponse.getContentAsString();
     }
 
     public static void setResponseContentByString(HttpServletResponse response, String content) {
         val mutableResponse = mutableResponse(response);
-        if (null == mutableResponse) return;
+        if (isNull(mutableResponse)) return;
         mutableResponse.setContentByString(content);
     }
 
     public static void appendResponseContentByString(HttpServletResponse response, String content) {
         val mutableResponse = mutableResponse(response);
-        if (null == mutableResponse) return;
+        if (isNull(mutableResponse)) return;
         mutableResponse.appendContentByString(content);
     }
 
     public static String getResponseContentAsString(HttpServletResponse response, Charset charset) {
         val mutableResponse = mutableResponse(response);
-        if (null == mutableResponse) return null;
+        if (isNull(mutableResponse)) return null;
         return mutableResponse.getContentAsString(charset);
     }
 
     public static void setResponseContentByString(HttpServletResponse response, String content, Charset charset) {
         val mutableResponse = mutableResponse(response);
-        if (null == mutableResponse) return;
+        if (isNull(mutableResponse)) return;
         mutableResponse.setContentByString(content, charset);
     }
 
     public static void appendResponseContentByString(HttpServletResponse response, String content, Charset charset) {
         val mutableResponse = mutableResponse(response);
-        if (null == mutableResponse) return;
+        if (isNull(mutableResponse)) return;
         mutableResponse.appendContentByString(content, charset);
     }
 
     public static void mutateResponse(HttpServletResponse response, Consumer<MutableHttpServletResponse> mutator) {
-        if (null == mutator) return;
+        if (isNull(mutator)) return;
         val mutableResponse = mutableResponse(response);
-        if (null == mutableResponse) return;
+        if (isNull(mutableResponse)) return;
         mutator.accept(mutableResponse);
     }
 

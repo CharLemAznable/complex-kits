@@ -17,6 +17,9 @@ import javax.annotation.Nonnull;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+
 public class SpringScannerRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware {
 
     private final Class<? extends Annotation> scanAnnotationClass;
@@ -45,11 +48,11 @@ public class SpringScannerRegistrar implements ImportBeanDefinitionRegistrar, Re
                                               @Nonnull BeanDefinitionRegistry registry) {
         val annoAttrs = AnnotationAttributes.fromMap(importingClassMetadata
                 .getAnnotationAttributes(scanAnnotationClass.getName()));
-        if (annoAttrs == null) return;
+        if (isNull(annoAttrs)) return;
 
         val scanner = new SpringClassPathScanner(
                 registry, factoryBeanClass, this::isCandidateClass, annotationClass);
-        if (resourceLoader != null) { // this check is needed in Spring 3.1
+        if (nonNull(resourceLoader)) { // this check is needed in Spring 3.1
             scanner.setResourceLoader(resourceLoader);
         }
 

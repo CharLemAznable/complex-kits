@@ -20,6 +20,8 @@ import java.util.Map;
 import static com.github.charlemaznable.core.codec.Bytes.bytes;
 import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 public final class MutableHttpServletRequest extends HttpServletRequestWrapper {
 
@@ -41,7 +43,7 @@ public final class MutableHttpServletRequest extends HttpServletRequestWrapper {
                 new InputStreamReader(request.getInputStream(), charset));
         val stringBuilder = new StringBuilder();
         String line;
-        while ((line = bufferedReader.readLine()) != null) {
+        while (nonNull(line = bufferedReader.readLine())) {
             stringBuilder.append(line);
         }
         this.content = stringBuilder.toString();
@@ -51,7 +53,7 @@ public final class MutableHttpServletRequest extends HttpServletRequestWrapper {
     @Override
     public String getParameter(String name) {
         val values = this.params.get(name);
-        if (values == null || values.length == 0) {
+        if (isNull(values) || values.length == 0) {
             return null;
         }
         return values[0];
@@ -79,7 +81,7 @@ public final class MutableHttpServletRequest extends HttpServletRequestWrapper {
     }
 
     public void setParameter(String name, Object value) {
-        if (value != null) {
+        if (nonNull(value)) {
             if (value instanceof String[]) {
                 this.params.put(name, (String[]) value);
             } else if (value instanceof String) {
@@ -92,13 +94,17 @@ public final class MutableHttpServletRequest extends HttpServletRequestWrapper {
 
     @Override
     public ServletInputStream getInputStream() {
+        val contentBytes = bytes(this.content, this.charset);
+        if (isNull(contentBytes)) return null;
         return new MutableServletInputStream(
-                new ByteArrayInputStream(bytes(this.content, this.charset)));
+                new ByteArrayInputStream(contentBytes));
     }
 
     @Override
     public BufferedReader getReader() {
-        return new BufferedReader(new InputStreamReader(this.getInputStream()));
+        val inputStream = this.getInputStream();
+        if (isNull(inputStream)) return null;
+        return new BufferedReader(new InputStreamReader(inputStream));
     }
 
     public String getRequestBody() {

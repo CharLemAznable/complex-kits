@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import static com.github.charlemaznable.core.lang.Mapp.of;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static java.util.regex.Pattern.compile;
 
 public final class PropsReader extends LineNumberReader {
@@ -106,7 +108,7 @@ public final class PropsReader extends LineNumberReader {
 
     @SuppressWarnings("SameParameterValue")
     protected static String unescapeJava(String str, char delimiter) {
-        if (str == null) return null;
+        if (isNull(str)) return null;
 
         val sz = str.length();
         val out = new StringBuilder(sz);
@@ -160,7 +162,7 @@ public final class PropsReader extends LineNumberReader {
     }
 
     private static void unescapeSlash(char ch, StringBuilder out, char delimiter) {
-        if (null != UNESCAPE_SLASH_MAP.get(ch)) out.append(UNESCAPE_SLASH_MAP.get(ch));
+        if (nonNull(UNESCAPE_SLASH_MAP.get(ch))) out.append(UNESCAPE_SLASH_MAP.get(ch));
         else if (ch == delimiter) out.append('\\').append(delimiter);
         else out.append(ch);
     }
@@ -170,7 +172,7 @@ public final class PropsReader extends LineNumberReader {
 
         while (true) {
             var line = readLine();
-            if (line == null) return null; // EOF
+            if (isNull(line)) return null; // EOF
 
             if (!readPropertyLine(line, buffer)) break;
         }
@@ -196,7 +198,7 @@ public final class PropsReader extends LineNumberReader {
     public boolean nextProperty() throws IOException {
         val line = readProperty();
 
-        if (line == null) return false; // EOF
+        if (isNull(line)) return false; // EOF
 
         // parse the line
         parseProperty(line);

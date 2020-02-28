@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Contract;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -16,6 +17,7 @@ import java.util.function.Supplier;
 import static com.github.charlemaznable.core.lang.Empty.isEmpty;
 import static com.github.charlemaznable.core.lang.Str.isBlank;
 import static com.github.charlemaznable.core.lang.Str.isNotBlank;
+import static java.util.Objects.isNull;
 
 public final class Condition {
 
@@ -24,7 +26,7 @@ public final class Condition {
     @SafeVarargs
     public static <T> T nonNull(T... objects) {
         for (val object : objects) {
-            if (null != object) return object;
+            if (Objects.nonNull(object)) return object;
         }
         return null;
     }
@@ -111,7 +113,7 @@ public final class Condition {
     }
 
     public static <T, R> R checkNull(T object, Supplier<R> nullAction, Function<? super T, R> notNullAction) {
-        return null == object ? nullAction.get() : notNullAction.apply(object);
+        return isNull(object) ? nullAction.get() : notNullAction.apply(object);
     }
 
     public static <T, R> R checkEmpty(T object, Supplier<R> emptyAction, Function<? super T, R> notEmptyAction) {
@@ -126,7 +128,7 @@ public final class Condition {
     @Nonnull
     @CanIgnoreReturnValue
     public static <T> T checkNotNull(@Nullable T object) {
-        if (object == null) {
+        if (isNull(object)) {
             throw new NullPointerException();
         }
         return object;
@@ -136,7 +138,7 @@ public final class Condition {
     @Nonnull
     @CanIgnoreReturnValue
     public static <T> T checkNotNull(@Nullable T object, Object errorMessage) {
-        if (object == null) {
+        if (isNull(object)) {
             throw new NullPointerException(String.valueOf(errorMessage));
         }
         return object;
@@ -146,7 +148,7 @@ public final class Condition {
     @Nonnull
     @CanIgnoreReturnValue
     public static <T> T checkNotNull(@Nullable T object, RuntimeException errorException) {
-        if (object == null) {
+        if (isNull(object)) {
             throw nullThen(errorException, NullPointerException::new);
         }
         return object;
@@ -156,7 +158,7 @@ public final class Condition {
     @Nonnull
     @CanIgnoreReturnValue
     public static <T> T checkNotEmpty(@Nullable T object) {
-        if (object == null || isEmpty(object))
+        if (isNull(object) || isEmpty(object))
             throw new EmptyObjectException();
         return object;
     }
@@ -165,7 +167,7 @@ public final class Condition {
     @Nonnull
     @CanIgnoreReturnValue
     public static <T> T checkNotEmpty(@Nullable T object, Object errorMessage) {
-        if (object == null || isEmpty(object))
+        if (isNull(object) || isEmpty(object))
             throw new EmptyObjectException(String.valueOf(errorMessage));
         return object;
     }
@@ -174,7 +176,7 @@ public final class Condition {
     @Nonnull
     @CanIgnoreReturnValue
     public static <T> T checkNotEmpty(@Nullable T object, RuntimeException errorException) {
-        if (object == null || isEmpty(object))
+        if (isNull(object) || isEmpty(object))
             throw nullThen(errorException, EmptyObjectException::new);
         return object;
     }
@@ -183,7 +185,7 @@ public final class Condition {
     @Nonnull
     @CanIgnoreReturnValue
     public static String checkNotBlank(@Nullable String string) {
-        if (string == null || isBlank(string))
+        if (isNull(string) || isBlank(string))
             throw new BlankStringException();
         return string;
     }
@@ -192,7 +194,7 @@ public final class Condition {
     @Nonnull
     @CanIgnoreReturnValue
     public static String checkNotBlank(@Nullable String string, Object errorMessage) {
-        if (string == null || isBlank(string))
+        if (isNull(string) || isBlank(string))
             throw new BlankStringException(String.valueOf(errorMessage));
         return string;
     }
@@ -201,7 +203,7 @@ public final class Condition {
     @Nonnull
     @CanIgnoreReturnValue
     public static String checkNotBlank(@Nullable String string, RuntimeException errorException) {
-        if (string == null || isBlank(string))
+        if (isNull(string) || isBlank(string))
             throw nullThen(errorException, BlankStringException::new);
         return string;
     }

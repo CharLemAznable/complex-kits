@@ -15,6 +15,8 @@ import java.util.Random;
 
 import static com.github.charlemaznable.core.lang.Mapp.of;
 import static com.google.common.collect.Sets.newHashSet;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static org.joor.Reflect.onClass;
 
 public final class Listt {
@@ -28,11 +30,11 @@ public final class Listt {
     }
 
     public static boolean isEmpty(Collection list) {
-        return list == null || list.isEmpty();
+        return isNull(list) || list.isEmpty();
     }
 
     public static boolean isNotEmpty(Collection list) {
-        return list != null && !list.isEmpty();
+        return nonNull(list) && !list.isEmpty();
     }
 
     public static <T> List<T> shuffle(Iterable<T> original) {
@@ -42,7 +44,7 @@ public final class Listt {
     }
 
     public static <T> List<Map<String, T>> listFromMap(Map<T, T> map, String keyKey, String valueKey) {
-        if (map == null) return newArrayList();
+        if (isNull(map)) return newArrayList();
 
         List<Map<String, T>> result = newArrayList();
         for (val entry : map.entrySet()) {
@@ -57,15 +59,15 @@ public final class Listt {
 
     @SafeVarargs
     public static <E> List<E> newArrayList(E... elements) {
-        return null == elements ? Lists.newArrayList() : Lists.newArrayList(elements);
+        return isNull(elements) ? Lists.newArrayList() : Lists.newArrayList(elements);
     }
 
     public static <E> List<E> newArrayList(Iterable<? extends E> elements) {
-        return null == elements ? Lists.newArrayList() : Lists.newArrayList(elements);
+        return isNull(elements) ? Lists.newArrayList() : Lists.newArrayList(elements);
     }
 
     public static <E> List<E> newArrayList(Iterator<? extends E> elements) {
-        return null == elements ? Lists.newArrayList() : Lists.newArrayList(elements);
+        return isNull(elements) ? Lists.newArrayList() : Lists.newArrayList(elements);
     }
 
     public static <E> List<E> newArrayListOfType(int count, Class<? extends E> itemType) {

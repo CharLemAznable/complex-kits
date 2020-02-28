@@ -11,6 +11,9 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+
 public final class Mapp {
 
     private Mapp() {}
@@ -60,7 +63,7 @@ public final class Mapp {
     }
 
     public static boolean isEmpty(Map<?, ?> map) {
-        return map == null || map.isEmpty();
+        return isNull(map) || map.isEmpty();
     }
 
     public static String getStr(Map m, Object key) {
@@ -68,17 +71,17 @@ public final class Mapp {
     }
 
     public static String getStr(Map m, Object key, String defaultValue) {
-        if (m == null) return defaultValue;
+        if (isNull(m)) return defaultValue;
         val value = m.get(key);
-        if (value == null) return defaultValue;
+        if (isNull(value)) return defaultValue;
         return value.toString();
     }
 
     @SneakyThrows
     public static Number getNum(Map m, Object key) {
-        if (m == null) return null;
+        if (isNull(m)) return null;
         val value = m.get(key);
-        if (value == null) return null;
+        if (isNull(value)) return null;
         if (value instanceof Number) return (Number) value;
         if (!(value instanceof String)) return null;
         return NumberFormat.getInstance().parse((String) value);
@@ -89,9 +92,9 @@ public final class Mapp {
     }
 
     public static Boolean getBool(Map m, Object key, Boolean defaultValue) {
-        if (m == null) return defaultValue;
+        if (isNull(m)) return defaultValue;
         val value = m.get(key);
-        if (value == null) return defaultValue;
+        if (isNull(value)) return defaultValue;
         if (value instanceof Boolean) return (Boolean) value;
         if (value instanceof Number) return ((Number) value).intValue() != 0;
         if (!(value instanceof String)) return defaultValue;
@@ -107,7 +110,7 @@ public final class Mapp {
 
     public static Integer getInt(Map m, Object key, Integer defaultValue) {
         val value = getNum(m, key);
-        if (value == null) return defaultValue;
+        if (isNull(value)) return defaultValue;
         return value instanceof Integer ? (Integer) value : new Integer(value.intValue());
     }
 
@@ -117,12 +120,12 @@ public final class Mapp {
 
     public static Long getLong(Map m, Object key, Long defaultValue) {
         val value = getNum(m, key);
-        if (value == null) return defaultValue;
+        if (isNull(value)) return defaultValue;
         return value instanceof Long ? (Long) value : new Long(value.longValue());
     }
 
     public static <T> Map<T, T> mapFromList(List<Map<String, T>> list, String keyKey, String valueKey) {
-        if (list == null) return newHashMap();
+        if (isNull(list)) return newHashMap();
 
         Map<T, T> result = newHashMap();
         for (val map : list) {
@@ -138,7 +141,7 @@ public final class Mapp {
     }
 
     public static <K, V> Map<K, V> newHashMap(Map<? extends K, ? extends V> map) {
-        return null == map ? Maps.newHashMap() : Maps.newHashMap(map);
+        return isNull(map) ? Maps.newHashMap() : Maps.newHashMap(map);
     }
 
     @SafeVarargs
@@ -146,7 +149,7 @@ public final class Mapp {
         Map<K, V> result = Maps.newHashMap();
         ArrayUtils.reverse(maps);
         for (val map : maps) {
-            if (null != map) result.putAll(map);
+            if (nonNull(map)) result.putAll(map);
         }
         return result;
     }

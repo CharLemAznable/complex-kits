@@ -10,6 +10,7 @@ import java.util.Properties;
 import java.util.ServiceLoader;
 
 import static com.github.charlemaznable.core.lang.ClzPath.classResource;
+import static java.util.Objects.nonNull;
 
 public final class Config {
 
@@ -38,7 +39,7 @@ public final class Config {
 
         var basePackage = defConfigDir;
         val envURL = classResource("envspace.props");
-        if (envURL != null) {
+        if (nonNull(envURL)) {
             val envSpaceConfig = new PropsConfigLoader().loadConfigable(envURL);
             basePackage = envSpaceConfig.getStr(configKey, defConfigDir);
             configBuilder.addConfig(envSpaceConfig);

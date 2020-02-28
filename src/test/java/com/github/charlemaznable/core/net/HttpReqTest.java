@@ -33,6 +33,7 @@ import static com.github.charlemaznable.core.codec.Bytes.bytes;
 import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static com.github.charlemaznable.core.lang.Mapp.of;
 import static java.lang.String.format;
+import static java.util.Objects.nonNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -169,7 +170,7 @@ public class HttpReqTest {
 
                     @Override
                     public boolean usingProxy() {
-                        return null != proxy;
+                        return nonNull(proxy);
                     }
 
                     @Override

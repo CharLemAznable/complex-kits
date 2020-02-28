@@ -35,6 +35,8 @@ import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static com.github.charlemaznable.core.lang.Str.isNotBlank;
 import static com.github.charlemaznable.core.miner.MinerElf.minerAsSubstitutor;
 import static com.google.common.cache.CacheLoader.from;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
@@ -170,28 +172,28 @@ public final class MinerFactory {
             var defaultArgument = args.length > 0 ? args[0] : null;
 
             val stone = minerable.getStone(group, blankThen(dataId, method::getName));
-            if (null != stone) return convertType(stone, method);
-            if (null != defaultArgument) return defaultArgument;
-            if (null != defaultValue) return convertType(defaultValue, method);
+            if (nonNull(stone)) return convertType(stone, method);
+            if (nonNull(defaultArgument)) return defaultArgument;
+            if (nonNull(defaultValue)) return convertType(defaultValue, method);
             return null;
         }
 
         private String checkMinerGroup(Method method, MinerConfig minerConfig) {
-            if (null == minerConfig) return "";
+            if (isNull(minerConfig)) return "";
             val providerClass = minerConfig.groupProvider();
             return substitute(GroupProvider.class == providerClass ? minerConfig.group()
                     : FactoryContext.apply(factory, providerClass, p -> p.group(minerClass, method)));
         }
 
         private String checkMinerDataId(Method method, MinerConfig minerConfig) {
-            if (null == minerConfig) return "";
+            if (isNull(minerConfig)) return "";
             val providerClass = minerConfig.dataIdProvider();
             return substitute(DataIdProvider.class == providerClass ? minerConfig.dataId()
                     : FactoryContext.apply(factory, providerClass, p -> p.dataId(minerClass, method)));
         }
 
         private String checkMinerDefaultValue(Method method, MinerConfig minerConfig) {
-            if (null == minerConfig) return null;
+            if (isNull(minerConfig)) return null;
             val providerClass = minerConfig.defaultValueProvider();
             String defaultValue = DefaultValueProvider.class == providerClass ? minerConfig.defaultValue()
                     : FactoryContext.apply(factory, providerClass, p -> p.defaultValue(minerClass, method));

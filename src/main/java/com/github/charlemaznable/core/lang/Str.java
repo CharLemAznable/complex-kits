@@ -4,6 +4,7 @@ import lombok.val;
 import lombok.var;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import static java.util.regex.Pattern.compile;
@@ -19,11 +20,11 @@ public final class Str {
     private Str() {}
 
     public static boolean isNull(String str) {
-        return str == null;
+        return Objects.isNull(str);
     }
 
     public static boolean isNotNull(String str) {
-        return str != null;
+        return Objects.nonNull(str);
     }
 
     public static boolean isEmpty(String str) {
@@ -85,7 +86,7 @@ public final class Str {
     }
 
     public static String toStr(Object obj) {
-        return obj == null ? "" : obj.toString();
+        return Objects.isNull(obj) ? "" : obj.toString();
     }
 
     /**
@@ -100,8 +101,8 @@ public final class Str {
 
         val number = matcher.group(1);
         val maxValue = "" + Integer.MAX_VALUE;
-        return number.length() <= maxValue.length() &&
-                alignRight(number, maxValue.length(), '0').compareTo(maxValue) <= 0;
+        return number.length() <= maxValue.length() && toStr(alignRight(
+                number, maxValue.length(), '0')).compareTo(maxValue) <= 0;
     }
 
     /**
@@ -116,8 +117,8 @@ public final class Str {
 
         val number = matcher.group(1);
         val maxValue = "" + Long.MAX_VALUE;
-        return number.length() <= maxValue.length() &&
-                alignRight(number, maxValue.length(), '0').compareTo(maxValue) <= 0;
+        return number.length() <= maxValue.length() && toStr(alignRight(
+                number, maxValue.length(), '0')).compareTo(maxValue) <= 0;
     }
 
     /**
@@ -129,7 +130,7 @@ public final class Str {
      * @return 新字符串
      */
     public static String alignRight(CharSequence cs, int width, char c) {
-        if (null == cs) return null;
+        if (Objects.isNull(cs)) return null;
         val len = cs.length();
         if (len >= width) return cs.toString();
         return repeat(c, width - len) + cs;

@@ -6,6 +6,8 @@ import java.io.Closeable;
 
 import static com.github.charlemaznable.core.lang.Clz.getMethod;
 import static com.github.charlemaznable.core.lang.Clz.invokeQuietly;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 public final class Closer {
 
@@ -29,7 +31,7 @@ public final class Closer {
      * @param obj 待关闭对象
      */
     public static void closeQuietly(Object obj) {
-        if (obj == null) return;
+        if (isNull(obj)) return;
 
         if (obj instanceof Closeable) {
             try {
@@ -41,7 +43,7 @@ public final class Closer {
         }
 
         val method = getMethod(obj.getClass(), "close");
-        if (method != null && method.getParameterTypes().length == 0) {
+        if (nonNull(method) && method.getParameterTypes().length == 0) {
             invokeQuietly(obj, method);
         }
     }

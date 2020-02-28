@@ -65,6 +65,8 @@ import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DE
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.ohConnectionPool;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.substitute;
 import static com.google.common.cache.CacheLoader.from;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedRepeatableAnnotations;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
@@ -86,7 +88,7 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
 
         this.clientProxy = Elf.checkClientProxy(this.ohClass, this.factory);
         val clientSSL = Elf.checkClientSSL(this.ohClass);
-        if (null != clientSSL) {
+        if (nonNull(clientSSL)) {
             this.sslSocketFactory = Elf.checkSSLSocketFactory(
                     this.ohClass, this.factory, clientSSL);
             this.x509TrustManager = Elf.checkX509TrustManager(
@@ -140,7 +142,7 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
 
         static String checkBaseUrl(Class clazz, Factory factory) {
             val mapping = findAnnotation(clazz, Mapping.class);
-            if (null == mapping) return "";
+            if (isNull(mapping)) return "";
             val providerClass = mapping.urlProvider();
             return substitute(UrlProvider.class == providerClass ? mapping.value()
                     : FactoryContext.apply(factory, providerClass, p -> p.url(clazz)));

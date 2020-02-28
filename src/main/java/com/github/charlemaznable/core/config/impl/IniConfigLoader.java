@@ -16,6 +16,7 @@ import java.util.Properties;
 import static com.github.charlemaznable.core.lang.ClzPath.urlAsInputStream;
 import static com.github.charlemaznable.core.spring.ClzResolver.getResources;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 @AutoService(ConfigLoader.class)
@@ -38,7 +39,7 @@ public final class IniConfigLoader implements ConfigLoader {
             val iniReader = new IniReader(reader);
             for (val section : iniReader.getSections()) {
                 val sectionProps = iniReader.getSection(section);
-                if (sectionProps == null) continue;
+                if (isNull(sectionProps)) continue;
 
                 val prefix = section.equals("") ? "" : section + '.';
                 for (val entry : sectionProps.entrySet()) {

@@ -18,6 +18,7 @@ import static com.google.common.io.Resources.readLines;
 import static java.lang.Class.forName;
 import static java.lang.Thread.currentThread;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Objects.nonNull;
 
 public final class ClzPath {
 
@@ -71,7 +72,7 @@ public final class ClzPath {
     }
 
     public static boolean classResourceExists(String classPath) {
-        return classResource(classPath) != null;
+        return nonNull(classResource(classPath));
     }
 
     public static InputStream classResourceAsInputStream(String classPath) {
@@ -88,7 +89,7 @@ public final class ClzPath {
 
     public static StringSubstitutor classResourceAsSubstitutor(String classPath) {
         val propsURL = classResource(classPath);
-        if (propsURL != null) {
+        if (nonNull(propsURL)) {
             val envProps = new PropsConfigLoader()
                     .loadConfigable(propsURL).getProperties();
             Map<String, String> envPropsMap = newHashMap();
@@ -106,7 +107,7 @@ public final class ClzPath {
 
     public static InputStream urlAsInputStream(URL url) {
         try {
-            return url != null ? url.openStream() : null;
+            return nonNull(url) ? url.openStream() : null;
         } catch (IOException e) {
             return null;
         }
@@ -114,7 +115,7 @@ public final class ClzPath {
 
     public static String urlAsString(URL url) {
         try {
-            return url != null ? Resources.toString(url, UTF_8) : null;
+            return nonNull(url) ? Resources.toString(url, UTF_8) : null;
         } catch (IOException e) {
             return null;
         }
@@ -122,7 +123,7 @@ public final class ClzPath {
 
     public static List<String> urlAsLines(URL url) {
         try {
-            return url != null ? readLines(url, UTF_8) : newArrayList();
+            return nonNull(url) ? readLines(url, UTF_8) : newArrayList();
         } catch (IOException e) {
             return newArrayList();
         }

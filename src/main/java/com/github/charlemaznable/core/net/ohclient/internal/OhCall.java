@@ -1,16 +1,16 @@
 package com.github.charlemaznable.core.net.ohclient.internal;
 
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.github.charlemaznable.core.lang.Str;
+import com.github.charlemaznable.core.net.common.Bundle;
 import com.github.charlemaznable.core.net.common.CncRequest;
 import com.github.charlemaznable.core.net.common.CncResponse.CncResponseImpl;
 import com.github.charlemaznable.core.net.common.Context;
 import com.github.charlemaznable.core.net.common.Header;
 import com.github.charlemaznable.core.net.common.Parameter;
-import com.github.charlemaznable.core.net.common.ParameterBundle;
 import com.github.charlemaznable.core.net.common.PathVar;
 import com.github.charlemaznable.core.net.common.RequestBodyRaw;
 import com.github.charlemaznable.core.net.ohclient.OhReq;
+import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
 import okhttp3.MediaType;
@@ -21,18 +21,18 @@ import okhttp3.Response;
 import okhttp3.internal.http.HttpMethod;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.text.StringSubstitutor;
+import org.joor.ReflectException;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.alibaba.fastjson.JSON.toJSONString;
-import static com.github.charlemaznable.core.codec.Json.unJson;
 import static com.github.charlemaznable.core.lang.Condition.checkNull;
 import static com.github.charlemaznable.core.lang.Condition.notNullThen;
 import static com.github.charlemaznable.core.lang.Condition.nullThen;
@@ -41,6 +41,10 @@ import static com.github.charlemaznable.core.lang.Str.isBlank;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.ACCEPT_CHARSET;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.CONTENT_TYPE;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.log;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static org.joor.Reflect.accessible;
+import static org.joor.Reflect.on;
 
 public final class OhCall extends OhRoot {
 
@@ -86,7 +90,7 @@ public final class OhCall extends OhRoot {
 
             val configuredType = processParameterType(argument, parameterType);
             if (configuredType) continue;
-            processParameterAnnotations(argument, parameterAnnotations);
+            processAnnotations(argument, parameterAnnotations, null);
         }
     }
 
@@ -110,21 +114,32 @@ public final class OhCall extends OhRoot {
         return true;
     }
 
-    private void processParameterAnnotations(Object argument, Annotation[] annotations) {
+    private void processAnnotations(Object argument, Annotation[] annotations,
+                                    String defaultParameterName) {
+        boolean processed = false;
         for (Annotation annotation : annotations) {
             if (annotation instanceof Header) {
                 processHeader(argument, (Header) annotation);
+                processed = true;
             } else if (annotation instanceof PathVar) {
                 processPathVar(argument, (PathVar) annotation);
+                processed = true;
             } else if (annotation instanceof Parameter) {
                 processParameter(argument, (Parameter) annotation);
+                processed = true;
             } else if (annotation instanceof Context) {
                 processContext(argument, (Context) annotation);
-            } else if (annotation instanceof ParameterBundle) {
-                processParameterBundle(argument);
+                processed = true;
             } else if (annotation instanceof RequestBodyRaw) {
                 processRequestBodyRaw(argument);
+                processed = true;
+            } else if (annotation instanceof Bundle) {
+                processBundle(argument);
+                processed = true;
             }
+        }
+        if (!processed && nonNull(defaultParameterName)) {
+            processParameter(argument, new ParameterImpl(defaultParameterName));
         }
     }
 
@@ -146,15 +161,6 @@ public final class OhCall extends OhRoot {
         this.contexts.add(Pair.of(context.value(), argument));
     }
 
-    private void processParameterBundle(Object argument) {
-        if (null == argument) return;
-        Map<String, Object> beanDesc = unJson(toJSONString(
-                argument, SerializerFeature.WriteMapNullValue));
-        for (val fieldEntry : beanDesc.entrySet()) {
-            this.parameters.add(Pair.of(fieldEntry.getKey(), fieldEntry.getValue()));
-        }
-    }
-
     private void processRequestBodyRaw(Object argument) {
         if (null == argument || (argument instanceof String)) {
             // OhRequestBodyRaw参数传值null时, 则继续使用parameters构造请求
@@ -163,6 +169,40 @@ public final class OhCall extends OhRoot {
         }
         log.warn("Argument annotated with @RequestBodyRaw, " +
                 "but Type is {} instead String.", argument.getClass());
+    }
+
+    private void processBundle(Object argument) {
+        if (isNull(argument)) return;
+
+        val clazz = argument.getClass();
+        val reflect = on(argument);
+        val fields = reflect.fields();
+        for (val fieldEntry : fields.entrySet()) {
+            val fieldName = fieldEntry.getKey();
+            val field = field0(clazz, fieldName);
+            val fieldReflect = fieldEntry.getValue();
+            val fieldValue = fieldReflect.get();
+
+            Annotation[] annotations = field.getAnnotations();
+            processAnnotations(fieldValue, annotations, fieldName);
+        }
+    }
+
+    private Field field0(Class<?> clazz, String fieldName) {
+        Class<?> t = clazz;
+        try {
+            return accessible(t.getField(fieldName));
+        } catch (NoSuchFieldException e) {
+            do {
+                try {
+                    return accessible(t.getDeclaredField(fieldName));
+                } catch (NoSuchFieldException ignore) {
+                    // ignored
+                }
+                t = t.getSuperclass();
+            } while (t != null);
+            throw new ReflectException(e);
+        }
     }
 
     private OkHttpClient buildOkHttpClient(OhMappingProxy proxy) {
@@ -218,5 +258,22 @@ public final class OhCall extends OhRoot {
             requestBuilder.url(requestUrl);
         }
         return requestBuilder.build();
+    }
+
+    @SuppressWarnings("ClassExplicitlyAnnotation")
+    @AllArgsConstructor
+    private static class ParameterImpl implements Parameter {
+
+        private String value;
+
+        @Override
+        public String value() {
+            return value;
+        }
+
+        @Override
+        public Class<? extends Annotation> annotationType() {
+            return Parameter.class;
+        }
     }
 }

@@ -30,6 +30,7 @@ import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.ACCEPT_CHARSET;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.CONTENT_TYPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Objects.isNull;
 
 public class VxReq extends CommonReq<VxReq> {
 
@@ -148,7 +149,7 @@ public class VxReq extends CommonReq<VxReq> {
             val iterator = Iterators.forArray(handlers);
             while (iterator.hasNext()) {
                 val nextHandler = iterator.next();
-                if (null == nextHandler) continue;
+                if (isNull(nextHandler)) continue;
                 nextHandler.handle(promise.future());
             }
         };

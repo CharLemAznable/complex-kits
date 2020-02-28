@@ -12,6 +12,8 @@ import static com.github.charlemaznable.core.lang.Str.removeLastLetters;
 import static java.lang.Math.min;
 import static java.lang.String.format;
 import static java.lang.System.arraycopy;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 public final class Base64 {
 
@@ -97,7 +99,7 @@ public final class Base64 {
         }
 
         int available(final Context context) {  // package protected for access from I/O streams
-            return context.buffer != null ? context.pos - context.readPos : 0;
+            return nonNull(context.buffer) ? context.pos - context.readPos : 0;
         }
 
         protected int getDefaultBufferSize() {
@@ -105,7 +107,7 @@ public final class Base64 {
         }
 
         private byte[] resizeBuffer(final Context context) {
-            if (context.buffer == null) {
+            if (isNull(context.buffer)) {
                 context.buffer = new byte[getDefaultBufferSize()];
                 context.pos = 0;
                 context.readPos = 0;
@@ -118,7 +120,7 @@ public final class Base64 {
         }
 
         protected byte[] ensureBufferSize(final int size, final Context context) {
-            if ((context.buffer == null) || (context.buffer.length < context.pos + size)) {
+            if (isNull(context.buffer) || (context.buffer.length < context.pos + size)) {
                 return resizeBuffer(context);
             }
             return context.buffer;
@@ -126,7 +128,7 @@ public final class Base64 {
 
         @SuppressWarnings("UnusedReturnValue")
         int readResults(final byte[] b, final int bPos, final int bAvail, final Context context) {
-            if (context.buffer != null) {
+            if (nonNull(context.buffer)) {
                 val len = min(available(context), bAvail);
                 arraycopy(context.buffer, context.readPos, b, bPos, len);
                 context.readPos += len;
@@ -143,7 +145,7 @@ public final class Base64 {
         }
 
         public byte[] decode(final byte[] pArray) {
-            if (pArray == null || pArray.length == 0) {
+            if (isNull(pArray) || pArray.length == 0) {
                 return pArray;
             }
             val context = new Context();
@@ -155,7 +157,7 @@ public final class Base64 {
         }
 
         public byte[] encode(final byte[] pArray) {
-            if (pArray == null || pArray.length == 0) {
+            if (isNull(pArray) || pArray.length == 0) {
                 return pArray;
             }
             val context = new Context();
@@ -175,7 +177,7 @@ public final class Base64 {
         protected abstract boolean isInAlphabet(byte value);
 
         protected boolean containsAlphabetOrPad(final byte[] arrayOctet) {
-            if (arrayOctet == null) {
+            if (isNull(arrayOctet)) {
                 return false;
             }
             for (val element : arrayOctet) {
@@ -290,8 +292,8 @@ public final class Base64 {
         public ApacheBase64(final int lineLength, final byte[] lineSeparator, final boolean urlSafe) {
             super(BYTES_PER_UNENCODED_BLOCK, BYTES_PER_ENCODED_BLOCK,
                     lineLength,
-                    lineSeparator == null ? 0 : lineSeparator.length);
-            if (lineSeparator != null) {
+                    isNull(lineSeparator) ? 0 : lineSeparator.length);
+            if (nonNull(lineSeparator)) {
                 if (containsAlphabetOrPad(lineSeparator)) {
                     val sep = string(lineSeparator);
                     throw new IllegalArgumentException("lineSeparator must not contain base64 characters: [" + sep + "]");
@@ -338,7 +340,7 @@ public final class Base64 {
 
         public static byte[] encodeBase64(final byte[] binaryData, final boolean isChunked,
                                           final boolean urlSafe, final int maxResultSize) {
-            if (binaryData == null || binaryData.length == 0) {
+            if (isNull(binaryData) || binaryData.length == 0) {
                 return binaryData;
             }
 

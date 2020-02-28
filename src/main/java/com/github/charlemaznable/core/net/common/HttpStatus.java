@@ -2,6 +2,8 @@ package com.github.charlemaznable.core.net.common;
 
 import javax.annotation.Nullable;
 
+import static java.util.Objects.isNull;
+
 public enum HttpStatus {
 
     // 1xx Informational
@@ -99,7 +101,7 @@ public enum HttpStatus {
 
     public static HttpStatus valueOf(int statusCode) {
         HttpStatus status = resolve(statusCode);
-        if (status == null) {
+        if (isNull(status)) {
             throw new IllegalArgumentException("No matching constant for [" + statusCode + "]");
         }
         return status;
@@ -176,7 +178,7 @@ public enum HttpStatus {
 
         public static Series valueOf(int statusCode) {
             Series series = resolve(statusCode);
-            if (series == null) {
+            if (isNull(series)) {
                 throw new IllegalArgumentException("No matching constant for [" + statusCode + "]");
             }
             return series;

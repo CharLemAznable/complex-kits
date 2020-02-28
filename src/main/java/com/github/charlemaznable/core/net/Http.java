@@ -19,6 +19,8 @@ import static com.google.common.base.Splitter.on;
 import static com.google.common.collect.Maps.newHashMap;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static org.springframework.web.servlet.HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE;
 
 public final class Http {
@@ -42,7 +44,7 @@ public final class Http {
     @SneakyThrows
     public static void responseContent(HttpServletResponse response, String content,
                                        String contentType, String characterEncoding) {
-        if (content == null) return;
+        if (isNull(content)) return;
 
         response.setHeader("Content-Type", contentType + "; charset=" + characterEncoding);
         response.setCharacterEncoding(characterEncoding);
@@ -97,7 +99,7 @@ public final class Http {
     public static Map<String, String> fetchPathVariableMap(HttpServletRequest request) {
         Map<String, String> pathVariableMap = newHashMap();
         val pathVariables = request.getAttribute(URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-        if (pathVariables != null) pathVariableMap.putAll((Map) pathVariables);
+        if (nonNull(pathVariables)) pathVariableMap.putAll((Map) pathVariables);
         return pathVariableMap;
     }
 
@@ -164,7 +166,7 @@ public final class Http {
         try (val bufferedReader = new BufferedReader(isr)) {
             val stringBuilder = new StringBuilder();
             String line;
-            while ((line = bufferedReader.readLine()) != null) {
+            while (nonNull(line = bufferedReader.readLine())) {
                 stringBuilder.append(line);
             }
             return stringBuilder.toString();

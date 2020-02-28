@@ -3,6 +3,8 @@ package com.github.charlemaznable.core.lang;
 import java.util.Collection;
 import java.util.Map;
 
+import static java.util.Objects.isNull;
+
 public final class Empty {
 
     private Empty() {}
@@ -15,7 +17,7 @@ public final class Empty {
         } else if (obj instanceof Map) {
             return ((Map) obj).isEmpty();
         } else {
-            return obj == null;
+            return isNull(obj);
         }
     }
 }

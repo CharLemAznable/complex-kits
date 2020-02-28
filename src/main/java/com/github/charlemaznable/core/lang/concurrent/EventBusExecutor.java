@@ -7,6 +7,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.Runtime.getRuntime;
+import static java.util.Objects.isNull;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 public abstract class EventBusExecutor {
@@ -20,7 +21,7 @@ public abstract class EventBusExecutor {
 
     public EventBusExecutor(Object subscriber) {
         eventBus = new AsyncEventBus(eventBusIdentifier(), eventBusExecutor());
-        eventBus.register(null == subscriber ? this : subscriber);
+        eventBus.register(isNull(subscriber) ? this : subscriber);
 
         executor = new ScheduledThreadPoolExecutor(getRuntime().availableProcessors() + 1);
     }
