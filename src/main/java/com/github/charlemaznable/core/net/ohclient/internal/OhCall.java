@@ -106,7 +106,7 @@ public final class OhCall extends OhRoot {
         } else if (CncRequest.class.isAssignableFrom(parameterType)) {
             this.responseClass = checkNull(argument,
                     () -> CncResponseImpl.class,
-                    xx -> ((CncRequest) xx).getResponseClass());
+                    xx -> ((CncRequest) xx).responseClass());
             return false;
         } else {
             return false;

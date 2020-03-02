@@ -132,7 +132,7 @@ public class CncTest {
     public static class TestRequest implements CncRequest<TestResponse> {
 
         @Override
-        public Class<TestResponse> getResponseClass() {
+        public Class<TestResponse> responseClass() {
             return TestResponse.class;
         }
     }
