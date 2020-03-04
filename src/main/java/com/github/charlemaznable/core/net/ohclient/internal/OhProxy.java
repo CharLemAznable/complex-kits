@@ -31,6 +31,8 @@ import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSL;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSL.HostnameVerifierProvider;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSL.SSLSocketFactoryProvider;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSL.X509TrustManagerProvider;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientTimeout;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientTimeout.TimeoutProvider;
 import com.github.charlemaznable.core.net.ohclient.annotation.IsolatedConnectionPool;
 import com.google.common.cache.LoadingCache;
 import lombok.val;
@@ -97,6 +99,17 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
                     this.ohClass, this.factory, clientSSL);
         }
         this.connectionPool = Elf.checkConnectionPool(this.ohClass);
+        val clientTimeout = Elf.checkClientTimeout(this.ohClass);
+        if (nonNull(clientTimeout)) {
+            this.callTimeout = Elf.checkCallTimeout(
+                    this.ohClass, this.factory, clientTimeout);
+            this.connectTimeout = Elf.checkConnectTimeout(
+                    this.ohClass, this.factory, clientTimeout);
+            this.readTimeout = Elf.checkReadTimeout(
+                    this.ohClass, this.factory, clientTimeout);
+            this.writeTimeout = Elf.checkWriteTimeout(
+                    this.ohClass, this.factory, clientTimeout);
+        }
         this.okHttpClient = Elf.buildOkHttpClient(this);
 
         this.acceptCharset = Elf.checkAcceptCharset(this.ohClass);
@@ -193,12 +206,48 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
             return checkNull(isolated, () -> ohConnectionPool, x -> new ConnectionPool());
         }
 
+        static ClientTimeout checkClientTimeout(Class clazz) {
+            return findAnnotation(clazz, ClientTimeout.class);
+        }
+
+        static long checkCallTimeout(
+                Class clazz, Factory factory, ClientTimeout clientTimeout) {
+            val providerClass = clientTimeout.callTimeoutProvider();
+            return TimeoutProvider.class == providerClass ? clientTimeout.callTimeout()
+                    : FactoryContext.apply(factory, providerClass, p -> p.timeout(clazz));
+        }
+
+        static long checkConnectTimeout(
+                Class clazz, Factory factory, ClientTimeout clientTimeout) {
+            val providerClass = clientTimeout.connectTimeoutProvider();
+            return TimeoutProvider.class == providerClass ? clientTimeout.connectTimeout()
+                    : FactoryContext.apply(factory, providerClass, p -> p.timeout(clazz));
+        }
+
+        static long checkReadTimeout(
+                Class clazz, Factory factory, ClientTimeout clientTimeout) {
+            val providerClass = clientTimeout.readTimeoutProvider();
+            return TimeoutProvider.class == providerClass ? clientTimeout.readTimeout()
+                    : FactoryContext.apply(factory, providerClass, p -> p.timeout(clazz));
+        }
+
+        static long checkWriteTimeout(
+                Class clazz, Factory factory, ClientTimeout clientTimeout) {
+            val providerClass = clientTimeout.writeTimeoutProvider();
+            return TimeoutProvider.class == providerClass ? clientTimeout.writeTimeout()
+                    : FactoryContext.apply(factory, providerClass, p -> p.timeout(clazz));
+        }
+
         static OkHttpClient buildOkHttpClient(OhProxy proxy) {
             return new OhReq().clientProxy(proxy.clientProxy)
                     .sslSocketFactory(proxy.sslSocketFactory)
                     .x509TrustManager(proxy.x509TrustManager)
                     .hostnameVerifier(proxy.hostnameVerifier)
                     .connectionPool(proxy.connectionPool)
+                    .callTimeout(proxy.callTimeout)
+                    .connectTimeout(proxy.connectTimeout)
+                    .readTimeout(proxy.readTimeout)
+                    .writeTimeout(proxy.writeTimeout)
                     .buildHttpClient();
         }
 

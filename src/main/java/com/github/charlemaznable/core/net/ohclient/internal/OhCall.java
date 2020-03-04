@@ -10,6 +10,7 @@ import com.github.charlemaznable.core.net.common.Parameter;
 import com.github.charlemaznable.core.net.common.PathVar;
 import com.github.charlemaznable.core.net.common.RequestBodyRaw;
 import com.github.charlemaznable.core.net.ohclient.OhReq;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientTimeout;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -70,6 +71,10 @@ public final class OhCall extends OhRoot {
         this.x509TrustManager = proxy.x509TrustManager;
         this.hostnameVerifier = proxy.hostnameVerifier;
         this.connectionPool = proxy.connectionPool;
+        this.callTimeout = proxy.callTimeout;
+        this.connectTimeout = proxy.connectTimeout;
+        this.readTimeout = proxy.readTimeout;
+        this.writeTimeout = proxy.writeTimeout;
 
         this.acceptCharset = proxy.acceptCharset;
         this.contentFormatter = proxy.contentFormatter;
@@ -103,6 +108,14 @@ public final class OhCall extends OhRoot {
             this.x509TrustManager = (X509TrustManager) argument;
         } else if (HostnameVerifier.class.isAssignableFrom(parameterType)) {
             this.hostnameVerifier = (HostnameVerifier) argument;
+        } else if (ClientTimeout.class.isAssignableFrom(parameterType)) {
+            if (nonNull(argument)) {
+                ClientTimeout clientTimeout = (ClientTimeout) argument;
+                this.callTimeout = clientTimeout.callTimeout();
+                this.connectTimeout = clientTimeout.connectTimeout();
+                this.readTimeout = clientTimeout.readTimeout();
+                this.writeTimeout = clientTimeout.writeTimeout();
+            }
         } else if (CncRequest.class.isAssignableFrom(parameterType)) {
             this.responseClass = checkNull(argument,
                     () -> CncResponseImpl.class,
@@ -210,14 +223,24 @@ public final class OhCall extends OhRoot {
         val sameSSLSocketFactory = this.sslSocketFactory == proxy.sslSocketFactory;
         val sameX509TrustManager = this.x509TrustManager == proxy.x509TrustManager;
         val sameHostnameVerifier = this.hostnameVerifier == proxy.hostnameVerifier;
-        if (sameClientProxy && sameSSLSocketFactory && sameX509TrustManager
-                && sameHostnameVerifier) return proxy.okHttpClient;
+        val sameCallTimeout = this.callTimeout == proxy.callTimeout;
+        val sameConnectTimeout = this.connectTimeout == proxy.connectTimeout;
+        val sameReadTimeout = this.readTimeout == proxy.readTimeout;
+        val sameWriteTimeout = this.writeTimeout == proxy.writeTimeout;
+        if (sameClientProxy && sameSSLSocketFactory
+                && sameX509TrustManager && sameHostnameVerifier
+                && sameCallTimeout && sameConnectTimeout &&
+                sameReadTimeout && sameWriteTimeout) return proxy.okHttpClient;
 
         return new OhReq().clientProxy(this.clientProxy)
                 .sslSocketFactory(this.sslSocketFactory)
                 .x509TrustManager(this.x509TrustManager)
                 .hostnameVerifier(this.hostnameVerifier)
                 .connectionPool(this.connectionPool)
+                .callTimeout(this.callTimeout)
+                .connectTimeout(this.connectTimeout)
+                .readTimeout(this.readTimeout)
+                .writeTimeout(this.writeTimeout)
                 .buildHttpClient();
     }
 

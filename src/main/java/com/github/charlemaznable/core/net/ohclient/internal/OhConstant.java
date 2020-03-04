@@ -16,6 +16,10 @@ public final class OhConstant {
     public static final String CONTENT_TYPE = "Content-Type";
     public static final ContentFormatter DEFAULT_CONTENT_FORMATTER = new FormContentFormatter();
     public static final HttpMethod DEFAULT_HTTP_METHOD = GET;
+    public static final long DEFAULT_CALL_TIMEOUT = 0;
+    public static final long DEFAULT_CONNECT_TIMEOUT = 10_000;
+    public static final long DEFAULT_READ_TIMEOUT = 10_000;
+    public static final long DEFAULT_WRITE_TIMEOUT = 10_000;
 
     private OhConstant() {
         throw new UnsupportedOperationException();

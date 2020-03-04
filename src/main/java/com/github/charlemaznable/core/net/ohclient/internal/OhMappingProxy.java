@@ -29,6 +29,8 @@ import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSL;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSL.HostnameVerifierProvider;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSL.SSLSocketFactoryProvider;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSL.X509TrustManagerProvider;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientTimeout;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientTimeout.TimeoutProvider;
 import com.github.charlemaznable.core.net.ohclient.annotation.IsolatedConnectionPool;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -113,6 +115,22 @@ public final class OhMappingProxy extends OhRoot {
             this.hostnameVerifier = proxy.hostnameVerifier;
         }
         this.connectionPool = Elf.checkConnectionPool(this.ohMethod, proxy);
+        val clientTimeout = Elf.checkClientTimeout(this.ohMethod);
+        if (nonNull(clientTimeout)) {
+            this.callTimeout = Elf.checkCallTimeout(
+                    this.ohClass, this.ohMethod, this.factory, clientTimeout);
+            this.connectTimeout = Elf.checkConnectTimeout(
+                    this.ohClass, this.ohMethod, this.factory, clientTimeout);
+            this.readTimeout = Elf.checkReadTimeout(
+                    this.ohClass, this.ohMethod, this.factory, clientTimeout);
+            this.writeTimeout = Elf.checkWriteTimeout(
+                    this.ohClass, this.ohMethod, this.factory, clientTimeout);
+        } else {
+            this.callTimeout = proxy.callTimeout;
+            this.connectTimeout = proxy.connectTimeout;
+            this.readTimeout = proxy.readTimeout;
+            this.writeTimeout = proxy.writeTimeout;
+        }
         this.okHttpClient = Elf.buildOkHttpClient(this, proxy);
 
         this.acceptCharset = Elf.checkAcceptCharset(this.ohMethod, proxy);
@@ -401,19 +419,61 @@ public final class OhMappingProxy extends OhRoot {
             return checkNull(isolated, () -> proxy.connectionPool, x -> new ConnectionPool());
         }
 
+        static ClientTimeout checkClientTimeout(Method method) {
+            return findAnnotation(method, ClientTimeout.class);
+        }
+
+        static long checkCallTimeout(
+                Class clazz, Method method, Factory factory, ClientTimeout clientTimeout) {
+            val providerClass = clientTimeout.callTimeoutProvider();
+            return TimeoutProvider.class == providerClass ? clientTimeout.callTimeout()
+                    : FactoryContext.apply(factory, providerClass, p -> p.timeout(clazz, method));
+        }
+
+        static long checkConnectTimeout(
+                Class clazz, Method method, Factory factory, ClientTimeout clientTimeout) {
+            val providerClass = clientTimeout.connectTimeoutProvider();
+            return TimeoutProvider.class == providerClass ? clientTimeout.connectTimeout()
+                    : FactoryContext.apply(factory, providerClass, p -> p.timeout(clazz, method));
+        }
+
+        static long checkReadTimeout(
+                Class clazz, Method method, Factory factory, ClientTimeout clientTimeout) {
+            val providerClass = clientTimeout.readTimeoutProvider();
+            return TimeoutProvider.class == providerClass ? clientTimeout.readTimeout()
+                    : FactoryContext.apply(factory, providerClass, p -> p.timeout(clazz, method));
+        }
+
+        static long checkWriteTimeout(
+                Class clazz, Method method, Factory factory, ClientTimeout clientTimeout) {
+            val providerClass = clientTimeout.writeTimeoutProvider();
+            return TimeoutProvider.class == providerClass ? clientTimeout.writeTimeout()
+                    : FactoryContext.apply(factory, providerClass, p -> p.timeout(clazz, method));
+        }
+
         static OkHttpClient buildOkHttpClient(OhMappingProxy mappingProxy, OhProxy proxy) {
             val sameClientProxy = mappingProxy.clientProxy == proxy.clientProxy;
             val sameSSLSocketFactory = mappingProxy.sslSocketFactory == proxy.sslSocketFactory;
             val sameX509TrustManager = mappingProxy.x509TrustManager == proxy.x509TrustManager;
             val sameHostnameVerifier = mappingProxy.hostnameVerifier == proxy.hostnameVerifier;
-            if (sameClientProxy && sameSSLSocketFactory && sameX509TrustManager
-                    && sameHostnameVerifier) return proxy.okHttpClient;
+            val sameCallTimeout = mappingProxy.callTimeout == proxy.callTimeout;
+            val sameConnectTimeout = mappingProxy.connectTimeout == proxy.connectTimeout;
+            val sameReadTimeout = mappingProxy.readTimeout == proxy.readTimeout;
+            val sameWriteTimeout = mappingProxy.writeTimeout == proxy.writeTimeout;
+            if (sameClientProxy && sameSSLSocketFactory
+                    && sameX509TrustManager && sameHostnameVerifier
+                    && sameCallTimeout && sameConnectTimeout &&
+                    sameReadTimeout && sameWriteTimeout) return proxy.okHttpClient;
 
             return new OhReq().clientProxy(mappingProxy.clientProxy)
                     .sslSocketFactory(mappingProxy.sslSocketFactory)
                     .x509TrustManager(mappingProxy.x509TrustManager)
                     .hostnameVerifier(mappingProxy.hostnameVerifier)
                     .connectionPool(mappingProxy.connectionPool)
+                    .callTimeout(mappingProxy.callTimeout)
+                    .connectTimeout(mappingProxy.connectTimeout)
+                    .readTimeout(mappingProxy.readTimeout)
+                    .writeTimeout(mappingProxy.writeTimeout)
                     .buildHttpClient();
         }
 

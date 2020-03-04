@@ -17,6 +17,11 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_CALL_TIMEOUT;
+import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_CONNECT_TIMEOUT;
+import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_READ_TIMEOUT;
+import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_WRITE_TIMEOUT;
+
 class OhRoot {
 
     Proxy clientProxy;
@@ -24,6 +29,10 @@ class OhRoot {
     X509TrustManager x509TrustManager;
     HostnameVerifier hostnameVerifier;
     ConnectionPool connectionPool;
+    long callTimeout = DEFAULT_CALL_TIMEOUT; // in milliseconds
+    long connectTimeout = DEFAULT_CONNECT_TIMEOUT; // in milliseconds
+    long readTimeout = DEFAULT_READ_TIMEOUT; // in milliseconds
+    long writeTimeout = DEFAULT_WRITE_TIMEOUT; // in milliseconds
     OkHttpClient okHttpClient;
 
     Charset acceptCharset;

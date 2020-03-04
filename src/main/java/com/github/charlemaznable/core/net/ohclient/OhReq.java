@@ -20,6 +20,7 @@ import javax.net.ssl.X509TrustManager;
 import java.net.Proxy;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import static com.github.charlemaznable.core.lang.Condition.checkNull;
 import static com.github.charlemaznable.core.lang.Condition.notNullThen;
@@ -27,6 +28,10 @@ import static com.github.charlemaznable.core.lang.Condition.nullThen;
 import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.ACCEPT_CHARSET;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.CONTENT_TYPE;
+import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_CALL_TIMEOUT;
+import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_CONNECT_TIMEOUT;
+import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_READ_TIMEOUT;
+import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_WRITE_TIMEOUT;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 
 public class OhReq extends CommonReq<OhReq> {
@@ -39,6 +44,10 @@ public class OhReq extends CommonReq<OhReq> {
     private X509TrustManager x509TrustManager;
     private HostnameVerifier hostnameVerifier;
     private ConnectionPool connectionPool;
+    private long callTimeout = DEFAULT_CALL_TIMEOUT; // in milliseconds
+    private long connectTimeout = DEFAULT_CONNECT_TIMEOUT; // in milliseconds
+    private long readTimeout = DEFAULT_READ_TIMEOUT; // in milliseconds
+    private long writeTimeout = DEFAULT_WRITE_TIMEOUT; // in milliseconds
 
     public OhReq() {
         super();
@@ -73,6 +82,26 @@ public class OhReq extends CommonReq<OhReq> {
         return this;
     }
 
+    public OhReq callTimeout(long callTimeout) {
+        this.callTimeout = callTimeout;
+        return this;
+    }
+
+    public OhReq connectTimeout(long connectTimeout) {
+        this.connectTimeout = connectTimeout;
+        return this;
+    }
+
+    public OhReq readTimeout(long readTimeout) {
+        this.readTimeout = readTimeout;
+        return this;
+    }
+
+    public OhReq writeTimeout(long writeTimeout) {
+        this.writeTimeout = writeTimeout;
+        return this;
+    }
+
     public String get() {
         return this.execute(buildGetRequest());
     }
@@ -99,6 +128,10 @@ public class OhReq extends CommonReq<OhReq> {
                 yy -> httpClientBuilder.sslSocketFactory(this.sslSocketFactory, this.x509TrustManager)));
         notNullThen(this.hostnameVerifier, httpClientBuilder::hostnameVerifier);
         httpClientBuilder.connectionPool(nullThen(this.connectionPool, () -> globalConnectionPool));
+        httpClientBuilder.callTimeout(this.callTimeout, TimeUnit.MILLISECONDS);
+        httpClientBuilder.connectTimeout(this.connectTimeout, TimeUnit.MILLISECONDS);
+        httpClientBuilder.readTimeout(this.readTimeout, TimeUnit.MILLISECONDS);
+        httpClientBuilder.writeTimeout(this.writeTimeout, TimeUnit.MILLISECONDS);
         return httpClientBuilder.build();
     }
 
