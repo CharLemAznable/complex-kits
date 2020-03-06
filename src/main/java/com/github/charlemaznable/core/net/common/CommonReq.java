@@ -69,12 +69,12 @@ public abstract class CommonReq<T extends CommonReq> {
         return (T) this;
     }
 
-    public T parameter(String name, String value) {
+    public T parameter(String name, Object value) {
         this.parameters.add(Pair.of(name, value));
         return (T) this;
     }
 
-    public T parameters(Map<String, String> parameters) {
+    public T parameters(Map<String, Object> parameters) {
         parameters.forEach(this::parameter);
         return (T) this;
     }
