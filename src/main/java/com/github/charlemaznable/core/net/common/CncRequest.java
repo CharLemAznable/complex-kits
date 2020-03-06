@@ -2,5 +2,5 @@ package com.github.charlemaznable.core.net.common;
 
 public interface CncRequest<T extends CncResponse> {
 
-    Class<T> responseClass();
+    Class<? extends T> responseClass();
 }
