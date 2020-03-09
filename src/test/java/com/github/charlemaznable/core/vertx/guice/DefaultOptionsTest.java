@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 public class DefaultOptionsTest {
 
     @Test
-    public void testVertxInjector() {
+    public void testVertxModular() {
         val injector = Guice.createInjector(new VertxModular().createModule());
         val vertx = injector.getInstance(Vertx.class);
         assertNotNull(vertx);

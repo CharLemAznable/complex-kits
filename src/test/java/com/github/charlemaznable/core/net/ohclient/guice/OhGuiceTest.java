@@ -56,10 +56,10 @@ public class OhGuiceTest {
     @SneakyThrows
     @Test
     public void testOhClient() {
-        val minerInjector = new MinerModular();
-        val minerModule = minerInjector.createModule(TestSampleUrlProvider.class);
-        val ohInjector = new OhModular(minerModule);
-        var injector = Guice.createInjector(ohInjector.createModule(
+        val minerModular = new MinerModular();
+        val minerModule = minerModular.createModule(TestSampleUrlProvider.class);
+        val ohModular = new OhModular(minerModule);
+        var injector = Guice.createInjector(ohModular.createModule(
                 TestHttpClient.class, TestHttpClientIsolated.class,
                 TestHttpClientConcrete.class, TestHttpClientNone.class));
 
@@ -105,8 +105,8 @@ public class OhGuiceTest {
     @SneakyThrows
     @Test
     public void testOhClientError() {
-        val ohInjector = new OhModular(emptyList());
-        var injector = Guice.createInjector(ohInjector.createModule(
+        val ohModular = new OhModular(emptyList());
+        var injector = Guice.createInjector(ohModular.createModule(
                 TestHttpClient.class, TestHttpClientIsolated.class,
                 TestHttpClientConcrete.class, TestHttpClientNone.class));
 
@@ -147,7 +147,7 @@ public class OhGuiceTest {
     @SneakyThrows
     @Test
     public void testOhClientNaked() {
-        val ohInjector = new OhModular();
+        val ohModular = new OhModular();
 
         try (val mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
@@ -167,22 +167,22 @@ public class OhGuiceTest {
             });
             mockWebServer.start(41102);
 
-            val testHttpClient = ohInjector.getClient(TestHttpClient.class);
+            val testHttpClient = ohModular.getClient(TestHttpClient.class);
             assertThrows(NullPointerException.class, testHttpClient::sample);
             assertThrows(NullPointerException.class, testHttpClient::sampleWrapper);
             assertEquals(SAMPLE_NO_ERROR_RESULT, testHttpClient.sampleWrap());
 
-            val testHttpClient2 = ohInjector.getClient(TestHttpClientIsolated.class);
+            val testHttpClient2 = ohModular.getClient(TestHttpClientIsolated.class);
             assertEquals(SAMPLE_ERROR_RESULT, testHttpClient2.sample());
             assertEquals(SAMPLE_ERROR_RESULT_WRAP_I, testHttpClient2.sampleWrapper());
 
             assertThrows(OhException.class,
-                    () -> ohInjector.getClient(TestHttpClientConcrete.class));
+                    () -> ohModular.getClient(TestHttpClientConcrete.class));
 
             assertThrows(OhException.class,
-                    () -> ohInjector.getClient(TestHttpClientNone.class));
+                    () -> ohModular.getClient(TestHttpClientNone.class));
 
-            val injector = Guice.createInjector(ohInjector.createModule());
+            val injector = Guice.createInjector(ohModular.createModule());
             assertThrows(ConfigurationException.class, () ->
                     injector.getInstance(TestHttpClient.class));
             assertNull(new GuiceFactory(injector).build(TestHttpClient.class));
