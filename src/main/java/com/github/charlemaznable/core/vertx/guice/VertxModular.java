@@ -1,37 +1,49 @@
 package com.github.charlemaznable.core.vertx.guice;
 
+import com.github.charlemaznable.core.guice.Modulee;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.Provider;
 import com.google.inject.util.Providers;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
+import lombok.AllArgsConstructor;
 
 import static com.google.inject.Scopes.SINGLETON;
 
+@AllArgsConstructor
 public class VertxModular {
 
-    public Module createModule() {
-        return createModule((VertxOptions) null);
+    private final Module vertxOptionsModule;
+
+    public VertxModular() {
+        this((VertxOptions) null);
     }
 
-    public Module createModule(VertxOptions vertxOptions) {
-        return new AbstractModule() {
+    public VertxModular(VertxOptions vertxOptions) {
+        this(new AbstractModule() {
             @Override
             protected void configure() {
                 bind(VertxOptions.class).toProvider(Providers.of(vertxOptions));
-                bind(Vertx.class).toProvider(VertxProvider.class).in(SINGLETON);
             }
-        };
+        });
     }
 
-    public Module createModule(Class<? extends Provider<VertxOptions>> vertxOptionsProviderClass) {
-        return new AbstractModule() {
+    public VertxModular(Class<? extends Provider<VertxOptions>> vertxOptionsProviderClass) {
+        this(new AbstractModule() {
             @Override
             protected void configure() {
                 bind(VertxOptions.class).toProvider(vertxOptionsProviderClass);
+            }
+        });
+    }
+
+    public Module createModule() {
+        return Modulee.combine(vertxOptionsModule, new AbstractModule() {
+            @Override
+            protected void configure() {
                 bind(Vertx.class).toProvider(VertxProvider.class).in(SINGLETON);
             }
-        };
+        });
     }
 }

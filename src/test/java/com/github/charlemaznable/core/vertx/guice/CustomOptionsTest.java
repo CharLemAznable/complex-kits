@@ -19,7 +19,7 @@ public class CustomOptionsTest {
 
     @Test
     public void testVertxModular() {
-        val injector = Guice.createInjector(new VertxModular().createModule(vertxOptions));
+        val injector = Guice.createInjector(new VertxModular(vertxOptions).createModule());
         val vertx = injector.getInstance(Vertx.class);
         assertNotNull(vertx);
         int defaultWorkerPoolSize = on(vertx).field("defaultWorkerPoolSize").get();
@@ -29,7 +29,7 @@ public class CustomOptionsTest {
 
     @Test
     public void testVertxModularProviderClass() {
-        val injector = Guice.createInjector(new VertxModular().createModule(CustomOptionsProvider.class));
+        val injector = Guice.createInjector(new VertxModular(CustomOptionsProvider.class).createModule());
         val vertx = injector.getInstance(Vertx.class);
         assertNotNull(vertx);
         int defaultWorkerPoolSize = on(vertx).field("defaultWorkerPoolSize").get();
