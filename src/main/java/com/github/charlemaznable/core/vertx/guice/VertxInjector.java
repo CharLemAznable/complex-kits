@@ -10,6 +10,8 @@ import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import lombok.AllArgsConstructor;
 
+import static com.google.inject.Scopes.SINGLETON;
+
 @AllArgsConstructor
 public class VertxInjector {
 
@@ -24,7 +26,7 @@ public class VertxInjector {
             @Override
             protected void configure() {
                 bind(VertxOptions.class).toProvider(Providers.of(vertxOptions));
-                bind(Vertx.class).toProvider(VertxProvider.class);
+                bind(Vertx.class).toProvider(VertxProvider.class).in(SINGLETON);
             }
         });
     }
@@ -34,7 +36,7 @@ public class VertxInjector {
             @Override
             protected void configure() {
                 bind(VertxOptions.class).toProvider(vertxOptionsProviderClass);
-                bind(Vertx.class).toProvider(VertxProvider.class);
+                bind(Vertx.class).toProvider(VertxProvider.class).in(SINGLETON);
             }
         });
     }

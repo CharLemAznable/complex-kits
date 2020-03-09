@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.joor.Reflect.on;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class DefaultOptionsTest {
 
@@ -18,5 +19,6 @@ public class DefaultOptionsTest {
         assertNotNull(vertx);
         int defaultWorkerPoolSize = on(vertx).field("defaultWorkerPoolSize").get();
         assertEquals(VertxOptions.DEFAULT_WORKER_POOL_SIZE, defaultWorkerPoolSize);
+        assertSame(vertx, injector.getInstance(Vertx.class));
     }
 }
