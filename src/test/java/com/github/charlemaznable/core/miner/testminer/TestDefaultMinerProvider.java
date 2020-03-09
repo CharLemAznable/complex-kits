@@ -2,7 +2,7 @@ package com.github.charlemaznable.core.miner.testminer;
 
 import com.github.charlemaznable.core.context.FactoryContext;
 import com.github.charlemaznable.core.context.FactoryContext.SpringFactory;
-import com.github.charlemaznable.core.guice.InjectorFactory;
+import com.github.charlemaznable.core.guice.GuiceFactory;
 import com.github.charlemaznable.core.miner.MinerConfig.DefaultValueProvider;
 
 import java.lang.reflect.Method;
@@ -14,7 +14,7 @@ public class TestDefaultMinerProvider implements DefaultValueProvider {
     public TestDefaultMinerProvider() {
         if (FactoryContext.get() instanceof SpringFactory) {
             init = "spring";
-        } else if (FactoryContext.get() instanceof InjectorFactory) {
+        } else if (FactoryContext.get() instanceof GuiceFactory) {
             init = "guice";
         } else init = "";
     }
@@ -23,7 +23,7 @@ public class TestDefaultMinerProvider implements DefaultValueProvider {
     public String defaultValue(Class<?> minerClass, Method method) {
         if (FactoryContext.get() instanceof SpringFactory) {
             return init + "spring";
-        } else if (FactoryContext.get() instanceof InjectorFactory) {
+        } else if (FactoryContext.get() instanceof GuiceFactory) {
             return init + "guice";
         } else return init;
     }

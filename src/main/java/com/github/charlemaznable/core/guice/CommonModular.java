@@ -3,7 +3,6 @@ package com.github.charlemaznable.core.guice;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
-import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Provider;
 import com.google.inject.util.Providers;
@@ -11,22 +10,22 @@ import lombok.val;
 
 import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 
-public abstract class CommonInjector {
+public abstract class CommonModular {
 
     protected Module baseModule;
-    protected InjectorFactory injectorFactory;
+    protected GuiceFactory guiceFactory;
 
-    public CommonInjector(Module... baseModules) {
+    public CommonModular(Module... baseModules) {
         this(newArrayList(baseModules));
     }
 
-    public CommonInjector(Iterable<? extends Module> baseModules) {
+    public CommonModular(Iterable<? extends Module> baseModules) {
         this.baseModule = Modulee.combine(newArrayList(baseModules));
-        this.injectorFactory = new InjectorFactory(Guice.createInjector(this.baseModule));
-        initialize(this.injectorFactory);
+        this.guiceFactory = new GuiceFactory(Guice.createInjector(this.baseModule));
+        initialize(this.guiceFactory);
     }
 
-    public abstract void initialize(InjectorFactory injectorFactory);
+    public abstract void initialize(GuiceFactory guiceFactory);
 
     public abstract boolean isCandidateClass(Class clazz);
 
@@ -61,13 +60,5 @@ public abstract class CommonInjector {
                 }
             }
         });
-    }
-
-    public Injector createInjector(Class... classes) {
-        return createInjector(newArrayList(classes));
-    }
-
-    public Injector createInjector(Iterable<Class> classes) {
-        return Guice.createInjector(createModule(classes));
     }
 }

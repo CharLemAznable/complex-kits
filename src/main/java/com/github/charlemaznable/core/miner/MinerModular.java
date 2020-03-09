@@ -1,7 +1,7 @@
 package com.github.charlemaznable.core.miner;
 
-import com.github.charlemaznable.core.guice.CommonInjector;
-import com.github.charlemaznable.core.guice.InjectorFactory;
+import com.github.charlemaznable.core.guice.CommonModular;
+import com.github.charlemaznable.core.guice.GuiceFactory;
 import com.github.charlemaznable.core.miner.MinerFactory.MinerLoader;
 import com.google.inject.Module;
 import com.google.inject.Provider;
@@ -10,21 +10,21 @@ import static com.github.charlemaznable.core.miner.MinerFactory.minerLoader;
 import static java.util.Objects.nonNull;
 import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
-public final class MinerInjector extends CommonInjector {
+public final class MinerModular extends CommonModular {
 
     private MinerLoader minerLoader;
 
-    public MinerInjector(Module... modules) {
+    public MinerModular(Module... modules) {
         super(modules);
     }
 
-    public MinerInjector(Iterable<? extends Module> modules) {
+    public MinerModular(Iterable<? extends Module> modules) {
         super(modules);
     }
 
     @Override
-    public void initialize(InjectorFactory injectorFactory) {
-        this.minerLoader = minerLoader(injectorFactory);
+    public void initialize(GuiceFactory guiceFactory) {
+        this.minerLoader = minerLoader(guiceFactory);
     }
 
     @Override

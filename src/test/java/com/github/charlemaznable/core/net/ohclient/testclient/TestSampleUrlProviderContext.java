@@ -1,6 +1,6 @@
 package com.github.charlemaznable.core.net.ohclient.testclient;
 
-import com.github.charlemaznable.core.miner.MinerInjector;
+import com.github.charlemaznable.core.miner.MinerModular;
 import com.github.charlemaznable.core.net.common.Mapping.UrlProvider;
 
 import java.lang.reflect.Method;
@@ -17,7 +17,7 @@ public class TestSampleUrlProviderContext implements UrlProvider {
     public TestSampleUrlProviderContext() {
         this.current = getMiner(TestDefaultContext.class);
         this.spring = springMinerLoader().getMiner(TestDefaultContext.class);
-        this.guice = new MinerInjector().getMiner(TestDefaultContext.class);
+        this.guice = new MinerModular().getMiner(TestDefaultContext.class);
     }
 
     @Override

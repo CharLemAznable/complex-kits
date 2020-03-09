@@ -8,7 +8,7 @@ import static com.github.charlemaznable.core.lang.Clz.isConcrete;
 import static org.joor.Reflect.onClass;
 
 @AllArgsConstructor
-public class InjectorFactory implements Factory {
+public class GuiceFactory implements Factory {
 
     private Injector injector;
 

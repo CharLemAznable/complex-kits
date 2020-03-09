@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.vertx.guice;
 
+import com.google.inject.Guice;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import lombok.val;
@@ -14,7 +15,7 @@ public class DefaultOptionsTest {
 
     @Test
     public void testVertxInjector() {
-        val injector = new VertxInjector().createInjector();
+        val injector = Guice.createInjector(new VertxModular().createModule());
         val vertx = injector.getInstance(Vertx.class);
         assertNotNull(vertx);
         int defaultWorkerPoolSize = on(vertx).field("defaultWorkerPoolSize").get();

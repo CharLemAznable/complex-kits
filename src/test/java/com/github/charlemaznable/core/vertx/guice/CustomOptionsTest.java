@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.vertx.guice;
 
+import com.google.inject.Guice;
 import com.google.inject.Provider;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
@@ -18,7 +19,7 @@ public class CustomOptionsTest {
 
     @Test
     public void testVertxInjector() {
-        val injector = new VertxInjector(vertxOptions).createInjector();
+        val injector = Guice.createInjector(new VertxModular().createModule(vertxOptions));
         val vertx = injector.getInstance(Vertx.class);
         assertNotNull(vertx);
         int defaultWorkerPoolSize = on(vertx).field("defaultWorkerPoolSize").get();
@@ -28,7 +29,7 @@ public class CustomOptionsTest {
 
     @Test
     public void testVertxInjectorProviderClass() {
-        val injector = new VertxInjector(CustomOptionsProvider.class).createInjector();
+        val injector = Guice.createInjector(new VertxModular().createModule(CustomOptionsProvider.class));
         val vertx = injector.getInstance(Vertx.class);
         assertNotNull(vertx);
         int defaultWorkerPoolSize = on(vertx).field("defaultWorkerPoolSize").get();

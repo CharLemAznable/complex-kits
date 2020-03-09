@@ -1,10 +1,10 @@
 package com.github.charlemaznable.core.net.ohclient.guice;
 
-import com.github.charlemaznable.core.guice.InjectorFactory;
-import com.github.charlemaznable.core.miner.MinerInjector;
+import com.github.charlemaznable.core.guice.GuiceFactory;
+import com.github.charlemaznable.core.miner.MinerModular;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.ohclient.OhException;
-import com.github.charlemaznable.core.net.ohclient.OhInjector;
+import com.github.charlemaznable.core.net.ohclient.OhModular;
 import com.github.charlemaznable.core.net.ohclient.testclient.TestComponent;
 import com.github.charlemaznable.core.net.ohclient.testclient.TestHttpClient;
 import com.github.charlemaznable.core.net.ohclient.testclient.TestHttpClientConcrete;
@@ -56,12 +56,12 @@ public class OhGuiceTest {
     @SneakyThrows
     @Test
     public void testOhClient() {
-        val minerInjector = new MinerInjector();
+        val minerInjector = new MinerModular();
         val minerModule = minerInjector.createModule(TestSampleUrlProvider.class);
-        val ohInjector = new OhInjector(minerModule);
-        var injector = ohInjector.createInjector(
+        val ohInjector = new OhModular(minerModule);
+        var injector = Guice.createInjector(ohInjector.createModule(
                 TestHttpClient.class, TestHttpClientIsolated.class,
-                TestHttpClientConcrete.class, TestHttpClientNone.class);
+                TestHttpClientConcrete.class, TestHttpClientNone.class));
 
         try (val mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
@@ -105,7 +105,7 @@ public class OhGuiceTest {
     @SneakyThrows
     @Test
     public void testOhClientError() {
-        val ohInjector = new OhInjector(emptyList());
+        val ohInjector = new OhModular(emptyList());
         var injector = Guice.createInjector(ohInjector.createModule(
                 TestHttpClient.class, TestHttpClientIsolated.class,
                 TestHttpClientConcrete.class, TestHttpClientNone.class));
@@ -147,7 +147,7 @@ public class OhGuiceTest {
     @SneakyThrows
     @Test
     public void testOhClientNaked() {
-        val ohInjector = new OhInjector();
+        val ohInjector = new OhModular();
 
         try (val mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
@@ -182,10 +182,10 @@ public class OhGuiceTest {
             assertThrows(OhException.class,
                     () -> ohInjector.getClient(TestHttpClientNone.class));
 
-            val injector = ohInjector.createInjector();
+            val injector = Guice.createInjector(ohInjector.createModule());
             assertThrows(ConfigurationException.class, () ->
                     injector.getInstance(TestHttpClient.class));
-            assertNull(new InjectorFactory(injector).build(TestHttpClient.class));
+            assertNull(new GuiceFactory(injector).build(TestHttpClient.class));
         }
     }
 }

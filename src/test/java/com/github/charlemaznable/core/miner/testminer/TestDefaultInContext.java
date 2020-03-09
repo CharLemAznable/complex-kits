@@ -1,7 +1,7 @@
 package com.github.charlemaznable.core.miner.testminer;
 
 import com.github.charlemaznable.core.miner.MinerConfig.DefaultValueProvider;
-import com.github.charlemaznable.core.miner.MinerInjector;
+import com.github.charlemaznable.core.miner.MinerModular;
 
 import java.lang.reflect.Method;
 
@@ -17,7 +17,7 @@ public class TestDefaultInContext implements DefaultValueProvider {
     public TestDefaultInContext() {
         this.current = getMiner(TestDefaultMiner.class);
         this.spring = springMinerLoader().getMiner(TestDefaultMiner.class);
-        this.guice = new MinerInjector().getMiner(TestDefaultMiner.class);
+        this.guice = new MinerModular().getMiner(TestDefaultMiner.class);
     }
 
     @Override

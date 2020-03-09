@@ -1,7 +1,7 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.guice.CommonInjector;
-import com.github.charlemaznable.core.guice.InjectorFactory;
+import com.github.charlemaznable.core.guice.CommonModular;
+import com.github.charlemaznable.core.guice.GuiceFactory;
 import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import com.google.inject.Module;
 import com.google.inject.Provider;
@@ -10,21 +10,21 @@ import static com.github.charlemaznable.core.net.ohclient.OhFactory.ohLoader;
 import static java.util.Objects.nonNull;
 import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
-public final class OhInjector extends CommonInjector {
+public final class OhModular extends CommonModular {
 
     private OhLoader ohLoader;
 
-    public OhInjector(Module... modules) {
+    public OhModular(Module... modules) {
         super(modules);
     }
 
-    public OhInjector(Iterable<? extends Module> modules) {
+    public OhModular(Iterable<? extends Module> modules) {
         super(modules);
     }
 
     @Override
-    public void initialize(InjectorFactory injectorFactory) {
-        this.ohLoader = ohLoader(injectorFactory);
+    public void initialize(GuiceFactory guiceFactory) {
+        this.ohLoader = ohLoader(guiceFactory);
     }
 
     @Override
