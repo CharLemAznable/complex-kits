@@ -34,11 +34,13 @@ import java.net.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.github.charlemaznable.core.codec.Json.desc;
 import static com.github.charlemaznable.core.lang.Condition.checkNull;
 import static com.github.charlemaznable.core.lang.Condition.notNullThen;
 import static com.github.charlemaznable.core.lang.Condition.nullThen;
 import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 import static com.github.charlemaznable.core.lang.Str.isBlank;
+import static com.github.charlemaznable.core.lang.Str.toStr;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.ACCEPT_CHARSET;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.CONTENT_TYPE;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.log;
@@ -186,6 +188,14 @@ public final class OhCall extends OhRoot {
 
     private void processBundle(Object argument) {
         if (isNull(argument)) return;
+        if (argument instanceof Map) {
+            Map<Object, Object> argMap = desc(argument);
+            for (val entry : argMap.entrySet()) {
+                processParameter(entry.getValue(),
+                        new ParameterImpl(toStr(entry.getKey())));
+            }
+            return;
+        }
 
         val clazz = argument.getClass();
         val reflect = on(argument);

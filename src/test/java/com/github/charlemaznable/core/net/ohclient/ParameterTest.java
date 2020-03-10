@@ -28,10 +28,12 @@ import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 import static com.github.charlemaznable.core.codec.Json.unJson;
 import static com.github.charlemaznable.core.codec.Xml.unXml;
 import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
+import static com.github.charlemaznable.core.lang.Mapp.of;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -83,6 +85,13 @@ public class ParameterTest {
                             assertNull(requestUrl.queryParameter("T3"));
                             assertNull(requestUrl.queryParameter("T4"));
                             return new MockResponse().setBody("OK");
+                        case "/sampleBundle3":
+                            assertEquals("V1", requestUrl.queryParameter("T1"));
+                            assertEquals("V2", requestUrl.queryParameter("T2"));
+                            assertNull(requestUrl.queryParameter("T3"));
+                            assertEquals("V4", requestUrl.queryParameter("T4"));
+                            assertEquals("V5", requestUrl.queryParameter("t5"));
+                            return new MockResponse().setBody("OK");
                         default:
                             return new MockResponse()
                                     .setResponseCode(HttpStatus.NOT_FOUND.value())
@@ -98,6 +107,7 @@ public class ParameterTest {
             assertEquals("OK", httpClient.sampleParameters(null, "V4"));
             assertEquals("OK", httpClient.sampleBundle(new TestBundle(null, null, "V4", "V5")));
             assertEquals("OK", httpClient.sampleBundle2(null));
+            assertEquals("OK", httpClient.sampleBundle3(of("T2", null, "T4", "V4", "t5", "V5")));
         }
     }
 
@@ -150,6 +160,15 @@ public class ParameterTest {
                             assertNull(bundleMap2.get("T3"));
                             assertNull(bundleMap2.get("T4"));
                             return new MockResponse().setBody("OK");
+                        case "/sampleBundle3":
+                            val bundleMap3 = Splitter.on("&")
+                                    .withKeyValueSeparator("=").split(body);
+                            assertEquals("V1", bundleMap3.get("T1"));
+                            assertEquals("V2", bundleMap3.get("T2"));
+                            assertNull(bundleMap3.get("T3"));
+                            assertEquals("V4", bundleMap3.get("T4"));
+                            assertEquals("V5", bundleMap3.get("t5"));
+                            return new MockResponse().setBody("OK");
                         case "/sampleRaw":
                             val rawMap = Splitter.on("&")
                                     .withKeyValueSeparator("=").split(body);
@@ -181,6 +200,7 @@ public class ParameterTest {
             assertEquals("OK", httpClient.sampleParameters(null, "V4"));
             assertEquals("OK", httpClient.sampleBundle(new TestBundle(null, null, "V4", "V5")));
             assertEquals("OK", httpClient.sampleBundle2(null));
+            assertEquals("OK", httpClient.sampleBundle3(of("T2", null, "T4", "V4", "t5", "V5")));
             assertEquals("OK", httpClient.sampleRaw("T3=V3&T4=V4"));
             assertEquals("OK", httpClient.sampleRawError(new Object()));
         }
@@ -209,6 +229,8 @@ public class ParameterTest {
         String sampleBundle(@Bundle TestBundle bundle);
 
         String sampleBundle2(@Bundle TestBundle bundle);
+
+        String sampleBundle3(@Bundle Map<String, Object> bundle);
     }
 
     @FixedParameter(name = "T1", value = "V1")
@@ -235,6 +257,8 @@ public class ParameterTest {
         String sampleBundle(@Bundle TestBundle bundle);
 
         String sampleBundle2(@Bundle TestBundle bundle);
+
+        String sampleBundle3(@Bundle Map<String, Object> bundle);
 
         String sampleRaw(@RequestBodyRaw String raw);
 
