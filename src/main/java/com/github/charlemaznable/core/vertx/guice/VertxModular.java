@@ -12,7 +12,7 @@ import lombok.AllArgsConstructor;
 import static com.google.inject.Scopes.SINGLETON;
 
 @AllArgsConstructor
-public class VertxModular {
+public final class VertxModular {
 
     private final Module vertxOptionsModule;
 

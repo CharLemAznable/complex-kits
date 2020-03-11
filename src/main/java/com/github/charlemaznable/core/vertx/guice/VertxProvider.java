@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 
 import static com.github.charlemaznable.core.lang.Condition.nullThen;
 
-public class VertxProvider implements Provider<Vertx> {
+public final class VertxProvider implements Provider<Vertx> {
 
     private final VertxOptions vertxOptions;
 
