@@ -13,7 +13,12 @@ import static org.joor.Reflect.onClass;
 public final class FactoryContext {
 
     private static ThreadLocal<Factory> local =
-            ThreadLocal.withInitial(SpringFactory::getInstance);
+            new InheritableThreadLocal<Factory>() {
+                @Override
+                protected Factory initialValue() {
+                    return SpringFactory.getInstance();
+                }
+            };
 
     private FactoryContext() {
         throw new UnsupportedOperationException();

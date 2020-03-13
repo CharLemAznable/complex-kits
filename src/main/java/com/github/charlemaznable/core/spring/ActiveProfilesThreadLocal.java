@@ -2,7 +2,7 @@ package com.github.charlemaznable.core.spring;
 
 public final class ActiveProfilesThreadLocal {
 
-    private static ThreadLocal<String[]> local = new ThreadLocal<>();
+    private static ThreadLocal<String[]> local = new InheritableThreadLocal<>();
 
     private ActiveProfilesThreadLocal() {}
 
