@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.codec;
 
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.val;
 
 import java.util.Collection;
@@ -12,6 +11,9 @@ import static com.alibaba.fastjson.JSON.parse;
 import static com.alibaba.fastjson.JSON.parseArray;
 import static com.alibaba.fastjson.JSON.parseObject;
 import static com.alibaba.fastjson.JSON.toJSONString;
+import static com.alibaba.fastjson.serializer.SerializerFeature.DisableCircularReferenceDetect;
+import static com.alibaba.fastjson.serializer.SerializerFeature.PrettyFormat;
+import static com.alibaba.fastjson.serializer.SerializerFeature.WriteClassName;
 import static com.github.charlemaznable.core.lang.Empty.isEmpty;
 import static com.github.charlemaznable.core.lang.Iterablee.forEach;
 import static com.github.charlemaznable.core.lang.Mapp.map;
@@ -22,7 +24,7 @@ public final class Json {
     private Json() {}
 
     public static String jsonWithType(Object obj) {
-        return toJSONString(obj, SerializerFeature.WriteClassName);
+        return toJSONString(obj, WriteClassName);
     }
 
     @SuppressWarnings("unchecked")
@@ -31,11 +33,15 @@ public final class Json {
     }
 
     public static String jsonPretty(Object obj) {
-        return toJSONString(obj, SerializerFeature.PrettyFormat);
+        return toJSONString(obj, PrettyFormat);
+    }
+
+    public static String jsonDetectRef(Object obj) {
+        return toJSONString(obj);
     }
 
     public static String json(Object obj) {
-        return toJSONString(obj);
+        return toJSONString(obj, DisableCircularReferenceDetect);
     }
 
     public static String jsonOf(Object... keyAndValues) {

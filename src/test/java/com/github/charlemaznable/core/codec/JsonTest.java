@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.github.charlemaznable.core.codec.Json.descFlat;
+import static com.github.charlemaznable.core.codec.Json.json;
+import static com.github.charlemaznable.core.codec.Json.jsonDetectRef;
 import static com.github.charlemaznable.core.codec.Json.jsonOf;
 import static com.github.charlemaznable.core.codec.Json.jsonPretty;
 import static com.github.charlemaznable.core.codec.Json.jsonWithType;
@@ -21,6 +23,7 @@ import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 import static com.github.charlemaznable.core.lang.Mapp.of;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -43,6 +46,10 @@ public class JsonTest {
                 "\t\"value1\":\"value1\",\n" +
                 "\t\"value2\":\"value2\"\n" +
                 "}", jsonPretty(beanType11));
+
+        Map<String, Object> data = of("key", "value");
+        Map<String, Object> wrap = of("data1", data, "data2", data);
+        assertNotEquals(jsonDetectRef(wrap), json(wrap));
 
         val jsonOf = jsonOf("key", "value");
         assertEquals("{\"key\":\"value\"}", jsonOf);
