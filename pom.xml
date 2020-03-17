@@ -91,6 +91,7 @@
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
         <spring.version>5.2.4.RELEASE</spring.version>
 
+        <logback-classic.version>1.2.3</logback-classic.version>
         <junit-jupiter.version>5.6.0</junit-jupiter.version>
         <jmockit.version>1.49</jmockit.version>
         <awaitility.version>4.0.2</awaitility.version>
@@ -206,6 +207,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback-classic.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>

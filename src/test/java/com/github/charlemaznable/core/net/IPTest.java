@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.net;
 
+import lombok.extern.slf4j.Slf4j;
 import lombok.var;
 import org.junit.jupiter.api.Test;
 
@@ -7,25 +8,26 @@ import static com.github.charlemaznable.core.net.IP.V4;
 import static com.github.charlemaznable.core.net.IP.V6;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+@Slf4j
 public class IPTest {
 
     @Test
     public void testIPV4() {
         var ip = V4.netIP();
-        System.out.println(ip);
+        log.info(ip);
         assertNotEquals("127.0.0.1", ip);
         ip = V4.localIP();
-        System.out.println(ip);
+        log.info(ip);
         assertNotEquals("127.0.0.1", ip);
     }
 
     @Test
     public void testIPV6() {
         var ip = V6.netIP();
-        System.out.println(ip);
+        log.info(ip);
         assertNotEquals("0:0:0:0:0:0:0:1", ip);
         ip = V6.localIP();
-        System.out.println(ip);
+        log.info(ip);
         assertNotEquals("0:0:0:0:0:0:0:1", ip);
     }
 }
