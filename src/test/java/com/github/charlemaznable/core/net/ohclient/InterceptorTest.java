@@ -82,9 +82,12 @@ public class InterceptorTest {
                             return new MockResponse().setBody(CONTENT);
                         case "/sample3":
                             val values3 = request.getHeaders().values(HEADER_NAME);
-                            assertEquals(2, values3.size());
-                            assertEquals("method", values3.get(0));
-                            assertEquals("parameter", values3.get(1));
+                            if (values3.size() == 1) {
+                                assertEquals("method", values3.get(0));
+                            } else if (values3.size() == 2) {
+                                assertEquals("method", values3.get(0));
+                                assertEquals("parameter", values3.get(1));
+                            }
                             assertEquals(BODY, request.getBody().readUtf8());
                             return new MockResponse().setBody(CONTENT);
                         default:
@@ -100,11 +103,13 @@ public class InterceptorTest {
             assertEquals(CONTENT, client.sample1());
             assertEquals(CONTENT, client.sample2());
             assertEquals(CONTENT, client.sample3(new ParamInterceptor(), Level.BODY, BODY));
+            assertEquals(CONTENT, client.sample3(null, Level.BODY, BODY));
 
             val providerClient = ohLoader.getClient(InterceptorProviderClient.class);
             assertEquals(CONTENT, providerClient.sample1());
             assertEquals(CONTENT, providerClient.sample2());
             assertEquals(CONTENT, providerClient.sample3(new ParamInterceptor(), Level.BODY, BODY));
+            assertEquals(CONTENT, providerClient.sample3(null, Level.BODY, BODY));
         }
     }
 
@@ -131,6 +136,7 @@ public class InterceptorTest {
 
         String sample1();
 
+        @ClientInterceptor
         @ClientInterceptor(MethodInterceptor.class)
         @ClientLoggingLevel(Level.HEADERS)
         String sample2();
