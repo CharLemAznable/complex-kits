@@ -4,6 +4,7 @@ import com.github.charlemaznable.core.net.common.ContentFormat.ContentFormatter;
 import com.github.charlemaznable.core.net.common.ContentFormat.FormContentFormatter;
 import com.github.charlemaznable.core.net.common.HttpMethod;
 import com.google.common.net.HttpHeaders;
+import okhttp3.logging.HttpLoggingInterceptor.Level;
 
 import java.nio.charset.Charset;
 
@@ -21,6 +22,7 @@ public final class OhConstant {
     public static final long DEFAULT_CONNECT_TIMEOUT = 10_000;
     public static final long DEFAULT_READ_TIMEOUT = 10_000;
     public static final long DEFAULT_WRITE_TIMEOUT = 10_000;
+    public static final Level DEFAULT_LOGGING_LEVEL = Level.NONE;
 
     private OhConstant() {
         throw new UnsupportedOperationException();

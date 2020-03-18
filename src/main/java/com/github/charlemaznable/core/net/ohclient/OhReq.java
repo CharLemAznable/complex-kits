@@ -9,15 +9,19 @@ import com.github.charlemaznable.core.net.ohclient.internal.StatusErrorFunction;
 import lombok.SneakyThrows;
 import lombok.val;
 import okhttp3.ConnectionPool;
+import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.logging.HttpLoggingInterceptor;
+import okhttp3.logging.HttpLoggingInterceptor.Level;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
 import java.net.Proxy;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -25,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import static com.github.charlemaznable.core.lang.Condition.checkNull;
 import static com.github.charlemaznable.core.lang.Condition.notNullThen;
 import static com.github.charlemaznable.core.lang.Condition.nullThen;
+import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.ACCEPT_CHARSET;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.CONTENT_TYPE;
@@ -32,6 +37,7 @@ import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DE
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_CONNECT_TIMEOUT;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_READ_TIMEOUT;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_WRITE_TIMEOUT;
+import static java.util.Objects.nonNull;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 
 public class OhReq extends CommonReq<OhReq> {
@@ -48,6 +54,8 @@ public class OhReq extends CommonReq<OhReq> {
     private long connectTimeout = DEFAULT_CONNECT_TIMEOUT; // in milliseconds
     private long readTimeout = DEFAULT_READ_TIMEOUT; // in milliseconds
     private long writeTimeout = DEFAULT_WRITE_TIMEOUT; // in milliseconds
+    private final List<Interceptor> interceptors = newArrayList();
+    private final HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
 
     public OhReq() {
         super();
@@ -102,6 +110,23 @@ public class OhReq extends CommonReq<OhReq> {
         return this;
     }
 
+    public OhReq addInterceptor(Interceptor interceptor) {
+        if (nonNull(interceptor)) {
+            this.interceptors.add(interceptor);
+        }
+        return this;
+    }
+
+    public OhReq addInterceptors(Iterable<Interceptor> interceptors) {
+        interceptors.forEach(this::addInterceptor);
+        return this;
+    }
+
+    public OhReq loggingLevel(Level level) {
+        this.loggingInterceptor.setLevel(level);
+        return this;
+    }
+
     public String get() {
         return this.execute(buildGetRequest());
     }
@@ -132,6 +157,8 @@ public class OhReq extends CommonReq<OhReq> {
         httpClientBuilder.connectTimeout(this.connectTimeout, TimeUnit.MILLISECONDS);
         httpClientBuilder.readTimeout(this.readTimeout, TimeUnit.MILLISECONDS);
         httpClientBuilder.writeTimeout(this.writeTimeout, TimeUnit.MILLISECONDS);
+        this.interceptors.forEach(httpClientBuilder::addInterceptor);
+        httpClientBuilder.addInterceptor(this.loggingInterceptor);
         return httpClientBuilder.build();
     }
 

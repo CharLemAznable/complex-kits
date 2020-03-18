@@ -23,6 +23,11 @@ import com.github.charlemaznable.core.net.common.StatusErrorMapping;
 import com.github.charlemaznable.core.net.common.StatusSeriesErrorMapping;
 import com.github.charlemaznable.core.net.ohclient.OhException;
 import com.github.charlemaznable.core.net.ohclient.OhReq;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientInterceptor;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientInterceptor.InterceptorProvider;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientInterceptorCleanup;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientLoggingLevel;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientLoggingLevel.LoggingLevelProvider;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientProxy;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientProxy.ProxyProvider;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSL;
@@ -36,8 +41,10 @@ import lombok.SneakyThrows;
 import lombok.val;
 import lombok.var;
 import okhttp3.ConnectionPool;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor.Level;
 import okio.BufferedSource;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
@@ -71,6 +78,7 @@ import static com.github.charlemaznable.core.lang.Str.isBlank;
 import static com.github.charlemaznable.core.lang.Str.isNotBlank;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.ohExecutorService;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.substitute;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedRepeatableAnnotations;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
@@ -131,6 +139,10 @@ public final class OhMappingProxy extends OhRoot {
             this.readTimeout = proxy.readTimeout;
             this.writeTimeout = proxy.writeTimeout;
         }
+        this.interceptors = Elf.checkClientInterceptors(
+                this.ohClass, this.ohMethod, this.factory, proxy);
+        this.loggingLevel = Elf.checkClientLoggingLevel(
+                this.ohClass, this.ohMethod, this.factory, proxy);
         this.okHttpClient = Elf.buildOkHttpClient(this, proxy);
 
         this.acceptCharset = Elf.checkAcceptCharset(this.ohMethod, proxy);
@@ -378,11 +390,12 @@ public final class OhMappingProxy extends OhRoot {
             val clientProxy = findAnnotation(method, ClientProxy.class);
             return checkNull(clientProxy, () -> proxy.clientProxy, annotation -> {
                 val providerClass = annotation.proxyProvider();
-                return ProxyProvider.class == providerClass ?
-                        checkBlank(annotation.host(), () -> null,
-                                xx -> new Proxy(annotation.type(), new InetSocketAddress(
-                                        annotation.host(), annotation.port())))
-                        : FactoryContext.apply(factory, providerClass, p -> p.proxy(clazz, method));
+                if (ProxyProvider.class == providerClass) {
+                    return checkBlank(annotation.host(), () -> null,
+                            xx -> new Proxy(annotation.type(), new InetSocketAddress(
+                                    annotation.host(), annotation.port())));
+                }
+                return FactoryContext.apply(factory, providerClass, p -> p.proxy(clazz, method));
             });
         }
 
@@ -393,24 +406,36 @@ public final class OhMappingProxy extends OhRoot {
         static SSLSocketFactory checkSSLSocketFactory(Class clazz, Method method,
                                                       Factory factory, ClientSSL clientSSL) {
             val providerClass = clientSSL.sslSocketFactoryProvider();
-            return SSLSocketFactoryProvider.class == providerClass ? null
-                    : FactoryContext.apply(factory, providerClass,
+            if (SSLSocketFactoryProvider.class == providerClass) {
+                val factoryClass = clientSSL.sslSocketFactory();
+                return SSLSocketFactory.class == factoryClass ? null
+                        : FactoryContext.build(factory, factoryClass);
+            }
+            return FactoryContext.apply(factory, providerClass,
                     p -> p.sslSocketFactory(clazz, method));
         }
 
         static X509TrustManager checkX509TrustManager(Class clazz, Method method,
                                                       Factory factory, ClientSSL clientSSL) {
             val providerClass = clientSSL.x509TrustManagerProvider();
-            return X509TrustManagerProvider.class == providerClass ? null
-                    : FactoryContext.apply(factory, providerClass,
+            if (X509TrustManagerProvider.class == providerClass) {
+                val managerClass = clientSSL.x509TrustManager();
+                return X509TrustManager.class == managerClass ? null
+                        : FactoryContext.build(factory, managerClass);
+            }
+            return FactoryContext.apply(factory, providerClass,
                     p -> p.x509TrustManager(clazz, method));
         }
 
         static HostnameVerifier checkHostnameVerifier(Class clazz, Method method,
                                                       Factory factory, ClientSSL clientSSL) {
             val providerClass = clientSSL.hostnameVerifierProvider();
-            return HostnameVerifierProvider.class == providerClass ? null
-                    : FactoryContext.apply(factory, providerClass,
+            if (HostnameVerifierProvider.class == providerClass) {
+                val verifierClass = clientSSL.hostnameVerifier();
+                return HostnameVerifier.class == verifierClass ? null
+                        : FactoryContext.build(factory, verifierClass);
+            }
+            return FactoryContext.apply(factory, providerClass,
                     p -> p.hostnameVerifier(clazz, method));
         }
 
@@ -451,19 +476,47 @@ public final class OhMappingProxy extends OhRoot {
                     : FactoryContext.apply(factory, providerClass, p -> p.timeout(clazz, method));
         }
 
+        static List<Interceptor> checkClientInterceptors(Class clazz, Method method, Factory factory, OhProxy proxy) {
+            val cleanup = nonNull(findAnnotation(method, ClientInterceptorCleanup.class));
+            val result = newArrayList(cleanup ? null : proxy.interceptors);
+            result.addAll(newArrayList(findMergedRepeatableAnnotations(method, ClientInterceptor.class))
+                    .stream().filter(annotation -> Interceptor.class != annotation.value()
+                            || InterceptorProvider.class != annotation.provider())
+                    .map(annotation -> {
+                        val providerClass = annotation.provider();
+                        if (InterceptorProvider.class == providerClass) {
+                            return FactoryContext.build(factory, annotation.value());
+                        }
+                        return FactoryContext.apply(factory, providerClass, p -> p.interceptor(clazz, method));
+                    }).collect(Collectors.toList()));
+            return result;
+        }
+
+        static Level checkClientLoggingLevel(Class clazz, Method method, Factory factory, OhProxy proxy) {
+            val clientLoggingLevel = findAnnotation(method, ClientLoggingLevel.class);
+            if (isNull(clientLoggingLevel)) return proxy.loggingLevel;
+            val providerClass = clientLoggingLevel.provider();
+            return LoggingLevelProvider.class == providerClass ? clientLoggingLevel.value()
+                    : FactoryContext.apply(factory, providerClass, p -> p.level(clazz, method));
+        }
+
         static OkHttpClient buildOkHttpClient(OhMappingProxy mappingProxy, OhProxy proxy) {
             val sameClientProxy = mappingProxy.clientProxy == proxy.clientProxy;
             val sameSSLSocketFactory = mappingProxy.sslSocketFactory == proxy.sslSocketFactory;
             val sameX509TrustManager = mappingProxy.x509TrustManager == proxy.x509TrustManager;
             val sameHostnameVerifier = mappingProxy.hostnameVerifier == proxy.hostnameVerifier;
+            val sameConnectionPool = mappingProxy.connectionPool == proxy.connectionPool;
             val sameCallTimeout = mappingProxy.callTimeout == proxy.callTimeout;
             val sameConnectTimeout = mappingProxy.connectTimeout == proxy.connectTimeout;
             val sameReadTimeout = mappingProxy.readTimeout == proxy.readTimeout;
             val sameWriteTimeout = mappingProxy.writeTimeout == proxy.writeTimeout;
-            if (sameClientProxy && sameSSLSocketFactory
-                    && sameX509TrustManager && sameHostnameVerifier
-                    && sameCallTimeout && sameConnectTimeout &&
-                    sameReadTimeout && sameWriteTimeout) return proxy.okHttpClient;
+            val sameInterceptors = mappingProxy.interceptors.equals(proxy.interceptors);
+            val sameLoggingLevel = mappingProxy.loggingLevel == proxy.loggingLevel;
+            if (sameClientProxy && sameSSLSocketFactory && sameX509TrustManager
+                    && sameHostnameVerifier && sameConnectionPool
+                    && sameCallTimeout && sameConnectTimeout
+                    && sameReadTimeout && sameWriteTimeout
+                    && sameInterceptors && sameLoggingLevel) return proxy.okHttpClient;
 
             return new OhReq().clientProxy(mappingProxy.clientProxy)
                     .sslSocketFactory(mappingProxy.sslSocketFactory)
@@ -474,6 +527,8 @@ public final class OhMappingProxy extends OhRoot {
                     .connectTimeout(mappingProxy.connectTimeout)
                     .readTimeout(mappingProxy.readTimeout)
                     .writeTimeout(mappingProxy.writeTimeout)
+                    .addInterceptors(mappingProxy.interceptors)
+                    .loggingLevel(mappingProxy.loggingLevel)
                     .buildHttpClient();
         }
 

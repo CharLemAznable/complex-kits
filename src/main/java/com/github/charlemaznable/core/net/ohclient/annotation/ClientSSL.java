@@ -19,6 +19,15 @@ import java.lang.reflect.Method;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ClientSSL {
 
+    Class<? extends SSLSocketFactory> sslSocketFactory()
+            default SSLSocketFactory.class;
+
+    Class<? extends X509TrustManager> x509TrustManager()
+            default X509TrustManager.class;
+
+    Class<? extends HostnameVerifier> hostnameVerifier()
+            default HostnameVerifier.class;
+
     Class<? extends SSLSocketFactoryProvider> sslSocketFactoryProvider()
             default SSLSocketFactoryProvider.class;
 

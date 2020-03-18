@@ -25,6 +25,10 @@ import com.github.charlemaznable.core.net.common.StatusSeriesErrorMapping;
 import com.github.charlemaznable.core.net.ohclient.OhClient;
 import com.github.charlemaznable.core.net.ohclient.OhException;
 import com.github.charlemaznable.core.net.ohclient.OhReq;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientInterceptor;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientInterceptor.InterceptorProvider;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientLoggingLevel;
+import com.github.charlemaznable.core.net.ohclient.annotation.ClientLoggingLevel.LoggingLevelProvider;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientProxy;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientProxy.ProxyProvider;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSL;
@@ -39,7 +43,9 @@ import lombok.val;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import okhttp3.ConnectionPool;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor.Level;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.net.ssl.HostnameVerifier;
@@ -64,6 +70,7 @@ import static com.github.charlemaznable.core.lang.Str.isNotBlank;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_ACCEPT_CHARSET;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_CONTENT_FORMATTER;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_HTTP_METHOD;
+import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_LOGGING_LEVEL;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.ohConnectionPool;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.substitute;
 import static com.google.common.cache.CacheLoader.from;
@@ -110,6 +117,8 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
             this.writeTimeout = Elf.checkWriteTimeout(
                     this.ohClass, this.factory, clientTimeout);
         }
+        this.interceptors = Elf.checkClientInterceptors(this.ohClass, this.factory);
+        this.loggingLevel = Elf.checkClientLoggingLevel(this.ohClass, this.factory);
         this.okHttpClient = Elf.buildOkHttpClient(this);
 
         this.acceptCharset = Elf.checkAcceptCharset(this.ohClass);
@@ -165,11 +174,12 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
             val clientProxy = findAnnotation(clazz, ClientProxy.class);
             return notNullThen(clientProxy, annotation -> {
                 val providerClass = annotation.proxyProvider();
-                return ProxyProvider.class == providerClass ?
-                        checkBlank(annotation.host(), () -> null,
-                                xx -> new Proxy(annotation.type(), new InetSocketAddress(
-                                        annotation.host(), annotation.port())))
-                        : FactoryContext.apply(factory, providerClass, p -> p.proxy(clazz));
+                if (ProxyProvider.class == providerClass) {
+                    return checkBlank(annotation.host(), () -> null,
+                            xx -> new Proxy(annotation.type(), new InetSocketAddress(
+                                    annotation.host(), annotation.port())));
+                }
+                return FactoryContext.apply(factory, providerClass, p -> p.proxy(clazz));
             });
         }
 
@@ -180,24 +190,36 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
         static SSLSocketFactory checkSSLSocketFactory(
                 Class clazz, Factory factory, ClientSSL clientSSL) {
             val providerClass = clientSSL.sslSocketFactoryProvider();
-            return SSLSocketFactoryProvider.class == providerClass ? null
-                    : FactoryContext.apply(factory, providerClass,
+            if (SSLSocketFactoryProvider.class == providerClass) {
+                val factoryClass = clientSSL.sslSocketFactory();
+                return SSLSocketFactory.class == factoryClass ? null
+                        : FactoryContext.build(factory, factoryClass);
+            }
+            return FactoryContext.apply(factory, providerClass,
                     p -> p.sslSocketFactory(clazz));
         }
 
         static X509TrustManager checkX509TrustManager(
                 Class clazz, Factory factory, ClientSSL clientSSL) {
             val providerClass = clientSSL.x509TrustManagerProvider();
-            return X509TrustManagerProvider.class == providerClass ? null
-                    : FactoryContext.apply(factory, providerClass,
+            if (X509TrustManagerProvider.class == providerClass) {
+                val managerClass = clientSSL.x509TrustManager();
+                return X509TrustManager.class == managerClass ? null
+                        : FactoryContext.build(factory, managerClass);
+            }
+            return FactoryContext.apply(factory, providerClass,
                     p -> p.x509TrustManager(clazz));
         }
 
         static HostnameVerifier checkHostnameVerifier(
                 Class clazz, Factory factory, ClientSSL clientSSL) {
             val providerClass = clientSSL.hostnameVerifierProvider();
-            return HostnameVerifierProvider.class == providerClass ? null
-                    : FactoryContext.apply(factory, providerClass,
+            if (HostnameVerifierProvider.class == providerClass) {
+                val verifierClass = clientSSL.hostnameVerifier();
+                return HostnameVerifier.class == verifierClass ? null
+                        : FactoryContext.build(factory, verifierClass);
+            }
+            return FactoryContext.apply(factory, providerClass,
                     p -> p.hostnameVerifier(clazz));
         }
 
@@ -238,6 +260,27 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
                     : FactoryContext.apply(factory, providerClass, p -> p.timeout(clazz));
         }
 
+        static List<Interceptor> checkClientInterceptors(Class clazz, Factory factory) {
+            return newArrayList(findMergedRepeatableAnnotations(clazz, ClientInterceptor.class))
+                    .stream().filter(annotation -> Interceptor.class != annotation.value()
+                            || InterceptorProvider.class != annotation.provider())
+                    .map(annotation -> {
+                        val providerClass = annotation.provider();
+                        if (InterceptorProvider.class == providerClass) {
+                            return FactoryContext.build(factory, annotation.value());
+                        }
+                        return FactoryContext.apply(factory, providerClass, p -> p.interceptor(clazz));
+                    }).collect(Collectors.toList());
+        }
+
+        static Level checkClientLoggingLevel(Class clazz, Factory factory) {
+            val clientLoggingLevel = findAnnotation(clazz, ClientLoggingLevel.class);
+            if (isNull(clientLoggingLevel)) return DEFAULT_LOGGING_LEVEL;
+            val providerClass = clientLoggingLevel.provider();
+            return LoggingLevelProvider.class == providerClass ? clientLoggingLevel.value()
+                    : FactoryContext.apply(factory, providerClass, p -> p.level(clazz));
+        }
+
         static OkHttpClient buildOkHttpClient(OhProxy proxy) {
             return new OhReq().clientProxy(proxy.clientProxy)
                     .sslSocketFactory(proxy.sslSocketFactory)
@@ -248,6 +291,8 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
                     .connectTimeout(proxy.connectTimeout)
                     .readTimeout(proxy.readTimeout)
                     .writeTimeout(proxy.writeTimeout)
+                    .addInterceptors(proxy.interceptors)
+                    .loggingLevel(proxy.loggingLevel)
                     .buildHttpClient();
         }
 

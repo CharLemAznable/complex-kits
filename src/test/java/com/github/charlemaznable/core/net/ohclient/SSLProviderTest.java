@@ -115,6 +115,11 @@ public class SSLProviderTest {
         } catch (Exception e) {
             assertEquals(FAILED, e.getMessage());
         }
+        try {
+            httpClient.sampleAllProvider();
+        } catch (Exception e) {
+            assertEquals(FAILED, e.getMessage());
+        }
     }
 
     @SneakyThrows
@@ -152,8 +157,8 @@ public class SSLProviderTest {
     @OhClient
     @Mapping("${root}:41120")
     @ClientSSL(
-            sslSocketFactoryProvider = TestSSLSocketFactoryProvider.class,
-            hostnameVerifierProvider = TestHostnameVerifierProvider.class)
+            sslSocketFactory = TestSSLSocketFactory.class,
+            hostnameVerifier = TestHostnameVerifier.class)
     public interface SSLDefHttpClient {
 
         String sample();
@@ -162,9 +167,9 @@ public class SSLProviderTest {
     @OhClient
     @Mapping("${root}:41121")
     @ClientSSL(
-            sslSocketFactoryProvider = TestSSLSocketFactoryProvider.class,
-            x509TrustManagerProvider = TestX509TrustManagerProvider.class,
-            hostnameVerifierProvider = TestHostnameVerifierProvider.class)
+            sslSocketFactory = TestSSLSocketFactory.class,
+            x509TrustManager = TestX509TrustManager.class,
+            hostnameVerifier = TestHostnameVerifier.class)
     public interface SSLAllHttpClient {
 
         String sample();
@@ -203,10 +208,16 @@ public class SSLProviderTest {
         String sampleDef();
 
         @ClientSSL(
+                sslSocketFactory = TestSSLSocketFactory.class,
+                x509TrustManager = TestX509TrustManager.class,
+                hostnameVerifier = TestHostnameVerifier.class)
+        String sampleAll();
+
+        @ClientSSL(
                 sslSocketFactoryProvider = TestSSLSocketFactoryProvider.class,
                 x509TrustManagerProvider = TestX509TrustManagerProvider.class,
                 hostnameVerifierProvider = TestHostnameVerifierProvider.class)
-        String sampleAll();
+        String sampleAllProvider();
     }
 
     @Documented

@@ -6,7 +6,9 @@ import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.ResponseParse.ResponseParser;
 import com.github.charlemaznable.core.net.common.StatusError;
 import okhttp3.ConnectionPool;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor.Level;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.net.ssl.HostnameVerifier;
@@ -33,6 +35,8 @@ class OhRoot {
     long connectTimeout = DEFAULT_CONNECT_TIMEOUT; // in milliseconds
     long readTimeout = DEFAULT_READ_TIMEOUT; // in milliseconds
     long writeTimeout = DEFAULT_WRITE_TIMEOUT; // in milliseconds
+    List<Interceptor> interceptors;
+    Level loggingLevel;
     OkHttpClient okHttpClient;
 
     Charset acceptCharset;

@@ -14,12 +14,14 @@ import com.github.charlemaznable.core.net.ohclient.annotation.ClientTimeout;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
+import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.internal.http.HttpMethod;
+import okhttp3.logging.HttpLoggingInterceptor.Level;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.text.StringSubstitutor;
 import org.joor.ReflectException;
@@ -77,6 +79,8 @@ public final class OhCall extends OhRoot {
         this.connectTimeout = proxy.connectTimeout;
         this.readTimeout = proxy.readTimeout;
         this.writeTimeout = proxy.writeTimeout;
+        this.interceptors = newArrayList(proxy.interceptors);
+        this.loggingLevel = proxy.loggingLevel;
 
         this.acceptCharset = proxy.acceptCharset;
         this.contentFormatter = proxy.contentFormatter;
@@ -123,6 +127,10 @@ public final class OhCall extends OhRoot {
                     () -> CncResponseImpl.class,
                     xx -> ((CncRequest) xx).responseClass());
             return false;
+        } else if (Interceptor.class.isAssignableFrom(parameterType)) {
+            this.interceptors.add((Interceptor) argument);
+        } else if (argument instanceof Level) {
+            this.loggingLevel = (Level) argument;
         } else {
             return false;
         }
@@ -237,10 +245,13 @@ public final class OhCall extends OhRoot {
         val sameConnectTimeout = this.connectTimeout == proxy.connectTimeout;
         val sameReadTimeout = this.readTimeout == proxy.readTimeout;
         val sameWriteTimeout = this.writeTimeout == proxy.writeTimeout;
+        val sameInterceptors = this.interceptors.equals(proxy.interceptors);
+        val sameLoggingLevel = this.loggingLevel == proxy.loggingLevel;
         if (sameClientProxy && sameSSLSocketFactory
                 && sameX509TrustManager && sameHostnameVerifier
-                && sameCallTimeout && sameConnectTimeout &&
-                sameReadTimeout && sameWriteTimeout) return proxy.okHttpClient;
+                && sameCallTimeout && sameConnectTimeout
+                && sameReadTimeout && sameWriteTimeout
+                && sameInterceptors && sameLoggingLevel) return proxy.okHttpClient;
 
         return new OhReq().clientProxy(this.clientProxy)
                 .sslSocketFactory(this.sslSocketFactory)
@@ -251,6 +262,8 @@ public final class OhCall extends OhRoot {
                 .connectTimeout(this.connectTimeout)
                 .readTimeout(this.readTimeout)
                 .writeTimeout(this.writeTimeout)
+                .addInterceptors(this.interceptors)
+                .loggingLevel(this.loggingLevel)
                 .buildHttpClient();
     }
 
