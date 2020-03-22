@@ -1,29 +1,25 @@
 package com.github.charlemaznable.core.net.ohclient;
 
 import com.github.charlemaznable.core.guice.CommonModular;
-import com.github.charlemaznable.core.guice.GuiceFactory;
 import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import com.google.inject.Module;
 import com.google.inject.Provider;
 
+import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 import static com.github.charlemaznable.core.net.ohclient.OhFactory.ohLoader;
 import static java.util.Objects.nonNull;
 import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
-public final class OhModular extends CommonModular {
+public final class OhModular extends CommonModular<OhModular> {
 
     private OhLoader ohLoader;
 
     public OhModular(Module... modules) {
-        super(modules);
+        this(newArrayList(modules));
     }
 
     public OhModular(Iterable<? extends Module> modules) {
         super(modules);
-    }
-
-    @Override
-    public void initialize(GuiceFactory guiceFactory) {
         this.ohLoader = ohLoader(guiceFactory);
     }
 

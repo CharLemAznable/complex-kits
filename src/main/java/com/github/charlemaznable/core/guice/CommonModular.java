@@ -8,36 +8,39 @@ import com.google.inject.Provider;
 import com.google.inject.util.Providers;
 import lombok.val;
 
+import java.util.Set;
+
 import static com.github.charlemaznable.core.lang.Listt.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 
-public abstract class CommonModular {
+@SuppressWarnings("unchecked")
+public abstract class CommonModular<M extends CommonModular> {
 
-    protected Module baseModule;
-    protected GuiceFactory guiceFactory;
-
-    public CommonModular(Module... baseModules) {
-        this(newArrayList(baseModules));
-    }
+    protected final Module baseModule;
+    protected final GuiceFactory guiceFactory;
+    protected final Set<Class> classes;
 
     public CommonModular(Iterable<? extends Module> baseModules) {
-        this.baseModule = Modulee.combine(newArrayList(baseModules));
+        this.baseModule = Modulee.combine(baseModules);
         this.guiceFactory = new GuiceFactory(Guice.createInjector(this.baseModule));
-        initialize(this.guiceFactory);
+        this.classes = newHashSet();
     }
-
-    public abstract void initialize(GuiceFactory guiceFactory);
 
     public abstract boolean isCandidateClass(Class clazz);
 
     public abstract <T> Provider<T> createProvider(Class<T> clazz);
 
-    public Module createModule(Class... classes) {
-        return createModule(newArrayList(classes));
+    public M bindClasses(Class... classes) {
+        return bindClasses(newArrayList(classes));
     }
 
-    @SuppressWarnings("unchecked")
-    public Module createModule(Iterable<Class> classes) {
-        val classSet = ImmutableSet.copyOf(newArrayList(classes));
+    public M bindClasses(Iterable<Class> classes) {
+        this.classes.addAll(newArrayList(classes));
+        return (M) this;
+    }
+
+    public Module createModule() {
+        val classSet = ImmutableSet.copyOf(classes);
         return Modulee.override(this.baseModule, new AbstractModule() {
             @Override
             protected void configure() {

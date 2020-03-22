@@ -56,12 +56,12 @@ public class OhGuiceTest {
     @SneakyThrows
     @Test
     public void testOhClient() {
-        val minerModular = new MinerModular();
-        val minerModule = minerModular.createModule(TestSampleUrlProvider.class);
-        val ohModular = new OhModular(minerModule);
-        var injector = Guice.createInjector(ohModular.createModule(
+        val minerModular = new MinerModular().bindClasses(TestSampleUrlProvider.class);
+        val minerModule = minerModular.createModule();
+        val ohModular = new OhModular(minerModule).bindClasses(
                 TestHttpClient.class, TestHttpClientIsolated.class,
-                TestHttpClientConcrete.class, TestHttpClientNone.class));
+                TestHttpClientConcrete.class, TestHttpClientNone.class);
+        var injector = Guice.createInjector(ohModular.createModule());
 
         try (val mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
@@ -105,10 +105,10 @@ public class OhGuiceTest {
     @SneakyThrows
     @Test
     public void testOhClientError() {
-        val ohModular = new OhModular(emptyList());
-        var injector = Guice.createInjector(ohModular.createModule(
+        val ohModular = new OhModular(emptyList()).bindClasses(
                 TestHttpClient.class, TestHttpClientIsolated.class,
-                TestHttpClientConcrete.class, TestHttpClientNone.class));
+                TestHttpClientConcrete.class, TestHttpClientNone.class);
+        var injector = Guice.createInjector(ohModular.createModule());
 
         try (val mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {

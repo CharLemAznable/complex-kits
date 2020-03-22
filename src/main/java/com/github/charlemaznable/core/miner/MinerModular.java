@@ -1,29 +1,25 @@
 package com.github.charlemaznable.core.miner;
 
 import com.github.charlemaznable.core.guice.CommonModular;
-import com.github.charlemaznable.core.guice.GuiceFactory;
 import com.github.charlemaznable.core.miner.MinerFactory.MinerLoader;
 import com.google.inject.Module;
 import com.google.inject.Provider;
 
+import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 import static com.github.charlemaznable.core.miner.MinerFactory.minerLoader;
 import static java.util.Objects.nonNull;
 import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
-public final class MinerModular extends CommonModular {
+public final class MinerModular extends CommonModular<MinerModular> {
 
     private MinerLoader minerLoader;
 
     public MinerModular(Module... modules) {
-        super(modules);
+        this(newArrayList(modules));
     }
 
     public MinerModular(Iterable<? extends Module> modules) {
         super(modules);
-    }
-
-    @Override
-    public void initialize(GuiceFactory guiceFactory) {
         this.minerLoader = minerLoader(guiceFactory);
     }
 

@@ -64,9 +64,8 @@ public class MinerGuiceTest {
                     }
                 }));
             }
-        });
-        val injector = Guice.createInjector(minerModular.createModule(
-                TestMiner.class, TestMinerConcrete.class, TestMinerNone.class));
+        }).bindClasses(TestMiner.class, TestMinerConcrete.class, TestMinerNone.class);
+        val injector = Guice.createInjector(minerModular.createModule());
 
         val testMiner = injector.getInstance(TestMiner.class);
         assertNotNull(testMiner);
@@ -95,9 +94,9 @@ public class MinerGuiceTest {
     @Test
     public void testMinerError() {
         MockDiamondServer.setConfigInfo(DEFAULT_GROUP, DEFAULT_DATA, DEFAULT_CONTENT);
-        val minerModular = new MinerModular(emptyList());
-        val injector = Guice.createInjector(minerModular.createModule(
-                TestMiner.class, TestMinerConcrete.class, TestMinerNone.class));
+        val minerModular = new MinerModular(emptyList()).bindClasses(
+                TestMiner.class, TestMinerConcrete.class, TestMinerNone.class);
+        val injector = Guice.createInjector(minerModular.createModule());
 
         val testMiner = injector.getInstance(TestMiner.class);
         assertNotNull(testMiner);
@@ -155,8 +154,8 @@ public class MinerGuiceTest {
                     }
                 }));
             }
-        });
-        val injector = Guice.createInjector(minerModular.createModule(TestMinerSub.class));
+        }).bindClasses(TestMinerSub.class);
+        val injector = Guice.createInjector(minerModular.createModule());
 
         val testMiner = injector.getInstance(TestMiner.class);
         assertNotNull(testMiner);
