@@ -43,14 +43,22 @@ public abstract class CommonModular<M extends CommonModular> {
         return (M) this;
     }
 
-    public M bindScan(String... basePackages) {
+    public M bindScanPackages(String... basePackages) {
+        return bindScanPackages(newArrayList(basePackages));
+    }
+
+    public M bindScanPackages(Iterable<String> basePackages) {
         for (val basePackage : basePackages) {
             bindClasses(getClasses(basePackage, resolverPredicate));
         }
         return (M) this;
     }
 
-    public M bindScan(Class<?>... basePackageClasses) {
+    public M bindScanPackageClasses(Class<?>... basePackageClasses) {
+        return bindScanPackageClasses(newArrayList(basePackageClasses));
+    }
+
+    public M bindScanPackageClasses(Iterable<Class<?>> basePackageClasses) {
         for (val basePackageClass : basePackageClasses) {
             val basePackage = ClassUtils.getPackageName(basePackageClass);
             bindClasses(getClasses(basePackage, resolverPredicate));

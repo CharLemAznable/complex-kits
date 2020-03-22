@@ -155,7 +155,7 @@ public class MinerGuiceTest {
                     }
                 }));
             }
-        }).bindScan(ClassUtils.getPackageName(TestMinerSub.class)).bindScan(TestMinerSub.class);
+        }).bindScanPackages(ClassUtils.getPackageName(TestMinerSub.class)).bindScanPackageClasses(TestMinerSub.class);
         val injector = Guice.createInjector(minerModular.createModule());
 
         val testMiner = injector.getInstance(TestMiner.class);
