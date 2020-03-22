@@ -16,6 +16,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.n3r.diamond.client.impl.MockDiamondServer;
+import org.springframework.util.ClassUtils;
 
 import java.lang.reflect.Method;
 
@@ -154,7 +155,7 @@ public class MinerGuiceTest {
                     }
                 }));
             }
-        }).bindClasses(TestMinerSub.class);
+        }).bindScan(ClassUtils.getPackageName(TestMinerSub.class)).bindScan(TestMinerSub.class);
         val injector = Guice.createInjector(minerModular.createModule());
 
         val testMiner = injector.getInstance(TestMiner.class);

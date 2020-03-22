@@ -5,6 +5,7 @@ import com.github.charlemaznable.core.miner.MinerModular;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.ohclient.OhException;
 import com.github.charlemaznable.core.net.ohclient.OhModular;
+import com.github.charlemaznable.core.net.ohclient.testclient.TestClientScanAnchor;
 import com.github.charlemaznable.core.net.ohclient.testclient.TestComponent;
 import com.github.charlemaznable.core.net.ohclient.testclient.TestHttpClient;
 import com.github.charlemaznable.core.net.ohclient.testclient.TestHttpClientConcrete;
@@ -186,6 +187,45 @@ public class OhGuiceTest {
             assertThrows(ConfigurationException.class, () ->
                     injector.getInstance(TestHttpClient.class));
             assertNull(new GuiceFactory(injector).build(TestHttpClient.class));
+        }
+    }
+
+    @SneakyThrows
+    @Test
+    public void testOhClientScan() {
+        val minerModular = new MinerModular().bindClasses(TestSampleUrlProvider.class);
+        val minerModule = minerModular.createModule();
+        val ohModular = new OhModular(minerModule).bindScan(TestClientScanAnchor.class);
+        var injector = Guice.createInjector(ohModular.createModule());
+
+        try (val mockWebServer = new MockWebServer()) {
+            mockWebServer.setDispatcher(new Dispatcher() {
+                @Override
+                public MockResponse dispatch(RecordedRequest request) {
+                    return new MockResponse().setBody(SAMPLE_RESULT);
+                }
+            });
+            mockWebServer.start(41102);
+
+            val testComponent = injector.getInstance(TestComponent.class);
+            val testHttpClient = testComponent.getTestHttpClient();
+            assertEquals(SAMPLE_RESULT, testHttpClient.sample());
+            assertEquals(SAMPLE_RESULT_WRAP, testHttpClient.sampleWrapper());
+            assertEquals(SAMPLE_RESULT, testHttpClient.sampleWrap());
+            assertEquals(SAMPLE_RESULT, testHttpClient.sampleByContext());
+            assertEquals(SAMPLE_RESULT, testHttpClient.sample());
+            assertEquals(SAMPLE_RESULT_WRAP, testHttpClient.sampleWrapper());
+            assertEquals(SAMPLE_RESULT, testHttpClient.sampleWrap());
+            assertEquals(SAMPLE_RESULT, testHttpClient.sampleByContext());
+
+            val testHttpClient2 = injector.getInstance(TestHttpClientIsolated.class);
+            assertEquals(SAMPLE_RESULT, testHttpClient2.sample());
+            assertEquals(SAMPLE_RESULT_WRAP_I, testHttpClient2.sampleWrapper());
+
+            assertNull(injector.getInstance(TestHttpClientConcrete.class));
+
+            assertThrows(ConfigurationException.class, () ->
+                    injector.getInstance(TestHttpClientNone.class));
         }
     }
 }
