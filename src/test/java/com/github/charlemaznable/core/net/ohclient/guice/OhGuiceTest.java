@@ -195,7 +195,7 @@ public class OhGuiceTest {
     public void testOhClientScan() {
         val minerModular = new MinerModular().bindClasses(TestSampleUrlProvider.class);
         val minerModule = minerModular.createModule();
-        val ohModular = new OhModular(minerModule).bindScanPackageClasses(TestClientScanAnchor.class);
+        val ohModular = new OhModular(minerModule).scanPackageClasses(TestClientScanAnchor.class);
         var injector = Guice.createInjector(ohModular.createModule());
 
         try (val mockWebServer = new MockWebServer()) {
