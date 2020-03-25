@@ -78,21 +78,21 @@
         <commons-pool2.version>2.8.0</commons-pool2.version>
         <guava.version>28.2-jre</guava.version>
         <slf4j-api.version>1.7.30</slf4j-api.version>
-        <fastjson.version>1.2.66</fastjson.version>
+        <fastjson.version>1.2.67</fastjson.version>
         <dom4j.version>2.1.1</dom4j.version>
         <diamond-client.version>0.0.21</diamond-client.version>
         <annotations.version>19.0.0</annotations.version>
         <auto-service.version>1.0-rc6</auto-service.version>
         <okhttp.version>3.14.7</okhttp.version>
         <vertx.version>3.8.5</vertx.version>
-        <guice.version>4.2.2</guice.version>
+        <guice.version>4.2.3</guice.version>
 
         <lombok.version>1.18.12</lombok.version>
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
-        <spring.version>5.2.4.RELEASE</spring.version>
+        <spring.version>5.2.5.RELEASE</spring.version>
 
         <logback-classic.version>1.2.3</logback-classic.version>
-        <junit-jupiter.version>5.6.0</junit-jupiter.version>
+        <junit-jupiter.version>5.6.1</junit-jupiter.version>
         <jmockit.version>1.49</jmockit.version>
         <awaitility.version>4.0.2</awaitility.version>
 
@@ -102,7 +102,7 @@
         <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
         <sonar-maven-plugin.version>3.7.0.1746</sonar-maven-plugin.version>
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
-        <maven-javadoc-plugin.version>3.1.1</maven-javadoc-plugin.version>
+        <maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
     </properties>
