@@ -6,6 +6,7 @@ import lombok.val;
 import lombok.var;
 import org.springframework.http.HttpStatus;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
@@ -101,6 +102,25 @@ public final class Http {
         val pathVariables = request.getAttribute(URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         if (nonNull(pathVariables)) pathVariableMap.putAll((Map) pathVariables);
         return pathVariableMap;
+    }
+
+    public static Map<String, String> fetchHeaderMap(HttpServletRequest request) {
+        Map<String, String> headerMap = newHashMap();
+        val headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            val headerName = headerNames.nextElement();
+            headerMap.put(headerName, request.getHeader(headerName));
+        }
+        return headerMap;
+    }
+
+    public static Map<String, String> fetchCookieMap(HttpServletRequest request) {
+        Map<String, String> cookieMap = newHashMap();
+        val cookies = nullThen(request.getCookies(), () -> new Cookie[]{});
+        for (val cookie : cookies) {
+            cookieMap.put(cookie.getName(), cookie.getValue());
+        }
+        return cookieMap;
     }
 
     public static String fetchRemoteAddr(HttpServletRequest request) {

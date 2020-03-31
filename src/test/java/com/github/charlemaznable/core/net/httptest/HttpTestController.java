@@ -51,6 +51,7 @@ public class HttpTestController {
         Http.errorHttpStatus(response, HttpStatus.NOT_FOUND);
     }
 
+    @SuppressWarnings("Duplicates")
     @RequestMapping("/parameter")
     public void parameter(HttpServletRequest request, HttpServletResponse response) {
         val parameterMap = Http.fetchParameterMap(request);
@@ -82,6 +83,32 @@ public class HttpTestController {
         if (!a.equals(pathVariableMap.get("AAA")) || !a.equals("aaa")) {
             Http.errorText(response, 500, "ERROR");
         } else if (!b.equals(pathVariableMap.get("BBB")) || !b.equals("bbb")) {
+            Http.errorText(response, 500, "ERROR");
+        } else {
+            Http.responseText(response, "OK");
+        }
+    }
+
+    @SuppressWarnings("Duplicates")
+    @RequestMapping("/header")
+    public void header(HttpServletRequest request, HttpServletResponse response) {
+        val headerMap = Http.fetchHeaderMap(request);
+        if (!"aaa".equals(headerMap.get("AAA"))) {
+            Http.errorText(response, 500, "ERROR");
+        } else if (!"bbb".equals(headerMap.get("BBB"))) {
+            Http.errorText(response, 500, "ERROR");
+        } else {
+            Http.responseText(response, "OK");
+        }
+    }
+
+    @SuppressWarnings("Duplicates")
+    @RequestMapping("/cookie")
+    public void cookie(HttpServletRequest request, HttpServletResponse response) {
+        val cookieMap = Http.fetchCookieMap(request);
+        if (!"aaa".equals(cookieMap.get("AAA"))) {
+            Http.errorText(response, 500, "ERROR");
+        } else if (!"bbb".equals(cookieMap.get("BBB"))) {
             Http.errorText(response, 500, "ERROR");
         } else {
             Http.responseText(response, "OK");

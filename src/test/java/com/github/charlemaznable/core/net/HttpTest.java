@@ -18,6 +18,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import javax.servlet.http.Cookie;
+
 import static com.github.charlemaznable.core.codec.Bytes.bytes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -111,6 +113,28 @@ public class HttpTest {
     @Test
     public void testPathVariable() {
         val response = mockMvc.perform(get("/path-variable/aaa/bbb"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+        assertEquals("OK", response.getContentAsString());
+    }
+
+    @SneakyThrows
+    @Test
+    public void testHeader() {
+        val response = mockMvc.perform(get("/header")
+                .header("AAA", "aaa")
+                .header("BBB", "bbb"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+        assertEquals("OK", response.getContentAsString());
+    }
+
+    @SneakyThrows
+    @Test
+    public void testCookie() {
+        val response = mockMvc.perform(get("/cookie")
+                .cookie(new Cookie("AAA", "aaa"))
+                .cookie(new Cookie("BBB", "bbb")))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         assertEquals("OK", response.getContentAsString());
