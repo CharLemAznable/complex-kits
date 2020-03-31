@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.net.ohclient.internal;
 
+import com.github.charlemaznable.core.lang.Reflectt;
 import com.github.charlemaznable.core.lang.Str;
 import com.github.charlemaznable.core.net.common.Bundle;
 import com.github.charlemaznable.core.net.common.CncRequest;
@@ -24,13 +25,11 @@ import okhttp3.internal.http.HttpMethod;
 import okhttp3.logging.HttpLoggingInterceptor.Level;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.text.StringSubstitutor;
-import org.joor.ReflectException;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.Proxy;
 import java.util.HashMap;
@@ -48,7 +47,6 @@ import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.CO
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.log;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static org.joor.Reflect.accessible;
 import static org.joor.Reflect.on;
 
 public final class OhCall extends OhRoot {
@@ -210,29 +208,12 @@ public final class OhCall extends OhRoot {
         val fields = reflect.fields();
         for (val fieldEntry : fields.entrySet()) {
             val fieldName = fieldEntry.getKey();
-            val field = field0(clazz, fieldName);
+            val field = Reflectt.field0(clazz, fieldName);
             val fieldReflect = fieldEntry.getValue();
             val fieldValue = fieldReflect.get();
 
             Annotation[] annotations = field.getAnnotations();
             processAnnotations(fieldValue, annotations, fieldName);
-        }
-    }
-
-    private Field field0(Class<?> clazz, String fieldName) {
-        Class<?> t = clazz;
-        try {
-            return accessible(t.getField(fieldName));
-        } catch (NoSuchFieldException e) {
-            do {
-                try {
-                    return accessible(t.getDeclaredField(fieldName));
-                } catch (NoSuchFieldException ignore) {
-                    // ignored
-                }
-                t = t.getSuperclass();
-            } while (t != null);
-            throw new ReflectException(e);
         }
     }
 
