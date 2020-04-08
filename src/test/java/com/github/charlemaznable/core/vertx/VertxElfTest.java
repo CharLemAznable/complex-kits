@@ -51,7 +51,7 @@ public class VertxElfTest {
                                         f.complete();
                                     })
                     )
-            )).setHandler(asyncResult -> {
+            )).onComplete(asyncResult -> {
                 if (asyncResult.failed()) {
                     startFuture.handle(Future.failedFuture(asyncResult.cause()));
                 } else {
