@@ -1,10 +1,13 @@
 package com.github.charlemaznable.core.guice;
 
+import com.github.charlemaznable.core.context.FactoryContext;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Module;
 import com.google.inject.Provider;
+import com.google.inject.matcher.Matchers;
+import com.google.inject.spi.ProvisionListener;
 import com.google.inject.util.Providers;
 import lombok.val;
 import org.springframework.util.ClassUtils;
@@ -78,6 +81,18 @@ public abstract class CommonModular<M extends CommonModular> {
                         bindProviderTraverse(clazz, createProvider(clazz));
                     }
                 }
+                bindListener(Matchers.any(), new ProvisionListener() {
+                    @Override
+                    public <T> void onProvision(ProvisionInvocation<T> provisionInvocation) {
+                        val temp = FactoryContext.get();
+                        FactoryContext.set(guiceFactory);
+                        try {
+                            provisionInvocation.provision();
+                        } finally {
+                            FactoryContext.set(temp);
+                        }
+                    }
+                });
             }
 
             private void bindProviderTraverse(Class clazz, Provider provider) {

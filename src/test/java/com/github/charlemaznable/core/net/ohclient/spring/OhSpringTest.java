@@ -1,7 +1,7 @@
 package com.github.charlemaznable.core.net.ohclient.spring;
 
 import com.github.charlemaznable.core.net.common.HttpStatus;
-import com.github.charlemaznable.core.net.ohclient.testclient.TestComponent;
+import com.github.charlemaznable.core.net.ohclient.testclient.TestComponentSpring;
 import com.github.charlemaznable.core.net.ohclient.testclient.TestHttpClientConcrete;
 import com.github.charlemaznable.core.net.ohclient.testclient.TestHttpClientIsolated;
 import com.github.charlemaznable.core.net.ohclient.testclient.TestHttpClientNone;
@@ -28,7 +28,7 @@ public class OhSpringTest {
 
     private static final String SAMPLE = "Sample";
     @Autowired
-    private TestComponent testComponent;
+    private TestComponentSpring testComponent;
 
     @SneakyThrows
     @Test

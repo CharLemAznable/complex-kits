@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.net.ohclient.spring;
 
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.ohclient.OhException;
+import com.github.charlemaznable.core.net.ohclient.testclient.TestComponentSpring;
 import com.github.charlemaznable.core.net.ohclient.testclient.TestHttpClient;
 import com.github.charlemaznable.core.net.ohclient.testclient.TestHttpClientConcrete;
 import com.github.charlemaznable.core.net.ohclient.testclient.TestHttpClientIsolated;
@@ -16,6 +17,7 @@ import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -30,6 +32,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = OhSpringNakedConfiguration.class)
 public class OhSpringNakedTest {
+
+    @Autowired
+    private TestComponentSpring testComponent;
 
     @SneakyThrows
     @Test
@@ -52,7 +57,7 @@ public class OhSpringNakedTest {
             });
             mockWebServer.start(41102);
 
-            val testHttpClient = getClient(TestHttpClient.class);
+            val testHttpClient = testComponent.getTestHttpClient();
             assertThrows(NullPointerException.class, testHttpClient::sample);
             assertThrows(NullPointerException.class, testHttpClient::sampleWrapper);
             assertEquals("SampleNoError", testHttpClient.sampleWrap());
