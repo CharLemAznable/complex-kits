@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Synchronized;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -29,6 +30,7 @@ import static java.util.Objects.isNull;
 import static org.joor.Reflect.onClass;
 
 @SuppressWarnings("unchecked")
+@Slf4j
 @Component
 public class SpringContext implements ApplicationContextAware {
 
@@ -223,6 +225,8 @@ public class SpringContext implements ApplicationContextAware {
 
     @Synchronized
     static void updateApplicationContext(@Nonnull ApplicationContext context) {
+        if (applicationContext == context) return;
+        log.info("Update Application Context: {}", context);
         applicationContext = context;
         defaultListableBeanFactory = (DefaultListableBeanFactory)
                 ((ConfigurableApplicationContext) applicationContext).getBeanFactory();
@@ -230,6 +234,7 @@ public class SpringContext implements ApplicationContextAware {
 
     @Override
     public final void setApplicationContext(@Nonnull ApplicationContext context) {
+        log.info("Awared Application Context: {}", context);
         SpringContext.updateApplicationContext(context);
     }
 

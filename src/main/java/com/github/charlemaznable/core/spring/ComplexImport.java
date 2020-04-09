@@ -11,6 +11,6 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import(ComplexComponents.class)
+@Import({ComplexComponents.class, SpringContextRegistrar.class})
 public @interface ComplexImport {
 }
