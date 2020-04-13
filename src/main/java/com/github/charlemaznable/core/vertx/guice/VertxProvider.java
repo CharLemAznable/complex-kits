@@ -8,6 +8,7 @@ import io.vertx.core.VertxOptions;
 import javax.annotation.Nullable;
 
 import static com.github.charlemaznable.core.lang.Condition.nullThen;
+import static com.github.charlemaznable.core.vertx.VertxElf.buildVertx;
 
 public final class VertxProvider implements Provider<Vertx> {
 
@@ -15,11 +16,11 @@ public final class VertxProvider implements Provider<Vertx> {
 
     @Inject
     public VertxProvider(@Nullable VertxOptions vertxOptions) {
-        this.vertxOptions = vertxOptions;
+        this.vertxOptions = nullThen(vertxOptions, VertxOptions::new);
     }
 
     @Override
     public Vertx get() {
-        return Vertx.vertx(nullThen(vertxOptions, VertxOptions::new));
+        return buildVertx(vertxOptions);
     }
 }

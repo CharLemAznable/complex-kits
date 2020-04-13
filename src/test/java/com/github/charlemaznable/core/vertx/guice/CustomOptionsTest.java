@@ -4,6 +4,7 @@ import com.google.inject.Guice;
 import com.google.inject.Provider;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
+import io.vertx.core.eventbus.impl.clustered.ClusteredEventBus;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -11,19 +12,29 @@ import static org.joor.Reflect.on;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CustomOptionsTest {
 
     static final int DEFAULT_WORKER_POOL_SIZE = 42;
-    static final VertxOptions vertxOptions = new VertxOptions().setWorkerPoolSize(DEFAULT_WORKER_POOL_SIZE);
+    static final VertxOptions vertxOptions;
+
+    static {
+        vertxOptions = new VertxOptions();
+        vertxOptions.setWorkerPoolSize(DEFAULT_WORKER_POOL_SIZE);
+        vertxOptions.getEventBusOptions().setClustered(true);
+    }
 
     @Test
     public void testVertxModular() {
         val injector = Guice.createInjector(new VertxModular(vertxOptions).createModule());
         val vertx = injector.getInstance(Vertx.class);
         assertNotNull(vertx);
-        int defaultWorkerPoolSize = on(vertx).field("defaultWorkerPoolSize").get();
+        val reflectVertx = on(vertx);
+        int defaultWorkerPoolSize = reflectVertx.field("defaultWorkerPoolSize").get();
         assertEquals(DEFAULT_WORKER_POOL_SIZE, defaultWorkerPoolSize);
+        val eventBus = reflectVertx.field("eventBus").get();
+        assertTrue(eventBus instanceof ClusteredEventBus);
         assertSame(vertx, injector.getInstance(Vertx.class));
     }
 
@@ -32,8 +43,11 @@ public class CustomOptionsTest {
         val injector = Guice.createInjector(new VertxModular(CustomOptionsProvider.class).createModule());
         val vertx = injector.getInstance(Vertx.class);
         assertNotNull(vertx);
-        int defaultWorkerPoolSize = on(vertx).field("defaultWorkerPoolSize").get();
+        val reflectVertx = on(vertx);
+        int defaultWorkerPoolSize = reflectVertx.field("defaultWorkerPoolSize").get();
         assertEquals(DEFAULT_WORKER_POOL_SIZE, defaultWorkerPoolSize);
+        val eventBus = reflectVertx.field("eventBus").get();
+        assertTrue(eventBus instanceof ClusteredEventBus);
         assertSame(vertx, injector.getInstance(Vertx.class));
     }
 
