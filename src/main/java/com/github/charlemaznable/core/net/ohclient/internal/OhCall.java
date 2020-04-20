@@ -217,6 +217,7 @@ public final class OhCall extends OhRoot {
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     private OkHttpClient buildOkHttpClient(OhMappingProxy proxy) {
         val sameClientProxy = this.clientProxy == proxy.clientProxy;
         val sameSSLSocketFactory = this.sslSocketFactory == proxy.sslSocketFactory;

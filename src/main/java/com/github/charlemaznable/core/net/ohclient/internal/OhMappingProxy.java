@@ -500,6 +500,7 @@ public final class OhMappingProxy extends OhRoot {
                     : FactoryContext.apply(factory, providerClass, p -> p.level(clazz, method));
         }
 
+        @SuppressWarnings("ConstantConditions")
         static OkHttpClient buildOkHttpClient(OhMappingProxy mappingProxy, OhProxy proxy) {
             val sameClientProxy = mappingProxy.clientProxy == proxy.clientProxy;
             val sameSSLSocketFactory = mappingProxy.sslSocketFactory == proxy.sslSocketFactory;
