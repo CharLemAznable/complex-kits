@@ -24,7 +24,10 @@ public abstract class BaseConfigable implements Configable {
 
     @Override
     public final int getInt(String key) {
-        val str = getStr(key);
+        return parseInt(key, getStr(key));
+    }
+
+    public final int parseInt(String key, String str) {
         if (isEmpty(str)) throw new ConfigNotFoundException(key + CONFIG_NOT_FOUND);
 
         val matcher = numberPattern.matcher(str);
@@ -40,7 +43,10 @@ public abstract class BaseConfigable implements Configable {
 
     @Override
     public final long getLong(String key) {
-        val str = getStr(key);
+        return parseLong(key, getStr(key));
+    }
+
+    public final long parseLong(String key, String str) {
         if (isEmpty(str))
             throw new ConfigNotFoundException(key + CONFIG_NOT_FOUND);
 
@@ -57,7 +63,10 @@ public abstract class BaseConfigable implements Configable {
 
     @Override
     public final boolean getBool(String key) {
-        val str = getStr(key);
+        return parseBool(key, getStr(key));
+    }
+
+    public final boolean parseBool(String key, String str) {
         if (isEmpty(str))
             throw new ConfigNotFoundException(key + CONFIG_NOT_FOUND);
 
@@ -66,7 +75,10 @@ public abstract class BaseConfigable implements Configable {
 
     @Override
     public final float getFloat(String key) {
-        val str = getStr(key);
+        return parseFloat(key, getStr(key));
+    }
+
+    public final float parseFloat(String key, String str) {
         if (isEmpty(str))
             throw new ConfigNotFoundException(key + CONFIG_NOT_FOUND);
 
@@ -80,7 +92,10 @@ public abstract class BaseConfigable implements Configable {
 
     @Override
     public final double getDouble(String key) {
-        val str = getStr(key);
+        return parseDouble(key, getStr(key));
+    }
+
+    public final double parseDouble(String key, String str) {
         if (isEmpty(str))
             throw new ConfigNotFoundException(key + CONFIG_NOT_FOUND);
 
@@ -162,12 +177,15 @@ public abstract class BaseConfigable implements Configable {
 
     @Override
     public final <T> T getBean(String key, Class<T> beanClass) {
-        val json = getStr(key);
-        if (isEmpty(json)) return null;
+        return parseBean(key, getStr(key), beanClass);
+    }
+
+    public final <T> T parseBean(String key, String str, Class<T> beanClass) {
+        if (isEmpty(str)) return null;
 
         T bean;
         try {
-            bean = unJson(json, beanClass);
+            bean = unJson(str, beanClass);
         } catch (Exception ex) {
             throw new ConfigValueFormatException(key + "'s value is not in JSONObject format");
         }
@@ -180,13 +198,16 @@ public abstract class BaseConfigable implements Configable {
 
     @Override
     public final <T> List<T> getBeans(String key, Class<T> beanClass) {
+        return parseBeans(key, getStr(key), beanClass);
+    }
+
+    public final <T> List<T> parseBeans(String key, String str, Class<T> beanClass) {
         List<T> beans = newArrayList();
-        val json = getStr(key);
-        if (isEmpty(json)) return beans;
+        if (isEmpty(str)) return beans;
 
         try {
-            if (json.startsWith("[")) beans = unJsonArray(json, beanClass);
-            else beans.add(unJson(json, beanClass));
+            if (str.startsWith("[")) beans = unJsonArray(str, beanClass);
+            else beans.add(unJson(str, beanClass));
         } catch (Exception ex) {
             throw new ConfigValueFormatException(key + "'s value is not in JSONArray format");
         }
