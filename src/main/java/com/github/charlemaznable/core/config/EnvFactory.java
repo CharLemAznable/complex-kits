@@ -60,10 +60,6 @@ public final class EnvFactory {
         return LoadingCachee.get(envLoaderCache, factory);
     }
 
-    private static String substitute(String source) {
-        return envClassPathSubstitutor.replace(source);
-    }
-
     @SuppressWarnings("unchecked")
     public static class EnvLoader {
 
@@ -170,6 +166,10 @@ public final class EnvFactory {
             String defaultValue = DefaultValueProvider.class == providerClass ? envConfig.defaultValue()
                     : FactoryContext.apply(factory, providerClass, p -> p.defaultValue(envClass, method));
             return substitute(blankThen(defaultValue, () -> null));
+        }
+
+        private String substitute(String source) {
+            return envClassPathSubstitutor.replace(source);
         }
 
         private Object parseValue(String key, String value, Method method) {
