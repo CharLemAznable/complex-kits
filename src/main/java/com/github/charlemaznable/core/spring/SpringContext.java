@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -194,9 +195,14 @@ public class SpringContext implements ApplicationContextAware {
                 .genericBeanDefinition(clazz).getBeanDefinition();
         val registerBeanName = nullThen(beanName,
                 () -> getBeanClassName(beanDefinition));
-        defaultListableBeanFactory.registerBeanDefinition(
-                registerBeanName, beanDefinition);
-        defaultListableBeanFactory.clearMetadataCache();
+        try {
+            // maybe already registered by this name
+            defaultListableBeanFactory.registerBeanDefinition(
+                    registerBeanName, beanDefinition);
+            defaultListableBeanFactory.clearMetadataCache();
+        } catch (BeanDefinitionStoreException e) {
+            // ignored
+        }
         return getBean(registerBeanName, clazz);
     }
 
@@ -212,13 +218,19 @@ public class SpringContext implements ApplicationContextAware {
         if (isNull(applicationContext)) return bean;
         if (isNull(bean)) return null;
 
+        Class<T> clazz = (Class<T>) bean.getClass();
         val beanDefinition = BeanDefinitionBuilder
-                .genericBeanDefinition(bean.getClass()).getBeanDefinition();
+                .genericBeanDefinition(clazz).getBeanDefinition();
         val registerBeanName = nullThen(beanName,
                 () -> getBeanClassName(beanDefinition));
-        defaultListableBeanFactory.autowireBean(bean);
-        defaultListableBeanFactory.registerSingleton(registerBeanName, bean);
-        return bean;
+        try {
+            // maybe already autowired by this name
+            defaultListableBeanFactory.autowireBean(bean);
+            defaultListableBeanFactory.registerSingleton(registerBeanName, bean);
+        } catch (IllegalStateException e) {
+            // ignored
+        }
+        return getBean(registerBeanName, clazz);
     }
 
     ////////////////////////////////////////////////////////////////

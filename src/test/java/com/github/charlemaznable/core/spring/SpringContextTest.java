@@ -11,8 +11,13 @@ import com.github.charlemaznable.core.spring.testcontext.TestClassF;
 import com.github.charlemaznable.core.spring.testcontext.TestClassG;
 import com.github.charlemaznable.core.spring.testcontext.TestConfiguration;
 import com.github.charlemaznable.core.spring.testcontext.TestMultiClass;
+import com.github.charlemaznable.core.spring.testcontext.TestRecreateBaseClass;
+import com.github.charlemaznable.core.spring.testcontext.TestRecreateSubClass;
+import com.github.charlemaznable.core.spring.testcontext.TestRewireBaseClass;
+import com.github.charlemaznable.core.spring.testcontext.TestRewireSubClass;
 import com.github.charlemaznable.core.spring.testcontext.TestSpringContext;
 import com.github.charlemaznable.core.spring.testcontext.TestSubSpringContext;
+import lombok.val;
 import lombok.var;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +26,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Arrays;
 
+import static org.joor.Reflect.onClass;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -190,5 +197,51 @@ public class SpringContextTest {
 
         assertNull(TestSpringContext.createBean(null));
         assertNull(TestSpringContext.autowireBean(null));
+    }
+
+    @Test
+    public void testSpringContextRecreate() {
+        onClass(TestSpringContext.class).field("defaultListableBeanFactory")
+                .set("allowBeanDefinitionOverriding", false);
+
+        TestRecreateBaseClass base = TestSpringContext.getBeanOrCreate(TestRecreateBaseClass.class);
+        assertNotNull(base);
+
+        TestRecreateSubClass sub = TestSpringContext.getBeanOrCreate(TestRecreateSubClass.class);
+        assertNotNull(sub);
+        assertNotEquals(base, sub);
+
+        TestRecreateBaseClass base2 = TestSpringContext.getBeanOrCreate(TestRecreateBaseClass.class);
+        assertNotNull(base2);
+        assertEquals(base, base2);
+
+        onClass(TestSpringContext.class).field("defaultListableBeanFactory")
+                .set("allowBeanDefinitionOverriding", true);
+    }
+
+    @Test
+    public void testSpringContextRewire() {
+        onClass(TestSpringContext.class).field("defaultListableBeanFactory")
+                .set("allowBeanDefinitionOverriding", false);
+
+        val baseBean = new TestRewireBaseClass();
+        TestRewireBaseClass base = TestSpringContext.getBeanOrAutowire(TestRewireBaseClass.class, baseBean);
+        assertNotNull(base);
+        assertEquals(baseBean, base);
+
+        val subBean = new TestRewireSubClass();
+        TestRewireSubClass sub = TestSpringContext.getBeanOrAutowire(TestRewireSubClass.class, subBean);
+        assertNotNull(sub);
+        assertNotEquals(base, sub);
+        assertEquals(subBean, sub);
+
+        val baseBean2 = new TestRewireBaseClass();
+        TestRewireBaseClass base2 = TestSpringContext.getBeanOrAutowire(TestRewireBaseClass.class, baseBean2);
+        assertNotNull(base2);
+        assertEquals(base, base2);
+        assertNotEquals(baseBean2, base2);
+
+        onClass(TestSpringContext.class).field("defaultListableBeanFactory")
+                .set("allowBeanDefinitionOverriding", true);
     }
 }
