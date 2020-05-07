@@ -68,11 +68,6 @@ public final class MinerFactory {
         return LoadingCachee.get(minerLoaderCache, factory);
     }
 
-    private static String substitute(String source) {
-        return minerClassPathSubstitutor.replace(
-                minerMinerSubstitutor.replace(source));
-    }
-
     @SuppressWarnings("unchecked")
     public static class MinerLoader {
 
@@ -243,6 +238,11 @@ public final class MinerFactory {
 
         private Object parseObjects(Class<?> rt, String value) {
             return DiamondUtils.parseObjects(value, rt);
+        }
+
+        private String substitute(String source) {
+            return minerClassPathSubstitutor.replace(
+                    minerMinerSubstitutor.replace(source));
         }
     }
 }
