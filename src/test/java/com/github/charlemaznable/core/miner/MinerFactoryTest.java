@@ -182,8 +182,10 @@ public class MinerFactoryTest {
         assertEquals("John Doe Richard", stoneProps.longName());
         assertEquals("DEFAULTDefault", stoneProps.prop());
 
-        assertThrows(MinerConfigException.class, () -> minerLoader.getMiner(ProvideError1.class));
-        assertThrows(MinerConfigException.class, () -> minerLoader.getMiner(ProvideError2.class));
+        val error1 = minerLoader.getMiner(ProvideError1.class);
+        assertThrows(MinerConfigException.class, error1::prop);
+        val error2 = minerLoader.getMiner(ProvideError2.class);
+        assertThrows(MinerConfigException.class, error2::prop);
         val error3 = minerLoader.getMiner(ProvideError3.class);
         assertThrows(MinerConfigException.class, error3::prop);
         val error4 = minerLoader.getMiner(ProvideError4.class);
@@ -305,13 +307,19 @@ public class MinerFactoryTest {
     @MinerConfig(
             groupProvider = ErrorGroupProvider.class
     )
-    interface ProvideError1 {}
+    interface ProvideError1 {
+
+        String prop();
+    }
 
     @MinerConfig(
             groupProvider = NoErrorGroupProvider.class,
             dataIdProvider = ErrorDataIdProvider.class
     )
-    interface ProvideError2 {}
+    interface ProvideError2 {
+
+        String prop();
+    }
 
     @MinerConfig(
             groupProvider = NoErrorGroupProvider.class,

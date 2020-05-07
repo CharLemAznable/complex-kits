@@ -90,14 +90,9 @@ public final class MinerFactory {
 
         private <T> Object loadMiner(Class<T> minerClass) {
             ensureClassIsAnInterface(minerClass);
-            val minerConfig = checkMinerConfig(minerClass);
+            val classConfig = checkClassConfig(minerClass);
 
-            val group = checkMinerGroup(minerClass, minerConfig);
-            val minerable = new Miner(blankThen(group, () -> "DEFAULT_GROUP"));
-            val dataId = checkMinerDataId(minerClass, minerConfig);
-            val minerProxy = new MinerProxy(minerClass, isNotBlank(dataId)
-                    ? minerable.getMiner(dataId) : minerable, factory);
-
+            val minerProxy = new MinerProxy(minerClass, classConfig, factory);
             return EasyEnhancer.create(MinerDummy.class,
                     new Class[]{minerClass, Minerable.class},
                     method -> {
@@ -111,21 +106,9 @@ public final class MinerFactory {
             throw new MinerConfigException(clazz + " is not An Interface");
         }
 
-        private <T> MinerConfig checkMinerConfig(Class<T> clazz) {
+        private <T> MinerConfig checkClassConfig(Class<T> clazz) {
             return checkNotNull(getAnnotation(clazz, MinerConfig.class),
                     new MinerConfigException(clazz + " has no MinerConfig"));
-        }
-
-        private <T> String checkMinerGroup(Class<T> clazz, MinerConfig minerConfig) {
-            val providerClass = minerConfig.groupProvider();
-            return substitute(GroupProvider.class == providerClass ? minerConfig.group()
-                    : FactoryContext.apply(factory, providerClass, p -> p.group(clazz)));
-        }
-
-        private <T> String checkMinerDataId(Class<T> clazz, MinerConfig minerConfig) {
-            val providerClass = minerConfig.dataIdProvider();
-            return substitute(DataIdProvider.class == providerClass ? minerConfig.dataId()
-                    : FactoryContext.apply(factory, providerClass, p -> p.dataId(clazz)));
         }
     }
 
@@ -149,10 +132,10 @@ public final class MinerFactory {
     }
 
     @AllArgsConstructor
-    private static class MinerProxy implements MethodInterceptor {
+    private static class MinerProxy<T> implements MethodInterceptor {
 
-        private Class minerClass;
-        private Minerable minerable;
+        private Class<T> minerClass;
+        private MinerConfig classConfig;
         private Factory factory;
 
         @Override
@@ -161,14 +144,16 @@ public final class MinerFactory {
             if (method.getDeclaringClass().equals(MinerDummy.class)) {
                 return methodProxy.invokeSuper(o, args);
             }
+
+            val minerable = buildMinerable();
             if (method.getDeclaringClass().equals(Minerable.class)) {
                 return method.invoke(minerable, args);
             }
 
-            val minerConfig = findAnnotation(method, MinerConfig.class);
-            val group = checkMinerGroup(method, minerConfig);
-            val dataId = checkMinerDataId(method, minerConfig);
-            var defaultValue = checkMinerDefaultValue(method, minerConfig);
+            val methodConfig = findAnnotation(method, MinerConfig.class);
+            val group = checkMinerGroup(method, methodConfig);
+            val dataId = checkMinerDataId(method, methodConfig);
+            var defaultValue = checkMinerDefaultValue(method, methodConfig);
             var defaultArgument = args.length > 0 ? args[0] : null;
 
             val stone = minerable.getStone(group, blankThen(dataId, method::getName));
@@ -176,6 +161,25 @@ public final class MinerFactory {
             if (nonNull(defaultArgument)) return defaultArgument;
             if (nonNull(defaultValue)) return convertType(defaultValue, method);
             return null;
+        }
+
+        private Minerable buildMinerable() {
+            val group = checkMinerGroup(classConfig);
+            val minerable = new Miner(blankThen(group, () -> "DEFAULT_GROUP"));
+            val dataId = checkMinerDataId(classConfig);
+            return isNotBlank(dataId) ? minerable.getMiner(dataId) : minerable;
+        }
+
+        private String checkMinerGroup(MinerConfig minerConfig) {
+            val providerClass = minerConfig.groupProvider();
+            return substitute(GroupProvider.class == providerClass ? minerConfig.group()
+                    : FactoryContext.apply(factory, providerClass, p -> p.group(minerClass)));
+        }
+
+        private String checkMinerDataId(MinerConfig minerConfig) {
+            val providerClass = minerConfig.dataIdProvider();
+            return substitute(DataIdProvider.class == providerClass ? minerConfig.dataId()
+                    : FactoryContext.apply(factory, providerClass, p -> p.dataId(minerClass)));
         }
 
         private String checkMinerGroup(Method method, MinerConfig minerConfig) {
