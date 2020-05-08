@@ -241,8 +241,11 @@ public final class MinerFactory {
         }
 
         private String substitute(String source) {
-            return minerClassPathSubstitutor.replace(
-                    minerMinerSubstitutor.replace(source));
+            if (nonNull(minerMinerSubstitutor))
+                source = minerMinerSubstitutor.replace(source);
+            if (nonNull(minerClassPathSubstitutor))
+                source = minerClassPathSubstitutor.replace(source);
+            return source;
         }
     }
 }

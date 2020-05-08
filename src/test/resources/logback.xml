@@ -7,7 +7,9 @@
         </encoder>
     </appender>
 
-    <root level="INFO">
+    <define name="MinerDefinedLogLevel"
+            class="com.github.charlemaznable.core.miner.MinerDefinedLogLevel"/>
+    <root level="${MinerDefinedLogLevel}">
         <appender-ref ref="Console"/>
     </root>
 
