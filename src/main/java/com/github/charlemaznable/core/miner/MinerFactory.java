@@ -10,7 +10,6 @@ import com.github.charlemaznable.core.miner.MinerConfig.DefaultValueProvider;
 import com.github.charlemaznable.core.miner.MinerConfig.GroupProvider;
 import com.google.common.cache.LoadingCache;
 import com.google.common.primitives.Primitives;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.val;
 import lombok.var;
@@ -32,11 +31,13 @@ import static com.github.charlemaznable.core.context.FactoryContext.SpringFactor
 import static com.github.charlemaznable.core.lang.ClzPath.classResourceAsSubstitutor;
 import static com.github.charlemaznable.core.lang.Condition.blankThen;
 import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
+import static com.github.charlemaznable.core.lang.LoadingCachee.get;
 import static com.github.charlemaznable.core.lang.Str.isNotBlank;
 import static com.github.charlemaznable.core.miner.MinerElf.minerAsSubstitutor;
 import static com.google.common.cache.CacheLoader.from;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
@@ -65,7 +66,7 @@ public final class MinerFactory {
     }
 
     public static MinerLoader minerLoader(Factory factory) {
-        return LoadingCachee.get(minerLoaderCache, factory);
+        return get(minerLoaderCache, factory);
     }
 
     @SuppressWarnings("unchecked")
@@ -80,7 +81,7 @@ public final class MinerFactory {
         }
 
         public <T> T getMiner(Class<T> minerClass) {
-            return (T) LoadingCachee.get(minerCache, minerClass);
+            return (T) get(minerCache, minerClass);
         }
 
         private <T> Object loadMiner(Class<T> minerClass) {
@@ -126,12 +127,21 @@ public final class MinerFactory {
         }
     }
 
-    @AllArgsConstructor
     private static class MinerProxy<T> implements MethodInterceptor {
 
         private Class<T> minerClass;
         private MinerConfig classConfig;
         private Factory factory;
+        private LoadingCache<MinerConfig, Minerable> minerableCache;
+
+        public MinerProxy(Class<T> minerClass, MinerConfig classConfig, Factory factory) {
+            this.minerClass = minerClass;
+            this.classConfig = classConfig;
+            this.factory = factory;
+            val cacheSeconds = Math.max(0, this.classConfig.cacheSeconds());
+            this.minerableCache = LoadingCachee.writeCache(
+                    from(this::loadMinerable), cacheSeconds, SECONDS);
+        }
 
         @Override
         public Object intercept(Object o, Method method, Object[] args,
@@ -140,7 +150,7 @@ public final class MinerFactory {
                 return methodProxy.invokeSuper(o, args);
             }
 
-            val minerable = buildMinerable();
+            val minerable = get(minerableCache, classConfig);
             if (method.getDeclaringClass().equals(Minerable.class)) {
                 return method.invoke(minerable, args);
             }
@@ -158,10 +168,10 @@ public final class MinerFactory {
             return null;
         }
 
-        private Minerable buildMinerable() {
-            val group = checkMinerGroup(classConfig);
+        private Minerable loadMinerable(MinerConfig minerConfig) {
+            val group = checkMinerGroup(minerConfig);
             val minerable = new Miner(blankThen(group, () -> "DEFAULT_GROUP"));
-            val dataId = checkMinerDataId(classConfig);
+            val dataId = checkMinerDataId(minerConfig);
             return isNotBlank(dataId) ? minerable.getMiner(dataId) : minerable;
         }
 

@@ -33,6 +33,11 @@ public @interface MinerConfig {
      */
     String defaultValue() default "";
 
+    /**
+     * effective when annotated on ElementType.TYPE
+     */
+    long cacheSeconds() default 0;
+
     Class<? extends GroupProvider> groupProvider() default GroupProvider.class;
 
     Class<? extends DataIdProvider> dataIdProvider() default DataIdProvider.class;

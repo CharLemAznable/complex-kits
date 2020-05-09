@@ -23,10 +23,13 @@ import java.util.Properties;
 
 import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
 import static com.github.charlemaznable.core.miner.MinerElf.minerAsSubstitutor;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
 import static org.joor.Reflect.onClass;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -71,6 +74,30 @@ public class MinerFactoryTest {
 
         assertThrows(MinerConfigException.class,
                 () -> minerLoader.getMiner(StoneNone.class));
+    }
+
+    @Test
+    public void testCache() {
+        MockDiamondServer.setConfigInfo("CACHE_GROUP", "CACHE_KEY", "key1=value1");
+
+        val testNoCache = minerLoader.getMiner(TestNoCache.class);
+        val testCache = minerLoader.getMiner(TestCache.class);
+        assertEquals("value1", testNoCache.key1());
+        assertEquals("value1", testCache.key1());
+        assertNull(testNoCache.key2());
+        assertNull(testCache.key2());
+
+        MockDiamondServer.setConfigInfo("CACHE_GROUP", "CACHE_KEY", "key2=value2");
+        assertNull(testNoCache.key1());
+        assertEquals("value1", testCache.key1());
+        assertEquals("value2", testNoCache.key2());
+        assertNull(testCache.key2());
+
+        await().pollDelay(2, SECONDS).until(() -> true);
+        assertNull(testNoCache.key1());
+        assertNull(testCache.key1());
+        assertEquals("value2", testNoCache.key2());
+        assertEquals("value2", testCache.key2());
     }
 
     @SneakyThrows
@@ -202,6 +229,22 @@ public class MinerFactoryTest {
 
         @MinerConfig(group = "stone.group", dataId = "stone.data")
         String xyz();
+    }
+
+    @MinerConfig(group = "CACHE_GROUP", dataId = "CACHE_KEY")
+    public interface TestNoCache {
+
+        String key1();
+
+        String key2();
+    }
+
+    @MinerConfig(group = "CACHE_GROUP", dataId = "CACHE_KEY", cacheSeconds = 1)
+    public interface TestCache {
+
+        String key1();
+
+        String key2();
     }
 
     @MinerConfig("DEFAULT_DATA")
