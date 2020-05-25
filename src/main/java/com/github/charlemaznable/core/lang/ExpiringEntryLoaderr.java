@@ -10,9 +10,7 @@ import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 @SuppressWarnings("unchecked")
 public final class ExpiringEntryLoaderr {
 
-    private ExpiringEntryLoaderr() {
-        throw new UnsupportedOperationException();
-    }
+    private ExpiringEntryLoaderr() {}
 
     public static <K, V> ExpiringEntryLoader<K, V> from(Function<K, ExpiringValue<V>> function) {
         return new FunctionToExpiringEntryLoader(function);
