@@ -1,34 +1,24 @@
 package com.github.charlemaznable.core.codec;
 
-import lombok.val;
-import lombok.var;
-
 import java.math.BigInteger;
-
-import static java.lang.Integer.parseInt;
-import static java.lang.String.format;
 
 public final class Hex {
 
     private Hex() {}
 
     public static String hex(byte[] array) {
-        val bi = new BigInteger(1, array);
-        val hex = bi.toString(16);
-        val paddingLength = (array.length * 2) - hex.length();
-        if (paddingLength > 0) {
-            val f = "%0" + paddingLength + "d";
-            return format(f, 0) + hex;
-        } else {
-            return hex;
-        }
+        return new BigInteger(1, array).toString(16);
     }
 
     public static byte[] unHex(String hex) {
-        val bytes = new byte[hex.length() / 2];
-        for (var i = 0; i < bytes.length; i++) {
-            bytes[i] = (byte) parseInt(hex.substring(2 * i, 2 * i + 2), 16);
-        }
-        return bytes;
+        return new BigInteger(hex, 16).toByteArray();
+    }
+
+    public static String hex36(byte[] array) {
+        return new BigInteger(1, array).toString(36);
+    }
+
+    public static byte[] unHex36(String hex36) {
+        return new BigInteger(hex36, 36).toByteArray();
     }
 }
