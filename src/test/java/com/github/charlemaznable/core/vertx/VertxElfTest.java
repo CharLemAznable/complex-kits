@@ -32,7 +32,7 @@ public class VertxElfTest {
     public static class TestVerticle extends AbstractVerticle {
 
         @Override
-        public void start(Future<Void> startFuture) {
+        public void start(Promise<Void> startPromise) {
             CompositeFuture.all(newArrayList(
                     Future.<Void>future(f ->
                             VertxElf.<Void>executeBlocking(promise -> {
@@ -53,9 +53,9 @@ public class VertxElfTest {
                     )
             )).onComplete(asyncResult -> {
                 if (asyncResult.failed()) {
-                    startFuture.handle(Future.failedFuture(asyncResult.cause()));
+                    startPromise.fail(asyncResult.cause());
                 } else {
-                    startFuture.handle(Future.succeededFuture());
+                    startPromise.complete();
                 }
             });
         }
