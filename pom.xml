@@ -93,7 +93,7 @@
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
         <spring.version>5.2.6.RELEASE</spring.version>
 
-        <logback-classic.version>1.2.3</logback-classic.version>
+        <complex-logger.version>0.0.1-SNAPSHOT</complex-logger.version>
         <junit-jupiter.version>5.6.2</junit-jupiter.version>
         <jmockit.version>1.49</jmockit.version>
         <awaitility.version>4.0.3</awaitility.version>
@@ -231,9 +231,9 @@
         </dependency>
 
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback-classic.version}</version>
+            <groupId>com.github.charlemaznable</groupId>
+            <artifactId>complex-logger</artifactId>
+            <version>${complex-logger.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
