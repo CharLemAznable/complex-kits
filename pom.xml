@@ -81,11 +81,11 @@
         <slf4j-api.version>1.7.30</slf4j-api.version>
         <fastjson.version>1.2.72</fastjson.version>
         <dom4j.version>2.1.3</dom4j.version>
-        <diamond-client.version>0.0.21</diamond-client.version>
+        <diamond-client.version>0.0.22</diamond-client.version>
         <annotations.version>19.0.0</annotations.version>
         <auto-service.version>1.0-rc7</auto-service.version>
         <okhttp.version>3.14.9</okhttp.version>
-        <vertx.version>3.9.1</vertx.version>
+        <vertx.version>3.9.2</vertx.version>
         <guice.version>4.2.3</guice.version>
         <expiringmap.version>0.5.9</expiringmap.version>
 
