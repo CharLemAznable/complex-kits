@@ -10,25 +10,30 @@ import java.util.concurrent.ExecutorService;
 
 import static com.github.charlemaznable.core.lang.ClzPath.classResourceAsSubstitutor;
 import static com.github.charlemaznable.core.miner.MinerElf.minerAsSubstitutor;
+import static java.util.Objects.isNull;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 
 @NoArgsConstructor
 public class OhDummy {
 
     static final Logger log = LoggerFactory.getLogger("OhClient");
-    static final StringSubstitutor ohMinerSubstitutor;
-    static final StringSubstitutor ohClassPathSubstitutor;
+    static StringSubstitutor ohMinerSubstitutor;
+    static StringSubstitutor ohClassPathSubstitutor;
     static final ExecutorService ohExecutorService;
     static final ConnectionPool ohConnectionPool;
 
     static {
-        ohMinerSubstitutor = minerAsSubstitutor("Env", "ohclient");
-        ohClassPathSubstitutor = classResourceAsSubstitutor("ohclient.env.props");
         ohExecutorService = newCachedThreadPool();
         ohConnectionPool = new ConnectionPool();
     }
 
     static String substitute(String source) {
+        if (isNull(ohMinerSubstitutor)) {
+            ohMinerSubstitutor = minerAsSubstitutor("Env", "ohclient");
+        }
+        if (isNull(ohClassPathSubstitutor)) {
+            ohClassPathSubstitutor = classResourceAsSubstitutor("ohclient.env.props");
+        }
         return ohClassPathSubstitutor.replace(ohMinerSubstitutor.replace(source));
     }
 

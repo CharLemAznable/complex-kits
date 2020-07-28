@@ -53,11 +53,6 @@ public final class MinerFactory {
     private static LoadingCache<Factory, MinerLoader> minerLoaderCache
             = LoadingCachee.simpleCache(CacheLoader.from(MinerLoader::new));
 
-    static {
-        minerMinerSubstitutor = minerAsSubstitutor("Env", "miner");
-        minerClassPathSubstitutor = classResourceAsSubstitutor("miner.env.props");
-    }
-
     private MinerFactory() {
         throw new UnsupportedOperationException();
     }
@@ -75,11 +70,13 @@ public final class MinerFactory {
     }
 
     private static String substitute(String source) {
-        if (nonNull(minerMinerSubstitutor))
-            source = minerMinerSubstitutor.replace(source);
-        if (nonNull(minerClassPathSubstitutor))
-            source = minerClassPathSubstitutor.replace(source);
-        return source;
+        if (isNull(minerMinerSubstitutor)) {
+            minerMinerSubstitutor = minerAsSubstitutor("Env", "miner");
+        }
+        if (isNull(minerClassPathSubstitutor)) {
+            minerClassPathSubstitutor = classResourceAsSubstitutor("miner.env.props");
+        }
+        return minerClassPathSubstitutor.replace(minerMinerSubstitutor.replace(source));
     }
 
     @SuppressWarnings("unchecked")
