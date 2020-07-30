@@ -1,7 +1,6 @@
 package com.github.charlemaznable.core.net;
 
 import lombok.extern.slf4j.Slf4j;
-import lombok.var;
 import org.junit.jupiter.api.Test;
 
 import static com.github.charlemaznable.core.net.IP.V4;

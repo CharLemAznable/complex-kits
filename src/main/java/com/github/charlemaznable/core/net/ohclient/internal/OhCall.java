@@ -14,7 +14,6 @@ import com.github.charlemaznable.core.net.ohclient.OhReq;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientTimeout;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.val;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -90,14 +89,14 @@ public final class OhCall extends OhRoot {
     }
 
     private void processArguments(Method method, Object[] args) {
-        val parameterAnnotationsArray = method.getParameterAnnotations();
-        val parameterTypes = method.getParameterTypes();
-        for (int i = 0, count = args.length; i < count; i++) {
-            val argument = args[i];
-            val parameterAnnotations = parameterAnnotationsArray[i];
-            val parameterType = parameterTypes[i];
+        var parameterAnnotationsArray = method.getParameterAnnotations();
+        var parameterTypes = method.getParameterTypes();
+        for (var i = 0; i < args.length; i++) {
+            var argument = args[i];
+            var parameterAnnotations = parameterAnnotationsArray[i];
+            var parameterType = parameterTypes[i];
 
-            val configuredType = processParameterType(argument, parameterType);
+            var configuredType = processParameterType(argument, parameterType);
             if (configuredType) continue;
             processAnnotations(argument, parameterAnnotations, null);
         }
@@ -196,21 +195,21 @@ public final class OhCall extends OhRoot {
         if (isNull(argument)) return;
         if (argument instanceof Map) {
             Map<Object, Object> argMap = desc(argument);
-            for (val entry : argMap.entrySet()) {
+            for (var entry : argMap.entrySet()) {
                 processParameter(entry.getValue(),
                         new ParameterImpl(toStr(entry.getKey())));
             }
             return;
         }
 
-        val clazz = argument.getClass();
-        val reflect = on(argument);
-        val fields = reflect.fields();
-        for (val fieldEntry : fields.entrySet()) {
-            val fieldName = fieldEntry.getKey();
-            val field = Reflectt.field0(clazz, fieldName);
-            val fieldReflect = fieldEntry.getValue();
-            val fieldValue = fieldReflect.get();
+        var clazz = argument.getClass();
+        var reflect = on(argument);
+        var fields = reflect.fields();
+        for (var fieldEntry : fields.entrySet()) {
+            var fieldName = fieldEntry.getKey();
+            var field = Reflectt.field0(clazz, fieldName);
+            var fieldReflect = fieldEntry.getValue();
+            var fieldValue = fieldReflect.get();
 
             Annotation[] annotations = field.getAnnotations();
             processAnnotations(fieldValue, annotations, fieldName);
@@ -219,16 +218,16 @@ public final class OhCall extends OhRoot {
 
     @SuppressWarnings("ConstantConditions")
     private OkHttpClient buildOkHttpClient(OhMappingProxy proxy) {
-        val sameClientProxy = this.clientProxy == proxy.clientProxy;
-        val sameSSLSocketFactory = this.sslSocketFactory == proxy.sslSocketFactory;
-        val sameX509TrustManager = this.x509TrustManager == proxy.x509TrustManager;
-        val sameHostnameVerifier = this.hostnameVerifier == proxy.hostnameVerifier;
-        val sameCallTimeout = this.callTimeout == proxy.callTimeout;
-        val sameConnectTimeout = this.connectTimeout == proxy.connectTimeout;
-        val sameReadTimeout = this.readTimeout == proxy.readTimeout;
-        val sameWriteTimeout = this.writeTimeout == proxy.writeTimeout;
-        val sameInterceptors = this.interceptors.equals(proxy.interceptors);
-        val sameLoggingLevel = this.loggingLevel == proxy.loggingLevel;
+        var sameClientProxy = this.clientProxy == proxy.clientProxy;
+        var sameSSLSocketFactory = this.sslSocketFactory == proxy.sslSocketFactory;
+        var sameX509TrustManager = this.x509TrustManager == proxy.x509TrustManager;
+        var sameHostnameVerifier = this.hostnameVerifier == proxy.hostnameVerifier;
+        var sameCallTimeout = this.callTimeout == proxy.callTimeout;
+        var sameConnectTimeout = this.connectTimeout == proxy.connectTimeout;
+        var sameReadTimeout = this.readTimeout == proxy.readTimeout;
+        var sameWriteTimeout = this.writeTimeout == proxy.writeTimeout;
+        var sameInterceptors = this.interceptors.equals(proxy.interceptors);
+        var sameLoggingLevel = this.loggingLevel == proxy.loggingLevel;
         if (sameClientProxy && sameSSLSocketFactory
                 && sameX509TrustManager && sameHostnameVerifier
                 && sameCallTimeout && sameConnectTimeout
@@ -250,13 +249,13 @@ public final class OhCall extends OhRoot {
     }
 
     private Request buildRequest(String url) {
-        val requestBuilder = new Request.Builder();
+        var requestBuilder = new Request.Builder();
 
-        val acceptCharsetName = this.acceptCharset.name();
+        var acceptCharsetName = this.acceptCharset.name();
         requestBuilder.header(ACCEPT_CHARSET, acceptCharsetName);
-        val contentType = this.contentFormatter.contentType();
+        var contentType = this.contentFormatter.contentType();
         requestBuilder.header(CONTENT_TYPE, contentType);
-        for (val header : this.headers) {
+        for (var header : this.headers) {
             checkNull(header.getValue(),
                     () -> requestBuilder.removeHeader(header.getKey()),
                     xx -> requestBuilder.header(header.getKey(), header.getValue()));
@@ -264,22 +263,22 @@ public final class OhCall extends OhRoot {
 
         Map<String, String> pathVarMap = this.pathVars.stream().collect(
                 HashMap::new, (m, p) -> m.put(p.getKey(), p.getValue()), HashMap::putAll);
-        val pathVarSubstitutor = new StringSubstitutor(pathVarMap, "{", "}");
-        val requestUrl = pathVarSubstitutor.replace(url);
+        var pathVarSubstitutor = new StringSubstitutor(pathVarMap, "{", "}");
+        var requestUrl = pathVarSubstitutor.replace(url);
         Map<String, Object> parameterMap = this.parameters.stream().collect(
                 HashMap::new, (m, p) -> m.put(p.getKey(), p.getValue()), HashMap::putAll);
         Map<String, Object> contextMap = this.contexts.stream().collect(
                 HashMap::new, (m, p) -> m.put(p.getKey(), p.getValue()), HashMap::putAll);
 
-        val requestMethod = this.httpMethod.toString();
+        var requestMethod = this.httpMethod.toString();
         if (!HttpMethod.permitsRequestBody(requestMethod)) {
             requestBuilder.method(requestMethod, null);
-            val addQuery = this.contentFormatter.format(parameterMap, contextMap);
+            var addQuery = this.contentFormatter.format(parameterMap, contextMap);
             if (isBlank(addQuery)) requestBuilder.url(requestUrl);
             else requestBuilder.url(requestUrl +
                     (requestUrl.contains("?") ? "&" : "?") + addQuery);
         } else {
-            val content = nullThen(this.requestBodyRaw, () ->
+            var content = nullThen(this.requestBodyRaw, () ->
                     this.contentFormatter.format(parameterMap, contextMap));
             requestBuilder.method(requestMethod, RequestBody.create(
                     MediaType.parse(contentType), content));

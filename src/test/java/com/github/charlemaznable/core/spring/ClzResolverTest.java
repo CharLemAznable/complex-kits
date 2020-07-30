@@ -4,8 +4,6 @@ import com.github.charlemaznable.core.spring.testcontext.TestAnnotation;
 import com.github.charlemaznable.core.spring.testcontext.TestClass;
 import com.github.charlemaznable.core.spring.testcontext.TestSpringContext;
 import com.github.charlemaznable.core.spring.testcontext.TestSubSpringContext;
-import lombok.val;
-import lombok.var;
 import org.junit.jupiter.api.Test;
 
 import java.net.URL;
@@ -22,11 +20,11 @@ public class ClzResolverTest {
 
     @Test
     public void testClzResolver() {
-        val basePackage = "com.github.charlemaznable.core.spring.testcontext";
+        var basePackage = "com.github.charlemaznable.core.spring.testcontext";
 
-        val classes = getClasses(basePackage);
+        var classes = getClasses(basePackage);
         int countTestClass = 0;
-        for (Class<?> clazz : classes) {
+        for (var clazz : classes) {
             if (TestClass.class == clazz)
                 countTestClass++;
         }
@@ -36,12 +34,12 @@ public class ClzResolverTest {
         assertEquals(2, subClasses.size());
         subClasses = getSubClasses(basePackage, TestSpringContext.class);
         assertEquals(1, subClasses.size());
-        val contextClass = subClasses.get(0);
+        var contextClass = subClasses.get(0);
         assertEquals(TestSubSpringContext.class, contextClass);
 
-        val annotatedClasses = getAnnotatedClasses(basePackage, TestAnnotation.class);
+        var annotatedClasses = getAnnotatedClasses(basePackage, TestAnnotation.class);
         assertEquals(1, annotatedClasses.size());
-        val annotatedClass = annotatedClasses.get(0);
+        var annotatedClass = annotatedClasses.get(0);
         assertEquals(TestSpringContext.class, annotatedClass);
     }
 

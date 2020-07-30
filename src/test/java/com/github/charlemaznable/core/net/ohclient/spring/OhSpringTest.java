@@ -7,7 +7,6 @@ import com.github.charlemaznable.core.net.ohclient.testclient.TestHttpClientIsol
 import com.github.charlemaznable.core.net.ohclient.testclient.TestHttpClientNone;
 import com.github.charlemaznable.core.spring.SpringContext;
 import lombok.SneakyThrows;
-import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -33,7 +32,7 @@ public class OhSpringTest {
     @SneakyThrows
     @Test
     public void testOhClient() {
-        try (val mockWebServer = new MockWebServer()) {
+        try (var mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
@@ -51,7 +50,7 @@ public class OhSpringTest {
             });
             mockWebServer.start(41102);
 
-            val testHttpClient = testComponent.getTestHttpClient();
+            var testHttpClient = testComponent.getTestHttpClient();
             assertEquals(SAMPLE, testHttpClient.sample());
             assertEquals("{Sample}", testHttpClient.sampleWrapper());
             assertEquals(SAMPLE, testHttpClient.sampleWrap());
@@ -61,14 +60,14 @@ public class OhSpringTest {
             assertEquals(SAMPLE, testHttpClient.sampleWrap());
             assertEquals("Done", testHttpClient.sampleByContext());
 
-            val testHttpClientIsolated = SpringContext.getBean(TestHttpClientIsolated.class);
+            var testHttpClientIsolated = SpringContext.getBean(TestHttpClientIsolated.class);
             assertEquals(SAMPLE, testHttpClientIsolated.sample());
             assertEquals("[Sample]", testHttpClientIsolated.sampleWrapper());
 
-            val testHttpClientConcrete = SpringContext.getBean(TestHttpClientConcrete.class);
+            var testHttpClientConcrete = SpringContext.getBean(TestHttpClientConcrete.class);
             assertNull(testHttpClientConcrete);
 
-            val testHttpClientNone = SpringContext.getBean(TestHttpClientNone.class);
+            var testHttpClientNone = SpringContext.getBean(TestHttpClientNone.class);
             assertNull(testHttpClientNone);
         }
     }

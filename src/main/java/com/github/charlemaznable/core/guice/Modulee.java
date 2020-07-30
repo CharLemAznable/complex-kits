@@ -2,8 +2,6 @@ package com.github.charlemaznable.core.guice;
 
 import com.google.inject.Module;
 import com.google.inject.util.Modules;
-import lombok.val;
-import lombok.var;
 
 import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 
@@ -31,7 +29,7 @@ public final class Modulee {
                                   Module secondModule,
                                   Iterable<? extends Module> modules) {
         var resultModule = Modules.override(firstModule).with(secondModule);
-        for (val module : modules) {
+        for (var module : modules) {
             resultModule = Modules.override(resultModule).with(module);
         }
         return resultModule;

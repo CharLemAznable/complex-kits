@@ -1,7 +1,6 @@
 package com.github.charlemaznable.core.spring;
 
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -22,11 +21,11 @@ public final class MutableHttpServletFilter extends OncePerRequestFilter {
                                     @Nonnull FilterChain filterChain) throws ServletException, IOException {
         log.debug("MutableHttpServletFilter do Filter...");
 
-        val mutableHttpServletRequest = new MutableHttpServletRequest(httpServletRequest);
-        val mutableHttpServletResponse = new MutableHttpServletResponse(httpServletResponse);
+        var mutableHttpServletRequest = new MutableHttpServletRequest(httpServletRequest);
+        var mutableHttpServletResponse = new MutableHttpServletResponse(httpServletResponse);
         filterChain.doFilter(mutableHttpServletRequest, mutableHttpServletResponse);
 
-        val outputStream = httpServletResponse.getOutputStream();
+        var outputStream = httpServletResponse.getOutputStream();
         outputStream.write(mutableHttpServletResponse.getContent());
         outputStream.flush();
 

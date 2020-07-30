@@ -2,7 +2,6 @@ package com.github.charlemaznable.core.spring;
 
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.val;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -20,7 +19,7 @@ public class SpringFactoryBean implements FactoryBean, ApplicationContextAware {
 
     @Override
     public Object getObject() {
-        val activeProfiles = applicationContext.getEnvironment().getActiveProfiles();
+        var activeProfiles = applicationContext.getEnvironment().getActiveProfiles();
         ActiveProfilesThreadLocal.set(activeProfiles);
         return factory.apply(xyzInterface);
     }

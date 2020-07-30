@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.codec.nonsense;
 
-import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -12,7 +11,7 @@ public class NonsenseOptionsTest {
 
     @Test
     public void testNonsenseOptions() {
-        val options = new NonsenseOptions();
+        var options = new NonsenseOptions();
 
         assertEquals("nonsense", options.key());
         assertEquals(16, options.count());
@@ -22,7 +21,7 @@ public class NonsenseOptionsTest {
         assertTrue(options.numbers());
         assertNull(options.chars());
 
-        val charStr = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        var charStr = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         options.key("nonce").count(32).start(32).end(127)
                 .letters(false).numbers(false)
                 .chars(charStr.toCharArray());

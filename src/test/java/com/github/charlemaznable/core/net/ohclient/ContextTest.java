@@ -16,7 +16,6 @@ import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -43,11 +42,11 @@ public class ContextTest {
     @SneakyThrows
     @Test
     public void testOhContext() {
-        try (val mockWebServer = new MockWebServer()) {
+        try (var mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
-                    val body = unJson(request.getBody().readUtf8());
+                    var body = unJson(request.getBody().readUtf8());
                     switch (request.getPath()) {
                         case "/sampleDefault":
                             assertEquals("CV1", body.get("C1"));
@@ -76,7 +75,7 @@ public class ContextTest {
             });
             mockWebServer.start(41170);
 
-            val httpClient = ohLoader.getClient(ContextHttpClient.class);
+            var httpClient = ohLoader.getClient(ContextHttpClient.class);
             assertEquals("OK", httpClient.sampleDefault());
             assertEquals("OK", httpClient.sampleMapping());
             assertEquals("OK", httpClient.sampleContexts(null, "V4"));
@@ -156,7 +155,7 @@ public class ContextTest {
         public String format(@Nonnull Map<String, Object> parameterMap,
                              @Nonnull Map<String, Object> contextMap) {
             Map<String, String> content = newHashMap();
-            for (val contextEntry : contextMap.entrySet()) {
+            for (var contextEntry : contextMap.entrySet()) {
                 content.put(contextEntry.getKey(), contextValue
                         .get(toStr(contextEntry.getValue())));
             }
@@ -172,7 +171,7 @@ public class ContextTest {
                             @Nonnull Map<String, Object> contextMap) {
             assertEquals("OK", responseContent);
             assertEquals(TestResponse.class, returnType);
-            val testResponse = new TestResponse();
+            var testResponse = new TestResponse();
             testResponse.setResponse(responseContent);
             return testResponse;
         }

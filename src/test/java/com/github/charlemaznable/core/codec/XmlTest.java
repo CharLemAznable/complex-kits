@@ -1,7 +1,6 @@
 package com.github.charlemaznable.core.codec;
 
 import com.github.charlemaznable.core.codec.Xml.XmlParseFeature;
-import lombok.var;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;

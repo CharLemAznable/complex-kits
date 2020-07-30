@@ -7,7 +7,6 @@ import com.github.charlemaznable.core.miner.MinerFactory.MinerLoader;
 import com.google.common.base.Splitter;
 import lombok.Data;
 import lombok.SneakyThrows;
-import lombok.val;
 import org.apache.commons.text.StringSubstitutor;
 import org.joor.ReflectException;
 import org.junit.jupiter.api.AfterAll;
@@ -62,7 +61,7 @@ public class MinerFactoryTest {
         MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "stone.data", "abc");
         MockDiamondServer.setConfigInfo("stone.group", "stone.data", "xyz");
 
-        val stoneDefault = minerLoader.getMiner(StoneDefault.class);
+        var stoneDefault = minerLoader.getMiner(StoneDefault.class);
         assertEquals("abc", stoneDefault.abc());
         assertEquals("xyz", stoneDefault.xyz());
 
@@ -80,8 +79,8 @@ public class MinerFactoryTest {
     public void testCache() {
         MockDiamondServer.setConfigInfo("CACHE_GROUP", "CACHE_KEY", "key1=value1");
 
-        val testNoCache = minerLoader.getMiner(TestNoCache.class);
-        val testCache = minerLoader.getMiner(TestCache.class);
+        var testNoCache = minerLoader.getMiner(TestNoCache.class);
+        var testCache = minerLoader.getMiner(TestCache.class);
         assertEquals("value1", testNoCache.key1());
         assertEquals("value1", testCache.key1());
         assertNull(testNoCache.key2());
@@ -111,7 +110,7 @@ public class MinerFactoryTest {
                         "@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.full}) " +
                         "@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.long})");
 
-        val minerDefault = minerLoader.getMiner(MinerDefault.class);
+        var minerDefault = minerLoader.getMiner(MinerDefault.class);
         assertNotNull(minerDefault);
 
         assertEquals("John", minerDefault.name());
@@ -140,7 +139,7 @@ public class MinerFactoryTest {
         assertEquals("John Doe", minerDefault.list().get(1).getName());
         assertEquals("John Doe Richard", minerDefault.list().get(2).getName());
 
-        val minerableDefault = (Minerable) minerDefault;
+        var minerableDefault = (Minerable) minerDefault;
         assertNotNull(minerableDefault);
         assertEquals("John", minerableDefault.getString("name"));
         assertEquals("John Doe", minerableDefault.getString("full"));
@@ -162,8 +161,8 @@ public class MinerFactoryTest {
         assertEquals(0, minerDefault.byteValueDefault());
         assertEquals('\0', minerDefault.charValueDefault());
 
-        val minerDefaultData = minerLoader.getMiner(MinerDefaultData.class);
-        val properties = minerDefaultData.properties();
+        var minerDefaultData = minerLoader.getMiner(MinerDefaultData.class);
+        var properties = minerDefaultData.properties();
 
         assertEquals("John", properties.getProperty("name"));
         assertEquals("John Doe", properties.getProperty("full"));
@@ -186,7 +185,7 @@ public class MinerFactoryTest {
         MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA",
                 "name=John\nfull=${this.name} Doe\nlong=${this.full} Richard");
 
-        val minerableDefault = minerLoader.getMiner(MinerableDefault.class);
+        var minerableDefault = minerLoader.getMiner(MinerableDefault.class);
         assertNotNull(minerableDefault);
         assertEquals("John", minerableDefault.getString("name"));
         assertEquals("John Doe", minerableDefault.getString("full"));
@@ -202,22 +201,22 @@ public class MinerFactoryTest {
         MockDiamondServer.setConfigInfo("GROUPGroup", "DataDATA",
                 "name=John\nfull=${this.name} Doe\nlong=${this.full} Richard");
 
-        val stoneProps = minerLoader.getMiner(StoneProps.class);
+        var stoneProps = minerLoader.getMiner(StoneProps.class);
         assertNotNull(stoneProps);
         assertEquals("John", stoneProps.name());
         assertEquals("John Doe", stoneProps.full());
         assertEquals("John Doe Richard", stoneProps.longName());
         assertEquals("DEFAULTDefault", stoneProps.prop());
 
-        val error1 = minerLoader.getMiner(ProvideError1.class);
+        var error1 = minerLoader.getMiner(ProvideError1.class);
         assertThrows(MinerConfigException.class, error1::prop);
-        val error2 = minerLoader.getMiner(ProvideError2.class);
+        var error2 = minerLoader.getMiner(ProvideError2.class);
         assertThrows(MinerConfigException.class, error2::prop);
-        val error3 = minerLoader.getMiner(ProvideError3.class);
+        var error3 = minerLoader.getMiner(ProvideError3.class);
         assertThrows(MinerConfigException.class, error3::prop);
-        val error4 = minerLoader.getMiner(ProvideError4.class);
+        var error4 = minerLoader.getMiner(ProvideError4.class);
         assertThrows(MinerConfigException.class, error4::prop);
-        val error5 = minerLoader.getMiner(ProvideError5.class);
+        var error5 = minerLoader.getMiner(ProvideError5.class);
         assertThrows(MinerConfigException.class, error5::prop);
     }
 

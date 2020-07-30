@@ -1,7 +1,5 @@
 package com.github.charlemaznable.core.lang;
 
-import lombok.val;
-import lombok.var;
 import org.junit.jupiter.api.Test;
 
 import static com.github.charlemaznable.core.lang.Listt.isEmpty;
@@ -17,16 +15,16 @@ public class ListtTest {
 
     @Test
     public void testUnique() {
-        val temp = newArrayList("aaa", "aaa", "aaa");
-        val list = newArrayList(temp.iterator());
-        val unique = Listt.unique(list);
+        var temp = newArrayList("aaa", "aaa", "aaa");
+        var list = newArrayList(temp.iterator());
+        var unique = Listt.unique(list);
         assertEquals(1, unique.size());
         assertEquals("aaa", unique.get(0));
     }
 
     @Test
     public void testShuffle() {
-        val list = newArrayList();
+        var list = newArrayList();
         var newList = shuffle(list);
         assertEquals(newList, list);
 
@@ -37,7 +35,7 @@ public class ListtTest {
 
     @Test
     public void testIsEmpty() {
-        val list = newArrayListOfType(1, String.class);
+        var list = newArrayListOfType(1, String.class);
         assertFalse(isEmpty(list));
         list.clear();
         assertTrue(isEmpty(list));

@@ -1,7 +1,6 @@
 package com.github.charlemaznable.core.vertx.spring;
 
 import io.vertx.core.VertxOptions;
-import lombok.val;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,7 +12,7 @@ public class CustomOptionsConfiguration {
 
     @Bean
     public VertxOptions vertxOptions() {
-        val vertxOptions = new VertxOptions();
+        var vertxOptions = new VertxOptions();
         vertxOptions.setWorkerPoolSize(DEFAULT_WORKER_POOL_SIZE);
         vertxOptions.getEventBusOptions().setClustered(true);
         return vertxOptions;

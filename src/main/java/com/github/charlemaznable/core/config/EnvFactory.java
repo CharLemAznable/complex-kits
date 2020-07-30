@@ -12,8 +12,6 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.primitives.Primitives;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import lombok.val;
-import lombok.var;
 import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
@@ -79,7 +77,7 @@ public final class EnvFactory {
             ensureClassIsAnInterface(envClass);
             checkEnvConfig(envClass);
 
-            val envProxy = new EnvProxy(envClass, factory);
+            var envProxy = new EnvProxy(envClass, factory);
             return EasyEnhancer.create(EnvDummy.class,
                     new Class[]{envClass, Configable.class},
                     method -> {
@@ -134,13 +132,13 @@ public final class EnvFactory {
                 return method.invoke(Config.getConfigImpl(), args);
             }
 
-            val envConfig = findAnnotation(method, EnvConfig.class);
-            val configKey = checkEnvConfigKey(method, envConfig);
+            var envConfig = findAnnotation(method, EnvConfig.class);
+            var configKey = checkEnvConfigKey(method, envConfig);
             var defaultValue = checkEnvDefaultValue(method, envConfig);
             var defaultArgument = args.length > 0 ? args[0] : null;
 
-            val key = blankThen(configKey, method::getName);
-            val value = Config.getStr(key);
+            var key = blankThen(configKey, method::getName);
+            var value = Config.getStr(key);
             try {
                 if (nonNull(value)) return parseValue(key, value, method);
             } catch (Exception e) {
@@ -155,14 +153,14 @@ public final class EnvFactory {
 
         private String checkEnvConfigKey(Method method, EnvConfig envConfig) {
             if (isNull(envConfig)) return "";
-            val providerClass = envConfig.configKeyProvider();
+            var providerClass = envConfig.configKeyProvider();
             return substitute(ConfigKeyProvider.class == providerClass ? envConfig.configKey()
                     : FactoryContext.apply(factory, providerClass, p -> p.configKey(envClass, method)));
         }
 
         private String checkEnvDefaultValue(Method method, EnvConfig envConfig) {
             if (isNull(envConfig)) return null;
-            val providerClass = envConfig.defaultValueProvider();
+            var providerClass = envConfig.defaultValueProvider();
             String defaultValue = DefaultValueProvider.class == providerClass ? envConfig.defaultValue()
                     : FactoryContext.apply(factory, providerClass, p -> p.defaultValue(envClass, method));
             return substitute(blankThen(defaultValue, () -> null));
@@ -177,8 +175,8 @@ public final class EnvFactory {
             if (rt == String.class) return value;
             if (rt.isPrimitive()) return parsePrimitive(rt, key, value);
 
-            val grt = method.getGenericReturnType();
-            val isCollection = grt instanceof ParameterizedType
+            var grt = method.getGenericReturnType();
+            var isCollection = grt instanceof ParameterizedType
                     && Collection.class.isAssignableFrom(rt);
             if (!isCollection) return parseObject(rt, key, value);
 

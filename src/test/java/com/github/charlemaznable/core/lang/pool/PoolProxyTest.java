@@ -3,8 +3,6 @@ package com.github.charlemaznable.core.lang.pool;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import lombok.val;
-import lombok.var;
 import org.joor.ReflectException;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +13,7 @@ public class PoolProxyTest {
 
     @Test
     public void testPoolProxy() {
-        val poolConfig = new PoolProxyConfigBuilder()
+        var poolConfig = new PoolProxyConfigBuilder()
                 .maxTotal(8).maxIdle(8).minIdle(0).<TestPoolProxyObject>build();
 
         var testPoolProxyObject = PoolProxy.builder(
@@ -26,7 +24,7 @@ public class PoolProxyTest {
                 new PooledObjectCreator<TestPoolProxyObject>() {}).config(poolConfig).args("ARGUMENT").build();
         assertEquals("proxy invoked: ARGUMENT", testPoolProxyObject.invokeArgument());
 
-        val errPoolProxyObject = PoolProxy.builder(
+        var errPoolProxyObject = PoolProxy.builder(
                 new PooledObjectCreator<TestPoolProxyObject>() {}).build();
         assertThrows(RuntimeException.class, errPoolProxyObject::invokeThrows);
 

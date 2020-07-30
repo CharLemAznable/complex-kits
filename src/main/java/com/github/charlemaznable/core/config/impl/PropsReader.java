@@ -1,8 +1,6 @@
 package com.github.charlemaznable.core.config.impl;
 
 import com.github.charlemaznable.core.config.ex.ConfigException;
-import lombok.val;
-import lombok.var;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.text.StringEscapeUtils;
 
@@ -79,9 +77,9 @@ public final class PropsReader extends LineNumberReader {
     }
 
     private static String[] doParseProperty(String line) {
-        val matcher = PROPERTY_PATTERN.matcher(line);
+        var matcher = PROPERTY_PATTERN.matcher(line);
 
-        val result = new String[]{"", "", ""};
+        var result = new String[]{"", "", ""};
 
         if (matcher.matches()) {
             result[0] = matcher.group(IDX_KEY).trim();
@@ -93,7 +91,7 @@ public final class PropsReader extends LineNumberReader {
     }
 
     static boolean isCommentLine(String line) {
-        val s = line.trim();
+        var s = line.trim();
         // blanc lines are also treated as comment lines
         return s.length() < 1 || COMMENT_CHARS.indexOf(s.charAt(0)) >= 0;
     }
@@ -110,15 +108,15 @@ public final class PropsReader extends LineNumberReader {
     protected static String unescapeJava(String str, char delimiter) {
         if (isNull(str)) return null;
 
-        val sz = str.length();
-        val out = new StringBuilder(sz);
-        val unicode = new StringBuilder(UNICODE_LEN);
+        var sz = str.length();
+        var out = new StringBuilder(sz);
+        var unicode = new StringBuilder(UNICODE_LEN);
         var hadSlash = false;
         var inUnicode = false;
         for (var i = 0; i < sz; i++) {
-            val ch = str.charAt(i);
+            var ch = str.charAt(i);
             if (inUnicode) {
-                val res = unescapeUnicode(ch, hadSlash, out, unicode);
+                var res = unescapeUnicode(ch, hadSlash, out, unicode);
                 inUnicode = res.getLeft();
                 hadSlash = res.getRight();
             } else if (hadSlash) {
@@ -150,7 +148,7 @@ public final class PropsReader extends LineNumberReader {
             // unicode now contains the four hex digits
             // which represents our unicode character
             try {
-                val value = Integer.parseInt(unicode.toString(), HEX_RADIX);
+                var value = Integer.parseInt(unicode.toString(), HEX_RADIX);
                 out.append((char) value);
                 unicode.setLength(0);
                 return Pair.of(false, false);
@@ -168,7 +166,7 @@ public final class PropsReader extends LineNumberReader {
     }
 
     public String readProperty() throws IOException {
-        val buffer = new StringBuilder();
+        var buffer = new StringBuilder();
 
         while (true) {
             var line = readLine();
@@ -196,7 +194,7 @@ public final class PropsReader extends LineNumberReader {
     }
 
     public boolean nextProperty() throws IOException {
-        val line = readProperty();
+        var line = readProperty();
 
         if (isNull(line)) return false; // EOF
 
@@ -214,7 +212,7 @@ public final class PropsReader extends LineNumberReader {
     }
 
     protected void parseProperty(String line) {
-        val property = doParseProperty(line);
+        var property = doParseProperty(line);
         initPropertyName(property[0]);
         initPropertyValue(property[1]);
     }

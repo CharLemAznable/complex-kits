@@ -4,8 +4,6 @@ import com.github.charlemaznable.core.codec.Digest;
 import com.github.charlemaznable.core.codec.DigestHMAC;
 import com.github.charlemaznable.core.crypto.SHAXWithRSA;
 import com.github.charlemaznable.core.lang.Mapp;
-import lombok.val;
-import lombok.var;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -44,7 +42,7 @@ public class SignatureTest {
     private static final String CUSTOM_KEY = "sign";
 
     static {
-        val keyPair = generateKeyPair();
+        var keyPair = generateKeyPair();
         RSA_PUB_KEY = getPublicKeyString(keyPair);
         RSA_PRV_KEY = getPrivateKeyString(keyPair);
     }
@@ -61,7 +59,7 @@ public class SignatureTest {
         verifySource.put(signature.getKey(), signature.getValue());
         assertTrue(verify(CUSTOM_KEY, verifySource));
 
-        val falseOptions = new SignatureOptions().flatValue(false).keySortAsc(false);
+        var falseOptions = new SignatureOptions().flatValue(false).keySortAsc(false);
         signature = signature(SOURCE, falseOptions);
         verifySource = newHashMap(SOURCE);
         verifySource.put(signature.getKey(), signature.getValue());

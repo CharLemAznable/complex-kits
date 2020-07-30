@@ -23,7 +23,7 @@ public final class Math {
 
     public static int gcd(int p1, int p2, int... params) {
         int result = gcd(p1, p2);
-        for (int p : params) {
+        for (var p : params) {
             result = gcd(result, p);
         }
         return result;
@@ -44,7 +44,7 @@ public final class Math {
 
     public static long gcd(long p1, long p2, long... params) {
         long result = gcd(p1, p2);
-        for (long p : params) {
+        for (var p : params) {
             result = gcd(result, p);
         }
         return result;

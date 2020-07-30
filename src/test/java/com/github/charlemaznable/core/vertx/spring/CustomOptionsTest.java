@@ -2,7 +2,6 @@ package com.github.charlemaznable.core.vertx.spring;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.impl.clustered.ClusteredEventBus;
-import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +23,10 @@ public class CustomOptionsTest {
     @Test
     public void testSpringVertxConfiguration() {
         assertNotNull(vertx);
-        val reflectVertx = on(vertx);
+        var reflectVertx = on(vertx);
         int defaultWorkerPoolSize = reflectVertx.field("defaultWorkerPoolSize").get();
         assertEquals(CustomOptionsConfiguration.DEFAULT_WORKER_POOL_SIZE, defaultWorkerPoolSize);
-        val eventBus = reflectVertx.field("eventBus").get();
+        var eventBus = reflectVertx.field("eventBus").get();
         assertTrue(eventBus instanceof ClusteredEventBus);
     }
 }

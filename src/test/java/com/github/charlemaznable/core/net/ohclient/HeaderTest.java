@@ -8,7 +8,6 @@ import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.ProviderException;
 import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import lombok.SneakyThrows;
-import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -29,7 +28,7 @@ public class HeaderTest {
     @SneakyThrows
     @Test
     public void testOhHeader() {
-        try (val mockWebServer = new MockWebServer()) {
+        try (var mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
@@ -61,7 +60,7 @@ public class HeaderTest {
             });
             mockWebServer.start(41140);
 
-            val httpClient = ohLoader.getClient(HeaderHttpClient.class);
+            var httpClient = ohLoader.getClient(HeaderHttpClient.class);
             assertEquals("OK", httpClient.sampleDefault());
             assertEquals("OK", httpClient.sampleMapping());
             assertEquals("OK", httpClient.sampleHeaders(null, "V4"));
@@ -74,7 +73,7 @@ public class HeaderTest {
         assertThrows(ProviderException.class, () ->
                 ohLoader.getClient(ErrorFixedHttpClient1.class));
 
-        val httpClient = ohLoader.getClient(ErrorFixedHttpClient2.class);
+        var httpClient = ohLoader.getClient(ErrorFixedHttpClient2.class);
         assertThrows(ProviderException.class, httpClient::sample);
     }
 

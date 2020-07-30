@@ -2,8 +2,6 @@ package com.github.charlemaznable.core.net;
 
 import lombok.Cleanup;
 import lombok.SneakyThrows;
-import lombok.val;
-import lombok.var;
 import org.springframework.http.HttpStatus;
 
 import javax.servlet.http.Cookie;
@@ -49,7 +47,7 @@ public final class Http {
 
         response.setHeader("Content-Type", contentType + "; charset=" + characterEncoding);
         response.setCharacterEncoding(characterEncoding);
-        val writer = response.getWriter();
+        var writer = response.getWriter();
         writer.write(content);
         writer.flush();
     }
@@ -88,9 +86,9 @@ public final class Http {
 
     public static Map<String, String> fetchParameterMap(HttpServletRequest request) {
         Map<String, String> parameterMap = newHashMap();
-        val parameterNames = request.getParameterNames();
+        var parameterNames = request.getParameterNames();
         while (parameterNames.hasMoreElements()) {
-            val parameterName = parameterNames.nextElement();
+            var parameterName = parameterNames.nextElement();
             parameterMap.put(parameterName, request.getParameter(parameterName));
         }
         return parameterMap;
@@ -99,16 +97,16 @@ public final class Http {
     @SuppressWarnings("unchecked")
     public static Map<String, String> fetchPathVariableMap(HttpServletRequest request) {
         Map<String, String> pathVariableMap = newHashMap();
-        val pathVariables = request.getAttribute(URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        var pathVariables = request.getAttribute(URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         if (nonNull(pathVariables)) pathVariableMap.putAll((Map) pathVariables);
         return pathVariableMap;
     }
 
     public static Map<String, String> fetchHeaderMap(HttpServletRequest request) {
         Map<String, String> headerMap = newHashMap();
-        val headerNames = request.getHeaderNames();
+        var headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
-            val headerName = headerNames.nextElement();
+            var headerName = headerNames.nextElement();
             headerMap.put(headerName, request.getHeader(headerName));
         }
         return headerMap;
@@ -116,18 +114,18 @@ public final class Http {
 
     public static Map<String, String> fetchCookieMap(HttpServletRequest request) {
         Map<String, String> cookieMap = newHashMap();
-        val cookies = nullThen(request.getCookies(), () -> new Cookie[]{});
-        for (val cookie : cookies) {
+        var cookies = nullThen(request.getCookies(), () -> new Cookie[]{});
+        for (var cookie : cookies) {
             cookieMap.put(cookie.getName(), cookie.getValue());
         }
         return cookieMap;
     }
 
     public static String fetchRemoteAddr(HttpServletRequest request) {
-        val xForwardedFor = request.getHeader("x-forwarded-for");
+        var xForwardedFor = request.getHeader("x-forwarded-for");
         if (isNotEmpty(xForwardedFor)) {
-            val forwardedAddrList = on(",").trimResults().splitToList(xForwardedFor);
-            for (val forwardedAddr : forwardedAddrList) {
+            var forwardedAddrList = on(",").trimResults().splitToList(xForwardedFor);
+            for (var forwardedAddr : forwardedAddrList) {
                 if (isNotEmpty(forwardedAddr) &&
                         !UNKNOWN.equalsIgnoreCase(forwardedAddr)) {
                     return forwardedAddr;
@@ -135,13 +133,13 @@ public final class Http {
             }
         }
 
-        val proxyClientIP = request.getHeader("Proxy-Client-IP");
+        var proxyClientIP = request.getHeader("Proxy-Client-IP");
         if (isNotEmpty(proxyClientIP) &&
                 !UNKNOWN.equalsIgnoreCase(proxyClientIP)) {
             return proxyClientIP;
         }
 
-        val wlProxyClientIP = request.getHeader("WL-Proxy-Client-IP");
+        var wlProxyClientIP = request.getHeader("WL-Proxy-Client-IP");
         if (isNotEmpty(wlProxyClientIP) &&
                 !UNKNOWN.equalsIgnoreCase(wlProxyClientIP)) {
             return wlProxyClientIP;
@@ -153,9 +151,9 @@ public final class Http {
     @SneakyThrows
     public static Map<String, String> dealReqParams(Map<String, String[]> requestParams) {
         Map<String, String> params = newHashMap();
-        for (val entry : requestParams.entrySet()) {
-            val key = entry.getKey();
-            val values = entry.getValue();
+        for (var entry : requestParams.entrySet()) {
+            var key = entry.getKey();
+            var values = entry.getValue();
 
             var valueStr = "";
             for (var i = 0; i < values.length; i++) {
@@ -169,12 +167,12 @@ public final class Http {
 
     @SneakyThrows
     public static String dealRequestBody(HttpServletRequest req, String charsetName) {
-        @Cleanup val dis = new DataInputStream(req.getInputStream());
-        val formDataLength = req.getContentLength();
-        val buff = new byte[formDataLength];
+        @Cleanup var dis = new DataInputStream(req.getInputStream());
+        var formDataLength = req.getContentLength();
+        var buff = new byte[formDataLength];
         var totalBytes = 0;
         while (totalBytes < formDataLength) {
-            val bytes = dis.read(buff, totalBytes, formDataLength);
+            var bytes = dis.read(buff, totalBytes, formDataLength);
             totalBytes += bytes;
         }
         return new String(buff, charsetName);
@@ -182,9 +180,9 @@ public final class Http {
 
     @SneakyThrows
     public static String dealRequestBodyStream(HttpServletRequest req, String charsetName) {
-        @Cleanup val isr = new InputStreamReader(req.getInputStream(), charsetName);
-        try (val bufferedReader = new BufferedReader(isr)) {
-            val stringBuilder = new StringBuilder();
+        @Cleanup var isr = new InputStreamReader(req.getInputStream(), charsetName);
+        try (var bufferedReader = new BufferedReader(isr)) {
+            var stringBuilder = new StringBuilder();
             String line;
             while (nonNull(line = bufferedReader.readLine())) {
                 stringBuilder.append(line);

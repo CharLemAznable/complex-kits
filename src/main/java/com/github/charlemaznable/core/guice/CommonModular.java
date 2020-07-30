@@ -9,7 +9,6 @@ import com.google.inject.Provider;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.spi.ProvisionListener;
 import com.google.inject.util.Providers;
-import lombok.val;
 import org.springframework.util.ClassUtils;
 
 import java.util.Set;
@@ -51,7 +50,7 @@ public abstract class CommonModular<M extends CommonModular> {
     }
 
     public M scanPackages(Iterable<String> basePackages) {
-        for (val basePackage : basePackages) {
+        for (var basePackage : basePackages) {
             bindClasses(getClasses(basePackage, resolverPredicate));
         }
         return (M) this;
@@ -62,15 +61,15 @@ public abstract class CommonModular<M extends CommonModular> {
     }
 
     public M scanPackageClasses(Iterable<Class<?>> basePackageClasses) {
-        for (val basePackageClass : basePackageClasses) {
-            val basePackage = ClassUtils.getPackageName(basePackageClass);
+        for (var basePackageClass : basePackageClasses) {
+            var basePackage = ClassUtils.getPackageName(basePackageClass);
             bindClasses(getClasses(basePackage, resolverPredicate));
         }
         return (M) this;
     }
 
     public Module createModule() {
-        val classSet = ImmutableSet.copyOf(classes);
+        var classSet = ImmutableSet.copyOf(classes);
         return Modulee.override(this.baseModule, new AbstractModule() {
             @Override
             protected void configure() {
@@ -84,7 +83,7 @@ public abstract class CommonModular<M extends CommonModular> {
                 bindListener(Matchers.any(), new ProvisionListener() {
                     @Override
                     public <T> void onProvision(ProvisionInvocation<T> provisionInvocation) {
-                        val temp = FactoryContext.get();
+                        var temp = FactoryContext.get();
                         FactoryContext.set(guiceFactory);
                         try {
                             provisionInvocation.provision();
@@ -97,8 +96,8 @@ public abstract class CommonModular<M extends CommonModular> {
 
             private void bindProviderTraverse(Class clazz, Provider provider) {
                 bind(clazz).toProvider(provider);
-                val interfaces = clazz.getInterfaces();
-                for (val interfacee : interfaces) {
+                var interfaces = clazz.getInterfaces();
+                for (var interfacee : interfaces) {
                     if (isCandidateClass(interfacee)) {
                         bind(interfacee).toProvider(provider);
                     }

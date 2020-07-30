@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -191,9 +190,9 @@ public class SpringContext implements ApplicationContextAware {
             return onClass(clazz).create().get();
         }
 
-        val beanDefinition = BeanDefinitionBuilder
+        var beanDefinition = BeanDefinitionBuilder
                 .genericBeanDefinition(clazz).getBeanDefinition();
-        val registerBeanName = nullThen(beanName,
+        var registerBeanName = nullThen(beanName,
                 () -> getBeanClassName(beanDefinition));
         try {
             // maybe already registered by this name
@@ -219,9 +218,9 @@ public class SpringContext implements ApplicationContextAware {
         if (isNull(bean)) return null;
 
         Class<T> clazz = (Class<T>) bean.getClass();
-        val beanDefinition = BeanDefinitionBuilder
+        var beanDefinition = BeanDefinitionBuilder
                 .genericBeanDefinition(clazz).getBeanDefinition();
-        val registerBeanName = nullThen(beanName,
+        var registerBeanName = nullThen(beanName,
                 () -> getBeanClassName(beanDefinition));
         try {
             // maybe already autowired by this name

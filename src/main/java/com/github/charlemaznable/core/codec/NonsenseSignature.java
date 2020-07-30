@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.val;
 
 import java.util.Map;
 
@@ -23,10 +22,10 @@ public final class NonsenseSignature {
 
     public Map<String, Object> sign(Object source) {
         Map<String, Object> sourceMap = Json.desc(source);
-        val nonsense = Nonsense.nonsense(nonsenseOptions);
+        var nonsense = Nonsense.nonsense(nonsenseOptions);
         sourceMap.put(nonsense.getKey(), nonsense.getValue());
 
-        val signature = Signature.signature(sourceMap, signatureOptions);
+        var signature = Signature.signature(sourceMap, signatureOptions);
         sourceMap.put(signature.getKey(), signature.getValue());
         return sourceMap;
     }

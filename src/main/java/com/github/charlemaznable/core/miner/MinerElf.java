@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.miner;
 
-import lombok.val;
 import org.apache.commons.text.StringSubstitutor;
 import org.n3r.diamond.client.Miner;
 
@@ -15,12 +14,12 @@ public final class MinerElf {
     }
 
     public static StringSubstitutor minerAsSubstitutor(String group, String dataId) {
-        val minerProps = new Miner(group).getProperties(dataId);
+        var minerProps = new Miner(group).getProperties(dataId);
         Map<String, String> minerPropsMap = newHashMap();
-        val propNames = minerProps.propertyNames();
+        var propNames = minerProps.propertyNames();
         while (propNames.hasMoreElements()) {
-            val propName = (String) propNames.nextElement();
-            val propValue = minerProps.getProperty(propName);
+            var propName = (String) propNames.nextElement();
+            var propValue = minerProps.getProperty(propName);
             minerPropsMap.put(propName, propValue);
         }
         return new StringSubstitutor(minerPropsMap);

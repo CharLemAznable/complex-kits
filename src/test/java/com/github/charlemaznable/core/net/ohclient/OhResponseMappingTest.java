@@ -8,7 +8,6 @@ import com.github.charlemaznable.core.net.common.StatusErrorMapping;
 import com.github.charlemaznable.core.net.common.StatusSeriesErrorMapping;
 import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import lombok.SneakyThrows;
-import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -26,7 +25,7 @@ public class OhResponseMappingTest {
     @SneakyThrows
     @Test
     public void testOhResponseMapping() {
-        try (val mockWebServer = new MockWebServer()) {
+        try (var mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
@@ -58,14 +57,14 @@ public class OhResponseMappingTest {
             });
             mockWebServer.start(41180);
 
-            val httpClient = ohLoader.getClient(MappingHttpClient.class);
+            var httpClient = ohLoader.getClient(MappingHttpClient.class);
             assertThrows(NotFoundException.class, httpClient::sampleNotFound);
             assertThrows(ClientErrorException.class, httpClient::sampleClientError);
             assertThrows(NotFoundException2.class, httpClient::sampleMappingNotFound);
             assertThrows(ClientErrorException2.class, httpClient::sampleMappingClientError);
             assertThrows(StatusError.class, httpClient::sampleServerError);
 
-            val defaultHttpClient = ohLoader.getClient(DefaultMappingHttpClient.class);
+            var defaultHttpClient = ohLoader.getClient(DefaultMappingHttpClient.class);
             try {
                 defaultHttpClient.sampleNotFound();
             } catch (Exception e) {
@@ -107,7 +106,7 @@ public class OhResponseMappingTest {
                 assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), er.getMessage());
             }
 
-            val disabledHttpClient = ohLoader.getClient(DisabledMappingHttpClient.class);
+            var disabledHttpClient = ohLoader.getClient(DisabledMappingHttpClient.class);
             assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), disabledHttpClient.sampleNotFound());
             assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), disabledHttpClient.sampleClientError());
             assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), disabledHttpClient.sampleMappingNotFound());

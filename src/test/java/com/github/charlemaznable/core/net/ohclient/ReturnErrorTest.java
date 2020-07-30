@@ -4,7 +4,6 @@ import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import lombok.SneakyThrows;
-import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -31,7 +30,7 @@ public class ReturnErrorTest {
     @SneakyThrows
     @Test
     public void testError() {
-        try (val mockWebServer = new MockWebServer()) {
+        try (var mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
@@ -56,13 +55,13 @@ public class ReturnErrorTest {
                 }
             });
             mockWebServer.start(41196);
-            val httpClient = ohLoader.getClient(ErrorHttpClient.class);
+            var httpClient = ohLoader.getClient(ErrorHttpClient.class);
 
             assertThrows(OhException.class, httpClient::sampleFuture);
             assertThrows(OhException.class, httpClient::sampleList);
             assertThrows(IllegalArgumentException.class, httpClient::sampleMapError);
 
-            val map = httpClient.sampleMap();
+            var map = httpClient.sampleMap();
             assertEquals("Doe", map.get("John"));
 
             assertThrows(OhException.class, httpClient::samplePair);

@@ -1,7 +1,6 @@
 package com.github.charlemaznable.core.net;
 
 import lombok.SneakyThrows;
-import lombok.val;
 
 import java.net.Inet4Address;
 import java.net.Inet6Address;
@@ -28,12 +27,12 @@ public enum IP {
 
     @SneakyThrows
     public final String localIP() {
-        val netInterfaces = getNetworkInterfaces();
+        var netInterfaces = getNetworkInterfaces();
         while (netInterfaces.hasMoreElements()) {
-            val ni = netInterfaces.nextElement();
-            val address = ni.getInetAddresses();
+            var ni = netInterfaces.nextElement();
+            var address = ni.getInetAddresses();
             while (address.hasMoreElements()) {
-                val ip = address.nextElement();
+                var ip = address.nextElement();
                 if (ip.isSiteLocalAddress() &&
                         isNotReservedAddress(ip) &&
                         checkInetAddress(ip)) {
@@ -46,12 +45,12 @@ public enum IP {
 
     @SneakyThrows
     public final String netIP() {
-        val netInterfaces = getNetworkInterfaces();
+        var netInterfaces = getNetworkInterfaces();
         while (netInterfaces.hasMoreElements()) {
-            val ni = netInterfaces.nextElement();
-            val address = ni.getInetAddresses();
+            var ni = netInterfaces.nextElement();
+            var address = ni.getInetAddresses();
             while (address.hasMoreElements()) {
-                val ip = address.nextElement();
+                var ip = address.nextElement();
                 if (!ip.isSiteLocalAddress() &&
                         isNotReservedAddress(ip) &&
                         checkInetAddress(ip)) {
@@ -69,7 +68,7 @@ public enum IP {
     }
 
     private String filterAdapterName(String hostAddress) {
-        val index = hostAddress.indexOf('%');
+        var index = hostAddress.indexOf('%');
         if (index > 0) hostAddress = hostAddress.substring(0, index);
         return hostAddress;
     }

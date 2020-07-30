@@ -109,7 +109,7 @@ public enum HttpStatus {
 
     @Nullable
     public static HttpStatus resolve(int statusCode) {
-        for (HttpStatus status : values()) {
+        for (var status : values()) {
             if (status.value == statusCode) {
                 return status;
             }
@@ -187,7 +187,7 @@ public enum HttpStatus {
         @Nullable
         public static Series resolve(int statusCode) {
             int seriesCode = statusCode / 100;
-            for (Series series : values()) {
+            for (var series : values()) {
                 if (series.value == seriesCode) {
                     return series;
                 }

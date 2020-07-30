@@ -4,7 +4,6 @@ import com.github.charlemaznable.core.lang.ex.BadConditionException;
 import com.github.charlemaznable.core.lang.ex.BlankStringException;
 import com.github.charlemaznable.core.lang.ex.EmptyObjectException;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import lombok.val;
 import org.jetbrains.annotations.Contract;
 
 import javax.annotation.Nonnull;
@@ -25,7 +24,7 @@ public final class Condition {
 
     @SafeVarargs
     public static <T> T nonNull(T... objects) {
-        for (val object : objects) {
+        for (var object : objects) {
             if (Objects.nonNull(object)) return object;
         }
         return null;
@@ -33,56 +32,56 @@ public final class Condition {
 
     @SafeVarargs
     public static <T> T nonEmpty(T... objects) {
-        for (val object : objects) {
+        for (var object : objects) {
             if (!isEmpty(object)) return object;
         }
         return null;
     }
 
     public static String nonBlank(String... strings) {
-        for (val string : strings) {
+        for (var string : strings) {
             if (isNotBlank(string)) return string;
         }
         return null;
     }
 
     public static short nonEquals(short base, short... numbers) {
-        for (val number : numbers) {
+        for (var number : numbers) {
             if (base != number) return number;
         }
         return base;
     }
 
     public static int nonEquals(int base, int... numbers) {
-        for (val number : numbers) {
+        for (var number : numbers) {
             if (base != number) return number;
         }
         return base;
     }
 
     public static long nonEquals(long base, long... numbers) {
-        for (val number : numbers) {
+        for (var number : numbers) {
             if (base != number) return number;
         }
         return base;
     }
 
     public static float nonEquals(float base, float... numbers) {
-        for (val number : numbers) {
+        for (var number : numbers) {
             if (base != number) return number;
         }
         return base;
     }
 
     public static double nonEquals(double base, double... numbers) {
-        for (val number : numbers) {
+        for (var number : numbers) {
             if (base != number) return number;
         }
         return base;
     }
 
     public static byte nonEquals(byte base, byte... bytes) {
-        for (val b : bytes) {
+        for (var b : bytes) {
             if (base != b) return b;
         }
         return base;

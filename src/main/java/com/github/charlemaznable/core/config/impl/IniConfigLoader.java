@@ -4,11 +4,9 @@ import com.github.charlemaznable.core.config.ConfigLoader;
 import com.github.charlemaznable.core.config.Configable;
 import com.github.charlemaznable.core.config.ex.ConfigException;
 import com.google.auto.service.AutoService;
-import lombok.val;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.URL;
 import java.util.List;
 import java.util.Properties;
@@ -33,17 +31,17 @@ public final class IniConfigLoader implements ConfigLoader {
     }
 
     private Properties buildProperties(URL url) {
-        val props = new Properties();
-        try (Reader reader = new InputStreamReader(
+        var props = new Properties();
+        try (var reader = new InputStreamReader(
                 requireNonNull(urlAsInputStream(url)), UTF_8)) {
-            val iniReader = new IniReader(reader);
-            for (val section : iniReader.getSections()) {
-                val sectionProps = iniReader.getSection(section);
+            var iniReader = new IniReader(reader);
+            for (var section : iniReader.getSections()) {
+                var sectionProps = iniReader.getSection(section);
                 if (isNull(sectionProps)) continue;
 
-                val prefix = section.equals("") ? "" : section + '.';
-                for (val entry : sectionProps.entrySet()) {
-                    val key = prefix + entry.getKey();
+                var prefix = section.equals("") ? "" : section + '.';
+                for (var entry : sectionProps.entrySet()) {
+                    var key = prefix + entry.getKey();
 
                     if (!props.containsKey(key)) {
                         props.put(key, entry.getValue().toString());

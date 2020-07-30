@@ -1,8 +1,6 @@
 package com.github.charlemaznable.core.config.impl;
 
 import com.github.charlemaznable.core.config.Configable;
-import lombok.val;
-import lombok.var;
 
 import java.util.Properties;
 
@@ -59,16 +57,16 @@ public class DefaultConfigable extends BaseConfigable {
     public final Configable subset(String prefix) {
         if (isEmpty(prefix)) return new DefaultConfigable(new Properties());
 
-        val prefixMatch = prefix.charAt(prefix.length() - 1) != '.' ? prefix + '.' : prefix;
-        val subProps = subProperties(properties, prefixMatch);
+        var prefixMatch = prefix.charAt(prefix.length() - 1) != '.' ? prefix + '.' : prefix;
+        var subProps = subProperties(properties, prefixMatch);
 
         return new DefaultConfigable(subProps);
     }
 
     protected final Properties subProperties(Properties properties, String prefixMatch) {
-        val subProps = new Properties();
-        for (val entry : properties.entrySet()) {
-            val key = (String) entry.getKey();
+        var subProps = new Properties();
+        for (var entry : properties.entrySet()) {
+            var key = (String) entry.getKey();
             if (!key.startsWith(prefixMatch)) continue;
 
             subProps.put(key.substring(prefixMatch.length()), entry.getValue());

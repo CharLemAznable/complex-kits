@@ -2,7 +2,6 @@ package com.github.charlemaznable.core.config.guice;
 
 import com.github.charlemaznable.core.config.EnvModular;
 import com.google.inject.Guice;
-import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -12,10 +11,10 @@ public class EnvGuiceTest {
 
     @Test
     public void testEnvGuice() {
-        val envModular = new EnvModular().scanPackageClasses(TestEnvGuiceConfig.class);
-        val injector = Guice.createInjector(envModular.createModule());
+        var envModular = new EnvModular().scanPackageClasses(TestEnvGuiceConfig.class);
+        var injector = Guice.createInjector(envModular.createModule());
 
-        val testEnvConfig = injector.getInstance(TestEnvGuiceConfig.class);
+        var testEnvConfig = injector.getInstance(TestEnvGuiceConfig.class);
         assertEquals(envModular.getEnv(TestEnvGuiceConfig.class), testEnvConfig);
 
         assertEquals("value1", testEnvConfig.key1());

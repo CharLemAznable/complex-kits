@@ -2,7 +2,6 @@ package com.github.charlemaznable.core.net.common;
 
 import com.github.charlemaznable.core.lang.Mapp;
 import com.github.charlemaznable.core.net.common.ContentFormat.ContentFormatter;
-import lombok.val;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.nio.charset.Charset;
@@ -104,7 +103,7 @@ public abstract class CommonReq<T extends CommonReq> {
 
     protected Map<String, Object> fetchParameterMap() {
         Map<String, Object> parameterMap = newHashMap();
-        for (val parameter : this.parameters) {
+        for (var parameter : this.parameters) {
             parameterMap.put(parameter.getKey(), parameter.getValue());
         }
         return parameterMap;

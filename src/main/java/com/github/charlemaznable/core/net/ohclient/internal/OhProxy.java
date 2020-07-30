@@ -39,7 +39,6 @@ import com.github.charlemaznable.core.net.ohclient.annotation.ClientTimeout;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientTimeout.TimeoutProvider;
 import com.github.charlemaznable.core.net.ohclient.annotation.IsolatedConnectionPool;
 import com.google.common.cache.LoadingCache;
-import lombok.val;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import okhttp3.ConnectionPool;
@@ -96,7 +95,7 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
         this.baseUrl = Elf.checkBaseUrl(this.ohClass, this.factory);
 
         this.clientProxy = Elf.checkClientProxy(this.ohClass, this.factory);
-        val clientSSL = Elf.checkClientSSL(this.ohClass);
+        var clientSSL = Elf.checkClientSSL(this.ohClass);
         if (nonNull(clientSSL)) {
             this.sslSocketFactory = Elf.checkSSLSocketFactory(
                     this.ohClass, this.factory, clientSSL);
@@ -106,7 +105,7 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
                     this.ohClass, this.factory, clientSSL);
         }
         this.connectionPool = Elf.checkConnectionPool(this.ohClass);
-        val clientTimeout = Elf.checkClientTimeout(this.ohClass);
+        var clientTimeout = Elf.checkClientTimeout(this.ohClass);
         if (nonNull(clientTimeout)) {
             this.callTimeout = Elf.checkCallTimeout(
                     this.ohClass, this.factory, clientTimeout);
@@ -142,7 +141,7 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
             return methodProxy.invokeSuper(o, args);
         }
 
-        val mappingProxy = LoadingCachee.get(
+        var mappingProxy = LoadingCachee.get(
                 this.ohMappingProxyCache, method);
         return mappingProxy.execute(args);
     }
@@ -163,17 +162,17 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
         }
 
         static String checkBaseUrl(Class clazz, Factory factory) {
-            val mapping = findAnnotation(clazz, Mapping.class);
+            var mapping = findAnnotation(clazz, Mapping.class);
             if (isNull(mapping)) return "";
-            val providerClass = mapping.urlProvider();
+            var providerClass = mapping.urlProvider();
             return substitute(UrlProvider.class == providerClass ? mapping.value()
                     : FactoryContext.apply(factory, providerClass, p -> p.url(clazz)));
         }
 
         static Proxy checkClientProxy(Class clazz, Factory factory) {
-            val clientProxy = findAnnotation(clazz, ClientProxy.class);
+            var clientProxy = findAnnotation(clazz, ClientProxy.class);
             return notNullThen(clientProxy, annotation -> {
-                val providerClass = annotation.proxyProvider();
+                var providerClass = annotation.proxyProvider();
                 if (ProxyProvider.class == providerClass) {
                     return checkBlank(annotation.host(), () -> null,
                             xx -> new Proxy(annotation.type(), new InetSocketAddress(
@@ -189,9 +188,9 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
 
         static SSLSocketFactory checkSSLSocketFactory(
                 Class clazz, Factory factory, ClientSSL clientSSL) {
-            val providerClass = clientSSL.sslSocketFactoryProvider();
+            var providerClass = clientSSL.sslSocketFactoryProvider();
             if (SSLSocketFactoryProvider.class == providerClass) {
-                val factoryClass = clientSSL.sslSocketFactory();
+                var factoryClass = clientSSL.sslSocketFactory();
                 return SSLSocketFactory.class == factoryClass ? null
                         : FactoryContext.build(factory, factoryClass);
             }
@@ -201,9 +200,9 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
 
         static X509TrustManager checkX509TrustManager(
                 Class clazz, Factory factory, ClientSSL clientSSL) {
-            val providerClass = clientSSL.x509TrustManagerProvider();
+            var providerClass = clientSSL.x509TrustManagerProvider();
             if (X509TrustManagerProvider.class == providerClass) {
-                val managerClass = clientSSL.x509TrustManager();
+                var managerClass = clientSSL.x509TrustManager();
                 return X509TrustManager.class == managerClass ? null
                         : FactoryContext.build(factory, managerClass);
             }
@@ -213,9 +212,9 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
 
         static HostnameVerifier checkHostnameVerifier(
                 Class clazz, Factory factory, ClientSSL clientSSL) {
-            val providerClass = clientSSL.hostnameVerifierProvider();
+            var providerClass = clientSSL.hostnameVerifierProvider();
             if (HostnameVerifierProvider.class == providerClass) {
-                val verifierClass = clientSSL.hostnameVerifier();
+                var verifierClass = clientSSL.hostnameVerifier();
                 return HostnameVerifier.class == verifierClass ? null
                         : FactoryContext.build(factory, verifierClass);
             }
@@ -224,7 +223,7 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
         }
 
         static ConnectionPool checkConnectionPool(Class clazz) {
-            val isolated = findAnnotation(clazz, IsolatedConnectionPool.class);
+            var isolated = findAnnotation(clazz, IsolatedConnectionPool.class);
             return checkNull(isolated, () -> ohConnectionPool, x -> new ConnectionPool());
         }
 
@@ -234,28 +233,28 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
 
         static long checkCallTimeout(
                 Class clazz, Factory factory, ClientTimeout clientTimeout) {
-            val providerClass = clientTimeout.callTimeoutProvider();
+            var providerClass = clientTimeout.callTimeoutProvider();
             return TimeoutProvider.class == providerClass ? clientTimeout.callTimeout()
                     : FactoryContext.apply(factory, providerClass, p -> p.timeout(clazz));
         }
 
         static long checkConnectTimeout(
                 Class clazz, Factory factory, ClientTimeout clientTimeout) {
-            val providerClass = clientTimeout.connectTimeoutProvider();
+            var providerClass = clientTimeout.connectTimeoutProvider();
             return TimeoutProvider.class == providerClass ? clientTimeout.connectTimeout()
                     : FactoryContext.apply(factory, providerClass, p -> p.timeout(clazz));
         }
 
         static long checkReadTimeout(
                 Class clazz, Factory factory, ClientTimeout clientTimeout) {
-            val providerClass = clientTimeout.readTimeoutProvider();
+            var providerClass = clientTimeout.readTimeoutProvider();
             return TimeoutProvider.class == providerClass ? clientTimeout.readTimeout()
                     : FactoryContext.apply(factory, providerClass, p -> p.timeout(clazz));
         }
 
         static long checkWriteTimeout(
                 Class clazz, Factory factory, ClientTimeout clientTimeout) {
-            val providerClass = clientTimeout.writeTimeoutProvider();
+            var providerClass = clientTimeout.writeTimeoutProvider();
             return TimeoutProvider.class == providerClass ? clientTimeout.writeTimeout()
                     : FactoryContext.apply(factory, providerClass, p -> p.timeout(clazz));
         }
@@ -265,7 +264,7 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
                     .stream().filter(annotation -> Interceptor.class != annotation.value()
                             || InterceptorProvider.class != annotation.provider())
                     .map(annotation -> {
-                        val providerClass = annotation.provider();
+                        var providerClass = annotation.provider();
                         if (InterceptorProvider.class == providerClass) {
                             return FactoryContext.build(factory, annotation.value());
                         }
@@ -274,9 +273,9 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
         }
 
         static Level checkClientLoggingLevel(Class clazz, Factory factory) {
-            val clientLoggingLevel = findAnnotation(clazz, ClientLoggingLevel.class);
+            var clientLoggingLevel = findAnnotation(clazz, ClientLoggingLevel.class);
             if (isNull(clientLoggingLevel)) return DEFAULT_LOGGING_LEVEL;
-            val providerClass = clientLoggingLevel.provider();
+            var providerClass = clientLoggingLevel.provider();
             return LoggingLevelProvider.class == providerClass ? clientLoggingLevel.value()
                     : FactoryContext.apply(factory, providerClass, p -> p.level(clazz));
         }
@@ -297,27 +296,27 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
         }
 
         static Charset checkAcceptCharset(Class clazz) {
-            val acceptCharset = findAnnotation(clazz, AcceptCharset.class);
+            var acceptCharset = findAnnotation(clazz, AcceptCharset.class);
             return checkNull(acceptCharset, () -> DEFAULT_ACCEPT_CHARSET,
                     annotation -> Charset.forName(annotation.value()));
         }
 
         static ContentFormatter checkContentFormatter(Class clazz, Factory factory) {
-            val contentFormat = findAnnotation(clazz, ContentFormat.class);
+            var contentFormat = findAnnotation(clazz, ContentFormat.class);
             return checkNull(contentFormat, () -> DEFAULT_CONTENT_FORMATTER,
                     annotation -> FactoryContext.build(factory, annotation.value()));
         }
 
         static HttpMethod checkHttpMethod(Class clazz) {
-            val requestMethod = findAnnotation(clazz, RequestMethod.class);
+            var requestMethod = findAnnotation(clazz, RequestMethod.class);
             return checkNull(requestMethod, () -> DEFAULT_HTTP_METHOD, RequestMethod::value);
         }
 
         static List<Pair<String, String>> checkFixedHeaders(Class clazz, Factory factory) {
             return newArrayList(findMergedRepeatableAnnotations(clazz, FixedHeader.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
-                        val name = an.name();
-                        val providerClass = an.valueProvider();
+                        var name = an.name();
+                        var providerClass = an.valueProvider();
                         return Pair.of(name, FixedValueProvider.class == providerClass
                                 ? an.value() : FactoryContext.apply(factory,
                                 providerClass, p -> p.value(clazz, name)));
@@ -327,8 +326,8 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
         static List<Pair<String, String>> checkFixedPathVars(Class clazz, Factory factory) {
             return newArrayList(findMergedRepeatableAnnotations(clazz, FixedPathVar.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
-                        val name = an.name();
-                        val providerClass = an.valueProvider();
+                        var name = an.name();
+                        var providerClass = an.valueProvider();
                         return Pair.of(name, FixedValueProvider.class == providerClass
                                 ? an.value() : FactoryContext.apply(factory,
                                 providerClass, p -> p.value(clazz, name)));
@@ -338,8 +337,8 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
         static List<Pair<String, Object>> checkFixedParameters(Class clazz, Factory factory) {
             return newArrayList(findMergedRepeatableAnnotations(clazz, FixedParameter.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
-                        val name = an.name();
-                        val providerClass = an.valueProvider();
+                        var name = an.name();
+                        var providerClass = an.valueProvider();
                         return Pair.of(name, (Object) (FixedValueProvider.class == providerClass
                                 ? an.value() : FactoryContext.apply(factory,
                                 providerClass, p -> p.value(clazz, name))));
@@ -349,8 +348,8 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
         static List<Pair<String, Object>> checkFixedContexts(Class clazz, Factory factory) {
             return newArrayList(findMergedRepeatableAnnotations(clazz, FixedContext.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
-                        val name = an.name();
-                        val providerClass = an.valueProvider();
+                        var name = an.name();
+                        var providerClass = an.valueProvider();
                         return Pair.of(name, (Object) (FixedValueProvider.class == providerClass
                                 ? an.value() : FactoryContext.apply(factory,
                                 providerClass, p -> p.value(clazz, name))));
@@ -367,7 +366,7 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
 
         static Map<HttpStatus.Series, Class<? extends StatusError>>
         checkStatusSeriesErrorMapping(Class clazz) {
-            val defaultDisabled = findAnnotation(clazz, DefaultErrorMappingDisabled.class);
+            var defaultDisabled = findAnnotation(clazz, DefaultErrorMappingDisabled.class);
             Map<HttpStatus.Series, Class<? extends StatusError>> result = checkNull(
                     defaultDisabled, () -> of(HttpStatus.Series.CLIENT_ERROR, StatusError.class,
                             HttpStatus.Series.SERVER_ERROR, StatusError.class), x -> newHashMap());
@@ -379,7 +378,7 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
         }
 
         static ResponseParser checkResponseParser(Class clazz, Factory factory) {
-            val responseParse = findAnnotation(clazz, ResponseParse.class);
+            var responseParse = findAnnotation(clazz, ResponseParse.class);
             return checkNull(responseParse, () -> null, annotation ->
                     FactoryContext.build(factory, annotation.value()));
         }

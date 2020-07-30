@@ -2,8 +2,6 @@ package com.github.charlemaznable.core.crypto;
 
 import com.github.charlemaznable.core.codec.Base64;
 import lombok.SneakyThrows;
-import lombok.val;
-import lombok.var;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -49,7 +47,7 @@ public final class RSA {
 
     @SneakyThrows
     public static KeyPair generateKeyPair(int keysize) {
-        val keyPairGenerator = KeyPairGenerator.getInstance(RSAKEY);
+        var keyPairGenerator = KeyPairGenerator.getInstance(RSAKEY);
         keyPairGenerator.initialize(keysize);
         return keyPairGenerator.generateKeyPair();
     }
@@ -149,11 +147,11 @@ public final class RSA {
     private static byte[] cryptByBlock(int mode, Key key, int keySize, byte[] data) throws
             NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
             IllegalBlockSizeException, BadPaddingException, IOException {
-        val cipher = Cipher.getInstance(RSA_ALGORITHM);
+        var cipher = Cipher.getInstance(RSA_ALGORITHM);
         cipher.init(mode, key);
-        val maxBlock = keySize / 8 - (ENCRYPT_MODE == mode ? 11 : 0);
-        val inputLen = data.length;
-        val out = new ByteArrayOutputStream();
+        var maxBlock = keySize / 8 - (ENCRYPT_MODE == mode ? 11 : 0);
+        var inputLen = data.length;
+        var out = new ByteArrayOutputStream();
         var offSet = 0;
         byte[] cache;
         var i = 0;
@@ -167,7 +165,7 @@ public final class RSA {
             i++;
             offSet = i * maxBlock;
         }
-        val decryptedData = out.toByteArray();
+        var decryptedData = out.toByteArray();
         out.close();
         return decryptedData;
     }

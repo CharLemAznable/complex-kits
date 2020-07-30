@@ -2,8 +2,6 @@ package com.github.charlemaznable.core.net;
 
 import lombok.Cleanup;
 import lombok.SneakyThrows;
-import lombok.val;
-import lombok.var;
 import mockit.Invocation;
 import mockit.Mock;
 import mockit.MockUp;
@@ -42,10 +40,10 @@ public class HttpReqTest {
     @SneakyThrows
     @Test
     public void testHttpReqGet() {
-        val doGetUrlTemp = "http://test.addr:8080%s";
-        val dogetPath = "/doGet";
-        val responseString = "RESPONSE";
-        @Cleanup val responseStream = new ByteArrayInputStream(bytes(responseString));
+        var doGetUrlTemp = "http://test.addr:8080%s";
+        var dogetPath = "/doGet";
+        var responseString = "RESPONSE";
+        @Cleanup var responseStream = new ByteArrayInputStream(bytes(responseString));
 
         new MockUp<URL>(URL.class) {
             @SneakyThrows
@@ -99,7 +97,7 @@ public class HttpReqTest {
             }
         };
 
-        val result = new HttpReq(doGetUrlTemp, dogetPath).sslSocketFactory(new SSLSocketFactory() {
+        var result = new HttpReq(doGetUrlTemp, dogetPath).sslSocketFactory(new SSLSocketFactory() {
             @Override
             public Socket createSocket(String s, int i) {
                 return null;
@@ -141,11 +139,11 @@ public class HttpReqTest {
     @SneakyThrows
     @Test
     public void testHttpReqGetProxy() {
-        val doGetUrlTemp = "http://test.addr:8080%s";
-        val dogetPath = "/doGet";
-        val responseString = "RESPONSE";
-        @Cleanup val responseStream = new ByteArrayInputStream(bytes(responseString));
-        val doGetProxy = new Proxy(Type.HTTP, new InetSocketAddress("127.0.0.1", 8090));
+        var doGetUrlTemp = "http://test.addr:8080%s";
+        var dogetPath = "/doGet";
+        var responseString = "RESPONSE";
+        @Cleanup var responseStream = new ByteArrayInputStream(bytes(responseString));
+        var doGetProxy = new Proxy(Type.HTTP, new InetSocketAddress("127.0.0.1", 8090));
 
         new MockUp<URL>(URL.class) {
             @SneakyThrows
@@ -200,15 +198,15 @@ public class HttpReqTest {
             }
         };
 
-        val result = new HttpReq(doGetUrlTemp, dogetPath).proxy(doGetProxy).get();
+        var result = new HttpReq(doGetUrlTemp, dogetPath).proxy(doGetProxy).get();
         assertEquals(responseString, result);
     }
 
     @SneakyThrows
     @Test
     public void testHttpReqGetError() {
-        val doGetUrlTemp = "http://test.addr:8080%s";
-        val dogetPath = "/doGet";
+        var doGetUrlTemp = "http://test.addr:8080%s";
+        var dogetPath = "/doGet";
 
         new MockUp<URL>(URL.class) {
             @Mock
@@ -255,11 +253,11 @@ public class HttpReqTest {
     @SneakyThrows
     @Test
     public void testHttpReqPost() {
-        val doPostRoot = "http://test.addr:8080";
-        val doPostPath = "/doPost";
-        @Cleanup val requestStream = new ByteArrayOutputStream();
-        val responseString = "RESPONSE";
-        @Cleanup val responseStream = new ByteArrayInputStream(bytes(responseString));
+        var doPostRoot = "http://test.addr:8080";
+        var doPostPath = "/doPost";
+        @Cleanup var requestStream = new ByteArrayOutputStream();
+        var responseString = "RESPONSE";
+        @Cleanup var responseStream = new ByteArrayInputStream(bytes(responseString));
 
         new MockUp<URL>(URL.class) {
             @SneakyThrows
@@ -372,11 +370,11 @@ public class HttpReqTest {
     @SneakyThrows
     @Test
     public void testHttpReqPostError() {
-        val doPostRoot = "http://test.addr:8080";
-        val doPostPath = "/doPost";
-        @Cleanup val requestStream = new ByteArrayOutputStream();
-        val responseString = "RESPONSE";
-        @Cleanup val responseStream = new ByteArrayInputStream(bytes(responseString));
+        var doPostRoot = "http://test.addr:8080";
+        var doPostPath = "/doPost";
+        @Cleanup var requestStream = new ByteArrayOutputStream();
+        var responseString = "RESPONSE";
+        @Cleanup var responseStream = new ByteArrayInputStream(bytes(responseString));
 
         new MockUp<URL>(URL.class) {
             @SneakyThrows
@@ -425,7 +423,7 @@ public class HttpReqTest {
             }
         };
 
-        val result = new HttpReq(doPostRoot)
+        var result = new HttpReq(doPostRoot)
                 .req(doPostPath)
                 .cookie(null)
                 .cookie("TestCookie")
@@ -440,9 +438,9 @@ public class HttpReqTest {
     @SneakyThrows
     @Test
     public void testHttpReqPostError2() {
-        val doPostRoot = "http://test.addr:8080";
-        val doPostPath = "/doPost";
-        @Cleanup val requestStream = new ByteArrayOutputStream();
+        var doPostRoot = "http://test.addr:8080";
+        var doPostPath = "/doPost";
+        @Cleanup var requestStream = new ByteArrayOutputStream();
 
         new MockUp<URL>(URL.class) {
             @SneakyThrows
@@ -490,16 +488,16 @@ public class HttpReqTest {
                 };
             }
         };
-        val result = new HttpReq(doPostRoot).post();
+        var result = new HttpReq(doPostRoot).post();
         assertNull(result);
     }
 
     @SneakyThrows
     @Test
     public void testHttpReqPostError3() {
-        val doPostRoot = "http://test.addr:8080";
-        val doPostPath = "/doPost";
-        @Cleanup val requestStream = new ByteArrayOutputStream();
+        var doPostRoot = "http://test.addr:8080";
+        var doPostPath = "/doPost";
+        @Cleanup var requestStream = new ByteArrayOutputStream();
 
         new MockUp<URL>(URL.class) {
             @SneakyThrows
@@ -542,7 +540,7 @@ public class HttpReqTest {
                 };
             }
         };
-        val result = new HttpReq(doPostRoot).post();
+        var result = new HttpReq(doPostRoot).post();
         assertNull(result);
     }
 }

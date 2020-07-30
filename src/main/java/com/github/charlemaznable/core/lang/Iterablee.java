@@ -1,8 +1,5 @@
 package com.github.charlemaznable.core.lang;
 
-import lombok.val;
-import lombok.var;
-
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
@@ -21,7 +18,7 @@ public final class Iterablee {
         requireNonNull(action);
 
         var index = 0;
-        for (val element : elements) {
+        for (var element : elements) {
             action.accept(index++, element);
         }
     }
@@ -32,7 +29,7 @@ public final class Iterablee {
         requireNonNull(action);
 
         var index = 0;
-        for (val element : elements) {
+        for (var element : elements) {
             if (action.test(index, element)) return index;
             index++;
         }
@@ -45,7 +42,7 @@ public final class Iterablee {
         requireNonNull(action);
 
         var index = 0;
-        for (val element : elements) {
+        for (var element : elements) {
             if (action.test(element)) return index;
             index++;
         }

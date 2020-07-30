@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.lang.time;
 
-import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import static com.github.charlemaznable.core.lang.time.Now.millis;
@@ -14,9 +13,9 @@ public class NowTest {
         assertEquals(19, now().length());
         assertEquals(23, millis().length());
 
-        val dateFormatter1 = new DateFormatter("yyyy-MM-dd HH:mm:ss");
+        var dateFormatter1 = new DateFormatter("yyyy-MM-dd HH:mm:ss");
         assertEquals(19, now(dateFormatter1).length());
-        val dateFormatter2 = new DateFormatter("yyyy-MM-dd HH:mm:ss.SSS");
+        var dateFormatter2 = new DateFormatter("yyyy-MM-dd HH:mm:ss.SSS");
         assertEquals(23, now(dateFormatter2).length());
     }
 }

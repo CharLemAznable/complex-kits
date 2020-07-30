@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.val;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import org.apache.commons.pool2.BasePooledObjectFactory;
@@ -53,7 +52,7 @@ public final class PoolProxy {
             T poolObject = null;
             try {
                 poolObject = pool.borrowObject();
-                val poolObjectClass = poolObject.getClass();
+                var poolObjectClass = poolObject.getClass();
                 return (T) EasyEnhancer.create(poolObjectClass,
                         new ObjectPoolProxy<>(pool), args);
             } finally {
@@ -81,7 +80,7 @@ public final class PoolProxy {
         }
 
         public T build() {
-            val factory = new PoolProxyPooledObjectFactory<T>(creator, args);
+            var factory = new PoolProxyPooledObjectFactory<T>(creator, args);
             return new ObjectPoolBuilder<T>(new GenericObjectPool<>(factory,
                     nullThen(config, GenericObjectPoolConfig::new))).args(args).build();
         }

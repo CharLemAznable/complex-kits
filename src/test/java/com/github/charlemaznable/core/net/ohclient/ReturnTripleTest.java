@@ -8,8 +8,6 @@ import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import lombok.val;
-import lombok.var;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -35,7 +33,7 @@ public class ReturnTripleTest {
     @SneakyThrows
     @Test
     public void testTriple() {
-        try (val mockWebServer = new MockWebServer()) {
+        try (var mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
@@ -56,13 +54,13 @@ public class ReturnTripleTest {
                 }
             });
             mockWebServer.start(41195);
-            val httpClient = ohLoader.getClient(TripleHttpClient.class);
+            var httpClient = ohLoader.getClient(TripleHttpClient.class);
 
             var triple = httpClient.sampleStatusCodeAndBean();
             assertEquals(HttpStatus.OK.value(), triple.getLeft());
             assertEquals(HttpStatus.OK, triple.getMiddle());
             assertEquals("John", triple.getRight().getName());
-            val futureTriple = httpClient.sampleFutureStatusCodeAndBean();
+            var futureTriple = httpClient.sampleFutureStatusCodeAndBean();
             await().forever().pollDelay(Duration.ofMillis(100)).until(futureTriple::isDone);
             triple = futureTriple.get();
             assertEquals(HttpStatus.OK.value(), triple.getLeft());
@@ -70,17 +68,17 @@ public class ReturnTripleTest {
             assertEquals("John", triple.getRight().getName());
 
             var rawTriple = httpClient.sampleRawStreamAndBean();
-            @Cleanup val isr1 = new InputStreamReader(rawTriple.getLeft(), "UTF-8");
-            try (val bufferedReader = new BufferedReader(isr1)) {
+            @Cleanup var isr1 = new InputStreamReader(rawTriple.getLeft(), "UTF-8");
+            try (var bufferedReader = new BufferedReader(isr1)) {
                 assertEquals(json(new Bean("Doe")), bufferedReader.readLine());
             }
             assertEquals(json(new Bean("Doe")), rawTriple.getMiddle());
             assertEquals("Doe", rawTriple.getRight().getName());
-            val futureRawTriple = httpClient.sampleFutureRawStreamAndBean();
+            var futureRawTriple = httpClient.sampleFutureRawStreamAndBean();
             await().forever().pollDelay(Duration.ofMillis(100)).until(futureRawTriple::isDone);
             rawTriple = futureRawTriple.get();
-            @Cleanup val isr2 = new InputStreamReader(rawTriple.getLeft(), "UTF-8");
-            try (val bufferedReader = new BufferedReader(isr2)) {
+            @Cleanup var isr2 = new InputStreamReader(rawTriple.getLeft(), "UTF-8");
+            try (var bufferedReader = new BufferedReader(isr2)) {
                 assertEquals(json(new Bean("Doe")), bufferedReader.readLine());
             }
             assertEquals(json(new Bean("Doe")), rawTriple.getMiddle());

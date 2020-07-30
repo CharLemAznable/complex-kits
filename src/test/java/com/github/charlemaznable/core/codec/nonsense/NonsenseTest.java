@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.codec.nonsense;
 
-import lombok.var;
 import org.junit.jupiter.api.Test;
 
 import static com.github.charlemaznable.core.codec.nonsense.Nonsense.nonsense;

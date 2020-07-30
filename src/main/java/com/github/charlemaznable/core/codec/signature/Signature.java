@@ -8,12 +8,12 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import static com.github.charlemaznable.core.lang.Condition.notNullThen;
+import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static com.github.charlemaznable.core.lang.Str.toStr;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -208,12 +208,12 @@ public final class Signature {
         if (options.flatValue()) {
             flatMap = Json.descFlat(source);
         } else {
-            flatMap = new HashMap<>();
+            flatMap = newHashMap();
             source.forEach((k, v) -> flatMap.put(
                     k, notNullThen(v, Object::toString)));
         }
-        Map<String, String> tempMap = options.keySortAsc()
-                ? new TreeMap<>(flatMap) : new TreeMap<>(flatMap).descendingMap();
+        var tempMap = options.keySortAsc() ? new TreeMap<>(flatMap)
+                : new TreeMap<>(flatMap).descendingMap();
         tempMap.remove(options.key());
         return options.plainProcessor().apply(tempMap
                 .entrySet().stream()

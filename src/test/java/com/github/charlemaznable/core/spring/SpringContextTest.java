@@ -17,8 +17,6 @@ import com.github.charlemaznable.core.spring.testcontext.TestRewireBaseClass;
 import com.github.charlemaznable.core.spring.testcontext.TestRewireSubClass;
 import com.github.charlemaznable.core.spring.testcontext.TestSpringContext;
 import com.github.charlemaznable.core.spring.testcontext.TestSubSpringContext;
-import lombok.val;
-import lombok.var;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -224,18 +222,18 @@ public class SpringContextTest {
         onClass(TestSpringContext.class).field("defaultListableBeanFactory")
                 .set("allowBeanDefinitionOverriding", false);
 
-        val baseBean = new TestRewireBaseClass();
+        var baseBean = new TestRewireBaseClass();
         TestRewireBaseClass base = TestSpringContext.getBeanOrAutowire(TestRewireBaseClass.class, baseBean);
         assertNotNull(base);
         assertEquals(baseBean, base);
 
-        val subBean = new TestRewireSubClass();
+        var subBean = new TestRewireSubClass();
         TestRewireSubClass sub = TestSpringContext.getBeanOrAutowire(TestRewireSubClass.class, subBean);
         assertNotNull(sub);
         assertNotEquals(base, sub);
         assertEquals(subBean, sub);
 
-        val baseBean2 = new TestRewireBaseClass();
+        var baseBean2 = new TestRewireBaseClass();
         TestRewireBaseClass base2 = TestSpringContext.getBeanOrAutowire(TestRewireBaseClass.class, baseBean2);
         assertNotNull(base2);
         assertEquals(base, base2);

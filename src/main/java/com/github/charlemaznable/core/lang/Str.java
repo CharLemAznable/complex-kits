@@ -1,7 +1,5 @@
 package com.github.charlemaznable.core.lang;
 
-import lombok.val;
-import lombok.var;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
@@ -44,7 +42,7 @@ public final class Str {
     }
 
     public static String padding(String s, char letter, int repeats) {
-        val sb = new StringBuilder(s);
+        var sb = new StringBuilder(s);
         while (repeats-- > 0) {
             sb.append(letter);
         }
@@ -53,7 +51,7 @@ public final class Str {
     }
 
     public static String removeLastLetters(String s, char letter) {
-        val sb = new StringBuilder(s);
+        var sb = new StringBuilder(s);
         while (sb.charAt(sb.length() - 1) == letter)
             sb.deleteCharAt(sb.length() - 1);
 
@@ -70,11 +68,11 @@ public final class Str {
     @SuppressWarnings("Duplicates")
     public static String substrInQuotes(String str, char left, int pos) {
         var leftTimes = 0;
-        val leftPos = str.indexOf(left, pos);
+        var leftPos = str.indexOf(left, pos);
         if (leftPos < 0) return "";
 
         for (var i = leftPos + 1; i < str.length(); ++i) {
-            val charAt = str.charAt(i);
+            var charAt = str.charAt(i);
             if (charAt == left) ++leftTimes;
             else if (matches(left, charAt)) {
                 if (leftTimes == 0) return str.substring(leftPos + 1, i);
@@ -96,11 +94,11 @@ public final class Str {
      * @return true 是整数。
      */
     public static boolean isInteger(String string) {
-        val matcher = INTEGER_PATTERN.matcher(string);
+        var matcher = INTEGER_PATTERN.matcher(string);
         if (!matcher.matches()) return false;
 
-        val number = matcher.group(1);
-        val maxValue = "" + Integer.MAX_VALUE;
+        var number = matcher.group(1);
+        var maxValue = "" + Integer.MAX_VALUE;
         return number.length() <= maxValue.length() && toStr(alignRight(
                 number, maxValue.length(), '0')).compareTo(maxValue) <= 0;
     }
@@ -112,11 +110,11 @@ public final class Str {
      * @return true 是长整数。
      */
     public static boolean isLong(String string) {
-        val matcher = INTEGER_PATTERN.matcher(string);
+        var matcher = INTEGER_PATTERN.matcher(string);
         if (!matcher.matches()) return false;
 
-        val number = matcher.group(1);
-        val maxValue = "" + Long.MAX_VALUE;
+        var number = matcher.group(1);
+        var maxValue = "" + Long.MAX_VALUE;
         return number.length() <= maxValue.length() && toStr(alignRight(
                 number, maxValue.length(), '0')).compareTo(maxValue) <= 0;
     }
@@ -131,7 +129,7 @@ public final class Str {
      */
     public static String alignRight(CharSequence cs, int width, char c) {
         if (Objects.isNull(cs)) return null;
-        val len = cs.length();
+        var len = cs.length();
         if (len >= width) return cs.toString();
         return repeat(c, width - len) + cs;
     }
@@ -209,7 +207,7 @@ public final class Str {
     }
 
     public static boolean anyOfIgnoreCase(String s, String... anys) {
-        for (val any : anys) {
+        for (var any : anys) {
             if (StringUtils.equalsIgnoreCase(s, any)) return true;
         }
 

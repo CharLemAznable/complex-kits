@@ -2,8 +2,6 @@ package com.github.charlemaznable.core.lang;
 
 import com.google.common.collect.Maps;
 import lombok.SneakyThrows;
-import lombok.val;
-import lombok.var;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -43,8 +41,8 @@ public final class Mapp {
     public static <T> Map<T, T> of(T... keyAndValues) {
         Map<T, T> map = newHashMap();
         for (var i = 0; i < keyAndValues.length; i += 2) {
-            val key = keyAndValues[i];
-            val value = i + 1 < keyAndValues.length ? keyAndValues[i + 1] : null;
+            var key = keyAndValues[i];
+            var value = i + 1 < keyAndValues.length ? keyAndValues[i + 1] : null;
             map.put(key, value);
         }
 
@@ -53,9 +51,9 @@ public final class Mapp {
 
     public static Map<Object, Object> map(Object... keyAndValues) {
         Map<Object, Object> map = newHashMap();
-        for (int i = 0; i < keyAndValues.length; i += 2) {
-            val key = keyAndValues[i];
-            val value = i + 1 < keyAndValues.length ? keyAndValues[i + 1] : null;
+        for (var i = 0; i < keyAndValues.length; i += 2) {
+            var key = keyAndValues[i];
+            var value = i + 1 < keyAndValues.length ? keyAndValues[i + 1] : null;
             map.put(key, value);
         }
 
@@ -72,7 +70,7 @@ public final class Mapp {
 
     public static String getStr(Map m, Object key, String defaultValue) {
         if (isNull(m)) return defaultValue;
-        val value = m.get(key);
+        var value = m.get(key);
         if (isNull(value)) return defaultValue;
         return value.toString();
     }
@@ -80,7 +78,7 @@ public final class Mapp {
     @SneakyThrows
     public static Number getNum(Map m, Object key) {
         if (isNull(m)) return null;
-        val value = m.get(key);
+        var value = m.get(key);
         if (isNull(value)) return null;
         if (value instanceof Number) return (Number) value;
         if (!(value instanceof String)) return null;
@@ -93,7 +91,7 @@ public final class Mapp {
 
     public static Boolean getBool(Map m, Object key, Boolean defaultValue) {
         if (isNull(m)) return defaultValue;
-        val value = m.get(key);
+        var value = m.get(key);
         if (isNull(value)) return defaultValue;
         if (value instanceof Boolean) return (Boolean) value;
         if (value instanceof Number) return ((Number) value).intValue() != 0;
@@ -109,9 +107,9 @@ public final class Mapp {
     }
 
     public static Integer getInt(Map m, Object key, Integer defaultValue) {
-        val value = getNum(m, key);
+        var value = getNum(m, key);
         if (isNull(value)) return defaultValue;
-        return value instanceof Integer ? (Integer) value : new Integer(value.intValue());
+        return value instanceof Integer ? (Integer) value : Integer.valueOf(value.intValue());
     }
 
     public static Long getLong(Map m, Object key) {
@@ -119,16 +117,16 @@ public final class Mapp {
     }
 
     public static Long getLong(Map m, Object key, Long defaultValue) {
-        val value = getNum(m, key);
+        var value = getNum(m, key);
         if (isNull(value)) return defaultValue;
-        return value instanceof Long ? (Long) value : new Long(value.longValue());
+        return value instanceof Long ? (Long) value : Long.valueOf(value.longValue());
     }
 
     public static <T> Map<T, T> mapFromList(List<Map<String, T>> list, String keyKey, String valueKey) {
         if (isNull(list)) return newHashMap();
 
         Map<T, T> result = newHashMap();
-        for (val map : list) {
+        for (var map : list) {
             if (!map.containsKey(keyKey) || StringUtils.isEmpty(getStr(map, keyKey)) ||
                     !map.containsKey(valueKey) || StringUtils.isEmpty(getStr(map, valueKey))) continue;
             result.put(map.get(keyKey), map.get(valueKey));
@@ -148,7 +146,7 @@ public final class Mapp {
     public static <K, V> Map<K, V> combineMaps(Map<? extends K, ? extends V>... maps) {
         Map<K, V> result = Maps.newHashMap();
         ArrayUtils.reverse(maps);
-        for (val map : maps) {
+        for (var map : maps) {
             if (nonNull(map)) result.putAll(map);
         }
         return result;

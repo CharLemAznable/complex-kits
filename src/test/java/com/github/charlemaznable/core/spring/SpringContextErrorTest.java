@@ -9,8 +9,6 @@ import com.github.charlemaznable.core.spring.testcontext.TestClassD;
 import com.github.charlemaznable.core.spring.testcontext.TestClassE;
 import com.github.charlemaznable.core.spring.testcontext.TestClassF;
 import com.github.charlemaznable.core.spring.testcontext.TestClassG;
-import lombok.val;
-import lombok.var;
 import org.junit.jupiter.api.Test;
 
 import static org.joor.Reflect.onClass;
@@ -22,8 +20,8 @@ public class SpringContextErrorTest {
 
     @Test
     public void testSpringContextError() {
-        val SpringContextClass = onClass(SpringContext.class);
-        val applicationContext = SpringContextClass.field("applicationContext").get();
+        var SpringContextClass = onClass(SpringContext.class);
+        var applicationContext = SpringContextClass.field("applicationContext").get();
         SpringContextClass.set("applicationContext", null);
 
         var multiBeanNames = SpringContext.getBeanNamesForType(TestClass.class);

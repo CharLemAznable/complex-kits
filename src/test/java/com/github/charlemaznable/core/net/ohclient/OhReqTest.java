@@ -8,7 +8,6 @@ import com.github.charlemaznable.core.net.ohclient.OhResponseMappingTest.ClientE
 import com.github.charlemaznable.core.net.ohclient.OhResponseMappingTest.NotFoundException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -31,9 +30,9 @@ public class OhReqTest extends CommonReqTest {
     @Test
     public void testOhReq() {
         startMockWebServer(41103);
-        val loggingInterceptor = new TestLoggingInterceptor();
+        var loggingInterceptor = new TestLoggingInterceptor();
 
-        val ohReq1 = new OhReq("http://127.0.0.1:41103/sample1")
+        var ohReq1 = new OhReq("http://127.0.0.1:41103/sample1")
                 .acceptCharset(ISO_8859_1)
                 .contentFormat(new FormContentFormatter())
                 .header("AAA", "aaa")
@@ -43,7 +42,7 @@ public class OhReqTest extends CommonReqTest {
                 .loggingLevel(Level.BASIC);
         assertEquals("Sample1", ohReq1.get());
 
-        val ohReq2 = new OhReq()
+        var ohReq2 = new OhReq()
                 .req("http://127.0.0.1:41103/sample2")
                 .parameter("AAA", "aaa")
                 .parameters(of("AAA", null, "BBB", "bbb"))
@@ -51,29 +50,29 @@ public class OhReqTest extends CommonReqTest {
                 .loggingLevel(Level.BASIC);
         assertEquals("Sample2", ohReq2.post());
 
-        val ohReq3 = new OhReq("http://127.0.0.1:41103")
+        var ohReq3 = new OhReq("http://127.0.0.1:41103")
                 .req("/sample3?DDD=ddd")
                 .parameter("AAA", "aaa")
                 .parameters(of("AAA", null, "BBB", "bbb"))
                 .requestBody("CCC=ccc")
                 .addInterceptor(loggingInterceptor)
                 .loggingLevel(Level.BASIC);
-        val future3 = ohReq3.getFuture();
+        var future3 = ohReq3.getFuture();
         await().forever().pollDelay(Duration.ofMillis(100)).until(future3::isDone);
         assertEquals("Sample3", future3.get());
 
-        val ohReq4 = new OhReq("http://127.0.0.1:41103")
+        var ohReq4 = new OhReq("http://127.0.0.1:41103")
                 .req("/sample4")
                 .parameter("AAA", "aaa")
                 .parameters(of("AAA", null, "BBB", "bbb"))
                 .requestBody("CCC=ccc")
                 .addInterceptor(loggingInterceptor)
                 .loggingLevel(Level.BASIC);
-        val future4 = ohReq4.postFuture();
+        var future4 = ohReq4.postFuture();
         await().forever().pollDelay(Duration.ofMillis(100)).until(future4::isDone);
         assertEquals("Sample4", future4.get());
 
-        val ohReq5 = new OhReq("http://127.0.0.1:41103/sample5")
+        var ohReq5 = new OhReq("http://127.0.0.1:41103/sample5")
                 .addInterceptors(newArrayList(loggingInterceptor))
                 .loggingLevel(Level.BASIC);
         try {
@@ -89,7 +88,7 @@ public class OhReqTest extends CommonReqTest {
             assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), e.getMessage());
         }
 
-        val ohReq6 = new OhReq("http://127.0.0.1:41103/sample6")
+        var ohReq6 = new OhReq("http://127.0.0.1:41103/sample6")
                 .statusErrorMapping(HttpStatus.NOT_FOUND, NotFoundException.class)
                 .statusSeriesErrorMapping(HttpStatus.Series.CLIENT_ERROR, ClientErrorException.class)
                 .addInterceptors(newArrayList(loggingInterceptor))

@@ -4,7 +4,6 @@ import com.github.charlemaznable.core.miner.testminer.TestMiner;
 import com.github.charlemaznable.core.miner.testminer.TestMinerConcrete;
 import com.github.charlemaznable.core.miner.testminer.TestMinerNone;
 import com.github.charlemaznable.core.spring.SpringContext;
-import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.n3r.diamond.client.impl.MockDiamondServer;
@@ -24,7 +23,7 @@ public class MinerSpringTest {
         MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA",
                 "name=John\nfull=${this.name} Doe\nlong=${this.full} Richard");
 
-        val testMiner = SpringContext.getBean(TestMiner.class);
+        var testMiner = SpringContext.getBean(TestMiner.class);
         assertNotNull(testMiner);
         assertEquals("John", testMiner.name());
         assertEquals("John Doe", testMiner.full());
@@ -43,10 +42,10 @@ public class MinerSpringTest {
         assertEquals("springspring&springspring&guiceguice",
                 testMiner.defaultInContext());
 
-        val testMinerConcrete = SpringContext.getBean(TestMinerConcrete.class);
+        var testMinerConcrete = SpringContext.getBean(TestMinerConcrete.class);
         assertNull(testMinerConcrete);
 
-        val testMinerNone = SpringContext.getBean(TestMinerNone.class);
+        var testMinerNone = SpringContext.getBean(TestMinerNone.class);
         assertNull(testMinerNone);
     }
 }

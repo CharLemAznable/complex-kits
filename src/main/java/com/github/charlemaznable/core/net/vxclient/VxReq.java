@@ -17,8 +17,6 @@ import io.vertx.core.net.TrustOptions;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
-import lombok.val;
-import lombok.var;
 import okhttp3.MediaType;
 
 import java.nio.charset.Charset;
@@ -74,24 +72,24 @@ public class VxReq extends CommonReq<VxReq> {
 
     @SafeVarargs
     public final void get(Handler<AsyncResult<String>>... handlers) {
-        val webClient = buildWebClient();
-        val requestUrl = concatRequestUrl();
-        val parameterMap = fetchParameterMap();
-        val headersMap = fetchHeaderMap();
+        var webClient = buildWebClient();
+        var requestUrl = concatRequestUrl();
+        var parameterMap = fetchParameterMap();
+        var headersMap = fetchHeaderMap();
 
-        val addQuery = this.contentFormatter.format(parameterMap, newHashMap());
+        var addQuery = this.contentFormatter.format(parameterMap, newHashMap());
         webClient.getAbs(concatRequestQuery(requestUrl, addQuery))
                 .putHeaders(headersMap).send(handle(handlers));
     }
 
     @SafeVarargs
     public final void post(Handler<AsyncResult<String>>... handlers) {
-        val webClient = buildWebClient();
-        val requestUrl = concatRequestUrl();
-        val parameterMap = fetchParameterMap();
-        val headersMap = fetchHeaderMap();
+        var webClient = buildWebClient();
+        var requestUrl = concatRequestUrl();
+        var parameterMap = fetchParameterMap();
+        var headersMap = fetchHeaderMap();
 
-        val content = nullThen(this.requestBody, () ->
+        var content = nullThen(this.requestBody, () ->
                 this.contentFormatter.format(parameterMap, newHashMap()));
         var charset = parseCharset(this.contentFormatter.contentType());
         webClient.postAbs(requestUrl).putHeaders(headersMap)
@@ -103,12 +101,12 @@ public class VxReq extends CommonReq<VxReq> {
     }
 
     private MultiMap fetchHeaderMap() {
-        val headersMap = new VertxHttpHeaders();
-        val acceptCharsetName = this.acceptCharset.name();
+        var headersMap = new VertxHttpHeaders();
+        var acceptCharsetName = this.acceptCharset.name();
         headersMap.set(ACCEPT_CHARSET, acceptCharsetName);
-        val contentType = this.contentFormatter.contentType();
+        var contentType = this.contentFormatter.contentType();
         headersMap.set(CONTENT_TYPE, contentType);
-        for (val header : this.headers) {
+        for (var header : this.headers) {
             checkNull(header.getValue(),
                     () -> headersMap.remove(header.getKey()),
                     xx -> headersMap.set(header.getKey(), header.getValue()));
@@ -125,14 +123,14 @@ public class VxReq extends CommonReq<VxReq> {
     private final Handler<AsyncResult<HttpResponse<Buffer>>> handle(
             Handler<AsyncResult<String>>... handlers) {
         return arResponse -> {
-            val promise = Promise.<String>promise();
+            var promise = Promise.<String>promise();
             if (arResponse.succeeded()) {
                 try {
-                    val response = arResponse.result();
-                    val statusCode = response.statusCode();
-                    val responseBody = response.bodyAsString(acceptCharset.name());
+                    var response = arResponse.result();
+                    var statusCode = response.statusCode();
+                    var responseBody = response.bodyAsString(acceptCharset.name());
 
-                    val errorMapping = new StatusErrorFunction(statusCode, responseBody);
+                    var errorMapping = new StatusErrorFunction(statusCode, responseBody);
                     notNullThen(statusErrorMapping.get(
                             HttpStatus.valueOf(statusCode)), errorMapping);
                     notNullThen(statusSeriesErrorMapping.get(
@@ -146,9 +144,9 @@ public class VxReq extends CommonReq<VxReq> {
                 promise.fail(new VxException(arResponse.cause()));
             }
 
-            val iterator = Iterators.forArray(handlers);
+            var iterator = Iterators.forArray(handlers);
             while (iterator.hasNext()) {
-                val nextHandler = iterator.next();
+                var nextHandler = iterator.next();
                 if (isNull(nextHandler)) continue;
                 nextHandler.handle(promise.future());
             }

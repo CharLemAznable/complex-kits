@@ -1,7 +1,6 @@
 package com.github.charlemaznable.core.net;
 
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.net.ssl.HostnameVerifier;
@@ -87,9 +86,9 @@ public final class HttpReq {
     }
 
     public HttpReq params(Map<String, String> params) {
-        for (val paramEntry : params.entrySet()) {
-            val key = paramEntry.getKey();
-            val value = paramEntry.getValue();
+        for (var paramEntry : params.entrySet()) {
+            var key = paramEntry.getKey();
+            var value = paramEntry.getValue();
             if (isEmpty(key) || isEmpty(value)) continue;
             param(key, value);
         }
@@ -123,7 +122,7 @@ public final class HttpReq {
         HttpURLConnection http = null;
         try {
             // Post请求的url，与get不同的是不需要带参数
-            val url = baseUrl + (isNull(req) ? "" : req);
+            var url = baseUrl + (isNull(req) ? "" : req);
 
             http = commonSettings(url);
             postSettings(http);
@@ -146,7 +145,7 @@ public final class HttpReq {
     public String get() {
         HttpURLConnection http = null;
         try {
-            val url = baseUrl + (isNull(req) ? "" : req)
+            var url = baseUrl + (isNull(req) ? "" : req)
                     + (params.length() > 0 ? ("?" + params) : "");
 
             http = commonSettings(url);
@@ -165,8 +164,8 @@ public final class HttpReq {
 
     private HttpURLConnection commonSettings(String urlString) throws IOException {
         setFollowRedirects(true);
-        val url = new URL(urlString);
-        val http = (HttpURLConnection) (isNull(this.proxy) ?
+        var url = new URL(urlString);
+        var http = (HttpURLConnection) (isNull(this.proxy) ?
                 url.openConnection() : url.openConnection(this.proxy));
         http.setRequestProperty("Accept-Charset", this.charset.name());
         http.setConnectTimeout(60 * 1000);
@@ -188,7 +187,7 @@ public final class HttpReq {
     }
 
     private void setHeaders(HttpURLConnection http) {
-        for (val prop : props) http.setRequestProperty(prop.getKey(), prop.getValue());
+        for (var prop : props) http.setRequestProperty(prop.getKey(), prop.getValue());
     }
 
     private void setSSL(HttpURLConnection http) {
@@ -204,19 +203,19 @@ public final class HttpReq {
     private void writePostRequestBody(HttpURLConnection http) throws IOException {
         if (params.length() == 0) return;
 
-        val out = new DataOutputStream(http.getOutputStream());
+        var out = new DataOutputStream(http.getOutputStream());
         // The URL-encoded contend 正文，正文内容其实跟get的URL中 '? '后的参数字符串一致
         // DataOutputStream.writeBytes将字符串中的16位的unicode字符以8位的字符形式写到流里面
         // 错误用法: out.writeBytes(postData)
-        val postData = params.toString();
+        var postData = params.toString();
         out.write(postData.getBytes(this.charset));
         out.flush();
         out.close();
     }
 
     private String parseResponse(HttpURLConnection http, String url) throws IOException {
-        val status = http.getResponseCode();
-        val rspCharset = parseCharset(http.getHeaderField("Content-Type"));
+        var status = http.getResponseCode();
+        var rspCharset = parseCharset(http.getHeaderField("Content-Type"));
 
         if (status == 200) return readResponseBody(http, rspCharset);
 
@@ -228,7 +227,7 @@ public final class HttpReq {
         if (isNull(contentType)) return this.charset;
 
         String charsetName = null;
-        for (val param : contentType.replace(" ", "").split(";")) {
+        for (var param : contentType.replace(" ", "").split(";")) {
             if (param.startsWith("charset=")) {
                 charsetName = param.split("=", 2)[1];
                 break;
@@ -243,9 +242,9 @@ public final class HttpReq {
     }
 
     private String readErrorResponseBody(String url, HttpURLConnection http, int status, Charset charset) throws IOException {
-        val errorStream = http.getErrorStream();
+        var errorStream = http.getErrorStream();
         if (nonNull(errorStream)) {
-            val error = readInputStreamToString(errorStream, charset);
+            var error = readInputStreamToString(errorStream, charset);
             return (url + ", STATUS CODE =" + status + ", headers=" + json(http.getHeaderFields()) + "\n\n" + error);
         } else {
             return (url + ", STATUS CODE =" + status + ", headers=" + json(http.getHeaderFields()));
@@ -253,8 +252,8 @@ public final class HttpReq {
     }
 
     private String readInputStreamToString(InputStream inputStream, Charset charset) throws IOException {
-        val baos = new ByteArrayOutputStream();
-        val buffer = new byte[1024];
+        var baos = new ByteArrayOutputStream();
+        var buffer = new byte[1024];
 
         int length;
         while ((length = inputStream.read(buffer)) != -1) {

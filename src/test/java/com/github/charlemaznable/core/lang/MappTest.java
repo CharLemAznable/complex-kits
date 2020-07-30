@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.lang;
 
-import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import java.text.ParseException;
@@ -15,21 +14,21 @@ public class MappTest {
 
     @Test
     public void testOf() {
-        val map1 = Mapp.of("a", "A", "b", "B", "c", "C", "d", "D", "e", "E", "f", "F");
+        var map1 = Mapp.of("a", "A", "b", "B", "c", "C", "d", "D", "e", "E", "f", "F");
         map1.put("g", null);
-        val map2 = Mapp.of("a", "A", "b", "B", "c", "C", "d", "D", "e", "E", "f", "F", "g");
+        var map2 = Mapp.of("a", "A", "b", "B", "c", "C", "d", "D", "e", "E", "f", "F", "g");
         assertEquals(map1, map2);
 
-        val map3 = Mapp.map("a", "A", "b", "B", "c", "C", "d", "D", "e", "E", "f", "F", "g");
+        var map3 = Mapp.map("a", "A", "b", "B", "c", "C", "d", "D", "e", "E", "f", "F", "g");
         assertEquals(map2, map3);
 
         assertFalse(Mapp.isEmpty(map3));
         map3.clear();
         assertTrue(Mapp.isEmpty(map3));
 
-        val map4 = Mapp.newHashMap(map2);
+        var map4 = Mapp.newHashMap(map2);
         assertFalse(Mapp.isEmpty(map4));
-        val map5 = Mapp.newHashMap(null);
+        var map5 = Mapp.newHashMap(null);
         assertTrue(Mapp.isEmpty(map3));
     }
 
@@ -37,7 +36,7 @@ public class MappTest {
     public void testGet() {
         assertNull(Mapp.getNum(null, "1"));
 
-        val map = Mapp.map("1", null, "2", 2, "3", "3", "4", "four", "b", true, "o", "on");
+        var map = Mapp.map("1", null, "2", 2, "3", "3", "4", "four", "b", true, "o", "on");
         assertNull(Mapp.getNum(map, "1"));
         assertEquals(2, Mapp.getNum(map, "2"));
         assertEquals(3L, Mapp.getNum(map, "3"));
@@ -60,11 +59,11 @@ public class MappTest {
 
     @Test
     public void testCombine() {
-        val map1 = Mapp.of("a", "A");
-        val map2 = Mapp.of("a", "AA", "b", "BB");
-        val map3 = Mapp.of("a", "AAA", "b", "BBB", "c", "CCC");
+        var map1 = Mapp.of("a", "A");
+        var map2 = Mapp.of("a", "AA", "b", "BB");
+        var map3 = Mapp.of("a", "AAA", "b", "BBB", "c", "CCC");
 
-        val result = Mapp.combineMaps(null, map1, null, map2, null, map3, null);
+        var result = Mapp.combineMaps(null, map1, null, map2, null, map3, null);
         assertEquals("A", Mapp.getStr(result, "a"));
         assertEquals("BB", Mapp.getStr(result, "b"));
         assertEquals("CCC", Mapp.getStr(result, "c"));

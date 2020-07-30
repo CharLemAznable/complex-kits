@@ -1,8 +1,6 @@
 package com.github.charlemaznable.core.codec.signature;
 
 import com.github.charlemaznable.core.codec.Digest;
-import lombok.val;
-import lombok.var;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,7 +12,7 @@ public class SignatureOptionsTest {
 
     @Test
     public void testSignatureOptions() {
-        val options = new SignatureOptions();
+        var options = new SignatureOptions();
 
         assertEquals("signature", options.key());
         assertTrue(options.flatValue());

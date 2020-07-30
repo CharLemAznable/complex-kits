@@ -17,8 +17,6 @@ import com.google.inject.ConfigurationException;
 import com.google.inject.Guice;
 import com.google.inject.util.Providers;
 import lombok.SneakyThrows;
-import lombok.val;
-import lombok.var;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -59,14 +57,14 @@ public class OhGuiceTest {
     @SneakyThrows
     @Test
     public void testOhClient() {
-        val minerModular = new MinerModular().bindClasses(TestSampleUrlProvider.class);
-        val minerModule = minerModular.createModule();
-        val ohModular = new OhModular(minerModule).bindClasses(
+        var minerModular = new MinerModular().bindClasses(TestSampleUrlProvider.class);
+        var minerModule = minerModular.createModule();
+        var ohModular = new OhModular(minerModule).bindClasses(
                 TestHttpClient.class, TestHttpClientIsolated.class,
                 TestHttpClientConcrete.class, TestHttpClientNone.class);
         var injector = Guice.createInjector(ohModular.createModule());
 
-        try (val mockWebServer = new MockWebServer()) {
+        try (var mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
@@ -84,8 +82,8 @@ public class OhGuiceTest {
             });
             mockWebServer.start(41102);
 
-            val testComponent = injector.getInstance(TestComponentGuice.class);
-            val testHttpClient = testComponent.getTestHttpClient();
+            var testComponent = injector.getInstance(TestComponentGuice.class);
+            var testHttpClient = testComponent.getTestHttpClient();
             assertEquals(SAMPLE_RESULT, testHttpClient.sample());
             assertEquals(SAMPLE_RESULT_WRAP, testHttpClient.sampleWrapper());
             assertEquals(SAMPLE_RESULT, testHttpClient.sampleWrap());
@@ -95,7 +93,7 @@ public class OhGuiceTest {
             assertEquals(SAMPLE_RESULT, testHttpClient.sampleWrap());
             assertEquals(CONTEXT_RESULT, testHttpClient.sampleByContext());
 
-            val testHttpClient2 = injector.getInstance(TestHttpClientIsolated.class);
+            var testHttpClient2 = injector.getInstance(TestHttpClientIsolated.class);
             assertEquals(SAMPLE_RESULT, testHttpClient2.sample());
             assertEquals(SAMPLE_RESULT_WRAP_I, testHttpClient2.sampleWrapper());
 
@@ -108,12 +106,12 @@ public class OhGuiceTest {
     @SneakyThrows
     @Test
     public void testOhClientError() {
-        val ohModular = new OhModular(emptyList()).bindClasses(
+        var ohModular = new OhModular(emptyList()).bindClasses(
                 TestHttpClient.class, TestHttpClientIsolated.class,
                 TestHttpClientConcrete.class, TestHttpClientNone.class);
         var injector = Guice.createInjector(ohModular.createModule());
 
-        try (val mockWebServer = new MockWebServer()) {
+        try (var mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
@@ -131,13 +129,13 @@ public class OhGuiceTest {
             });
             mockWebServer.start(41102);
 
-            val testComponent = injector.getInstance(TestComponentGuice.class);
-            val testHttpClient = testComponent.getTestHttpClient();
+            var testComponent = injector.getInstance(TestComponentGuice.class);
+            var testHttpClient = testComponent.getTestHttpClient();
             assertThrows(NullPointerException.class, testHttpClient::sample);
             assertThrows(NullPointerException.class, testHttpClient::sampleWrapper);
             assertEquals(SAMPLE_RESULT, testHttpClient.sampleWrap());
 
-            val testHttpClient2 = injector.getInstance(TestHttpClientIsolated.class);
+            var testHttpClient2 = injector.getInstance(TestHttpClientIsolated.class);
             assertEquals(SAMPLE_ERROR_RESULT, testHttpClient2.sample());
             assertEquals(SAMPLE_ERROR_RESULT_WRAP_I, testHttpClient2.sampleWrapper());
 
@@ -150,9 +148,9 @@ public class OhGuiceTest {
     @SneakyThrows
     @Test
     public void testOhClientNaked() {
-        val ohModular = new OhModular();
+        var ohModular = new OhModular();
 
-        try (val mockWebServer = new MockWebServer()) {
+        try (var mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
@@ -170,19 +168,19 @@ public class OhGuiceTest {
             });
             mockWebServer.start(41102);
 
-            val emptyInjector = Guice.createInjector(new AbstractModule() {
+            var emptyInjector = Guice.createInjector(new AbstractModule() {
                 @Override
                 protected void configure() {
                     bind(TestHttpClient.class).toProvider(Providers.of(null));
                 }
             }, ohModular.createModule() /* required for provision */);
 
-            val testHttpClient = emptyInjector.getInstance(TestComponentGuice.class).getTestHttpClient();
+            var testHttpClient = emptyInjector.getInstance(TestComponentGuice.class).getTestHttpClient();
             assertThrows(NullPointerException.class, testHttpClient::sample);
             assertThrows(NullPointerException.class, testHttpClient::sampleWrapper);
             assertEquals(SAMPLE_NO_ERROR_RESULT, testHttpClient.sampleWrap());
 
-            val testHttpClient2 = ohModular.getClient(TestHttpClientIsolated.class);
+            var testHttpClient2 = ohModular.getClient(TestHttpClientIsolated.class);
             assertEquals(SAMPLE_ERROR_RESULT, testHttpClient2.sample());
             assertEquals(SAMPLE_ERROR_RESULT_WRAP_I, testHttpClient2.sampleWrapper());
 
@@ -192,7 +190,7 @@ public class OhGuiceTest {
             assertThrows(OhException.class,
                     () -> ohModular.getClient(TestHttpClientNone.class));
 
-            val injector = Guice.createInjector(ohModular.createModule());
+            var injector = Guice.createInjector(ohModular.createModule());
             assertThrows(ConfigurationException.class, () ->
                     injector.getInstance(TestHttpClient.class));
             assertNull(new GuiceFactory(injector).build(TestHttpClient.class));
@@ -202,12 +200,12 @@ public class OhGuiceTest {
     @SneakyThrows
     @Test
     public void testOhClientScan() {
-        val minerModular = new MinerModular().bindClasses(TestSampleUrlProvider.class);
-        val minerModule = minerModular.createModule();
-        val ohModular = new OhModular(minerModule).scanPackageClasses(TestClientScanAnchor.class);
+        var minerModular = new MinerModular().bindClasses(TestSampleUrlProvider.class);
+        var minerModule = minerModular.createModule();
+        var ohModular = new OhModular(minerModule).scanPackageClasses(TestClientScanAnchor.class);
         var injector = Guice.createInjector(ohModular.createModule());
 
-        try (val mockWebServer = new MockWebServer()) {
+        try (var mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
@@ -216,8 +214,8 @@ public class OhGuiceTest {
             });
             mockWebServer.start(41102);
 
-            val testComponent = injector.getInstance(TestComponentGuice.class);
-            val testHttpClient = testComponent.getTestHttpClient();
+            var testComponent = injector.getInstance(TestComponentGuice.class);
+            var testHttpClient = testComponent.getTestHttpClient();
             assertEquals(SAMPLE_RESULT, testHttpClient.sample());
             assertEquals(SAMPLE_RESULT_WRAP, testHttpClient.sampleWrapper());
             assertEquals(SAMPLE_RESULT, testHttpClient.sampleWrap());
@@ -227,7 +225,7 @@ public class OhGuiceTest {
             assertEquals(SAMPLE_RESULT, testHttpClient.sampleWrap());
             assertEquals(SAMPLE_RESULT, testHttpClient.sampleByContext());
 
-            val testHttpClient2 = injector.getInstance(TestHttpClientIsolated.class);
+            var testHttpClient2 = injector.getInstance(TestHttpClientIsolated.class);
             assertEquals(SAMPLE_RESULT, testHttpClient2.sample());
             assertEquals(SAMPLE_RESULT_WRAP_I, testHttpClient2.sampleWrapper());
 

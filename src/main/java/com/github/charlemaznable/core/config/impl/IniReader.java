@@ -1,7 +1,5 @@
 package com.github.charlemaznable.core.config.impl;
 
-import lombok.val;
-import lombok.var;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -41,7 +39,7 @@ public final class IniReader {
     public IniReader(Reader reader) throws IOException {
         sections.add(""); // add Global section.
 
-        val bufferedReader = new BufferedReader(reader);
+        var bufferedReader = new BufferedReader(reader);
 
         var line = bufferedReader.readLine();
 
@@ -52,7 +50,7 @@ public final class IniReader {
 
             String key;
             var value = "";
-            val index = findSeparator(line);
+            var index = findSeparator(line);
             if (index >= 0) {
                 key = line.substring(0, index);
                 value = parseValue(line.substring(index + 1), bufferedReader);
@@ -69,16 +67,16 @@ public final class IniReader {
     }
 
     private static String parseValue(String val, BufferedReader reader) throws IOException {
-        val propertyValue = new StringBuilder();
+        var propertyValue = new StringBuilder();
         boolean lineContinues;
         var value = val.trim();
 
         do {
-            val quoted = value.startsWith("\"") || value.startsWith("'");
-            val quote = quoted ? value.charAt(0) : 0;
+            var quoted = value.startsWith("\"") || value.startsWith("'");
+            var quote = quoted ? value.charAt(0) : 0;
             var i = quoted ? 1 : 0;
 
-            val result = new StringBuilder();
+            var result = new StringBuilder();
             i = parseValueByChars(quoted, quote, i, value, result);
 
             var v = result.toString();
@@ -106,10 +104,10 @@ public final class IniReader {
         var escape = false;
         var lastChar = 0;
         while (i < value.length() && !stop) {
-            val c = value.charAt(i);
+            var c = value.charAt(i);
 
             if (quoted) {
-                val res = parseValueQuoted(quote, c, result, escape);
+                var res = parseValueQuoted(quote, c, result, escape);
                 escape = res.getLeft();
                 stop = res.getRight();
             } else {
@@ -125,7 +123,7 @@ public final class IniReader {
 
     private static Pair<Boolean/* escape */, Boolean/* stop */> parseValueQuoted(
             int quote, char c, StringBuilder result, boolean escape) {
-        val res = MutablePair.of(escape, false);
+        var res = MutablePair.of(escape, false);
         if ('\\' == c && !escape) res.setLeft(true);
         else if (!escape && quote == c) res.setRight(true);
         else if (escape && quote == c) {
@@ -143,7 +141,7 @@ public final class IniReader {
     }
 
     private static boolean lineContinues(String line) {
-        val s = line.trim();
+        var s = line.trim();
         return s.equals(LINE_CONT) || s.length() > 2 && s.endsWith(LINE_CONT)
                 && isWhitespace(s.charAt(s.length() - 2));
     }
@@ -169,7 +167,7 @@ public final class IniReader {
     private static int findSeparator(String line) {
         var index1 = findSeparatorBeforeQuote(line,
                 findFirstOccurrence(line, QUOTE_CHARACTERS));
-        val index2 = findFirstOccurrence(line, SEPARATOR_CHARS);
+        var index2 = findFirstOccurrence(line, SEPARATOR_CHARS);
         if (index1 < 0) index1 = index2;
 
         return index1 < index2 ? index1 : index2;
@@ -188,8 +186,8 @@ public final class IniReader {
         var index = -1;
 
         for (var i = 0; i < separators.length(); i++) {
-            val sep = separators.charAt(i);
-            val pos = line.indexOf(sep);
+            var sep = separators.charAt(i);
+            var pos = line.indexOf(sep);
             if (pos >= 0 && (index < 0 || pos < index)) index = pos;
         }
 
@@ -218,7 +216,7 @@ public final class IniReader {
     private boolean checkLine(@Nonnull String line) {
         if (isCommentLine(line)) return false;
         if (isSectionLine(line)) {
-            val section = line.substring(1, line.length() - 1).trim();
+            var section = line.substring(1, line.length() - 1).trim();
             if (!sections.contains(section)) sections.add(section);
             return false;
         }
@@ -226,13 +224,13 @@ public final class IniReader {
     }
 
     private void createValueNodes(String key, String value) {
-        val lastSection = sections.get(sections.size() - 1);
+        var lastSection = sections.get(sections.size() - 1);
         var sectionProps = properties.get(lastSection);
         if (isNull(sectionProps)) {
             sectionProps = new Properties();
             properties.put(lastSection, sectionProps);
         } else {
-            val oldValue = (String) sectionProps.get(key);
+            var oldValue = (String) sectionProps.get(key);
             if (nonNull(oldValue))
                 putIncKeyAndValue(sectionProps, key, oldValue);
         }

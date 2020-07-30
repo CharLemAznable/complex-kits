@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -16,13 +15,13 @@ public class TextableTest {
 
     @Test
     public void testTextable() {
-        val bean1 = new TestTextable1();
+        var bean1 = new TestTextable1();
         bean1.setKey1(42);
         bean1.setKey2("answer");
         assertEquals("key1=42&key2=answer", bean1.toText());
         assertEquals("key1='42'&key2='answer'", bean1.toText(origin -> "'" + origin + "'"));
 
-        val bean2 = new TestTextable2();
+        var bean2 = new TestTextable2();
         bean2.setKey1(42);
         bean2.setKey2("answer");
         assertEquals("key1=42&key2=answer", bean2.toText());

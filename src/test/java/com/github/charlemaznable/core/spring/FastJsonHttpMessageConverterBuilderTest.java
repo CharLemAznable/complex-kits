@@ -7,7 +7,6 @@ import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializeFilter;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.github.charlemaznable.core.lang.Mapp;
-import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import static com.alibaba.fastjson.parser.Feature.OrderedField;
@@ -21,9 +20,9 @@ public class FastJsonHttpMessageConverterBuilderTest {
 
     @Test
     public void testFastJsonHttpMessageConverterBuilder() {
-        val parseProcess = new ParseProcess() {};
-        val serializeFilter = new SerializeFilter() {};
-        val converter = new FastJsonHttpMessageConverterBuilder()
+        var parseProcess = new ParseProcess() {};
+        var serializeFilter = new SerializeFilter() {};
+        var converter = new FastJsonHttpMessageConverterBuilder()
                 .charset(UTF_8)
                 .serializeConfig(SerializeConfig.getGlobalInstance())
                 .parserConfig(ParserConfig.getGlobalInstance())

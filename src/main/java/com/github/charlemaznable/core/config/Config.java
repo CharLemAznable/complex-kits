@@ -2,8 +2,6 @@ package com.github.charlemaznable.core.config;
 
 import com.github.charlemaznable.core.config.impl.ConfigBuilder;
 import com.github.charlemaznable.core.config.impl.PropsConfigLoader;
-import lombok.val;
-import lombok.var;
 
 import java.util.List;
 import java.util.Properties;
@@ -29,25 +27,25 @@ public final class Config {
     }
 
     private static void loadConfigImplementation() {
-        val defConfig = createConfigable("defconfigdir", "defconfig", null);
+        var defConfig = createConfigable("defconfigdir", "defconfig", null);
         impl = createConfigable("bizconfigdir", "bizconfig", defConfig);
     }
 
     private static Configable createConfigable(String configKey, String defConfigDir, Configable defConfig) {
-        val configBuilder = new ConfigBuilder();
+        var configBuilder = new ConfigBuilder();
         configBuilder.setDefConfig(defConfig);
 
         var basePackage = defConfigDir;
-        val envURL = classResource("envspace.props");
+        var envURL = classResource("envspace.props");
         if (nonNull(envURL)) {
-            val envSpaceConfig = new PropsConfigLoader().loadConfigable(envURL);
+            var envSpaceConfig = new PropsConfigLoader().loadConfigable(envURL);
             basePackage = envSpaceConfig.getStr(configKey, defConfigDir);
             configBuilder.addConfig(envSpaceConfig);
         }
 
-        for (val configLoader : configLoaders) {
-            val resources = configLoader.loadResources(basePackage);
-            for (val resource : resources) {
+        for (var configLoader : configLoaders) {
+            var resources = configLoader.loadResources(basePackage);
+            for (var resource : resources) {
                 configBuilder.addConfig(configLoader.loadConfigable(resource));
             }
         }

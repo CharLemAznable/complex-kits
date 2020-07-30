@@ -4,7 +4,6 @@ import com.github.charlemaznable.core.spring.mutable.MutableHttpServletFilterCon
 import com.github.charlemaznable.core.spring.mutable.MutableHttpServletFilterController;
 import com.github.charlemaznable.core.spring.mutable.MutableHttpServletFilterInterceptor;
 import lombok.SneakyThrows;
-import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -47,13 +46,13 @@ public class MutableHttpServletFilterTest {
     @SneakyThrows
     @Test
     public void testSample() {
-        val response = mockMvc.perform(get("/mutable-filter")
+        var response = mockMvc.perform(get("/mutable-filter")
                 .param("IN_REQUEST", "TRUE")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
-        val responseContent = response.getContentAsString();
-        val responseMap = unJson(responseContent);
+        var responseContent = response.getContentAsString();
+        var responseMap = unJson(responseContent);
         assertEquals("TRUE", responseMap.get("IN_REQUEST"));
         assertEquals("TRUE", responseMap.get("IN_PREHANDLE"));
         assertEquals("TRUE", responseMap.get("IN_CONTROLLER"));

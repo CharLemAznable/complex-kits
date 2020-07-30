@@ -2,7 +2,6 @@ package com.github.charlemaznable.core.lang;
 
 import com.github.charlemaznable.core.config.impl.PropsConfigLoader;
 import com.google.common.io.Resources;
-import lombok.val;
 import org.apache.commons.text.StringSubstitutor;
 
 import java.io.IOException;
@@ -88,15 +87,15 @@ public final class ClzPath {
     }
 
     public static StringSubstitutor classResourceAsSubstitutor(String classPath) {
-        val propsURL = classResource(classPath);
+        var propsURL = classResource(classPath);
         if (nonNull(propsURL)) {
-            val envProps = new PropsConfigLoader()
+            var envProps = new PropsConfigLoader()
                     .loadConfigable(propsURL).getProperties();
             Map<String, String> envPropsMap = newHashMap();
-            val propNames = envProps.propertyNames();
+            var propNames = envProps.propertyNames();
             while (propNames.hasMoreElements()) {
-                val propName = (String) propNames.nextElement();
-                val propValue = envProps.getProperty(propName);
+                var propName = (String) propNames.nextElement();
+                var propValue = envProps.getProperty(propName);
                 envPropsMap.put(propName, propValue);
             }
             return new StringSubstitutor(envPropsMap);

@@ -1,7 +1,6 @@
 package com.github.charlemaznable.core.net.common;
 
 import lombok.SneakyThrows;
-import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -26,12 +25,12 @@ public abstract class CommonReqTest {
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
             public MockResponse dispatch(RecordedRequest request) {
-                val requestUrl = request.getRequestUrl();
+                var requestUrl = request.getRequestUrl();
                 switch (requestUrl.encodedPath()) {
                     case "/sample1":
-                        val acceptCharset = request.getHeader(ACCEPT_CHARSET);
+                        var acceptCharset = request.getHeader(ACCEPT_CHARSET);
                         assertEquals(ISO_8859_1.name(), acceptCharset);
-                        val contentType = request.getHeader(CONTENT_TYPE);
+                        var contentType = request.getHeader(CONTENT_TYPE);
                         assertTrue(contentType.startsWith(FORM_DATA.toString()));
                         assertNull(request.getHeader("AAA"));
                         assertEquals("bbb", request.getHeader("BBB"));

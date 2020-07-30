@@ -1,8 +1,5 @@
 package com.github.charlemaznable.core.codec;
 
-import lombok.val;
-import lombok.var;
-
 import static java.util.Objects.isNull;
 
 public final class BaseX {
@@ -28,9 +25,9 @@ public final class BaseX {
     public String encode(byte[] data) {
         if (data.length == 0) return "";
 
-        val digits = new int[data.length * 2];
+        var digits = new int[data.length * 2];
         var digitpos = 0;
-        for (val b : data) {
+        for (var b : data) {
             var v = b & 0xFF;
             for (var j = 0; j <= digitpos; j++) {
                 v |= digits[j] << 8;
@@ -46,7 +43,7 @@ public final class BaseX {
             if (data[k] != 0) break;
             digits[++digitpos] = 0;
         }
-        val chs = new char[digitpos + 1];
+        var chs = new char[digitpos + 1];
         for (var i = digitpos; i >= 0; i--) {
             chs[digitpos - i] = this.chars[digits[i]];
         }
@@ -56,7 +53,7 @@ public final class BaseX {
     public byte[] decode(String value) {
         if (isNull(value) || value.trim().isEmpty()) return new byte[0];
 
-        val digits = new int[value.length()];
+        var digits = new int[value.length()];
         var digitpos = 0;
         for (var i = 0; i < value.length(); i++) {
             var b = (int) this.bytes[value.charAt(i)];
@@ -76,7 +73,7 @@ public final class BaseX {
             if (value.charAt(k) != this.leader) break;
             digits[++digitpos] = 0;
         }
-        val result = new byte[digitpos + 1];
+        var result = new byte[digitpos + 1];
         for (var i = digitpos; i >= 0; i--) {
             result[digitpos - i] = (byte) digits[i];
         }

@@ -4,8 +4,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
-import lombok.val;
-import lombok.var;
 import org.joor.ReflectException;
 import org.junit.jupiter.api.Test;
 
@@ -23,47 +21,47 @@ public class ModuleeTest {
 
     @Test
     public void testCombine() {
-        val moduleA = new AbstractModule() {
+        var moduleA = new AbstractModule() {
             @Override
             protected void configure() {
                 bind(TestService.class).annotatedWith(Names.named("A")).to(TestImplA.class);
             }
         };
-        val moduleB = new AbstractModule() {
+        var moduleB = new AbstractModule() {
             @Override
             protected void configure() {
                 bind(TestService.class).annotatedWith(Names.named("B")).to(TestImplB.class);
             }
         };
 
-        val injector = Guice.createInjector(Modulee.combine(moduleA, moduleB));
-        val implA = injector.getInstance(Key.get(TestService.class, Names.named("A")));
+        var injector = Guice.createInjector(Modulee.combine(moduleA, moduleB));
+        var implA = injector.getInstance(Key.get(TestService.class, Names.named("A")));
         assertEquals("AAA", implA.string());
-        val implB = injector.getInstance(Key.get(TestService.class, Names.named("B")));
+        var implB = injector.getInstance(Key.get(TestService.class, Names.named("B")));
         assertEquals("BBB", implB.string());
     }
 
     @Test
     public void testOverride() {
-        val moduleA = new AbstractModule() {
+        var moduleA = new AbstractModule() {
             @Override
             protected void configure() {
                 bind(TestService.class).to(TestImplA.class);
             }
         };
-        val moduleB = new AbstractModule() {
+        var moduleB = new AbstractModule() {
             @Override
             protected void configure() {
                 bind(TestService.class).to(TestImplB.class);
             }
         };
-        val moduleC = new AbstractModule() {
+        var moduleC = new AbstractModule() {
             @Override
             protected void configure() {
                 bind(TestService.class).to(TestImplC.class);
             }
         };
-        val moduleD = new AbstractModule() {
+        var moduleD = new AbstractModule() {
             @Override
             protected void configure() {
                 bind(TestService.class).to(TestImplD.class);

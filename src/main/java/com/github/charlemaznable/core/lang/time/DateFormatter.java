@@ -2,7 +2,6 @@ package com.github.charlemaznable.core.lang.time;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import lombok.SneakyThrows;
-import lombok.val;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,7 +18,7 @@ public final class DateFormatter {
     }
 
     public String transToFormat(String dateString, String toPattern) {
-        val parsed = parse(dateString);
+        var parsed = parse(dateString);
         if (isNull(parsed)) return null;
         return new SimpleDateFormat(toPattern).format(parse(dateString));
     }

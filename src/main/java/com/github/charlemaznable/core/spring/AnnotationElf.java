@@ -1,7 +1,5 @@
 package com.github.charlemaznable.core.spring;
 
-import lombok.val;
-
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
 
@@ -15,7 +13,7 @@ public final class AnnotationElf {
     }
 
     public static Class<? extends Annotation> resolveContainerAnnotationType(Class<? extends Annotation> annotationType) {
-        val repeatable = getAnnotation(annotationType, Repeatable.class);
+        var repeatable = getAnnotation(annotationType, Repeatable.class);
         return nonNull(repeatable) ? repeatable.value() : null;
     }
 }

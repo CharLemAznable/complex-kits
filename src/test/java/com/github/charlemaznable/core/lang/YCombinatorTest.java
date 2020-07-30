@@ -1,7 +1,6 @@
 package com.github.charlemaznable.core.lang;
 
 import com.github.charlemaznable.core.lang.YCombinator.CacheableUnaryOperator;
-import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -15,7 +14,7 @@ public class YCombinatorTest {
     @Test
     public void testYCombinator() {
         List<Integer> facOrder = newArrayList();
-        val fac = YCombinator.<Integer, Integer>of(
+        var fac = YCombinator.<Integer, Integer>of(
                 recFunc -> n -> {
                     facOrder.add(n);
                     return n < 2 ? 1 : (n * recFunc.apply(n - 1));
@@ -28,7 +27,7 @@ public class YCombinatorTest {
         assertEquals(10, facOrder.size());
 
         List<Integer> fibOrder = newArrayList();
-        val fib = YCombinator.<Integer, Integer>of(
+        var fib = YCombinator.<Integer, Integer>of(
                 recFunc -> n -> {
                     fibOrder.add(n);
                     return n <= 2 ? 1 : (recFunc.apply(n - 1) + recFunc.apply(n - 2));
@@ -44,7 +43,7 @@ public class YCombinatorTest {
     @Test
     public void testYCombinatorCache() {
         List<Integer> facOrder = newArrayList();
-        val fac = YCombinator.of(new CacheableUnaryOperator<Integer, Integer>() {
+        var fac = YCombinator.of(new CacheableUnaryOperator<Integer, Integer>() {
             @Override
             public Function<Integer, Integer> apply(Function<Integer, Integer> recFunc) {
                 return n -> {
@@ -61,7 +60,7 @@ public class YCombinatorTest {
         assertEquals(0, facOrder.size());
 
         List<Integer> fibOrder = newArrayList();
-        val fib = YCombinator.of(new CacheableUnaryOperator<Integer, Integer>() {
+        var fib = YCombinator.of(new CacheableUnaryOperator<Integer, Integer>() {
             @Override
             public Function<Integer, Integer> apply(Function<Integer, Integer> recFunc) {
                 return n -> {

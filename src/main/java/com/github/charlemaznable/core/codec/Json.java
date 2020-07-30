@@ -1,7 +1,5 @@
 package com.github.charlemaznable.core.codec;
 
-import lombok.val;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +86,7 @@ public final class Json {
     private static void flatMapping(String key, Map<String, Object> desc, Map<String, String> target) {
         if (isEmpty(desc)) return;
 
-        desc.forEach(new BiConsumer<String, Object>() {
+        desc.forEach(new BiConsumer<>() {
             @Override
             public void accept(String k, Object v) {
                 String mk = mappingKey(key, k);
@@ -96,7 +94,7 @@ public final class Json {
                     flatMapping(mk, (Map<String, Object>) v, target);
 
                 } else if (v instanceof Collection) {
-                    val collection = (Collection<Object>) v;
+                    var collection = (Collection<Object>) v;
                     forEach(collection, (index, item) -> accept(
                             mk + "[" + index + "]", item));
 

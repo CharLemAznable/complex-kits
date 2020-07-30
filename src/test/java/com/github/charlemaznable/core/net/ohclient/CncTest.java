@@ -10,7 +10,6 @@ import com.github.charlemaznable.core.net.ohclient.internal.OhDummy;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -59,38 +58,38 @@ public class CncTest {
                 onClass(OhDummy.class).field("ohMinerSubstitutor").get();
         ohMinerSubstitutor.setVariableResolver(
                 minerAsSubstitutor("Env", "ohclient").getStringLookup());
-        try (val mockWebServer = new MockWebServer()) {
+        try (var mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
-                    val testResponse = new TestResponse();
+                    var testResponse = new TestResponse();
                     testResponse.setContent(CONTENT);
                     return new MockResponse().setBody(json(testResponse));
                 }
             });
             mockWebServer.start(41200);
 
-            val client = ohLoader.getClient(CncClient.class);
+            var client = ohLoader.getClient(CncClient.class);
 
-            val response = client.sample1(new TestRequest());
+            var response = client.sample1(new TestRequest());
             assertEquals(CONTENT, response.getContent());
-            val nullResponse = client.sample1(null);
+            var nullResponse = client.sample1(null);
             assertTrue(nullResponse instanceof CncResponseImpl);
 
-            val futureResponse = client.sample2(new TestRequest());
+            var futureResponse = client.sample2(new TestRequest());
             await().forever().pollDelay(Duration.ofMillis(100)).until(futureResponse::isDone);
             assertEquals(CONTENT, futureResponse.get().getContent());
 
-            val pair = client.sample3(new TestRequest());
+            var pair = client.sample3(new TestRequest());
             assertEquals(HttpStatus.OK, pair.getLeft());
             assertEquals(CONTENT, pair.getRight().getContent());
 
-            val futurePair = client.sample4(new TestRequest());
+            var futurePair = client.sample4(new TestRequest());
             await().forever().pollDelay(Duration.ofMillis(100)).until(futurePair::isDone);
             assertEquals(HttpStatus.OK, futurePair.get().getLeft());
             assertEquals(CONTENT, futurePair.get().getRight().getContent());
 
-            val errorClient = ohLoader.getClient(CncErrorClient.class);
+            var errorClient = ohLoader.getClient(CncErrorClient.class);
 
             assertThrows(OhException.class, errorClient::sample1);
             assertThrows(OhException.class, () -> errorClient.sample2(null));

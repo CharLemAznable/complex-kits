@@ -1,7 +1,6 @@
 package com.github.charlemaznable.core.spring;
 
 import lombok.NoArgsConstructor;
-import lombok.val;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanNameGenerator;
@@ -33,7 +32,7 @@ public class SpringContextRegistrar implements ImportBeanDefinitionRegistrar, Re
     @Override
     public final void registerBeanDefinitions(@Nonnull AnnotationMetadata importingClassMetadata,
                                               @Nonnull BeanDefinitionRegistry registry) {
-        val scanner = new ComplexScanner(registry);
+        var scanner = new ComplexScanner(registry);
         // this check is needed in Spring 3.1
         if (nonNull(resourceLoader)) scanner.setResourceLoader(resourceLoader);
         scanner.setBeanNameGenerator(new ComplexBeanNameGenerator());
@@ -58,9 +57,9 @@ public class SpringContextRegistrar implements ImportBeanDefinitionRegistrar, Re
         @Nonnull
         @Override
         public Set<BeanDefinitionHolder> doScan(String... basePackages) {
-            val beanDefinitions = super.doScan(basePackages);
-            for (val holder : beanDefinitions) {
-                val definition = (GenericBeanDefinition) holder.getBeanDefinition();
+            var beanDefinitions = super.doScan(basePackages);
+            for (var holder : beanDefinitions) {
+                var definition = (GenericBeanDefinition) holder.getBeanDefinition();
                 definition.getPropertyValues().add("xyzInterface", definition.getBeanClassName());
                 definition.setBeanClass(ComplexFactoryBean.class);
             }

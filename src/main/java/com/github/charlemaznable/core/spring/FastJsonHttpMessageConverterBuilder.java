@@ -8,7 +8,6 @@ import com.alibaba.fastjson.serializer.SerializeFilter;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
-import lombok.val;
 import org.springframework.http.MediaType;
 
 import java.nio.charset.Charset;
@@ -76,7 +75,7 @@ public final class FastJsonHttpMessageConverterBuilder {
     }
 
     public FastJsonHttpMessageConverter build(MediaType... mediaTypes) {
-        val fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();
+        var fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();
         fastJsonHttpMessageConverter.setFastJsonConfig(fastJsonConfig);
         fastJsonHttpMessageConverter.setSupportedMediaTypes(newArrayList(mediaTypes));
         return fastJsonHttpMessageConverter;

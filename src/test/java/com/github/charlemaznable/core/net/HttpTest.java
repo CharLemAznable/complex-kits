@@ -3,8 +3,6 @@ package com.github.charlemaznable.core.net;
 import com.github.charlemaznable.core.net.httptest.HttpTestConfiguration;
 import com.github.charlemaznable.core.net.httptest.HttpTestController;
 import lombok.SneakyThrows;
-import lombok.val;
-import lombok.var;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -44,19 +42,19 @@ public class HttpTest {
     @SneakyThrows
     @Test
     public void testResponse() {
-        val responseJson = mockMvc.perform(get("/json"))
+        var responseJson = mockMvc.perform(get("/json"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         assertEquals("json", responseJson.getContentAsString());
         assertEquals("application/json; charset=UTF-8", responseJson.getContentType());
 
-        val responseText = mockMvc.perform(get("/text"))
+        var responseText = mockMvc.perform(get("/text"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         assertEquals("text", responseText.getContentAsString());
         assertEquals("text/plain; charset=UTF-8", responseText.getContentType());
 
-        val responseHtml = mockMvc.perform(get("/html"))
+        var responseHtml = mockMvc.perform(get("/html"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         assertEquals("html", responseHtml.getContentAsString());
@@ -66,25 +64,25 @@ public class HttpTest {
     @SneakyThrows
     @Test
     public void testResponseError() {
-        val responseJson = mockMvc.perform(get("/json-error"))
+        var responseJson = mockMvc.perform(get("/json-error"))
                 .andExpect(status().isNotFound())
                 .andReturn().getResponse();
         assertEquals("json", responseJson.getContentAsString());
         assertEquals("application/json; charset=UTF-8", responseJson.getContentType());
 
-        val responseText = mockMvc.perform(get("/text-error"))
+        var responseText = mockMvc.perform(get("/text-error"))
                 .andExpect(status().isNotFound())
                 .andReturn().getResponse();
         assertEquals("text", responseText.getContentAsString());
         assertEquals("text/plain; charset=UTF-8", responseText.getContentType());
 
-        val responseHtml = mockMvc.perform(get("/html-error"))
+        var responseHtml = mockMvc.perform(get("/html-error"))
                 .andExpect(status().isNotFound())
                 .andReturn().getResponse();
         assertEquals("html", responseHtml.getContentAsString());
         assertEquals("text/html; charset=UTF-8", responseHtml.getContentType());
 
-        val responseHttpStatus = mockMvc.perform(get("/http-status-error"))
+        var responseHttpStatus = mockMvc.perform(get("/http-status-error"))
                 .andExpect(status().isNotFound())
                 .andReturn().getResponse();
         assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), responseHttpStatus.getContentAsString());
@@ -94,14 +92,14 @@ public class HttpTest {
     @SneakyThrows
     @Test
     public void testParameter() {
-        val response = mockMvc.perform(get("/parameter")
+        var response = mockMvc.perform(get("/parameter")
                 .param("AAA", "aaa")
                 .param("BBB", "bbb"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         assertEquals("OK", response.getContentAsString());
 
-        val response2 = mockMvc.perform(get("/deal-parameter")
+        var response2 = mockMvc.perform(get("/deal-parameter")
                 .param("AAA", "aaa")
                 .param("BBB", "bbb", "bbb"))
                 .andExpect(status().isOk())
@@ -112,7 +110,7 @@ public class HttpTest {
     @SneakyThrows
     @Test
     public void testPathVariable() {
-        val response = mockMvc.perform(get("/path-variable/aaa/bbb"))
+        var response = mockMvc.perform(get("/path-variable/aaa/bbb"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         assertEquals("OK", response.getContentAsString());
@@ -121,7 +119,7 @@ public class HttpTest {
     @SneakyThrows
     @Test
     public void testHeader() {
-        val response = mockMvc.perform(get("/header")
+        var response = mockMvc.perform(get("/header")
                 .header("AAA", "aaa")
                 .header("BBB", "bbb"))
                 .andExpect(status().isOk())
@@ -132,7 +130,7 @@ public class HttpTest {
     @SneakyThrows
     @Test
     public void testCookie() {
-        val response = mockMvc.perform(get("/cookie")
+        var response = mockMvc.perform(get("/cookie")
                 .cookie(new Cookie("AAA", "aaa"))
                 .cookie(new Cookie("BBB", "bbb")))
                 .andExpect(status().isOk())
@@ -174,7 +172,7 @@ public class HttpTest {
     @Test
     public void testBody() {
         byte[] content = bytes("The quick brown fox jumps over the lazy dog.");
-        val response = mockMvc.perform(post("/body")
+        var response = mockMvc.perform(post("/body")
                 .content(content))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
@@ -184,7 +182,7 @@ public class HttpTest {
     @SneakyThrows
     @Test
     public void testAjax() {
-        val response = mockMvc.perform(post("/ajax")
+        var response = mockMvc.perform(post("/ajax")
                 .header("X-Requested-With", "XMLHttpRequest"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();

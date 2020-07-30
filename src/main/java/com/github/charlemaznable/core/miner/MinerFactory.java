@@ -14,8 +14,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.primitives.Primitives;
 import lombok.NoArgsConstructor;
-import lombok.val;
-import lombok.var;
 import net.jodah.expiringmap.ExpiringMap;
 import net.jodah.expiringmap.ExpiringValue;
 import net.sf.cglib.proxy.Callback;
@@ -104,7 +102,7 @@ public final class MinerFactory {
             ensureClassIsAnInterface(minerClass);
             checkClassConfig(minerClass);
 
-            val minerProxy = new MinerProxy(minerClass, factory, this);
+            var minerProxy = new MinerProxy(minerClass, factory, this);
             return EasyEnhancer.create(MinerDummy.class,
                     new Class[]{minerClass, Minerable.class},
                     method -> {
@@ -124,23 +122,23 @@ public final class MinerFactory {
         }
 
         private <T> ExpiringValue<Minerable> loadMinerable(Class<T> clazz) {
-            val minerConfig = checkClassConfig(clazz);
-            val group = checkMinerGroup(clazz, minerConfig);
-            val minerable = new Miner(blankThen(group, () -> "DEFAULT_GROUP"));
-            val dataId = checkMinerDataId(clazz, minerConfig);
-            val value = isNotBlank(dataId) ? minerable.getMiner(dataId) : minerable;
-            val cacheSeconds = Math.max(0, minerConfig.cacheSeconds());
+            var minerConfig = checkClassConfig(clazz);
+            var group = checkMinerGroup(clazz, minerConfig);
+            var minerable = new Miner(blankThen(group, () -> "DEFAULT_GROUP"));
+            var dataId = checkMinerDataId(clazz, minerConfig);
+            var value = isNotBlank(dataId) ? minerable.getMiner(dataId) : minerable;
+            var cacheSeconds = Math.max(0, minerConfig.cacheSeconds());
             return new ExpiringValue(value, cacheSeconds, TimeUnit.SECONDS);
         }
 
         private <T> String checkMinerGroup(Class<T> clazz, MinerConfig minerConfig) {
-            val providerClass = minerConfig.groupProvider();
+            var providerClass = minerConfig.groupProvider();
             return substitute(GroupProvider.class == providerClass ? minerConfig.group()
                     : FactoryContext.apply(factory, providerClass, p -> p.group(clazz)));
         }
 
         private <T> String checkMinerDataId(Class<T> clazz, MinerConfig minerConfig) {
-            val providerClass = minerConfig.dataIdProvider();
+            var providerClass = minerConfig.dataIdProvider();
             return substitute(DataIdProvider.class == providerClass ? minerConfig.dataId()
                     : FactoryContext.apply(factory, providerClass, p -> p.dataId(clazz)));
         }
@@ -171,9 +169,9 @@ public final class MinerFactory {
                 return method.invoke(minerLoader.getMinerable(minerClass), args);
             }
 
-            val cacheStone = stoneCache.get(method);
-            val stone = cacheStone.getLeft();
-            val defaultValue = cacheStone.getRight();
+            var cacheStone = stoneCache.get(method);
+            var stone = cacheStone.getLeft();
+            var defaultValue = cacheStone.getRight();
             var defaultArgument = args.length > 0 ? args[0] : null;
 
             if (nonNull(stone)) return convertType(stone, method);
@@ -184,34 +182,34 @@ public final class MinerFactory {
 
         @SuppressWarnings("unchecked")
         private ExpiringValue<Pair<String, String>> loadStone(Method method) {
-            val minerConfig = findAnnotation(method, MinerConfig.class);
-            val group = checkMinerGroup(method, minerConfig);
-            val dataId = checkMinerDataId(method, minerConfig);
+            var minerConfig = findAnnotation(method, MinerConfig.class);
+            var group = checkMinerGroup(method, minerConfig);
+            var dataId = checkMinerDataId(method, minerConfig);
             var defaultValue = checkMinerDefaultValue(method, minerConfig);
-            val minerable = minerLoader.getMinerable(minerClass);
-            val stone = minerable.getStone(group, blankThen(dataId, method::getName));
-            val cacheSeconds = checkMinerCacheSeconds(minerConfig);
+            var minerable = minerLoader.getMinerable(minerClass);
+            var stone = minerable.getStone(group, blankThen(dataId, method::getName));
+            var cacheSeconds = checkMinerCacheSeconds(minerConfig);
             return new ExpiringValue(Pair.of(stone, defaultValue), cacheSeconds, TimeUnit.SECONDS);
         }
 
         private String checkMinerGroup(Method method, MinerConfig minerConfig) {
             if (isNull(minerConfig)) return "";
-            val providerClass = minerConfig.groupProvider();
+            var providerClass = minerConfig.groupProvider();
             return substitute(GroupProvider.class == providerClass ? minerConfig.group()
                     : FactoryContext.apply(factory, providerClass, p -> p.group(minerClass, method)));
         }
 
         private String checkMinerDataId(Method method, MinerConfig minerConfig) {
             if (isNull(minerConfig)) return "";
-            val providerClass = minerConfig.dataIdProvider();
+            var providerClass = minerConfig.dataIdProvider();
             return substitute(DataIdProvider.class == providerClass ? minerConfig.dataId()
                     : FactoryContext.apply(factory, providerClass, p -> p.dataId(minerClass, method)));
         }
 
         private String checkMinerDefaultValue(Method method, MinerConfig minerConfig) {
             if (isNull(minerConfig)) return null;
-            val providerClass = minerConfig.defaultValueProvider();
-            String defaultValue = DefaultValueProvider.class == providerClass ? minerConfig.defaultValue()
+            var providerClass = minerConfig.defaultValueProvider();
+            var defaultValue = DefaultValueProvider.class == providerClass ? minerConfig.defaultValue()
                     : FactoryContext.apply(factory, providerClass, p -> p.defaultValue(minerClass, method));
             return substitute(blankThen(defaultValue, () -> null));
         }
@@ -229,8 +227,8 @@ public final class MinerFactory {
             if (Properties.class.isAssignableFrom(rt))
                 return parseProperties(value);
 
-            val grt = method.getGenericReturnType();
-            val isCollection = grt instanceof ParameterizedType
+            var grt = method.getGenericReturnType();
+            var isCollection = grt instanceof ParameterizedType
                     && Collection.class.isAssignableFrom(rt);
             if (!isCollection) return parseObject(rt, value);
 

@@ -3,7 +3,6 @@ package com.github.charlemaznable.core.spring;
 import lombok.AllArgsConstructor;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
-import lombok.val;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
@@ -39,9 +38,9 @@ public final class MutableHttpServletRequest extends HttpServletRequestWrapper {
 
         this.params = newHashMap(request.getParameterMap());
 
-        @Cleanup val bufferedReader = new BufferedReader(
+        @Cleanup var bufferedReader = new BufferedReader(
                 new InputStreamReader(request.getInputStream(), charset));
-        val stringBuilder = new StringBuilder();
+        var stringBuilder = new StringBuilder();
         String line;
         while (nonNull(line = bufferedReader.readLine())) {
             stringBuilder.append(line);
@@ -52,7 +51,7 @@ public final class MutableHttpServletRequest extends HttpServletRequestWrapper {
 
     @Override
     public String getParameter(String name) {
-        val values = this.params.get(name);
+        var values = this.params.get(name);
         if (isNull(values) || values.length == 0) {
             return null;
         }
@@ -65,7 +64,7 @@ public final class MutableHttpServletRequest extends HttpServletRequestWrapper {
     }
 
     public void setParameterMap(Map<String, Object> params) {
-        for (val param : params.entrySet()) {
+        for (var param : params.entrySet()) {
             setParameter(param.getKey(), param.getValue());
         }
     }
@@ -94,7 +93,7 @@ public final class MutableHttpServletRequest extends HttpServletRequestWrapper {
 
     @Override
     public ServletInputStream getInputStream() {
-        val contentBytes = bytes(this.content, this.charset);
+        var contentBytes = bytes(this.content, this.charset);
         if (isNull(contentBytes)) return null;
         return new MutableServletInputStream(
                 new ByteArrayInputStream(contentBytes));
@@ -102,7 +101,7 @@ public final class MutableHttpServletRequest extends HttpServletRequestWrapper {
 
     @Override
     public BufferedReader getReader() {
-        val inputStream = this.getInputStream();
+        var inputStream = this.getInputStream();
         if (isNull(inputStream)) return null;
         return new BufferedReader(new InputStreamReader(inputStream));
     }
