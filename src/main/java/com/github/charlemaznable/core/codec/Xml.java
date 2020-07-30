@@ -264,25 +264,12 @@ public final class Xml {
     @Getter
     public static final class XmlParseFeature {
 
-        private static final String DISALLOW_DOCTYPE_DECL_NAME
-                = "http://apache.org/xml/features/disallow-doctype-decl";
-        private static final String LOAD_EXTERNAL_DTD_NAME
-                = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
-        private static final String EXTERNAL_GENERAL_ENTITIES_NAME
-                = "http://xml.org/sax/features/external-general-entities";
-        private static final String EXTERNAL_PARAMETER_ENTITIES_NAME
-                = "http://xml.org/sax/features/external-parameter-entities";
-        private boolean disallowDoctypeDecl = true;
-        private boolean loadExternalDTD = false;
-        private boolean externalGeneralEntities = false;
-        private boolean externalParameterEntities = false;
-
         public void setSAXReaderFeatures(SAXReader reader) {
             try {
-                reader.setFeature(DISALLOW_DOCTYPE_DECL_NAME, disallowDoctypeDecl);
-                reader.setFeature(LOAD_EXTERNAL_DTD_NAME, loadExternalDTD);
-                reader.setFeature(EXTERNAL_GENERAL_ENTITIES_NAME, externalGeneralEntities);
-                reader.setFeature(EXTERNAL_PARAMETER_ENTITIES_NAME, externalParameterEntities);
+                reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+                reader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+                reader.setFeature("http://xml.org/sax/features/external-general-entities", false);
+                reader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
             } catch (SAXException ignored) {
                 // ignored
             }
