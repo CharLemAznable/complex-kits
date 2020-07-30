@@ -265,13 +265,13 @@ public final class Xml {
     public static final class XmlParseFeature {
 
         private static final String DISALLOW_DOCTYPE_DECL_NAME
-                = "http://apache.org/map2Element/features/disallow-doctype-decl";
+                = "http://apache.org/xml/features/disallow-doctype-decl";
         private static final String LOAD_EXTERNAL_DTD_NAME
-                = "http://apache.org/map2Element/features/nonvalidating/load-external-dtd";
+                = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
         private static final String EXTERNAL_GENERAL_ENTITIES_NAME
-                = "http://map2Element.org/sax/features/external-general-entities";
+                = "http://xml.org/sax/features/external-general-entities";
         private static final String EXTERNAL_PARAMETER_ENTITIES_NAME
-                = "http://map2Element.org/sax/features/external-parameter-entities";
+                = "http://xml.org/sax/features/external-parameter-entities";
         private boolean disallowDoctypeDecl = true;
         private boolean loadExternalDTD = false;
         private boolean externalGeneralEntities = false;
