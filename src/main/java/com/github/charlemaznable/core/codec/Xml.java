@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.codec;
 
-import lombok.Getter;
 import lombok.SneakyThrows;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -8,7 +7,6 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -52,19 +50,11 @@ public final class Xml {
     }
 
     public static Map<String, Object> unXml(String text) {
-        return unXml(text, new XmlParseFeature(), false);
-    }
-
-    public static Map<String, Object> unXml(String text, XmlParseFeature feature) {
-        return unXml(text, feature, false);
+        return unXml(text, false);
     }
 
     public static Map<String, Object> unXml(String text, boolean rootAsTop) {
-        return unXml(text, new XmlParseFeature(), rootAsTop);
-    }
-
-    public static Map<String, Object> unXml(String text, XmlParseFeature feature, boolean rootAsTop) {
-        var document = XmlString2Map.xmlString2Document(text, feature);
+        var document = XmlString2Map.xmlString2Document(text);
         var rootElement = document.getRootElement();
         if (rootElement.elements().isEmpty() &&
                 rootElement.attributes().isEmpty())
@@ -76,9 +66,14 @@ public final class Xml {
     private static final class XmlString2Map {
 
         @SneakyThrows
-        public static Document xmlString2Document(String text, XmlParseFeature feature) {
+        public static Document xmlString2Document(String text) {
             var reader = new SAXReader();
-            feature.setSAXReaderFeatures(reader);
+
+            reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            reader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            reader.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            reader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+
             var encoding = getEncoding(text);
             var source = new InputSource(new StringReader(text));
             source.setEncoding(encoding);
@@ -259,20 +254,5 @@ public final class Xml {
             }
         }
 
-    }
-
-    @Getter
-    public static final class XmlParseFeature {
-
-        public void setSAXReaderFeatures(SAXReader reader) {
-            try {
-                reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-                reader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-                reader.setFeature("http://xml.org/sax/features/external-general-entities", false);
-                reader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            } catch (SAXException ignored) {
-                // ignored
-            }
-        }
     }
 }

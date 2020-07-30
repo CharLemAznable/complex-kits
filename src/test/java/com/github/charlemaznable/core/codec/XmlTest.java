@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.codec;
 
-import com.github.charlemaznable.core.codec.Xml.XmlParseFeature;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -51,7 +50,7 @@ public class XmlTest {
         assertEquals(rootXml, xml(newHashMap(), "root"));
         assertEquals(k12xml, xml(of("k1", "k2"), true));
 
-        assertEquals(newHashMap(), unXml(rootXml, new XmlParseFeature()));
+        assertEquals(newHashMap(), unXml(rootXml));
         assertEquals(of("xml", of("k1", "k2")), unXml(k12xml, true));
     }
 
