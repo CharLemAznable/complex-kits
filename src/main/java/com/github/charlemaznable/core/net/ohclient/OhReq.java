@@ -17,9 +17,17 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import okhttp3.logging.HttpLoggingInterceptor.Level;
 
 import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509ExtendedTrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.net.Proxy;
+import java.net.Socket;
+import java.security.KeyStore;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -147,8 +155,9 @@ public class OhReq extends CommonReq<OhReq> {
     @SuppressWarnings("deprecation")
     public OkHttpClient buildHttpClient() {
         var httpClientBuilder = new OkHttpClient.Builder().proxy(this.clientProxy);
-        notNullThen(this.sslSocketFactory, xx -> notNullThen(this.x509TrustManager, yy ->
-                httpClientBuilder.sslSocketFactory(this.sslSocketFactory, this.x509TrustManager)));
+        notNullThen(this.sslSocketFactory, xx -> checkNull(this.x509TrustManager,
+                () -> httpClientBuilder.sslSocketFactory(this.sslSocketFactory, defaultTrustManager()),
+                yy -> httpClientBuilder.sslSocketFactory(this.sslSocketFactory, this.x509TrustManager)));
         notNullThen(this.hostnameVerifier, httpClientBuilder::hostnameVerifier);
         httpClientBuilder.connectionPool(nullThen(this.connectionPool, () -> globalConnectionPool));
         httpClientBuilder.callTimeout(this.callTimeout, TimeUnit.MILLISECONDS);
@@ -158,6 +167,24 @@ public class OhReq extends CommonReq<OhReq> {
         this.interceptors.forEach(httpClientBuilder::addInterceptor);
         httpClientBuilder.addInterceptor(this.loggingInterceptor);
         return httpClientBuilder.build();
+    }
+
+    private X509TrustManager defaultTrustManager() {
+        var trustManagers = new TrustManager[0];
+        try {
+            var trustManagerFactory = TrustManagerFactory
+                    .getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            trustManagerFactory.init((KeyStore) null);
+            trustManagers = trustManagerFactory.getTrustManagers();
+        } catch (Exception ignored) {
+            // ignored
+        }
+        for (TrustManager trustManager : trustManagers) {
+            if (trustManager instanceof X509TrustManager) {
+                return (X509TrustManager) trustManager;
+            }
+        }
+        return DummyX509TrustManager.INSTANCE;
     }
 
     private Request buildGetRequest() {
@@ -212,5 +239,42 @@ public class OhReq extends CommonReq<OhReq> {
                 HttpStatus.Series.valueOf(statusCode)), errorMapping);
 
         return notNullThen(responseBody, ResponseBodyExtractor::string);
+    }
+
+    private static class DummyX509TrustManager extends X509ExtendedTrustManager implements X509TrustManager {
+
+        private static final String EXCEPTION_MESSAGE = "No X509TrustManager implementation available";
+        private static final X509TrustManager INSTANCE = new DummyX509TrustManager();
+
+        private DummyX509TrustManager() {
+        }
+
+        public void checkClientTrusted(X509Certificate[] var1, String var2) throws CertificateException {
+            throw new CertificateException(EXCEPTION_MESSAGE);
+        }
+
+        public void checkServerTrusted(X509Certificate[] var1, String var2) throws CertificateException {
+            throw new CertificateException(EXCEPTION_MESSAGE);
+        }
+
+        public X509Certificate[] getAcceptedIssuers() {
+            return new X509Certificate[0];
+        }
+
+        public void checkClientTrusted(X509Certificate[] var1, String var2, Socket var3) throws CertificateException {
+            throw new CertificateException(EXCEPTION_MESSAGE);
+        }
+
+        public void checkServerTrusted(X509Certificate[] var1, String var2, Socket var3) throws CertificateException {
+            throw new CertificateException(EXCEPTION_MESSAGE);
+        }
+
+        public void checkClientTrusted(X509Certificate[] var1, String var2, SSLEngine var3) throws CertificateException {
+            throw new CertificateException(EXCEPTION_MESSAGE);
+        }
+
+        public void checkServerTrusted(X509Certificate[] var1, String var2, SSLEngine var3) throws CertificateException {
+            throw new CertificateException(EXCEPTION_MESSAGE);
+        }
     }
 }

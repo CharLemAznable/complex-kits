@@ -30,7 +30,6 @@ import java.security.cert.X509Certificate;
 import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
 import static org.joor.Reflect.on;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -45,7 +44,7 @@ public class SSLProviderTest {
         var httpClient = ohLoader.getClient(SSLDefHttpClient.class);
         var callback = on(httpClient).field("CGLIB$CALLBACK_0").get();
         OkHttpClient okHttpClient = on(callback).field("okHttpClient").get();
-        assertFalse(okHttpClient.sslSocketFactory() instanceof TestSSLSocketFactory);
+        assertTrue(okHttpClient.sslSocketFactory() instanceof TestSSLSocketFactory);
         assertTrue(okHttpClient.hostnameVerifier() instanceof TestHostnameVerifier);
     }
 
