@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.context;
 
+import lombok.val;
 import org.joor.ReflectException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,7 @@ public class FactoryContextTest {
                 TestInterface.class, Assertions::assertNull);
         assertSame(springFactory(), FactoryContext.get());
 
-        var desc = FactoryContext.apply(reflectFactory(),
+        val desc = FactoryContext.apply(reflectFactory(),
                 TestClass.class, TestClass::desc);
         assertEquals("TestClass", desc);
         assertSame(springFactory(), FactoryContext.get());

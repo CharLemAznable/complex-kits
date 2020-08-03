@@ -1,6 +1,7 @@
 package com.github.charlemaznable.core.crypto;
 
 import lombok.SneakyThrows;
+import lombok.val;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
@@ -22,16 +23,16 @@ public final class AES {
 
     @SneakyThrows
     public static byte[] encrypt(String value, Key key) {
-        var cipher = getInstance(CIPHER_ALGORITHM);
+        val cipher = getInstance(CIPHER_ALGORITHM);
         cipher.init(ENCRYPT_MODE, key);
         return cipher.doFinal(bytes(value));
     }
 
     @SneakyThrows
     public static String decrypt(byte[] value, Key key) {
-        var cipher = getInstance(CIPHER_ALGORITHM);
+        val cipher = getInstance(CIPHER_ALGORITHM);
         cipher.init(DECRYPT_MODE, key);
-        var decrypted = cipher.doFinal(value);
+        val decrypted = cipher.doFinal(value);
         return string(decrypted);
     }
 
@@ -57,15 +58,15 @@ public final class AES {
     }
 
     private static Key getKey(String keyString, int size) {
-        var keyBytes = new byte[size >> 3];
-        var srcBytes = bytes(keyString);
+        val keyBytes = new byte[size >> 3];
+        val srcBytes = bytes(keyString);
 
         if (srcBytes.length >= keyBytes.length) {
             arraycopy(srcBytes, 0, keyBytes, 0, keyBytes.length);
             return keyFromString(keyBytes);
         }
 
-        var pos = 0;
+        int pos = 0;
         while (pos + srcBytes.length < keyBytes.length) {
             arraycopy(srcBytes, 0, keyBytes, pos, srcBytes.length);
             pos += srcBytes.length;

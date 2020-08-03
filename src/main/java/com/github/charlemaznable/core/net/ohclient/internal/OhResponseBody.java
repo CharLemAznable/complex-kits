@@ -1,6 +1,7 @@
 package com.github.charlemaznable.core.net.ohclient.internal;
 
 import lombok.SneakyThrows;
+import lombok.val;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 import okio.Buffer;
@@ -20,7 +21,7 @@ public class OhResponseBody extends ResponseBody {
         this.contentType = responseBody.contentType();
         this.contentLength = responseBody.contentLength();
 
-        var source = responseBody.source();
+        val source = responseBody.source();
         source.request(Long.MAX_VALUE);
         this.buffer = source.getBuffer().clone();
     }

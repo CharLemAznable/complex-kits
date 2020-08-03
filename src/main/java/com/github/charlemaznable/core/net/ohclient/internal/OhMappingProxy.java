@@ -38,6 +38,7 @@ import com.github.charlemaznable.core.net.ohclient.annotation.ClientTimeout;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientTimeout.TimeoutProvider;
 import com.github.charlemaznable.core.net.ohclient.annotation.IsolatedConnectionPool;
 import lombok.SneakyThrows;
+import lombok.val;
 import okhttp3.ConnectionPool;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -107,7 +108,7 @@ public final class OhMappingProxy extends OhRoot {
 
         this.clientProxy = Elf.checkClientProxy(
                 this.ohClass, this.ohMethod, this.factory, proxy);
-        var clientSSL = Elf.checkClientSSL(this.ohMethod);
+        val clientSSL = Elf.checkClientSSL(this.ohMethod);
         if (nonNull(clientSSL)) {
             this.sslSocketFactory = Elf.checkSSLSocketFactory(
                     this.ohClass, this.ohMethod, this.factory, clientSSL);
@@ -121,7 +122,7 @@ public final class OhMappingProxy extends OhRoot {
             this.hostnameVerifier = proxy.hostnameVerifier;
         }
         this.connectionPool = Elf.checkConnectionPool(this.ohMethod, proxy);
-        var clientTimeout = Elf.checkClientTimeout(this.ohMethod);
+        val clientTimeout = Elf.checkClientTimeout(this.ohMethod);
         if (nonNull(clientTimeout)) {
             this.callTimeout = Elf.checkCallTimeout(
                     this.ohClass, this.ohMethod, this.factory, clientTimeout);
@@ -174,14 +175,14 @@ public final class OhMappingProxy extends OhRoot {
 
     @SuppressWarnings("unchecked")
     private void processReturnType(Method method) {
-        var returnType = method.getReturnType();
+        Class<?> returnType = method.getReturnType();
         this.returnFuture = Future.class == returnType;
         this.returnCollection = Collection.class.isAssignableFrom(returnType);
         this.returnMap = Map.class.isAssignableFrom(returnType);
         this.returnPair = Pair.class.isAssignableFrom(returnType);
         this.returnTriple = Triple.class.isAssignableFrom(returnType);
 
-        var genericReturnType = method.getGenericReturnType();
+        val genericReturnType = method.getGenericReturnType();
         if (!(genericReturnType instanceof ParameterizedType)) {
             // 错误的泛型时
             if (this.returnFuture || this.returnCollection ||
@@ -205,10 +206,10 @@ public final class OhMappingProxy extends OhRoot {
 
         // 方法返回泛型时
         ParameterizedType parameterizedType = (ParameterizedType) genericReturnType;
-        var actualTypeArguments = parameterizedType.getActualTypeArguments();
+        Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
         if (this.returnFuture) {
             // 返回Future类型, 则多处理一层泛型
-            var futureTypeArgument = actualTypeArguments[0];
+            val futureTypeArgument = actualTypeArguments[0];
             if (!(futureTypeArgument instanceof ParameterizedType)) {
                 if (futureTypeArgument instanceof TypeVariable) {
                     checkTypeVariableBounds(futureTypeArgument);
@@ -238,7 +239,7 @@ public final class OhMappingProxy extends OhRoot {
 
     private List<Class> processActualTypeArguments(Type[] actualTypeArguments) {
         List<Class> result = newArrayList();
-        for (var actualTypeArgument : actualTypeArguments) {
+        for (Type actualTypeArgument : actualTypeArguments) {
             if (actualTypeArgument instanceof TypeVariable) {
                 checkTypeVariableBounds(actualTypeArgument);
                 result.add(CncResponse.class);
@@ -250,7 +251,7 @@ public final class OhMappingProxy extends OhRoot {
     }
 
     private void checkTypeVariableBounds(Type type) {
-        var bounds = ((TypeVariable) type).getBounds();
+        val bounds = ((TypeVariable) type).getBounds();
         if (bounds.length != 1 || !CncResponse.class
                 .isAssignableFrom((Class) bounds[0])) {
             throw new OhException(RETURN_GENERIC_ERROR);
@@ -259,22 +260,22 @@ public final class OhMappingProxy extends OhRoot {
 
     @SneakyThrows
     private Object internalExecute(Object[] args) {
-        var ohCall = new OhCall(this, args);
-        var response = ohCall.execute();
+        val ohCall = new OhCall(this, args);
+        val response = ohCall.execute();
 
-        var statusCode = response.code();
-        var responseBody = notNullThen(response.body(), OhResponseBody::new);
+        val statusCode = response.code();
+        val responseBody = notNullThen(response.body(), OhResponseBody::new);
 
-        var errorMapping = new StatusErrorFunction(statusCode, responseBody);
+        val errorMapping = new StatusErrorFunction(statusCode, responseBody);
         notNullThen(this.statusErrorMapping.get(
                 HttpStatus.valueOf(statusCode)), errorMapping);
         notNullThen(this.statusSeriesErrorMapping.get(
                 HttpStatus.Series.valueOf(statusCode)), errorMapping);
 
-        var responseObjs = processResponseBody(
+        val responseObjs = processResponseBody(
                 statusCode, responseBody, ohCall.responseClass);
         if (this.returnCollection) {
-            var responseObj = responseObjs.get(0);
+            val responseObj = responseObjs.get(0);
             if (responseObj instanceof Collection) {
                 return newArrayList((Collection) responseObj);
             } else {
@@ -282,7 +283,7 @@ public final class OhMappingProxy extends OhRoot {
             }
 
         } else if (this.returnMap) {
-            var responseObj = responseObjs.get(0);
+            val responseObj = responseObjs.get(0);
             if (responseObj instanceof Map) {
                 return newHashMap((Map) responseObj);
             } else {
@@ -306,7 +307,7 @@ public final class OhMappingProxy extends OhRoot {
                                              ResponseBody responseBody,
                                              Class responseClass) {
         List<Object> returnValues = newArrayList();
-        for (var returnType : this.returnTypes) {
+        for (val returnType : this.returnTypes) {
             returnValues.add(processReturnTypeValue(statusCode, responseBody,
                     CncResponse.class == returnType ? responseClass : returnType));
         }
@@ -372,9 +373,9 @@ public final class OhMappingProxy extends OhRoot {
 
         static String checkRequestUrl(Class clazz, Method method,
                                       Factory factory, OhProxy proxy) {
-            var mapping = findAnnotation(method, Mapping.class);
-            var url = checkNull(mapping, () -> "/" + method.getName(), annotation -> {
-                var providerClass = annotation.urlProvider();
+            val mapping = findAnnotation(method, Mapping.class);
+            val url = checkNull(mapping, () -> "/" + method.getName(), annotation -> {
+                val providerClass = annotation.urlProvider();
                 return substitute(UrlProvider.class == providerClass ? annotation.value()
                         : FactoryContext.apply(factory, providerClass, p -> p.url(clazz, method)));
             });
@@ -385,9 +386,9 @@ public final class OhMappingProxy extends OhRoot {
 
         static Proxy checkClientProxy(Class clazz, Method method,
                                       Factory factory, OhProxy proxy) {
-            var clientProxy = findAnnotation(method, ClientProxy.class);
+            val clientProxy = findAnnotation(method, ClientProxy.class);
             return checkNull(clientProxy, () -> proxy.clientProxy, annotation -> {
-                var providerClass = annotation.proxyProvider();
+                val providerClass = annotation.proxyProvider();
                 if (ProxyProvider.class == providerClass) {
                     return checkBlank(annotation.host(), () -> null,
                             xx -> new Proxy(annotation.type(), new InetSocketAddress(
@@ -403,9 +404,9 @@ public final class OhMappingProxy extends OhRoot {
 
         static SSLSocketFactory checkSSLSocketFactory(Class clazz, Method method,
                                                       Factory factory, ClientSSL clientSSL) {
-            var providerClass = clientSSL.sslSocketFactoryProvider();
+            val providerClass = clientSSL.sslSocketFactoryProvider();
             if (SSLSocketFactoryProvider.class == providerClass) {
-                var factoryClass = clientSSL.sslSocketFactory();
+                val factoryClass = clientSSL.sslSocketFactory();
                 return SSLSocketFactory.class == factoryClass ? null
                         : FactoryContext.build(factory, factoryClass);
             }
@@ -415,9 +416,9 @@ public final class OhMappingProxy extends OhRoot {
 
         static X509TrustManager checkX509TrustManager(Class clazz, Method method,
                                                       Factory factory, ClientSSL clientSSL) {
-            var providerClass = clientSSL.x509TrustManagerProvider();
+            val providerClass = clientSSL.x509TrustManagerProvider();
             if (X509TrustManagerProvider.class == providerClass) {
-                var managerClass = clientSSL.x509TrustManager();
+                val managerClass = clientSSL.x509TrustManager();
                 return X509TrustManager.class == managerClass ? null
                         : FactoryContext.build(factory, managerClass);
             }
@@ -427,9 +428,9 @@ public final class OhMappingProxy extends OhRoot {
 
         static HostnameVerifier checkHostnameVerifier(Class clazz, Method method,
                                                       Factory factory, ClientSSL clientSSL) {
-            var providerClass = clientSSL.hostnameVerifierProvider();
+            val providerClass = clientSSL.hostnameVerifierProvider();
             if (HostnameVerifierProvider.class == providerClass) {
-                var verifierClass = clientSSL.hostnameVerifier();
+                val verifierClass = clientSSL.hostnameVerifier();
                 return HostnameVerifier.class == verifierClass ? null
                         : FactoryContext.build(factory, verifierClass);
             }
@@ -438,7 +439,7 @@ public final class OhMappingProxy extends OhRoot {
         }
 
         static ConnectionPool checkConnectionPool(Method method, OhProxy proxy) {
-            var isolated = findAnnotation(method, IsolatedConnectionPool.class);
+            val isolated = findAnnotation(method, IsolatedConnectionPool.class);
             return checkNull(isolated, () -> proxy.connectionPool, x -> new ConnectionPool());
         }
 
@@ -448,40 +449,40 @@ public final class OhMappingProxy extends OhRoot {
 
         static long checkCallTimeout(
                 Class clazz, Method method, Factory factory, ClientTimeout clientTimeout) {
-            var providerClass = clientTimeout.callTimeoutProvider();
+            val providerClass = clientTimeout.callTimeoutProvider();
             return TimeoutProvider.class == providerClass ? clientTimeout.callTimeout()
                     : FactoryContext.apply(factory, providerClass, p -> p.timeout(clazz, method));
         }
 
         static long checkConnectTimeout(
                 Class clazz, Method method, Factory factory, ClientTimeout clientTimeout) {
-            var providerClass = clientTimeout.connectTimeoutProvider();
+            val providerClass = clientTimeout.connectTimeoutProvider();
             return TimeoutProvider.class == providerClass ? clientTimeout.connectTimeout()
                     : FactoryContext.apply(factory, providerClass, p -> p.timeout(clazz, method));
         }
 
         static long checkReadTimeout(
                 Class clazz, Method method, Factory factory, ClientTimeout clientTimeout) {
-            var providerClass = clientTimeout.readTimeoutProvider();
+            val providerClass = clientTimeout.readTimeoutProvider();
             return TimeoutProvider.class == providerClass ? clientTimeout.readTimeout()
                     : FactoryContext.apply(factory, providerClass, p -> p.timeout(clazz, method));
         }
 
         static long checkWriteTimeout(
                 Class clazz, Method method, Factory factory, ClientTimeout clientTimeout) {
-            var providerClass = clientTimeout.writeTimeoutProvider();
+            val providerClass = clientTimeout.writeTimeoutProvider();
             return TimeoutProvider.class == providerClass ? clientTimeout.writeTimeout()
                     : FactoryContext.apply(factory, providerClass, p -> p.timeout(clazz, method));
         }
 
         static List<Interceptor> checkClientInterceptors(Class clazz, Method method, Factory factory, OhProxy proxy) {
-            var cleanup = nonNull(findAnnotation(method, ClientInterceptorCleanup.class));
-            var result = newArrayList(cleanup ? null : proxy.interceptors);
+            val cleanup = nonNull(findAnnotation(method, ClientInterceptorCleanup.class));
+            val result = newArrayList(cleanup ? null : proxy.interceptors);
             result.addAll(newArrayList(findMergedRepeatableAnnotations(method, ClientInterceptor.class))
                     .stream().filter(annotation -> Interceptor.class != annotation.value()
                             || InterceptorProvider.class != annotation.provider())
                     .map(annotation -> {
-                        var providerClass = annotation.provider();
+                        val providerClass = annotation.provider();
                         if (InterceptorProvider.class == providerClass) {
                             return FactoryContext.build(factory, annotation.value());
                         }
@@ -491,26 +492,26 @@ public final class OhMappingProxy extends OhRoot {
         }
 
         static Level checkClientLoggingLevel(Class clazz, Method method, Factory factory, OhProxy proxy) {
-            var clientLoggingLevel = findAnnotation(method, ClientLoggingLevel.class);
+            val clientLoggingLevel = findAnnotation(method, ClientLoggingLevel.class);
             if (isNull(clientLoggingLevel)) return proxy.loggingLevel;
-            var providerClass = clientLoggingLevel.provider();
+            val providerClass = clientLoggingLevel.provider();
             return LoggingLevelProvider.class == providerClass ? clientLoggingLevel.value()
                     : FactoryContext.apply(factory, providerClass, p -> p.level(clazz, method));
         }
 
         @SuppressWarnings("ConstantConditions")
         static OkHttpClient buildOkHttpClient(OhMappingProxy mappingProxy, OhProxy proxy) {
-            var sameClientProxy = mappingProxy.clientProxy == proxy.clientProxy;
-            var sameSSLSocketFactory = mappingProxy.sslSocketFactory == proxy.sslSocketFactory;
-            var sameX509TrustManager = mappingProxy.x509TrustManager == proxy.x509TrustManager;
-            var sameHostnameVerifier = mappingProxy.hostnameVerifier == proxy.hostnameVerifier;
-            var sameConnectionPool = mappingProxy.connectionPool == proxy.connectionPool;
-            var sameCallTimeout = mappingProxy.callTimeout == proxy.callTimeout;
-            var sameConnectTimeout = mappingProxy.connectTimeout == proxy.connectTimeout;
-            var sameReadTimeout = mappingProxy.readTimeout == proxy.readTimeout;
-            var sameWriteTimeout = mappingProxy.writeTimeout == proxy.writeTimeout;
-            var sameInterceptors = mappingProxy.interceptors.equals(proxy.interceptors);
-            var sameLoggingLevel = mappingProxy.loggingLevel == proxy.loggingLevel;
+            val sameClientProxy = mappingProxy.clientProxy == proxy.clientProxy;
+            val sameSSLSocketFactory = mappingProxy.sslSocketFactory == proxy.sslSocketFactory;
+            val sameX509TrustManager = mappingProxy.x509TrustManager == proxy.x509TrustManager;
+            val sameHostnameVerifier = mappingProxy.hostnameVerifier == proxy.hostnameVerifier;
+            val sameConnectionPool = mappingProxy.connectionPool == proxy.connectionPool;
+            val sameCallTimeout = mappingProxy.callTimeout == proxy.callTimeout;
+            val sameConnectTimeout = mappingProxy.connectTimeout == proxy.connectTimeout;
+            val sameReadTimeout = mappingProxy.readTimeout == proxy.readTimeout;
+            val sameWriteTimeout = mappingProxy.writeTimeout == proxy.writeTimeout;
+            val sameInterceptors = mappingProxy.interceptors.equals(proxy.interceptors);
+            val sameLoggingLevel = mappingProxy.loggingLevel == proxy.loggingLevel;
             if (sameClientProxy && sameSSLSocketFactory && sameX509TrustManager
                     && sameHostnameVerifier && sameConnectionPool
                     && sameCallTimeout && sameConnectTimeout
@@ -532,30 +533,30 @@ public final class OhMappingProxy extends OhRoot {
         }
 
         static Charset checkAcceptCharset(Method method, OhProxy proxy) {
-            var acceptCharset = findAnnotation(method, AcceptCharset.class);
+            val acceptCharset = findAnnotation(method, AcceptCharset.class);
             return checkNull(acceptCharset, () -> proxy.acceptCharset,
                     annotation -> Charset.forName(annotation.value()));
         }
 
         static ContentFormatter checkContentFormatter(
                 Method method, Factory factory, OhProxy proxy) {
-            var contentFormat = findAnnotation(method, ContentFormat.class);
+            val contentFormat = findAnnotation(method, ContentFormat.class);
             return checkNull(contentFormat, () -> proxy.contentFormatter,
                     annotation -> FactoryContext.build(factory, annotation.value()));
         }
 
         static HttpMethod checkHttpMethod(Method method, OhProxy proxy) {
-            var requestMethod = findAnnotation(method, RequestMethod.class);
+            val requestMethod = findAnnotation(method, RequestMethod.class);
             return checkNull(requestMethod, () -> proxy.httpMethod, RequestMethod::value);
         }
 
         static List<Pair<String, String>> checkFixedHeaders(Class clazz, Method method,
                                                             Factory factory, OhProxy proxy) {
-            var result = newArrayList(proxy.headers);
+            val result = newArrayList(proxy.headers);
             result.addAll(newArrayList(findMergedRepeatableAnnotations(method, FixedHeader.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
-                        var name = an.name();
-                        var providerClass = an.valueProvider();
+                        val name = an.name();
+                        val providerClass = an.valueProvider();
                         return Pair.of(name, FixedValueProvider.class == providerClass
                                 ? an.value() : FactoryContext.apply(factory,
                                 providerClass, p -> p.value(clazz, method, name)));
@@ -565,11 +566,11 @@ public final class OhMappingProxy extends OhRoot {
 
         static List<Pair<String, String>> checkFixedPathVars(Class clazz, Method method,
                                                              Factory factory, OhProxy proxy) {
-            var result = newArrayList(proxy.pathVars);
+            val result = newArrayList(proxy.pathVars);
             result.addAll(newArrayList(findMergedRepeatableAnnotations(method, FixedPathVar.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
-                        var name = an.name();
-                        var providerClass = an.valueProvider();
+                        val name = an.name();
+                        val providerClass = an.valueProvider();
                         return Pair.of(name, FixedValueProvider.class == providerClass
                                 ? an.value() : FactoryContext.apply(factory,
                                 providerClass, p -> p.value(clazz, method, name)));
@@ -579,11 +580,11 @@ public final class OhMappingProxy extends OhRoot {
 
         static List<Pair<String, Object>> checkFixedParameters(Class clazz, Method method,
                                                                Factory factory, OhProxy proxy) {
-            var result = newArrayList(proxy.parameters);
+            val result = newArrayList(proxy.parameters);
             result.addAll(newArrayList(findMergedRepeatableAnnotations(method, FixedParameter.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
-                        var name = an.name();
-                        var providerClass = an.valueProvider();
+                        val name = an.name();
+                        val providerClass = an.valueProvider();
                         return Pair.of(name, (Object) (FixedValueProvider.class == providerClass
                                 ? an.value() : FactoryContext.apply(factory,
                                 providerClass, p -> p.value(clazz, method, name))));
@@ -593,11 +594,11 @@ public final class OhMappingProxy extends OhRoot {
 
         static List<Pair<String, Object>> checkFixedContexts(Class clazz, Method method,
                                                              Factory factory, OhProxy proxy) {
-            var result = newArrayList(proxy.contexts);
+            val result = newArrayList(proxy.contexts);
             result.addAll(newArrayList(findMergedRepeatableAnnotations(method, FixedContext.class))
                     .stream().filter(an -> isNotBlank(an.name())).map(an -> {
-                        var name = an.name();
-                        var providerClass = an.valueProvider();
+                        val name = an.name();
+                        val providerClass = an.valueProvider();
                         return Pair.of(name, (Object) (FixedValueProvider.class == providerClass
                                 ? an.value() : FactoryContext.apply(factory,
                                 providerClass, p -> p.value(clazz, method, name))));
@@ -607,7 +608,7 @@ public final class OhMappingProxy extends OhRoot {
 
         static Map<HttpStatus, Class<? extends StatusError>>
         checkStatusErrorMapping(Method method, OhProxy proxy) {
-            var result = newHashMap(proxy.statusErrorMapping);
+            val result = newHashMap(proxy.statusErrorMapping);
             result.putAll(newArrayList(findMergedRepeatableAnnotations(
                     method, StatusErrorMapping.class)).stream()
                     .collect(Collectors.toMap(StatusErrorMapping::status,
@@ -617,7 +618,7 @@ public final class OhMappingProxy extends OhRoot {
 
         static Map<HttpStatus.Series, Class<? extends StatusError>>
         checkStatusSeriesErrorMapping(Method method, OhProxy proxy) {
-            var result = newHashMap(proxy.statusSeriesErrorMapping);
+            val result = newHashMap(proxy.statusSeriesErrorMapping);
             result.putAll(newArrayList(findMergedRepeatableAnnotations(
                     method, StatusSeriesErrorMapping.class)).stream()
                     .collect(Collectors.toMap(StatusSeriesErrorMapping::statusSeries,
@@ -627,7 +628,7 @@ public final class OhMappingProxy extends OhRoot {
 
         static ResponseParser checkResponseParser(
                 Method method, Factory factory, OhProxy proxy) {
-            var responseParse = findAnnotation(method, ResponseParse.class);
+            val responseParse = findAnnotation(method, ResponseParse.class);
             return checkNull(responseParse, () -> proxy.responseParser, annotation ->
                     FactoryContext.build(factory, annotation.value()));
         }

@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -31,7 +32,7 @@ public class ReturnListTest {
     @SneakyThrows
     @Test
     public void testList() {
-        try (var mockWebServer = new MockWebServer()) {
+        try (val mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
@@ -55,14 +56,14 @@ public class ReturnListTest {
                 }
             });
             mockWebServer.start(41192);
-            var httpClient = ohLoader.getClient(ListHttpClient.class);
+            val httpClient = ohLoader.getClient(ListHttpClient.class);
 
-            var beans = httpClient.sampleListBean();
-            var bean1 = beans.get(0);
-            var bean2 = beans.get(1);
+            List<Bean> beans = httpClient.sampleListBean();
+            Bean bean1 = beans.get(0);
+            Bean bean2 = beans.get(1);
             assertEquals("John", bean1.getName());
             assertEquals("Doe", bean2.getName());
-            var futureBeans = httpClient.sampleFutureListBean();
+            val futureBeans = httpClient.sampleFutureListBean();
             await().forever().pollDelay(Duration.ofMillis(100)).until(futureBeans::isDone);
             beans = futureBeans.get();
             bean1 = beans.get(0);
@@ -70,12 +71,12 @@ public class ReturnListTest {
             assertEquals("John", bean1.getName());
             assertEquals("Doe", bean2.getName());
 
-            var strs = httpClient.sampleListString();
-            var str1 = strs.get(0);
-            var str2 = strs.get(1);
+            List<String> strs = httpClient.sampleListString();
+            String str1 = strs.get(0);
+            String str2 = strs.get(1);
             assertEquals("John", str1);
             assertEquals("Doe", str2);
-            var futureStrs = httpClient.sampleFutureListString();
+            val futureStrs = httpClient.sampleFutureListString();
             await().forever().pollDelay(Duration.ofMillis(100)).until(futureStrs::isDone);
             strs = futureStrs.get();
             str1 = strs.get(0);
@@ -83,7 +84,7 @@ public class ReturnListTest {
             assertEquals("John", str1);
             assertEquals("Doe", str2);
 
-            var bufferedSources = httpClient.sampleListBufferedSource();
+            val bufferedSources = httpClient.sampleListBufferedSource();
             assertEquals(1, bufferedSources.size());
             assertEquals(HttpStatus.OK.getReasonPhrase(), bufferedSources.get(0).readUtf8());
         }

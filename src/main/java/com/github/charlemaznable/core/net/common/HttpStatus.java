@@ -1,5 +1,7 @@
 package com.github.charlemaznable.core.net.common;
 
+import lombok.val;
+
 import javax.annotation.Nullable;
 
 import static java.util.Objects.isNull;
@@ -109,7 +111,7 @@ public enum HttpStatus {
 
     @Nullable
     public static HttpStatus resolve(int statusCode) {
-        for (var status : values()) {
+        for (val status : values()) {
             if (status.value == statusCode) {
                 return status;
             }
@@ -187,7 +189,7 @@ public enum HttpStatus {
         @Nullable
         public static Series resolve(int statusCode) {
             int seriesCode = statusCode / 100;
-            for (var series : values()) {
+            for (val series : values()) {
                 if (series.value == seriesCode) {
                     return series;
                 }

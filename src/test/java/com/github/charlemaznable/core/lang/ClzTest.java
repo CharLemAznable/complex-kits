@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.lang;
 
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
@@ -40,9 +41,9 @@ public class ClzTest {
 
     @Test
     public void testGetConstructorParameterTypes() {
-        var testTypeClass = TestType.class;
+        val testTypeClass = TestType.class;
 
-        var types = getConstructorParameterTypes(testTypeClass);
+        Class<?>[] types = getConstructorParameterTypes(testTypeClass);
         assertNotNull(types);
         assertEquals(0, types.length);
 

@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.lang;
 
+import lombok.val;
 import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
@@ -13,7 +14,7 @@ public class EasyEnhancerTest {
 
     @Test
     public void testEnhancerrCreate() {
-        var actual = (ActualClass) EasyEnhancer.create(
+        ActualClass actual = (ActualClass) EasyEnhancer.create(
                 ActualClass.class, new Interceptor());
         actual.method();
         assertEquals(1, Interceptor.count);
@@ -30,7 +31,7 @@ public class EasyEnhancerTest {
         actual.method();
         assertEquals(3, Interceptor.count);
 
-        var params = new Object[]{new ActualParamType()};
+        val params = new Object[]{new ActualParamType()};
 
         actual = (ActualClass) EasyEnhancer.create(
                 ActualClass.class, new Interceptor(), params);

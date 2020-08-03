@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.lang;
 
+import lombok.val;
 import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.CallbackFilter;
 import net.sf.cglib.proxy.Enhancer;
@@ -24,7 +25,7 @@ public final class EasyEnhancer extends Enhancer {
     public static Object create
             (Class type, Callback callback,
              Class[] argumentTypes, Object[] arguments) {
-        var e = new EasyEnhancer();
+        val e = new EasyEnhancer();
         e.setSuperclass(type);
         e.setCallback(callback);
         return e.create(argumentTypes,
@@ -43,7 +44,7 @@ public final class EasyEnhancer extends Enhancer {
     public static Object create
             (Class superclass, Class[] interfaces, Callback callback,
              Class[] argumentTypes, Object[] arguments) {
-        var e = new EasyEnhancer();
+        val e = new EasyEnhancer();
         e.setSuperclass(superclass);
         e.setInterfaces(interfaces);
         e.setCallback(callback);
@@ -63,7 +64,7 @@ public final class EasyEnhancer extends Enhancer {
     public static Object create
             (Class superclass, Class[] interfaces, CallbackFilter filter, Callback[] callbacks,
              Class[] argumentTypes, Object[] arguments) {
-        var e = new EasyEnhancer();
+        val e = new EasyEnhancer();
         e.setSuperclass(superclass);
         e.setInterfaces(interfaces);
         e.setCallbackFilter(filter);

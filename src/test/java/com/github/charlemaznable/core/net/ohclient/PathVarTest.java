@@ -7,6 +7,7 @@ import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.PathVar;
 import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import lombok.SneakyThrows;
+import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -25,7 +26,7 @@ public class PathVarTest {
     @SneakyThrows
     @Test
     public void testOhPathVar() {
-        try (var mockWebServer = new MockWebServer()) {
+        try (val mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
@@ -45,7 +46,7 @@ public class PathVarTest {
             });
             mockWebServer.start(41150);
 
-            var httpClient = ohLoader.getClient(PathVarHttpClient.class);
+            val httpClient = ohLoader.getClient(PathVarHttpClient.class);
             assertEquals("V2", httpClient.sampleDefault());
             assertEquals("V3", httpClient.sampleMapping());
             assertEquals("V4", httpClient.samplePathVars("V4"));

@@ -1,6 +1,7 @@
 package com.github.charlemaznable.core.net.ohclient.internal;
 
 import lombok.SneakyThrows;
+import lombok.val;
 import okhttp3.ResponseBody;
 import okio.BufferedSource;
 
@@ -47,7 +48,7 @@ public final class ResponseBodyExtractor {
     static Object object(ResponseBody responseBody,
                          Function<String, Object> customParser,
                          Class<?> returnType) {
-        var content = string(responseBody);
+        val content = string(responseBody);
         if (isBlank(content)) return null;
         if (nonNull(customParser)) return customParser.apply(content);
         if (content.startsWith("<")) return spec(unXml(content), returnType);

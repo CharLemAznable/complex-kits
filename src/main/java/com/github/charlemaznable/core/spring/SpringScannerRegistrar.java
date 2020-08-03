@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.spring;
 
+import lombok.val;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanNameGenerator;
@@ -45,11 +46,11 @@ public class SpringScannerRegistrar implements ImportBeanDefinitionRegistrar, Re
     @Override
     public final void registerBeanDefinitions(@Nonnull AnnotationMetadata importingClassMetadata,
                                               @Nonnull BeanDefinitionRegistry registry) {
-        var annoAttrs = AnnotationAttributes.fromMap(importingClassMetadata
+        val annoAttrs = AnnotationAttributes.fromMap(importingClassMetadata
                 .getAnnotationAttributes(scanAnnotationClass.getName()));
         if (isNull(annoAttrs)) return;
 
-        var scanner = new SpringClassPathScanner(
+        val scanner = new SpringClassPathScanner(
                 registry, factoryBeanClass, this::isCandidateClass, annotationClass);
         if (nonNull(resourceLoader)) { // this check is needed in Spring 3.1
             scanner.setResourceLoader(resourceLoader);
@@ -60,23 +61,23 @@ public class SpringScannerRegistrar implements ImportBeanDefinitionRegistrar, Re
             scanner.setBeanNameGenerator(BeanUtils.instantiateClass(generatorClass));
         }
 
-        var basePackages = new ArrayList<String>();
-        for (var pkg : annoAttrs.getStringArray("value")) {
+        val basePackages = new ArrayList<String>();
+        for (val pkg : annoAttrs.getStringArray("value")) {
             if (StringUtils.hasText(pkg)) {
                 basePackages.add(pkg);
             }
         }
-        for (var pkg : annoAttrs.getStringArray("basePackages")) {
+        for (val pkg : annoAttrs.getStringArray("basePackages")) {
             if (StringUtils.hasText(pkg)) {
                 basePackages.add(pkg);
             }
         }
-        for (var clazz : annoAttrs.getClassArray("basePackageClasses")) {
+        for (val clazz : annoAttrs.getClassArray("basePackageClasses")) {
             basePackages.add(ClassUtils.getPackageName(clazz));
         }
 
         if (basePackages.isEmpty()) {
-            var className = importingClassMetadata.getClassName();
+            val className = importingClassMetadata.getClassName();
             basePackages.add(ClassUtils.getPackageName(className));
         }
 

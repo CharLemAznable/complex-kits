@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.net.httptest;
 
 import com.github.charlemaznable.core.net.Http;
 import com.github.charlemaznable.core.spring.MutableHttpServletRequest;
+import lombok.val;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,7 +54,7 @@ public class HttpTestController {
     @SuppressWarnings("Duplicates")
     @RequestMapping("/parameter")
     public void parameter(HttpServletRequest request, HttpServletResponse response) {
-        var parameterMap = Http.fetchParameterMap(request);
+        val parameterMap = Http.fetchParameterMap(request);
         if (!"aaa".equals(parameterMap.get("AAA"))) {
             Http.errorText(response, 500, "ERROR");
         } else if (!"bbb".equals(parameterMap.get("BBB"))) {
@@ -65,7 +66,7 @@ public class HttpTestController {
 
     @RequestMapping("/deal-parameter")
     public void dealParameter(HttpServletRequest request, HttpServletResponse response) {
-        var parameterMap = Http.dealReqParams(request.getParameterMap());
+        val parameterMap = Http.dealReqParams(request.getParameterMap());
         if (!"aaa".equals(parameterMap.get("AAA"))) {
             Http.errorText(response, 500, "ERROR");
         } else if (!"bbb,bbb".equals(parameterMap.get("BBB"))) {
@@ -78,7 +79,7 @@ public class HttpTestController {
     @RequestMapping("/path-variable/{AAA}/{BBB}")
     public void pathVariable(HttpServletRequest request, HttpServletResponse response,
                              @PathVariable("AAA") String a, @PathVariable("BBB") String b) {
-        var pathVariableMap = Http.fetchPathVariableMap(request);
+        val pathVariableMap = Http.fetchPathVariableMap(request);
         if (!a.equals(pathVariableMap.get("AAA")) || !a.equals("aaa")) {
             Http.errorText(response, 500, "ERROR");
         } else if (!b.equals(pathVariableMap.get("BBB")) || !b.equals("bbb")) {
@@ -91,7 +92,7 @@ public class HttpTestController {
     @SuppressWarnings("Duplicates")
     @RequestMapping("/header")
     public void header(HttpServletRequest request, HttpServletResponse response) {
-        var headerMap = Http.fetchHeaderMap(request);
+        val headerMap = Http.fetchHeaderMap(request);
         if (!"aaa".equals(headerMap.get("AAA"))) {
             Http.errorText(response, 500, "ERROR");
         } else if (!"bbb".equals(headerMap.get("BBB"))) {
@@ -104,7 +105,7 @@ public class HttpTestController {
     @SuppressWarnings("Duplicates")
     @RequestMapping("/cookie")
     public void cookie(HttpServletRequest request, HttpServletResponse response) {
-        var cookieMap = Http.fetchCookieMap(request);
+        val cookieMap = Http.fetchCookieMap(request);
         if (!"aaa".equals(cookieMap.get("AAA"))) {
             Http.errorText(response, 500, "ERROR");
         } else if (!"bbb".equals(cookieMap.get("BBB"))) {
@@ -116,7 +117,7 @@ public class HttpTestController {
 
     @RequestMapping("/remote-addr")
     public void remoteAddr(HttpServletRequest request, HttpServletResponse response) {
-        var remoteAddr = Http.fetchRemoteAddr(request);
+        val remoteAddr = Http.fetchRemoteAddr(request);
         if (!"test.addr".equals(remoteAddr)) {
             Http.responseText(response, remoteAddr);
         } else {
@@ -126,9 +127,9 @@ public class HttpTestController {
 
     @RequestMapping("/body")
     public void body(HttpServletRequest request, HttpServletResponse response) {
-        var mutableRequest = new MutableHttpServletRequest(request);
-        var requestBody = Http.dealRequestBody(mutableRequest, UTF_8.name());
-        var requestBodyByStream = Http.dealRequestBodyStream(mutableRequest, UTF_8.name());
+        val mutableRequest = new MutableHttpServletRequest(request);
+        val requestBody = Http.dealRequestBody(mutableRequest, UTF_8.name());
+        val requestBodyByStream = Http.dealRequestBodyStream(mutableRequest, UTF_8.name());
         if (!requestBody.equals(requestBodyByStream)) {
             Http.errorText(response, 500, "ERROR");
         } else {

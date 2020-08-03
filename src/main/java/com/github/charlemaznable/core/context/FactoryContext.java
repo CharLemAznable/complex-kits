@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.context;
 
 import com.github.charlemaznable.core.lang.Factory;
 import com.github.charlemaznable.core.spring.SpringContext;
+import lombok.val;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -12,7 +13,7 @@ import static org.joor.Reflect.onClass;
 public final class FactoryContext {
 
     private static ThreadLocal<Factory> local =
-            new InheritableThreadLocal<>() {
+            new InheritableThreadLocal<Factory>() {
                 @Override
                 protected Factory initialValue() {
                     return SpringFactory.getInstance();
@@ -36,7 +37,7 @@ public final class FactoryContext {
     }
 
     public static <T> T build(Factory factory, Class<T> clazz) {
-        var temp = local.get();
+        val temp = local.get();
         local.set(factory);
         try {
             return factory.build(clazz);
@@ -47,7 +48,7 @@ public final class FactoryContext {
 
     public static <T> void accept(Factory factory, Class<T> clazz,
                                   Consumer<T> consumer) {
-        var temp = local.get();
+        val temp = local.get();
         local.set(factory);
         try {
             consumer.accept(factory.build(clazz));
@@ -58,7 +59,7 @@ public final class FactoryContext {
 
     public static <T, R> R apply(Factory factory, Class<T> clazz,
                                  Function<T, R> function) {
-        var temp = local.get();
+        val temp = local.get();
         local.set(factory);
         try {
             return function.apply(factory.build(clazz));

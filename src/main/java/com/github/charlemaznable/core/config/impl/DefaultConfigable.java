@@ -1,6 +1,7 @@
 package com.github.charlemaznable.core.config.impl;
 
 import com.github.charlemaznable.core.config.Configable;
+import lombok.val;
 
 import java.util.Properties;
 
@@ -40,7 +41,7 @@ public class DefaultConfigable extends BaseConfigable {
 
     @Override
     public final String getStr(String key) {
-        var property = properties.getProperty(key);
+        String property = properties.getProperty(key);
         if (isNull(property)) return null;
 
         // ${key}会在properties中定义了key时进行替换，否则保持原样
@@ -57,16 +58,16 @@ public class DefaultConfigable extends BaseConfigable {
     public final Configable subset(String prefix) {
         if (isEmpty(prefix)) return new DefaultConfigable(new Properties());
 
-        var prefixMatch = prefix.charAt(prefix.length() - 1) != '.' ? prefix + '.' : prefix;
-        var subProps = subProperties(properties, prefixMatch);
+        val prefixMatch = prefix.charAt(prefix.length() - 1) != '.' ? prefix + '.' : prefix;
+        val subProps = subProperties(properties, prefixMatch);
 
         return new DefaultConfigable(subProps);
     }
 
     protected final Properties subProperties(Properties properties, String prefixMatch) {
-        var subProps = new Properties();
-        for (var entry : properties.entrySet()) {
-            var key = (String) entry.getKey();
+        val subProps = new Properties();
+        for (val entry : properties.entrySet()) {
+            val key = (String) entry.getKey();
             if (!key.startsWith(prefixMatch)) continue;
 
             subProps.put(key.substring(prefixMatch.length()), entry.getValue());

@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.lang.pool;
 
+import lombok.val;
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 
@@ -10,7 +11,7 @@ import static org.joor.Reflect.onClass;
 public interface PooledObjectCreator<T> {
 
     default T create(Object... args) {
-        var tType = getActualTypeArgument(this.getClass(), PooledObjectCreator.class);
+        val tType = getActualTypeArgument(this.getClass(), PooledObjectCreator.class);
         checkNotNull(tType, "PooledObjectCreator's Type Argument is Missing");
         return onClass(tType).create(args).get();
     }

@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.codec;
 
 import com.alibaba.fastjson.parser.ParserConfig;
 import lombok.Data;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -31,14 +32,14 @@ public class JsonTest {
 
     @Test
     public void testJson() {
-        var beanType11 = new BeanType1();
+        val beanType11 = new BeanType1();
         beanType11.setValue1("value1");
         beanType11.setValue2("value2");
         String jsonWithType = jsonWithType(beanType11);
         assertTrue(jsonWithType.contains("\"@type\":\"com.github.charlemaznable.core.codec.JsonTest$BeanType1\""));
 
         ParserConfig.getGlobalInstance().addAccept("com.github.charlemaznable.core.codec.");
-        var unJsonWithType = unJsonWithType(jsonWithType);
+        val unJsonWithType = unJsonWithType(jsonWithType);
         assertTrue(unJsonWithType instanceof BeanType1);
 
         assertEquals("{\n" +
@@ -50,20 +51,20 @@ public class JsonTest {
         Map<String, Object> wrap = of("data1", data, "data2", data);
         assertNotEquals(jsonDetectRef(wrap), json(wrap));
 
-        var jsonOf = jsonOf("key", "value");
+        val jsonOf = jsonOf("key", "value");
         assertEquals("{\"key\":\"value\"}", jsonOf);
         Map<String, Object> unJsonMap = unJson(jsonOf);
         assertEquals(of("key", "value"), unJsonMap);
 
-        var listJson = "[{\"value1\":\"value1\",\"value2\":\"value2\"}]";
-        var list1 = unJsonArray(listJson);
+        val listJson = "[{\"value1\":\"value1\",\"value2\":\"value2\"}]";
+        val list1 = unJsonArray(listJson);
         assertEquals(1, list1.size());
         assertFalse(list1.get(0) instanceof BeanType1);
-        var list2 = unJsonArray(listJson, BeanType1.class);
+        val list2 = unJsonArray(listJson, BeanType1.class);
         assertEquals(1, list2.size());
         assertNotNull(list2.get(0));
 
-        var specMap = of("value1", "value1", "value2", "value2");
+        val specMap = of("value1", "value1", "value2", "value2");
         BeanType1 specBean = spec(specMap, BeanType1.class);
         assertEquals("value1", specBean.getValue1());
         assertEquals("value2", specBean.getValue2());
@@ -71,48 +72,48 @@ public class JsonTest {
 
     @Test
     public void testTrans() {
-        var beanType11 = new BeanType1();
+        val beanType11 = new BeanType1();
         beanType11.setValue1("value1");
         beanType11.setValue2("value2");
 
-        var beanType2 = trans(beanType11, BeanType2.class);
+        val beanType2 = trans(beanType11, BeanType2.class);
         assertEquals("value2", beanType2.getValue2());
         assertNull(beanType2.getValue3());
 
-        var beanType12 = trans(beanType2, BeanType1.class);
+        val beanType12 = trans(beanType2, BeanType1.class);
         assertNull(beanType12.getValue1());
         assertEquals("value2", beanType12.getValue2());
     }
 
     @Test
     public void testDescFlat() {
-        var mapStr = of("cc", "dd");
+        val mapStr = of("cc", "dd");
         assertEquals(of("cc", "dd"), descFlat(mapStr));
 
-        var bean11 = new BeanType1();
+        val bean11 = new BeanType1();
         bean11.setValue1("v11");
         bean11.setValue2("v12");
-        var bean12 = new BeanType1();
+        val bean12 = new BeanType1();
         bean12.setValue1("v21");
         bean12.setValue2("v22");
 
-        var mapBean = of("ee", bean11, "ff", bean12);
+        val mapBean = of("ee", bean11, "ff", bean12);
         assertEquals(of("ee.value1", "v11", "ee.value2", "v12",
                 "ff.value1", "v21", "ff.value2", "v22"), descFlat(mapBean));
 
-        var bean2 = new BeanType2();
+        val bean2 = new BeanType2();
         bean2.setValue2("v2");
         bean2.setValue3("v3");
         assertEquals(of("value2", "v2", "value3", "v3"), descFlat(bean2));
 
-        var complex = new ComplexType();
+        val complex = new ComplexType();
         complex.setName("name");
         complex.setListStr(newArrayList("aa", "bb"));
         complex.setListBean(newArrayList(bean11, bean12));
         complex.setMapStr(mapStr);
         complex.setMapBean(mapBean);
         complex.setBean2(bean2);
-        var expected = of("name", "name",
+        val expected = of("name", "name",
                 "listStr[0]", "aa", "listStr[1]", "bb",
                 "listBean[0].value1", "v11",
                 "listBean[0].value2", "v12",

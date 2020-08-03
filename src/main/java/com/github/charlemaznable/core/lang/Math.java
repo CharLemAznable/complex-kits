@@ -1,5 +1,7 @@
 package com.github.charlemaznable.core.lang;
 
+import lombok.val;
+
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -23,7 +25,7 @@ public final class Math {
 
     public static int gcd(int p1, int p2, int... params) {
         int result = gcd(p1, p2);
-        for (var p : params) {
+        for (val p : params) {
             result = gcd(result, p);
         }
         return result;
@@ -44,7 +46,7 @@ public final class Math {
 
     public static long gcd(long p1, long p2, long... params) {
         long result = gcd(p1, p2);
-        for (var p : params) {
+        for (val p : params) {
             result = gcd(result, p);
         }
         return result;

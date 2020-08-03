@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.crypto;
 
 import com.github.charlemaznable.core.lang.Rand;
 import lombok.SneakyThrows;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import java.security.spec.InvalidKeySpecException;
@@ -31,13 +32,13 @@ public class RSATest {
 
     @Test
     public void testRSA() {
-        var plainText = "{ mac=\"MAC Address\", appId=\"16位字符串\", signature=SHA1(\"appId=xxx&mac=yyy\") }";
-        var keyPair = generateKeyPair();
-        var publicKeyString = getPublicKeyString(keyPair);
-        var privateKeyString = getPrivateKeyString(keyPair);
+        val plainText = "{ mac=\"MAC Address\", appId=\"16位字符串\", signature=SHA1(\"appId=xxx&mac=yyy\") }";
+        val keyPair = generateKeyPair();
+        val publicKeyString = getPublicKeyString(keyPair);
+        val privateKeyString = getPrivateKeyString(keyPair);
 
-        var publicKey = publicKey(publicKeyString);
-        var privateKey = privateKey(privateKeyString);
+        val publicKey = publicKey(publicKeyString);
+        val privateKey = privateKey(privateKeyString);
 
         assertEquals(plainText, prvDecrypt(pubEncrypt(plainText, publicKey), privateKey));
         assertEquals(plainText, pubDecrypt(prvEncrypt(plainText, privateKey), publicKey));
@@ -51,46 +52,46 @@ public class RSATest {
 
     @Test
     public void testRSA2() {
-        var plainText = "{ mac=\"MAC Address\", appId=\"16位字符串\", signature=SHA1(\"appId=xxx&mac=yyy\") }";
-        var keyPair = generateKeyPair(2048);
-        var publicKeyString = getPublicKeyString(keyPair);
-        var privateKeyString = getPrivateKeyString(keyPair);
+        val plainText = "{ mac=\"MAC Address\", appId=\"16位字符串\", signature=SHA1(\"appId=xxx&mac=yyy\") }";
+        val keyPair = generateKeyPair(2048);
+        val publicKeyString = getPublicKeyString(keyPair);
+        val privateKeyString = getPrivateKeyString(keyPair);
 
-        var publicKey = publicKey(publicKeyString);
-        var privateKey = privateKey(privateKeyString);
+        val publicKey = publicKey(publicKeyString);
+        val privateKey = privateKey(privateKeyString);
 
         assertEquals(plainText, prvDecrypt(pubEncrypt(plainText, publicKey), privateKey));
         assertEquals(plainText, pubDecrypt(prvEncrypt(plainText, privateKey), publicKey));
     }
 
     public void batchRun(int times) {
-        var rand = Rand.randAlphanumeric(100);
-        var keyPair = generateKeyPair();
-        var publicKey = getPublicKey(keyPair);
-        var privateKey = getPrivateKey(keyPair);
+        val rand = Rand.randAlphanumeric(100);
+        val keyPair = generateKeyPair();
+        val publicKey = getPublicKey(keyPair);
+        val privateKey = getPrivateKey(keyPair);
 
-        for (var i = 0; i < times; ++i) {
-            var plainText = rand + i;
+        for (int i = 0; i < times; ++i) {
+            val plainText = rand + i;
 
-            var enc1 = hex(pubEncrypt(plainText, publicKey));
-            var dec1 = prvDecrypt(unHex(enc1), privateKey);
+            val enc1 = hex(pubEncrypt(plainText, publicKey));
+            val dec1 = prvDecrypt(unHex(enc1), privateKey);
             assertEquals(plainText, dec1);
 
-            var enc2 = hex(prvEncrypt(plainText, privateKey));
-            var dec2 = pubDecrypt(unHex(enc2), publicKey);
+            val enc2 = hex(prvEncrypt(plainText, privateKey));
+            val dec2 = pubDecrypt(unHex(enc2), publicKey);
             assertEquals(plainText, dec2);
         }
     }
 
     @SneakyThrows
     public void routineRun(int threads) {
-        var service = new Thread[threads];
-        for (var i = 0; i < threads; i++) {
+        val service = new Thread[threads];
+        for (int i = 0; i < threads; i++) {
             service[i] = new Thread(() -> batchRun(TIMES));
             service[i].start();
         }
 
-        for (var i = 0; i < threads; i++) {
+        for (int i = 0; i < threads; i++) {
             service[i].join();
         }
     }

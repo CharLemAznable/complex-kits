@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.codec;
 
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -19,33 +20,33 @@ public class DigestHMACTest {
 
     @Test
     public void testDigestMACHex() throws Exception {
-        var key = randAlphanumeric(32);
+        val key = randAlphanumeric(32);
 
-        var hashMD5Hex = MD5.digestHex("可以提供有状态的Hasher", key);
+        val hashMD5Hex = MD5.digestHex("可以提供有状态的Hasher", key);
         assertEquals(hashMD5Hex, MD5.digestHex("可以提供有状态的Hasher", key));
         assertEquals(hashMD5Hex, MD5.digestHex("可以提供有状态的Hasher", bytes(key)));
         assertEquals(hashMD5Hex, hex(MD5.digest("可以提供有状态的Hasher", key)));
         assertEquals(hashMD5Hex, hex(MD5.digest("可以提供有状态的Hasher", bytes(key))));
-        var hmacMD5 = getInstance("HmacMD5");
+        val hmacMD5 = getInstance("HmacMD5");
         hmacMD5.init(new SecretKeySpec(bytes(key), "HmacMD5"));
         assertEquals(hashMD5Hex, hex(hmacMD5.doFinal(bytes("可以提供有状态的Hasher"))));
 
-        var hashSHA1Hex = SHA1.digestHex("可以提供有状态的Hasher", key);
+        val hashSHA1Hex = SHA1.digestHex("可以提供有状态的Hasher", key);
         assertEquals(hashSHA1Hex, SHA1.digestHex("可以提供有状态的Hasher", key));
         assertEquals(hashSHA1Hex, SHA1.digestHex("可以提供有状态的Hasher", bytes(key)));
         assertEquals(hashSHA1Hex, hex(SHA1.digest("可以提供有状态的Hasher", key)));
         assertEquals(hashSHA1Hex, hex(SHA1.digest("可以提供有状态的Hasher", bytes(key))));
-        var hmacSHA1 = getInstance("HmacSHA1");
+        val hmacSHA1 = getInstance("HmacSHA1");
         hmacSHA1.init(new SecretKeySpec(bytes(key), "HmacSHA1"));
         assertEquals(hashSHA1Hex, hex(hmacSHA1.doFinal(bytes("可以提供有状态的Hasher"))));
 
-        var hashSHA256Hex = SHA256.digestHex("可以提供有状态的Hasher", key);
+        val hashSHA256Hex = SHA256.digestHex("可以提供有状态的Hasher", key);
         assertEquals(hashSHA256Hex, SHA256.digestHex("可以提供有状态的Hasher", key));
         assertEquals(hashSHA256Hex, SHA256.digestHex("可以提供有状态的Hasher", bytes(key)));
         assertEquals(hashSHA256Hex, hex(SHA256.digest("可以提供有状态的Hasher", key)));
         assertEquals(hashSHA256Hex, hex(SHA256.digest("可以提供有状态的Hasher", bytes(key))));
 
-        var hashSHA512Hex = SHA512.digestHex("可以提供有状态的Hasher", key);
+        val hashSHA512Hex = SHA512.digestHex("可以提供有状态的Hasher", key);
         assertEquals(hashSHA512Hex, SHA512.digestHex("可以提供有状态的Hasher", key));
         assertEquals(hashSHA512Hex, SHA512.digestHex("可以提供有状态的Hasher", bytes(key)));
         assertEquals(hashSHA512Hex, hex(SHA512.digest("可以提供有状态的Hasher", key)));
@@ -54,27 +55,27 @@ public class DigestHMACTest {
 
     @Test
     public void testDigestMACBase64() throws Exception {
-        var key = randAlphanumeric(32);
+        val key = randAlphanumeric(32);
 
-        var hashMD5Base64 = MD5.digestBase64("可以提供有状态的Hasher", key);
+        val hashMD5Base64 = MD5.digestBase64("可以提供有状态的Hasher", key);
         assertEquals(hashMD5Base64, MD5.digestBase64("可以提供有状态的Hasher", key));
         assertEquals(hashMD5Base64, MD5.digestBase64("可以提供有状态的Hasher", bytes(key)));
-        var hmacMD5 = getInstance("HmacMD5");
+        val hmacMD5 = getInstance("HmacMD5");
         hmacMD5.init(new SecretKeySpec(bytes(key), "HmacMD5"));
         assertEquals(hashMD5Base64, base64(hmacMD5.doFinal(bytes("可以提供有状态的Hasher"))));
 
-        var hashSHA1Base64 = SHA1.digestBase64("可以提供有状态的Hasher", key);
+        val hashSHA1Base64 = SHA1.digestBase64("可以提供有状态的Hasher", key);
         assertEquals(hashSHA1Base64, SHA1.digestBase64("可以提供有状态的Hasher", key));
         assertEquals(hashSHA1Base64, SHA1.digestBase64("可以提供有状态的Hasher", bytes(key)));
-        var hmacSHA1 = getInstance("HmacSHA1");
+        val hmacSHA1 = getInstance("HmacSHA1");
         hmacSHA1.init(new SecretKeySpec(bytes(key), "HmacSHA1"));
         assertEquals(hashSHA1Base64, base64(hmacSHA1.doFinal(bytes("可以提供有状态的Hasher"))));
 
-        var hashSHA256Base64 = SHA256.digestBase64("可以提供有状态的Hasher", key);
+        val hashSHA256Base64 = SHA256.digestBase64("可以提供有状态的Hasher", key);
         assertEquals(hashSHA256Base64, SHA256.digestBase64("可以提供有状态的Hasher", key));
         assertEquals(hashSHA256Base64, SHA256.digestBase64("可以提供有状态的Hasher", bytes(key)));
 
-        var hashSHA512Base64 = SHA512.digestBase64("可以提供有状态的Hasher", key);
+        val hashSHA512Base64 = SHA512.digestBase64("可以提供有状态的Hasher", key);
         assertEquals(hashSHA512Base64, SHA512.digestBase64("可以提供有状态的Hasher", key));
         assertEquals(hashSHA512Base64, SHA512.digestBase64("可以提供有状态的Hasher", bytes(key)));
     }

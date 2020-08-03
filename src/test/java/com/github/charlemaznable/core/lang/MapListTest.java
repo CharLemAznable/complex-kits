@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.lang;
 
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -19,11 +20,11 @@ public class MapListTest {
         List<Map<String, String>> list = newArrayList();
         list.add(of("key", "key1", "value", "value1"));
         list.add(of("key", "key2", "value", "value2"));
-        var map = mapFromList(list, "key", "value");
+        val map = mapFromList(list, "key", "value");
         assertEquals("value1", map.get("key1"));
         assertEquals("value2", map.get("key2"));
 
-        var list2 = listFromMap(map, "key", "value");
+        val list2 = listFromMap(map, "key", "value");
         assertIterableEquals(list, list2);
     }
 }

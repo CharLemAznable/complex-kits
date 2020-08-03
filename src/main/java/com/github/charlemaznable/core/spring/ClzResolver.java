@@ -1,6 +1,7 @@
 package com.github.charlemaznable.core.spring;
 
 import lombok.SneakyThrows;
+import lombok.val;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
@@ -30,9 +31,9 @@ public final class ClzResolver {
 
     @SneakyThrows
     public static List<Class<?>> getClasses(String basePackage, Predicate<Class<?>> classPredicate) {
-        var resolver = new PathMatchingResourcePatternResolver();
-        var readerFactory = new CachingMetadataReaderFactory(resolver);
-        var resources = resolver.getResources(CLASSPATH_ALL_URL_PREFIX
+        val resolver = new PathMatchingResourcePatternResolver();
+        val readerFactory = new CachingMetadataReaderFactory(resolver);
+        val resources = resolver.getResources(CLASSPATH_ALL_URL_PREFIX
                 + resolveBasePackage(basePackage) + CLASS_PATTER);
 
         return stream(resources).filter(Resource::isReadable)
@@ -54,8 +55,8 @@ public final class ClzResolver {
 
     @SneakyThrows
     public static List<URL> getResources(String basePackage, String extension) {
-        var resolver = new PathMatchingResourcePatternResolver();
-        var resources = resolver.getResources(CLASSPATH_ALL_URL_PREFIX
+        val resolver = new PathMatchingResourcePatternResolver();
+        val resources = resolver.getResources(CLASSPATH_ALL_URL_PREFIX
                 + resolveBasePackage(basePackage) + ALL_MATCH_PATTERN + extension);
 
         return stream(resources).filter(Resource::isReadable)

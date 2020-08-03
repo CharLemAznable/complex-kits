@@ -1,6 +1,7 @@
 package com.github.charlemaznable.core.crypto;
 
 import lombok.SneakyThrows;
+import lombok.val;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -37,7 +38,7 @@ public enum SHAXWithRSA {
 
     @SneakyThrows
     public final byte[] sign(String plainText, PrivateKey privateKey) {
-        var signature = getInstance(signAlgorithms());
+        val signature = getInstance(signAlgorithms());
         signature.initSign(privateKey);
         signature.update(bytes(plainText));
         return signature.sign();
@@ -49,7 +50,7 @@ public enum SHAXWithRSA {
 
     @SneakyThrows
     public final boolean verify(String plainText, byte[] sign, PublicKey publicKey) {
-        var signature = getInstance(signAlgorithms());
+        val signature = getInstance(signAlgorithms());
         signature.initVerify(publicKey);
         signature.update(bytes(plainText));
         return signature.verify(sign);

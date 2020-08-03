@@ -3,6 +3,7 @@ package com.github.charlemaznable.core.config.impl;
 import com.github.charlemaznable.core.config.Configable;
 import com.github.charlemaznable.core.config.ex.ConfigNotFoundException;
 import com.github.charlemaznable.core.config.ex.ConfigValueFormatException;
+import lombok.val;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -29,12 +30,12 @@ public abstract class BaseConfigable implements Configable {
     public final int parseInt(String key, String str) {
         if (isEmpty(str)) throw new ConfigNotFoundException(key + CONFIG_NOT_FOUND);
 
-        var matcher = numberPattern.matcher(str);
+        val matcher = numberPattern.matcher(str);
         if (!matcher.matches())
             throw new ConfigValueFormatException(key
                     + CONFIG_FORMAT_PREFIX + str + "] is not an int");
 
-        var intStr = substringBefore(matcher.group(1), ".");
+        val intStr = substringBefore(matcher.group(1), ".");
         if (isEmpty(intStr)) return 0;
 
         return Integer.valueOf(intStr);
@@ -49,12 +50,12 @@ public abstract class BaseConfigable implements Configable {
         if (isEmpty(str))
             throw new ConfigNotFoundException(key + CONFIG_NOT_FOUND);
 
-        var matcher = numberPattern.matcher(str);
+        val matcher = numberPattern.matcher(str);
         if (!matcher.matches())
             throw new ConfigValueFormatException(key
                     + CONFIG_FORMAT_PREFIX + str + "] is not a long");
 
-        var intStr = substringBefore(matcher.group(1), ".");
+        val intStr = substringBefore(matcher.group(1), ".");
         if (isEmpty(intStr)) return 0;
 
         return Long.valueOf(intStr);
@@ -81,7 +82,7 @@ public abstract class BaseConfigable implements Configable {
         if (isEmpty(str))
             throw new ConfigNotFoundException(key + CONFIG_NOT_FOUND);
 
-        var matcher = numberPattern.matcher(str);
+        val matcher = numberPattern.matcher(str);
         if (!matcher.matches())
             throw new ConfigValueFormatException(key
                     + CONFIG_FORMAT_PREFIX + str + "] is not a float");
@@ -98,7 +99,7 @@ public abstract class BaseConfigable implements Configable {
         if (isEmpty(str))
             throw new ConfigNotFoundException(key + CONFIG_NOT_FOUND);
 
-        var matcher = numberPattern.matcher(str);
+        val matcher = numberPattern.matcher(str);
         if (!matcher.matches())
             throw new ConfigValueFormatException(key
                     + CONFIG_FORMAT_PREFIX + str + "] is not a double");
@@ -108,13 +109,13 @@ public abstract class BaseConfigable implements Configable {
 
     @Override
     public final int getInt(String key, int defaultValue) {
-        var str = getStr(key);
+        val str = getStr(key);
         if (isEmpty(str)) return defaultValue;
 
-        var matcher = numberPattern.matcher(str);
+        val matcher = numberPattern.matcher(str);
         if (!matcher.matches()) return defaultValue;
 
-        var intStr = substringBefore(matcher.group(1), ".");
+        val intStr = substringBefore(matcher.group(1), ".");
         if (isEmpty(intStr)) return defaultValue;
 
         return Integer.valueOf(intStr);
@@ -122,13 +123,13 @@ public abstract class BaseConfigable implements Configable {
 
     @Override
     public final long getLong(String key, long defaultValue) {
-        var str = getStr(key);
+        val str = getStr(key);
         if (isEmpty(str)) return defaultValue;
 
-        var matcher = numberPattern.matcher(str);
+        val matcher = numberPattern.matcher(str);
         if (!matcher.matches()) return defaultValue;
 
-        var intStr = substringBefore(matcher.group(1), ".");
+        val intStr = substringBefore(matcher.group(1), ".");
         if (isEmpty(intStr)) return defaultValue;
 
         return Long.valueOf(intStr);
@@ -136,7 +137,7 @@ public abstract class BaseConfigable implements Configable {
 
     @Override
     public final boolean getBool(String key, boolean defaultValue) {
-        var str = getStr(key);
+        val str = getStr(key);
         if (isEmpty(str)) return defaultValue;
 
         return toBool(str);
@@ -149,10 +150,10 @@ public abstract class BaseConfigable implements Configable {
 
     @Override
     public final float getFloat(String key, float defaultValue) {
-        var str = getStr(key);
+        val str = getStr(key);
         if (isEmpty(str)) return defaultValue;
 
-        var matcher = numberPattern.matcher(str);
+        val matcher = numberPattern.matcher(str);
         if (!matcher.matches()) return defaultValue;
 
         return Float.valueOf(matcher.group(1));
@@ -160,10 +161,10 @@ public abstract class BaseConfigable implements Configable {
 
     @Override
     public final double getDouble(String key, double defaultValue) {
-        var str = getStr(key);
+        val str = getStr(key);
         if (isEmpty(str)) return defaultValue;
 
-        var matcher = numberPattern.matcher(str);
+        val matcher = numberPattern.matcher(str);
         if (!matcher.matches()) return defaultValue;
 
         return Double.valueOf(matcher.group(1));

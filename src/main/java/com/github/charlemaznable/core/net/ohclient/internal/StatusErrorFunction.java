@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.net.ohclient.internal;
 
 import com.github.charlemaznable.core.net.common.StatusError;
 import lombok.AllArgsConstructor;
+import lombok.val;
 import okhttp3.ResponseBody;
 
 import java.util.function.Function;
@@ -19,7 +20,7 @@ public final class StatusErrorFunction
 
     @Override
     public Void apply(Class<? extends StatusError> exClass) {
-        var message = toStr(notNullThen(responseBody,
+        val message = toStr(notNullThen(responseBody,
                 ResponseBodyExtractor::string));
         throw (StatusError) onClass(exClass)
                 .create(statusCode, message).get();

@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.net;
 
 import lombok.Cleanup;
 import lombok.SneakyThrows;
+import lombok.val;
 import org.springframework.http.HttpStatus;
 
 import javax.servlet.http.Cookie;
@@ -47,7 +48,7 @@ public final class Http {
 
         response.setHeader("Content-Type", contentType + "; charset=" + characterEncoding);
         response.setCharacterEncoding(characterEncoding);
-        var writer = response.getWriter();
+        val writer = response.getWriter();
         writer.write(content);
         writer.flush();
     }
@@ -86,9 +87,9 @@ public final class Http {
 
     public static Map<String, String> fetchParameterMap(HttpServletRequest request) {
         Map<String, String> parameterMap = newHashMap();
-        var parameterNames = request.getParameterNames();
+        val parameterNames = request.getParameterNames();
         while (parameterNames.hasMoreElements()) {
-            var parameterName = parameterNames.nextElement();
+            val parameterName = parameterNames.nextElement();
             parameterMap.put(parameterName, request.getParameter(parameterName));
         }
         return parameterMap;
@@ -97,16 +98,16 @@ public final class Http {
     @SuppressWarnings("unchecked")
     public static Map<String, String> fetchPathVariableMap(HttpServletRequest request) {
         Map<String, String> pathVariableMap = newHashMap();
-        var pathVariables = request.getAttribute(URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        val pathVariables = request.getAttribute(URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         if (nonNull(pathVariables)) pathVariableMap.putAll((Map) pathVariables);
         return pathVariableMap;
     }
 
     public static Map<String, String> fetchHeaderMap(HttpServletRequest request) {
         Map<String, String> headerMap = newHashMap();
-        var headerNames = request.getHeaderNames();
+        val headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
-            var headerName = headerNames.nextElement();
+            val headerName = headerNames.nextElement();
             headerMap.put(headerName, request.getHeader(headerName));
         }
         return headerMap;
@@ -114,18 +115,18 @@ public final class Http {
 
     public static Map<String, String> fetchCookieMap(HttpServletRequest request) {
         Map<String, String> cookieMap = newHashMap();
-        var cookies = nullThen(request.getCookies(), () -> new Cookie[]{});
-        for (var cookie : cookies) {
+        val cookies = nullThen(request.getCookies(), () -> new Cookie[]{});
+        for (val cookie : cookies) {
             cookieMap.put(cookie.getName(), cookie.getValue());
         }
         return cookieMap;
     }
 
     public static String fetchRemoteAddr(HttpServletRequest request) {
-        var xForwardedFor = request.getHeader("x-forwarded-for");
+        val xForwardedFor = request.getHeader("x-forwarded-for");
         if (isNotEmpty(xForwardedFor)) {
-            var forwardedAddrList = on(",").trimResults().splitToList(xForwardedFor);
-            for (var forwardedAddr : forwardedAddrList) {
+            val forwardedAddrList = on(",").trimResults().splitToList(xForwardedFor);
+            for (val forwardedAddr : forwardedAddrList) {
                 if (isNotEmpty(forwardedAddr) &&
                         !UNKNOWN.equalsIgnoreCase(forwardedAddr)) {
                     return forwardedAddr;
@@ -133,13 +134,13 @@ public final class Http {
             }
         }
 
-        var proxyClientIP = request.getHeader("Proxy-Client-IP");
+        val proxyClientIP = request.getHeader("Proxy-Client-IP");
         if (isNotEmpty(proxyClientIP) &&
                 !UNKNOWN.equalsIgnoreCase(proxyClientIP)) {
             return proxyClientIP;
         }
 
-        var wlProxyClientIP = request.getHeader("WL-Proxy-Client-IP");
+        val wlProxyClientIP = request.getHeader("WL-Proxy-Client-IP");
         if (isNotEmpty(wlProxyClientIP) &&
                 !UNKNOWN.equalsIgnoreCase(wlProxyClientIP)) {
             return wlProxyClientIP;
@@ -151,12 +152,12 @@ public final class Http {
     @SneakyThrows
     public static Map<String, String> dealReqParams(Map<String, String[]> requestParams) {
         Map<String, String> params = newHashMap();
-        for (var entry : requestParams.entrySet()) {
-            var key = entry.getKey();
-            var values = entry.getValue();
+        for (val entry : requestParams.entrySet()) {
+            val key = entry.getKey();
+            val values = entry.getValue();
 
-            var valueStr = "";
-            for (var i = 0; i < values.length; i++) {
+            String valueStr = "";
+            for (int i = 0; i < values.length; i++) {
                 valueStr = (i == values.length - 1) ? valueStr + values[i] : valueStr + values[i] + ",";
             }
             valueStr = new String(valueStr.getBytes(ISO_8859_1), "gbk");
@@ -167,12 +168,12 @@ public final class Http {
 
     @SneakyThrows
     public static String dealRequestBody(HttpServletRequest req, String charsetName) {
-        @Cleanup var dis = new DataInputStream(req.getInputStream());
-        var formDataLength = req.getContentLength();
-        var buff = new byte[formDataLength];
-        var totalBytes = 0;
+        @Cleanup val dis = new DataInputStream(req.getInputStream());
+        val formDataLength = req.getContentLength();
+        val buff = new byte[formDataLength];
+        int totalBytes = 0;
         while (totalBytes < formDataLength) {
-            var bytes = dis.read(buff, totalBytes, formDataLength);
+            val bytes = dis.read(buff, totalBytes, formDataLength);
             totalBytes += bytes;
         }
         return new String(buff, charsetName);
@@ -180,9 +181,9 @@ public final class Http {
 
     @SneakyThrows
     public static String dealRequestBodyStream(HttpServletRequest req, String charsetName) {
-        @Cleanup var isr = new InputStreamReader(req.getInputStream(), charsetName);
-        try (var bufferedReader = new BufferedReader(isr)) {
-            var stringBuilder = new StringBuilder();
+        @Cleanup val isr = new InputStreamReader(req.getInputStream(), charsetName);
+        try (val bufferedReader = new BufferedReader(isr)) {
+            val stringBuilder = new StringBuilder();
             String line;
             while (nonNull(line = bufferedReader.readLine())) {
                 stringBuilder.append(line);

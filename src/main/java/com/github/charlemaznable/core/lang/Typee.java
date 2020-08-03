@@ -1,5 +1,7 @@
 package com.github.charlemaznable.core.lang;
 
+import lombok.val;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -19,14 +21,14 @@ public final class Typee {
             Class<?> subClass,
             Class<?> genericType,
             int argumentOrder) {
-        var genericSuperclass = subClass.getGenericSuperclass();
+        val genericSuperclass = subClass.getGenericSuperclass();
         if (genericSuperclass instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType) genericSuperclass;
-            var rawType = pt.getRawType();
+            val rawType = pt.getRawType();
 
             if (rawType == genericType || isAssignable(
                     (Class<?>) rawType, genericType)) {
-                var type = pt.getActualTypeArguments()[argumentOrder];
+                val type = pt.getActualTypeArguments()[argumentOrder];
                 return (Class<?>) type;
             }
         }
@@ -35,17 +37,17 @@ public final class Typee {
             if (!(genericInterface instanceof ParameterizedType)) continue;
 
             ParameterizedType pt = (ParameterizedType) genericInterface;
-            var rawType = pt.getRawType();
+            val rawType = pt.getRawType();
 
             if (rawType == genericType || isAssignable(
                     (Class<?>) rawType, genericType)) {
-                var type = pt.getActualTypeArguments()[argumentOrder];
+                val type = pt.getActualTypeArguments()[argumentOrder];
                 return (Class<?>) type;
             }
         }
 
-        var interfaces = subClass.getInterfaces();
-        for (var impInterface : interfaces) {
+        val interfaces = subClass.getInterfaces();
+        for (val impInterface : interfaces) {
             if (isAssignable(impInterface, genericType)) {
                 return getActualTypeArgument(impInterface, genericType, argumentOrder);
             }

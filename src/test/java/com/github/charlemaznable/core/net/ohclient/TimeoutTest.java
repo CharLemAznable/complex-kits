@@ -7,6 +7,7 @@ import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientTimeout;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientTimeout.TimeoutProvider;
 import lombok.SneakyThrows;
+import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -27,7 +28,7 @@ public class TimeoutTest {
     @SneakyThrows
     @Test
     public void testTimeout() {
-        try (var mockWebServer = new MockWebServer()) {
+        try (val mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
@@ -43,24 +44,24 @@ public class TimeoutTest {
             });
             mockWebServer.start(41210);
 
-            var client1 = ohLoader.getClient(TimeoutHttpClient1.class);
+            val client1 = ohLoader.getClient(TimeoutHttpClient1.class);
             assertEquals(SAMPLE, client1.sample());
 
-            var client2 = ohLoader.getClient(TimeoutHttpClient2.class);
+            val client2 = ohLoader.getClient(TimeoutHttpClient2.class);
             assertEquals(SAMPLE, client2.sample());
 
-            var provider1 = ohLoader.getClient(TimeoutProviderHttpClient1.class);
+            val provider1 = ohLoader.getClient(TimeoutProviderHttpClient1.class);
             assertEquals(SAMPLE, provider1.sample());
 
-            var provider2 = ohLoader.getClient(TimeoutProviderHttpClient2.class);
+            val provider2 = ohLoader.getClient(TimeoutProviderHttpClient2.class);
             assertEquals(SAMPLE, provider2.sample());
 
-            var timeout1 = OhFactory.timeout();
-            var param1 = ohLoader.getClient(TimeoutParamHttpClient1.class);
+            val timeout1 = OhFactory.timeout();
+            val param1 = ohLoader.getClient(TimeoutParamHttpClient1.class);
             assertEquals(SAMPLE, param1.sample(timeout1));
 
-            var timeout2 = OhFactory.timeout(60_000, 60_000, 60_000, 60_000);
-            var param2 = ohLoader.getClient(TimeoutParamHttpClient2.class);
+            val timeout2 = OhFactory.timeout(60_000, 60_000, 60_000, 60_000);
+            val param2 = ohLoader.getClient(TimeoutParamHttpClient2.class);
             assertEquals(SAMPLE, param2.sample(timeout2));
 
             assertEquals(TimeoutProvider.class, timeout1.callTimeoutProvider());
@@ -81,7 +82,7 @@ public class TimeoutTest {
         assertThrows(ProviderException.class, () ->
                 ohLoader.getClient(TimeoutErrorHttpClient1.class));
 
-        var httpClient = ohLoader.getClient(TimeoutErrorHttpClient2.class);
+        val httpClient = ohLoader.getClient(TimeoutErrorHttpClient2.class);
         assertThrows(ProviderException.class, httpClient::sample);
     }
 

@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.lang;
 
+import lombok.val;
 import org.joor.ReflectException;
 import org.junit.jupiter.api.Test;
 
@@ -14,9 +15,9 @@ public class ReflecttTest {
         assertThrows(ReflectException.class, () ->
                 onClass(Reflectt.class).create().get());
 
-        var pubNameField = Reflectt.field0(DemoReflect.class, "pubName");
+        val pubNameField = Reflectt.field0(DemoReflect.class, "pubName");
         assertEquals("pubName", pubNameField.getName());
-        var prvNameField = Reflectt.field0(DemoReflect.class, "prvName");
+        val prvNameField = Reflectt.field0(DemoReflect.class, "prvName");
         assertEquals("prvName", prvNameField.getName());
 
         assertThrows(ReflectException.class, () ->

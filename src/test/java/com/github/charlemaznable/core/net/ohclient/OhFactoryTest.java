@@ -11,6 +11,7 @@ import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.RequestMethod;
 import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import lombok.SneakyThrows;
+import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -49,17 +50,17 @@ public class OhFactoryTest {
     @SneakyThrows
     @Test
     public void testAcceptCharset() {
-        try (var mockWebServer = new MockWebServer()) {
+        try (val mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
                     switch (request.getPath()) {
                         case SAMPLE:
-                            var acceptCharset = request.getHeader(ACCEPT_CHARSET);
+                            val acceptCharset = request.getHeader(ACCEPT_CHARSET);
                             assertEquals(ISO_8859_1.name(), acceptCharset);
                             return new MockResponse().setBody(acceptCharset);
                         case SAMPLE2:
-                            var acceptCharset2 = request.getHeader(ACCEPT_CHARSET);
+                            val acceptCharset2 = request.getHeader(ACCEPT_CHARSET);
                             assertEquals(UTF_8.name(), acceptCharset2);
                             return new MockResponse().setBody(acceptCharset2);
                         default:
@@ -71,7 +72,7 @@ public class OhFactoryTest {
             });
             mockWebServer.start(41130);
 
-            var httpClient = ohLoader.getClient(AcceptCharsetHttpClient.class);
+            val httpClient = ohLoader.getClient(AcceptCharsetHttpClient.class);
             assertEquals(ISO_8859_1.name(), httpClient.sample());
             assertEquals(UTF_8.name(), httpClient.sample2());
 
@@ -84,25 +85,25 @@ public class OhFactoryTest {
     @SneakyThrows
     @Test
     public void testContentFormat() {
-        try (var mockWebServer = new MockWebServer()) {
+        try (val mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
                     switch (request.getPath()) {
                         case SAMPLE:
-                            var contentType = request.getHeader(CONTENT_TYPE);
+                            val contentType = request.getHeader(CONTENT_TYPE);
                             assertTrue(contentType.startsWith(FORM_DATA.toString()));
-                            var bodyString = request.getBody().readUtf8();
+                            val bodyString = request.getBody().readUtf8();
                             return new MockResponse().setBody(bodyString);
                         case SAMPLE2:
-                            var contentType2 = request.getHeader(CONTENT_TYPE);
+                            val contentType2 = request.getHeader(CONTENT_TYPE);
                             assertTrue(contentType2.startsWith(JSON_UTF_8.toString()));
-                            var bodyString2 = request.getBody().readUtf8();
+                            val bodyString2 = request.getBody().readUtf8();
                             return new MockResponse().setBody(bodyString2);
                         case "/sample3":
-                            var contentType3 = request.getHeader(CONTENT_TYPE);
+                            val contentType3 = request.getHeader(CONTENT_TYPE);
                             assertTrue(contentType3.startsWith(APPLICATION_XML_UTF_8.toString()));
-                            var bodyString3 = request.getBody().readUtf8();
+                            val bodyString3 = request.getBody().readUtf8();
                             return new MockResponse().setBody(bodyString3);
                         default:
                             return new MockResponse()
@@ -113,7 +114,7 @@ public class OhFactoryTest {
             });
             mockWebServer.start(41131);
 
-            var httpClient = ohLoader.getClient(ContentFormatHttpClient.class);
+            val httpClient = ohLoader.getClient(ContentFormatHttpClient.class);
             assertEquals("", httpClient.sample());
             assertEquals("{}", httpClient.sample2());
             assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<xml/>", httpClient.sample3());
@@ -127,17 +128,17 @@ public class OhFactoryTest {
     @SneakyThrows
     @Test
     public void testRequestMethod() {
-        try (var mockWebServer = new MockWebServer()) {
+        try (val mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
                     switch (request.getPath()) {
                         case SAMPLE:
-                            var method = request.getMethod();
+                            val method = request.getMethod();
                             assertEquals("POST", method);
                             return new MockResponse().setBody(method);
                         case SAMPLE2:
-                            var method2 = request.getMethod();
+                            val method2 = request.getMethod();
                             assertEquals("GET", method2);
                             return new MockResponse().setBody(method2);
                         default:
@@ -149,7 +150,7 @@ public class OhFactoryTest {
             });
             mockWebServer.start(41132);
 
-            var httpClient = ohLoader.getClient(RequestMethodHttpClient.class);
+            val httpClient = ohLoader.getClient(RequestMethodHttpClient.class);
             assertEquals("POST", httpClient.sample());
             assertEquals("GET", httpClient.sample2());
 
@@ -162,7 +163,7 @@ public class OhFactoryTest {
     @SneakyThrows
     @Test
     public void testExtendInterface() {
-        try (var mockWebServer = new MockWebServer()) {
+        try (val mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
@@ -177,7 +178,7 @@ public class OhFactoryTest {
             });
             mockWebServer.start(41133);
 
-            var baseHttpClient = ohLoader.getClient(BaseHttpClient.class);
+            val baseHttpClient = ohLoader.getClient(BaseHttpClient.class);
             assertNotNull(baseHttpClient);
 
             assertThrows(OhException.class, () -> ohLoader.getClient(SubHttpClient.class));

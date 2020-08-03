@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.lang;
 
 import com.google.common.cache.CacheLoader;
 import lombok.SneakyThrows;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
@@ -25,7 +26,7 @@ public class LoadingCacheeTest {
 
     @Test
     public void testSimpleCache() {
-        var simpleCache = simpleCache(new CacheLoader<String, String>() {
+        val simpleCache = simpleCache(new CacheLoader<String, String>() {
             @Override
             public String load(@Nonnull String s) {
                 if (s.equals("ex")) {
@@ -46,14 +47,14 @@ public class LoadingCacheeTest {
     @SneakyThrows
     @Test
     public void testAccessCache() {
-        var accessCache = accessCache(new CacheLoader<String, String>() {
+        val accessCache = accessCache(new CacheLoader<String, String>() {
             @Override
             public String load(@Nonnull String s) {
                 return s + toStr(currentTimeMillis());
             }
         }, Duration.ofMillis(200));
 
-        var cachedValue = get(accessCache, "abc");
+        val cachedValue = get(accessCache, "abc");
         assertEquals(cachedValue, get(accessCache, "abc"));
 
         assertDoesNotThrow(() ->
@@ -68,14 +69,14 @@ public class LoadingCacheeTest {
     @SneakyThrows
     @Test
     public void testWriteCache() {
-        var writeCache = writeCache(new CacheLoader<String, String>() {
+        val writeCache = writeCache(new CacheLoader<String, String>() {
             @Override
             public String load(@Nonnull String s) {
                 return s + toStr(currentTimeMillis());
             }
         }, Duration.ofMillis(100));
 
-        var cachedValue = get(writeCache, "abc");
+        val cachedValue = get(writeCache, "abc");
         assertEquals(cachedValue, get(writeCache, "abc"));
 
         assertDoesNotThrow(() ->

@@ -1,6 +1,7 @@
 package com.github.charlemaznable.core.lang;
 
 import com.google.common.collect.Lists;
+import lombok.val;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public final class Listt {
         if (isNull(map)) return newArrayList();
 
         List<Map<String, T>> result = newArrayList();
-        for (var entry : map.entrySet()) {
+        for (val entry : map.entrySet()) {
             result.add(of(keyKey, entry.getKey(), valueKey, entry.getValue()));
         }
         return result;
@@ -70,7 +71,7 @@ public final class Listt {
 
     public static <E> List<E> newArrayListOfType(int count, Class<? extends E> itemType) {
         ArrayList<E> list = Lists.newArrayList();
-        for (var i = 0; i < count; ++i) {
+        for (int i = 0; i < count; ++i) {
             list.add(onClass(itemType).create().get());
         }
         return list;

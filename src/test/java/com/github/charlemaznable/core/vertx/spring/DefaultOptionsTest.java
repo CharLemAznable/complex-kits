@@ -3,6 +3,7 @@ package com.github.charlemaznable.core.vertx.spring;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.impl.EventBusImpl;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +25,10 @@ public class DefaultOptionsTest {
     @Test
     public void testSpringVertxConfiguration() {
         assertNotNull(vertx);
-        var reflectVertx = on(vertx);
+        val reflectVertx = on(vertx);
         int defaultWorkerPoolSize = reflectVertx.field("defaultWorkerPoolSize").get();
         assertEquals(VertxOptions.DEFAULT_WORKER_POOL_SIZE, defaultWorkerPoolSize);
-        var eventBus = reflectVertx.field("eventBus").get();
+        val eventBus = reflectVertx.field("eventBus").get();
         assertTrue(eventBus instanceof EventBusImpl);
     }
 }

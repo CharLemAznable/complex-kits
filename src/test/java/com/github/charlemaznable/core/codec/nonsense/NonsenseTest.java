@@ -16,7 +16,7 @@ public class NonsenseTest {
 
     @Test
     public void testNonsense() {
-        var nonsense = nonsense();
+        Nonsense nonsense = nonsense();
         assertEquals(DEFAULT_KEY, nonsense.getKey());
         assertTrue(nonsense.getValue().matches("[A-Za-z0-9]{16}"));
 
@@ -35,7 +35,7 @@ public class NonsenseTest {
 
     @Test
     public void testNonsenseAscii() {
-        var nonsense = nonsenseAscii();
+        Nonsense nonsense = nonsenseAscii();
         assertEquals(DEFAULT_KEY, nonsense.getKey());
         assertTrue(nonsense.getValue().matches("[\\x20-\\xff]{16}"));
 
@@ -54,7 +54,7 @@ public class NonsenseTest {
 
     @Test
     public void testNonsenseNumbers() {
-        var nonsense = nonsenseNumbers();
+        Nonsense nonsense = nonsenseNumbers();
         assertEquals(DEFAULT_KEY, nonsense.getKey());
         assertTrue(nonsense.getValue().matches("[0-9]{16}"));
 
@@ -73,7 +73,7 @@ public class NonsenseTest {
 
     @Test
     public void testNonsenseLetters() {
-        var nonsense = nonsenseLetters();
+        Nonsense nonsense = nonsenseLetters();
         assertEquals(DEFAULT_KEY, nonsense.getKey());
         assertTrue(nonsense.getValue().matches("[A-Za-z]{16}"));
 

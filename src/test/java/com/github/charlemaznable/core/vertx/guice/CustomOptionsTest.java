@@ -5,6 +5,7 @@ import com.google.inject.Provider;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.impl.clustered.ClusteredEventBus;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import static org.joor.Reflect.on;
@@ -26,26 +27,26 @@ public class CustomOptionsTest {
 
     @Test
     public void testVertxModular() {
-        var injector = Guice.createInjector(new VertxModular(vertxOptions).createModule());
-        var vertx = injector.getInstance(Vertx.class);
+        val injector = Guice.createInjector(new VertxModular(vertxOptions).createModule());
+        val vertx = injector.getInstance(Vertx.class);
         assertNotNull(vertx);
-        var reflectVertx = on(vertx);
+        val reflectVertx = on(vertx);
         int defaultWorkerPoolSize = reflectVertx.field("defaultWorkerPoolSize").get();
         assertEquals(DEFAULT_WORKER_POOL_SIZE, defaultWorkerPoolSize);
-        var eventBus = reflectVertx.field("eventBus").get();
+        val eventBus = reflectVertx.field("eventBus").get();
         assertTrue(eventBus instanceof ClusteredEventBus);
         assertSame(vertx, injector.getInstance(Vertx.class));
     }
 
     @Test
     public void testVertxModularProviderClass() {
-        var injector = Guice.createInjector(new VertxModular(CustomOptionsProvider.class).createModule());
-        var vertx = injector.getInstance(Vertx.class);
+        val injector = Guice.createInjector(new VertxModular(CustomOptionsProvider.class).createModule());
+        val vertx = injector.getInstance(Vertx.class);
         assertNotNull(vertx);
-        var reflectVertx = on(vertx);
+        val reflectVertx = on(vertx);
         int defaultWorkerPoolSize = reflectVertx.field("defaultWorkerPoolSize").get();
         assertEquals(DEFAULT_WORKER_POOL_SIZE, defaultWorkerPoolSize);
-        var eventBus = reflectVertx.field("eventBus").get();
+        val eventBus = reflectVertx.field("eventBus").get();
         assertTrue(eventBus instanceof ClusteredEventBus);
         assertSame(vertx, injector.getInstance(Vertx.class));
     }

@@ -7,6 +7,7 @@ import com.github.charlemaznable.core.net.common.Mapping.UrlProvider;
 import com.github.charlemaznable.core.net.common.ProviderException;
 import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
 import lombok.SneakyThrows;
+import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -28,9 +29,9 @@ public class UrlConcatTest {
     @SneakyThrows
     @Test
     public void testUrlPlainConcat() {
-        try (var mockWebServer = startMockWebServer(41100)) {
+        try (val mockWebServer = startMockWebServer(41100)) {
 
-            var httpClient = ohLoader.getClient(UrlPlainHttpClient.class);
+            val httpClient = ohLoader.getClient(UrlPlainHttpClient.class);
             assertEquals(ROOT, httpClient.empty());
             assertEquals(ROOT, httpClient.root());
             assertEquals(SAMPLE, httpClient.sample());
@@ -42,9 +43,9 @@ public class UrlConcatTest {
     @SneakyThrows
     @Test
     public void testUrlProviderConcat() {
-        try (var mockWebServer = startMockWebServer(41101)) {
+        try (val mockWebServer = startMockWebServer(41101)) {
 
-            var httpClient = ohLoader.getClient(UrlProviderHttpClient.class);
+            val httpClient = ohLoader.getClient(UrlProviderHttpClient.class);
             assertEquals(ROOT, httpClient.empty());
             assertEquals(ROOT, httpClient.root());
             assertEquals(SAMPLE, httpClient.sample());
@@ -59,13 +60,13 @@ public class UrlConcatTest {
         assertThrows(ProviderException.class, () ->
                 ohLoader.getClient(ErrorUrlHttpClient1.class));
 
-        var httpClient = ohLoader.getClient(ErrorUrlHttpClient2.class);
+        val httpClient = ohLoader.getClient(ErrorUrlHttpClient2.class);
         assertThrows(ProviderException.class, httpClient::sample);
     }
 
     @SneakyThrows
     private MockWebServer startMockWebServer(int port) {
-        var mockWebServer = new MockWebServer();
+        val mockWebServer = new MockWebServer();
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
             public MockResponse dispatch(RecordedRequest request) {

@@ -17,6 +17,7 @@ import com.github.charlemaznable.core.spring.testcontext.TestRewireBaseClass;
 import com.github.charlemaznable.core.spring.testcontext.TestRewireSubClass;
 import com.github.charlemaznable.core.spring.testcontext.TestSpringContext;
 import com.github.charlemaznable.core.spring.testcontext.TestSubSpringContext;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -37,7 +38,7 @@ public class SpringContextTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testSpringContext() {
-        var testClassBean = TestSpringContext.getBean(TestClass.class);
+        TestClass testClassBean = TestSpringContext.getBean(TestClass.class);
         assertNotNull(testClassBean);
 
         testClassBean = TestSpringContext.getBean((Class) null, new TestClass());
@@ -49,13 +50,13 @@ public class SpringContextTest {
         testClassBean = TestSpringContext.getBean("", new TestClass());
         assertNotNull(testClassBean);
 
-        var clzResolverBean = TestSpringContext.getBean(ClzResolver.class);
+        ClzResolver clzResolverBean = TestSpringContext.getBean(ClzResolver.class);
         assertNull(clzResolverBean);
 
         clzResolverBean = TestSpringContext.getBean("ClzResolver");
         assertNull(clzResolverBean);
 
-        var multiBean = TestSpringContext.getBean(TestMultiClass.class);
+        TestMultiClass multiBean = TestSpringContext.getBean(TestMultiClass.class);
         assertNull(multiBean);
 
         multiBean = TestSpringContext.getBean("", (Class<TestMultiClass>) null);
@@ -83,7 +84,7 @@ public class SpringContextTest {
         multiBean = TestSpringContext.getBean("TestMultiClassC", TestMultiClass.class);
         assertNull(multiBean);
 
-        var multiBeanNames = TestSpringContext.getBeanNamesForType(null);
+        String[] multiBeanNames = TestSpringContext.getBeanNamesForType(null);
         assertEquals(0, multiBeanNames.length);
         multiBeanNames = TestSpringContext.getBeanNamesForType(TestClass.class);
         assertEquals(1, multiBeanNames.length);
@@ -222,18 +223,18 @@ public class SpringContextTest {
         onClass(TestSpringContext.class).field("defaultListableBeanFactory")
                 .set("allowBeanDefinitionOverriding", false);
 
-        var baseBean = new TestRewireBaseClass();
+        val baseBean = new TestRewireBaseClass();
         TestRewireBaseClass base = TestSpringContext.getBeanOrAutowire(TestRewireBaseClass.class, baseBean);
         assertNotNull(base);
         assertEquals(baseBean, base);
 
-        var subBean = new TestRewireSubClass();
+        val subBean = new TestRewireSubClass();
         TestRewireSubClass sub = TestSpringContext.getBeanOrAutowire(TestRewireSubClass.class, subBean);
         assertNotNull(sub);
         assertNotEquals(base, sub);
         assertEquals(subBean, sub);
 
-        var baseBean2 = new TestRewireBaseClass();
+        val baseBean2 = new TestRewireBaseClass();
         TestRewireBaseClass base2 = TestSpringContext.getBeanOrAutowire(TestRewireBaseClass.class, baseBean2);
         assertNotNull(base2);
         assertEquals(base, base2);

@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.lang.concurrent;
 
 import com.google.common.eventbus.Subscribe;
 import lombok.SneakyThrows;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -15,7 +16,7 @@ public class EventBusExecutorTest {
     @SneakyThrows
     @Test
     public void testEventBusCachedExecutor() {
-        var testEventBusCachedExecutor = new TestEventBusCachedExecutor();
+        val testEventBusCachedExecutor = new TestEventBusCachedExecutor();
         testEventBusCachedExecutor.post("test");
         assertDoesNotThrow(() ->
                 await().pollDelay(Duration.ofMillis(100)).until(() ->
@@ -29,8 +30,8 @@ public class EventBusExecutorTest {
                 await().pollDelay(Duration.ofMillis(2000)).until(() ->
                         "delay".equals(testEventBusCachedExecutor.message)));
 
-        var testEventBusCachedSubscriber = new TestEventBusCachedSubscriber();
-        var testEventBusCachedExecutor2 = new EventBusCachedExecutor(testEventBusCachedSubscriber) {};
+        val testEventBusCachedSubscriber = new TestEventBusCachedSubscriber();
+        val testEventBusCachedExecutor2 = new EventBusCachedExecutor(testEventBusCachedSubscriber) {};
         testEventBusCachedExecutor2.post("test");
         assertDoesNotThrow(() ->
                 await().pollDelay(Duration.ofMillis(100)).until(() ->
@@ -48,7 +49,7 @@ public class EventBusExecutorTest {
     @SneakyThrows
     @Test
     public void testEventBusFixedExecutor() {
-        var testEventBusFixedExecutor = new TestEventBusFixedExecutor();
+        val testEventBusFixedExecutor = new TestEventBusFixedExecutor();
         testEventBusFixedExecutor.post("test");
         assertDoesNotThrow(() ->
                 await().pollDelay(Duration.ofMillis(100)).until(() ->
@@ -62,8 +63,8 @@ public class EventBusExecutorTest {
                 await().pollDelay(Duration.ofMillis(2000)).until(() ->
                         "delay".equals(testEventBusFixedExecutor.message)));
 
-        var testEventBusFixedSubscriber = new TestEventBusFixedSubscriber();
-        var testEventBusFixedExecutor2 = new EventBusFixedExecutor(testEventBusFixedSubscriber) {};
+        val testEventBusFixedSubscriber = new TestEventBusFixedSubscriber();
+        val testEventBusFixedExecutor2 = new EventBusFixedExecutor(testEventBusFixedSubscriber) {};
         testEventBusFixedExecutor2.post("test");
         assertDoesNotThrow(() ->
                 await().pollDelay(Duration.ofMillis(100)).until(() ->

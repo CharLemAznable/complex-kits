@@ -4,6 +4,7 @@ import com.github.charlemaznable.core.lang.ex.BadConditionException;
 import com.github.charlemaznable.core.lang.ex.BlankStringException;
 import com.github.charlemaznable.core.lang.ex.EmptyObjectException;
 import lombok.Data;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
@@ -33,9 +34,9 @@ public class ConditionTest {
     @Test
     public void testCondition() {
         String strnull = null;
-        var strempty = "";
-        var strblank = "  ";
-        var string = "string";
+        val strempty = "";
+        val strblank = "  ";
+        val string = "string";
 
         assertNull(nonNull(strnull));
         assertEquals(strempty, nonNull(strnull, strempty, strblank, string));
@@ -85,9 +86,9 @@ public class ConditionTest {
     @Test
     public void testConditionCheck() {
         String strnull = null;
-        var strempty = "";
-        var strblank = "  ";
-        var string = "string";
+        val strempty = "";
+        val strblank = "  ";
+        val string = "string";
 
         assertThrows(NullPointerException.class, () -> checkNotNull(strnull));
         assertThrows(NullPointerException.class, () -> checkNotNull(strnull, "strnull is Null"));
@@ -127,7 +128,7 @@ public class ConditionTest {
         assertDoesNotThrow(() -> checkCondition(() -> Objects.isNull(strnull), "strnull is Null"));
         assertDoesNotThrow(() -> checkCondition(() -> Objects.isNull(strnull), new ConditionTestException()));
 
-        var testBean = new ConditionTestBean();
+        val testBean = new ConditionTestBean();
         assertThrows(BadConditionException.class, () -> checkCondition(() -> Objects.nonNull(strnull), () -> testBean.setValue("true")));
         assertNull(testBean.getValue());
         assertThrows(BadConditionException.class, () -> checkCondition(() -> Objects.nonNull(strnull), () -> testBean.setValue("true"), "strnull is Null"));

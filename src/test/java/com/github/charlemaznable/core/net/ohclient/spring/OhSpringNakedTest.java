@@ -9,6 +9,7 @@ import com.github.charlemaznable.core.net.ohclient.testclient.TestHttpClientIsol
 import com.github.charlemaznable.core.net.ohclient.testclient.TestHttpClientNone;
 import com.github.charlemaznable.core.spring.SpringContext;
 import lombok.SneakyThrows;
+import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -38,7 +39,7 @@ public class OhSpringNakedTest {
     @SneakyThrows
     @Test
     public void testOhClientNaked() {
-        try (var mockWebServer = new MockWebServer()) {
+        try (val mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
@@ -56,12 +57,12 @@ public class OhSpringNakedTest {
             });
             mockWebServer.start(41102);
 
-            var testHttpClient = testComponent.getTestHttpClient();
+            val testHttpClient = testComponent.getTestHttpClient();
             assertThrows(NullPointerException.class, testHttpClient::sample);
             assertThrows(NullPointerException.class, testHttpClient::sampleWrapper);
             assertEquals("SampleNoError", testHttpClient.sampleWrap());
 
-            var testHttpClientIsolated = getClient(TestHttpClientIsolated.class);
+            val testHttpClientIsolated = getClient(TestHttpClientIsolated.class);
             assertEquals("SampleError", testHttpClientIsolated.sample());
             assertEquals("[SampleError]", testHttpClientIsolated.sampleWrapper());
 

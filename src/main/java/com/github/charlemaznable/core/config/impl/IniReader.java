@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.config.impl;
 
+import lombok.val;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -39,9 +40,9 @@ public final class IniReader {
     public IniReader(Reader reader) throws IOException {
         sections.add(""); // add Global section.
 
-        var bufferedReader = new BufferedReader(reader);
+        val bufferedReader = new BufferedReader(reader);
 
-        var line = bufferedReader.readLine();
+        String line = bufferedReader.readLine();
 
         for (; nonNull(line); line = bufferedReader.readLine()) {
             ++lineNumber;
@@ -49,8 +50,8 @@ public final class IniReader {
             if (!checkLine(line)) continue;
 
             String key;
-            var value = "";
-            var index = findSeparator(line);
+            String value = "";
+            val index = findSeparator(line);
             if (index >= 0) {
                 key = line.substring(0, index);
                 value = parseValue(line.substring(index + 1), bufferedReader);
@@ -67,19 +68,19 @@ public final class IniReader {
     }
 
     private static String parseValue(String val, BufferedReader reader) throws IOException {
-        var propertyValue = new StringBuilder();
+        val propertyValue = new StringBuilder();
         boolean lineContinues;
-        var value = val.trim();
+        String value = val.trim();
 
         do {
-            var quoted = value.startsWith("\"") || value.startsWith("'");
-            var quote = quoted ? value.charAt(0) : 0;
-            var i = quoted ? 1 : 0;
+            val quoted = value.startsWith("\"") || value.startsWith("'");
+            val quote = quoted ? value.charAt(0) : 0;
+            int i = quoted ? 1 : 0;
 
-            var result = new StringBuilder();
+            val result = new StringBuilder();
             i = parseValueByChars(quoted, quote, i, value, result);
 
-            var v = result.toString();
+            String v = result.toString();
             if (!quoted) {
                 v = v.trim();
                 lineContinues = lineContinues(v);
@@ -100,14 +101,14 @@ public final class IniReader {
     }
 
     private static int parseValueByChars(boolean quoted, int quote, int i, String value, StringBuilder result) {
-        var stop = false;
-        var escape = false;
-        var lastChar = 0;
+        boolean stop = false;
+        boolean escape = false;
+        char lastChar = 0;
         while (i < value.length() && !stop) {
-            var c = value.charAt(i);
+            val c = value.charAt(i);
 
             if (quoted) {
-                var res = parseValueQuoted(quote, c, result, escape);
+                val res = parseValueQuoted(quote, c, result, escape);
                 escape = res.getLeft();
                 stop = res.getRight();
             } else {
@@ -123,7 +124,7 @@ public final class IniReader {
 
     private static Pair<Boolean/* escape */, Boolean/* stop */> parseValueQuoted(
             int quote, char c, StringBuilder result, boolean escape) {
-        var res = MutablePair.of(escape, false);
+        val res = MutablePair.of(escape, false);
         if ('\\' == c && !escape) res.setLeft(true);
         else if (!escape && quote == c) res.setRight(true);
         else if (escape && quote == c) {
@@ -141,7 +142,7 @@ public final class IniReader {
     }
 
     private static boolean lineContinues(String line) {
-        var s = line.trim();
+        val s = line.trim();
         return s.equals(LINE_CONT) || s.length() > 2 && s.endsWith(LINE_CONT)
                 && isWhitespace(s.charAt(s.length() - 2));
     }
@@ -151,7 +152,7 @@ public final class IniReader {
 
         if (pos >= line.length()) s = line;
         else {
-            var end = pos;
+            int end = pos;
             while (end < line.length() && !isCommentChar(line.charAt(end)))
                 end++;
             s = line.substring(pos, end);
@@ -165,9 +166,9 @@ public final class IniReader {
     }
 
     private static int findSeparator(String line) {
-        var index1 = findSeparatorBeforeQuote(line,
+        int index1 = findSeparatorBeforeQuote(line,
                 findFirstOccurrence(line, QUOTE_CHARACTERS));
-        var index2 = findFirstOccurrence(line, SEPARATOR_CHARS);
+        val index2 = findFirstOccurrence(line, SEPARATOR_CHARS);
         if (index1 < 0) index1 = index2;
 
         return index1 < index2 ? index1 : index2;
@@ -183,11 +184,11 @@ public final class IniReader {
      * is found
      */
     private static int findFirstOccurrence(String line, String separators) {
-        var index = -1;
+        int index = -1;
 
-        for (var i = 0; i < separators.length(); i++) {
-            var sep = separators.charAt(i);
-            var pos = line.indexOf(sep);
+        for (int i = 0; i < separators.length(); i++) {
+            val sep = separators.charAt(i);
+            val pos = line.indexOf(sep);
             if (pos >= 0 && (index < 0 || pos < index)) index = pos;
         }
 
@@ -206,7 +207,7 @@ public final class IniReader {
      * none
      */
     private static int findSeparatorBeforeQuote(String line, int quoteIndex) {
-        var index = quoteIndex - 1;
+        int index = quoteIndex - 1;
         while (index >= 0 && isWhitespace(line.charAt(index))) index--;
         if (index >= 0 && SEPARATOR_CHARS.indexOf(line.charAt(index)) < 0) index = -1;
 
@@ -216,7 +217,7 @@ public final class IniReader {
     private boolean checkLine(@Nonnull String line) {
         if (isCommentLine(line)) return false;
         if (isSectionLine(line)) {
-            var section = line.substring(1, line.length() - 1).trim();
+            val section = line.substring(1, line.length() - 1).trim();
             if (!sections.contains(section)) sections.add(section);
             return false;
         }
@@ -224,13 +225,13 @@ public final class IniReader {
     }
 
     private void createValueNodes(String key, String value) {
-        var lastSection = sections.get(sections.size() - 1);
-        var sectionProps = properties.get(lastSection);
+        val lastSection = sections.get(sections.size() - 1);
+        Properties sectionProps = properties.get(lastSection);
         if (isNull(sectionProps)) {
             sectionProps = new Properties();
             properties.put(lastSection, sectionProps);
         } else {
-            var oldValue = (String) sectionProps.get(key);
+            val oldValue = (String) sectionProps.get(key);
             if (nonNull(oldValue))
                 putIncKeyAndValue(sectionProps, key, oldValue);
         }
@@ -239,7 +240,7 @@ public final class IniReader {
     }
 
     private void putIncKeyAndValue(Properties props, String key, String oldValue) {
-        var seq = 0;
+        int seq = 0;
         while (props.containsKey(key + "." + seq)) ++seq;
 
         props.put(key + "." + seq, oldValue);

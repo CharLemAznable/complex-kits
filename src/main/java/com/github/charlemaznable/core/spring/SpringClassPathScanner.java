@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.spring;
 
+import lombok.val;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -35,7 +36,7 @@ public final class SpringClassPathScanner extends ClassPathBeanDefinitionScanner
     }
 
     public void registerFilters() {
-        for (var annotationClass : annotationClasses) {
+        for (val annotationClass : annotationClasses) {
             addIncludeFilter(new AnnotationTypeFilter(annotationClass));
         }
     }
@@ -43,14 +44,14 @@ public final class SpringClassPathScanner extends ClassPathBeanDefinitionScanner
     @Nonnull
     @Override
     public Set<BeanDefinitionHolder> doScan(String... basePackages) {
-        var beanDefinitions = super.doScan(basePackages);
+        val beanDefinitions = super.doScan(basePackages);
 
         if (beanDefinitions.isEmpty()) {
             logger.warn("No " + factoryBeanClass.getSimpleName() + " was found in '"
                     + Arrays.toString(basePackages) + "' package. Please check your configuration.");
         } else {
-            for (var holder : beanDefinitions) {
-                var definition = (GenericBeanDefinition) holder.getBeanDefinition();
+            for (val holder : beanDefinitions) {
+                val definition = (GenericBeanDefinition) holder.getBeanDefinition();
 
                 if (logger.isDebugEnabled()) {
                     logger.debug("Creating " + factoryBeanClass.getSimpleName() + " with name '"

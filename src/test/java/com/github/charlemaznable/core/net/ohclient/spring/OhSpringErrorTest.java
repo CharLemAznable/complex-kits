@@ -7,6 +7,7 @@ import com.github.charlemaznable.core.net.ohclient.testclient.TestHttpClientIsol
 import com.github.charlemaznable.core.net.ohclient.testclient.TestHttpClientNone;
 import com.github.charlemaznable.core.spring.SpringContext;
 import lombok.SneakyThrows;
+import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -32,7 +33,7 @@ public class OhSpringErrorTest {
     @SneakyThrows
     @Test
     public void testOhClientError() {
-        try (var mockWebServer = new MockWebServer()) {
+        try (val mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
@@ -50,19 +51,19 @@ public class OhSpringErrorTest {
             });
             mockWebServer.start(41102);
 
-            var testHttpClient = testComponent.getTestHttpClient();
+            val testHttpClient = testComponent.getTestHttpClient();
             assertThrows(NullPointerException.class, testHttpClient::sample);
             assertThrows(NullPointerException.class, testHttpClient::sampleWrapper);
             assertEquals("Sample", testHttpClient.sampleWrap());
 
-            var testHttpClientIsolated = SpringContext.getBean(TestHttpClientIsolated.class);
+            val testHttpClientIsolated = SpringContext.getBean(TestHttpClientIsolated.class);
             assertEquals("SampleError", testHttpClientIsolated.sample());
             assertEquals("[SampleError]", testHttpClientIsolated.sampleWrapper());
 
-            var testHttpClientConcrete = SpringContext.getBean(TestHttpClientConcrete.class);
+            val testHttpClientConcrete = SpringContext.getBean(TestHttpClientConcrete.class);
             assertNull(testHttpClientConcrete);
 
-            var testHttpClientNone = SpringContext.getBean(TestHttpClientNone.class);
+            val testHttpClientNone = SpringContext.getBean(TestHttpClientNone.class);
             assertNull(testHttpClientNone);
         }
     }

@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -29,7 +30,7 @@ public class ReturnPairTest {
     @SneakyThrows
     @Test
     public void testPair() {
-        try (var mockWebServer = new MockWebServer()) {
+        try (val mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
@@ -50,21 +51,21 @@ public class ReturnPairTest {
                 }
             });
             mockWebServer.start(41194);
-            var httpClient = ohLoader.getClient(PairHttpClient.class);
+            val httpClient = ohLoader.getClient(PairHttpClient.class);
 
-            var pair = httpClient.sampleStatusAndBean();
+            Pair<Integer, Bean> pair = httpClient.sampleStatusAndBean();
             assertEquals(HttpStatus.OK.value(), pair.getKey());
             assertEquals("John", pair.getValue().getName());
-            var futurePair = httpClient.sampleFutureStatusAndBean();
+            val futurePair = httpClient.sampleFutureStatusAndBean();
             await().forever().pollDelay(Duration.ofMillis(100)).until(futurePair::isDone);
             pair = futurePair.get();
             assertEquals(HttpStatus.OK.value(), pair.getKey());
             assertEquals("John", pair.getValue().getName());
 
-            var rawPair = httpClient.sampleRawAndBean();
+            Pair<String, Bean> rawPair = httpClient.sampleRawAndBean();
             assertEquals(json(new Bean("Doe")), rawPair.getKey());
             assertEquals("Doe", rawPair.getValue().getName());
-            var futureRawPair = httpClient.sampleFutureRawAndBean();
+            val futureRawPair = httpClient.sampleFutureRawAndBean();
             await().forever().pollDelay(Duration.ofMillis(100)).until(futureRawPair::isDone);
             rawPair = futureRawPair.get();
             assertEquals(json(new Bean("Doe")), rawPair.getKey());

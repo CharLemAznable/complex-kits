@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -32,7 +33,7 @@ public class ReturnMapTest {
     @SneakyThrows
     @Test
     public void testMap() {
-        try (var mockWebServer = new MockWebServer()) {
+        try (val mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
@@ -55,13 +56,13 @@ public class ReturnMapTest {
                 }
             });
             mockWebServer.start(41193);
-            var httpClient = ohLoader.getClient(MapHttpClient.class);
+            val httpClient = ohLoader.getClient(MapHttpClient.class);
 
-            var map = httpClient.sampleMap();
-            var beanMap = (Map) map.get("John");
+            Map<String, Object> map = httpClient.sampleMap();
+            Map beanMap = (Map) map.get("John");
             assertEquals("Doe", beanMap.get("name"));
 
-            var futureMap = httpClient.sampleFutureMap();
+            Future<Map<String, Object>> futureMap = httpClient.sampleFutureMap();
             await().forever().pollDelay(Duration.ofMillis(100)).until(futureMap::isDone);
             map = futureMap.get();
             beanMap = (Map) map.get("John");

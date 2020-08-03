@@ -1,6 +1,7 @@
 package com.github.charlemaznable.core.lang;
 
 import lombok.SneakyThrows;
+import lombok.val;
 import org.apache.commons.lang3.ClassUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -16,7 +17,7 @@ public final class Clz {
     private Clz() {}
 
     public static boolean isAssignable(Class<?> fromClass, Class<?>... toClasses) {
-        for (var toClass : toClasses)
+        for (val toClass : toClasses)
             if (ClassUtils.isAssignable(fromClass, toClass)) return true;
 
         return false;
@@ -63,8 +64,8 @@ public final class Clz {
     public static Class<?>[] types(Object... values) {
         if (isNull(values)) return new Class[0];
 
-        var result = new Class[values.length];
-        for (var i = 0; i < values.length; i++) {
+        val result = new Class[values.length];
+        for (int i = 0; i < values.length; i++) {
             result[i] = checkNull(values[i], () -> NULL.class, Object::getClass);
         }
         return result;
@@ -72,8 +73,8 @@ public final class Clz {
 
     public static boolean match(Class<?>[] declaredTypes, Class<?>[] actualTypes) {
         if (declaredTypes.length == actualTypes.length) {
-            for (var i = 0; i < actualTypes.length; i++) {
-                var actualType = actualTypes[i];
+            for (int i = 0; i < actualTypes.length; i++) {
+                val actualType = actualTypes[i];
                 if (actualType == NULL.class ||
                         wrapper(declaredTypes[i]).isAssignableFrom(
                                 wrapper(actualType))) continue;
@@ -84,13 +85,13 @@ public final class Clz {
     }
 
     public static Class<?>[] getConstructorParameterTypes(Class<?> clazz, Object... arguments) {
-        var types = types(arguments);
+        val types = types(arguments);
 
         try {
             return clazz.getDeclaredConstructor(types).getParameterTypes();
         } catch (NoSuchMethodException e) {
-            for (var constructor : clazz.getDeclaredConstructors()) {
-                var parameterTypes = constructor.getParameterTypes();
+            for (val constructor : clazz.getDeclaredConstructors()) {
+                val parameterTypes = constructor.getParameterTypes();
                 if (match(parameterTypes, types)) return parameterTypes;
             }
             throw new IllegalArgumentException(clazz

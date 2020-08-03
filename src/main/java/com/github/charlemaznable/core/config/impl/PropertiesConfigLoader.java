@@ -3,6 +3,7 @@ package com.github.charlemaznable.core.config.impl;
 import com.github.charlemaznable.core.config.ConfigLoader;
 import com.github.charlemaznable.core.config.Configable;
 import com.google.auto.service.AutoService;
+import lombok.val;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,7 +29,7 @@ public final class PropertiesConfigLoader implements ConfigLoader {
     }
 
     private Properties buildProperties(URL url) {
-        var properties = new Properties();
+        val properties = new Properties();
         InputStream inputStream = null;
         try {
             inputStream = urlAsInputStream(url);

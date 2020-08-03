@@ -7,6 +7,7 @@ import com.github.charlemaznable.core.crypto.SHAXWithRSA;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.val;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -212,7 +213,7 @@ public final class Signature {
             source.forEach((k, v) -> flatMap.put(
                     k, notNullThen(v, Object::toString)));
         }
-        var tempMap = options.keySortAsc() ? new TreeMap<>(flatMap)
+        val tempMap = options.keySortAsc() ? new TreeMap<>(flatMap)
                 : new TreeMap<>(flatMap).descendingMap();
         tempMap.remove(options.key());
         return options.plainProcessor().apply(tempMap

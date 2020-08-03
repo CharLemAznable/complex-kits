@@ -4,6 +4,7 @@ import com.github.charlemaznable.core.config.ConfigLoader;
 import com.github.charlemaznable.core.config.Configable;
 import com.github.charlemaznable.core.config.ex.ConfigException;
 import com.google.auto.service.AutoService;
+import lombok.val;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -30,11 +31,11 @@ public final class PropsConfigLoader implements ConfigLoader {
     }
 
     private Properties buildProperties(URL url) {
-        var props = new Properties();
-        try (var reader = new PropsReader(new InputStreamReader(
+        val props = new Properties();
+        try (val reader = new PropsReader(new InputStreamReader(
                 requireNonNull(urlAsInputStream(url)), UTF_8))) {
             while (reader.nextProperty()) {
-                var propertyName = reader.getPropertyName();
+                val propertyName = reader.getPropertyName();
                 if (props.containsKey(propertyName)) {
                     throw new ConfigException("duplicate key ["
                             + propertyName + "] in file...");

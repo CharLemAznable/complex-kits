@@ -14,6 +14,7 @@ import com.github.charlemaznable.core.net.ohclient.annotation.ClientLoggingLevel
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientLoggingLevel.LoggingLevelProvider;
 import com.github.charlemaznable.core.net.ohclient.internal.OhDummy;
 import lombok.SneakyThrows;
+import lombok.val;
 import okhttp3.Interceptor;
 import okhttp3.Response;
 import okhttp3.internal.annotations.EverythingIsNonNull;
@@ -63,24 +64,24 @@ public class InterceptorTest {
                 onClass(OhDummy.class).field("ohMinerSubstitutor").get();
         ohMinerSubstitutor.setVariableResolver(
                 minerAsSubstitutor("Env", "ohclient").getStringLookup());
-        try (var mockWebServer = new MockWebServer()) {
+        try (val mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
                     switch (request.getPath()) {
                         case "/sample1":
-                            var values1 = request.getHeaders().values(HEADER_NAME);
+                            val values1 = request.getHeaders().values(HEADER_NAME);
                             assertEquals(1, values1.size());
                             assertEquals("class", values1.get(0));
                             return new MockResponse().setBody(CONTENT);
                         case "/sample2":
-                            var values2 = request.getHeaders().values(HEADER_NAME);
+                            val values2 = request.getHeaders().values(HEADER_NAME);
                             assertEquals(2, values2.size());
                             assertEquals("class", values2.get(0));
                             assertEquals("method", values2.get(1));
                             return new MockResponse().setBody(CONTENT);
                         case "/sample3":
-                            var values3 = request.getHeaders().values(HEADER_NAME);
+                            val values3 = request.getHeaders().values(HEADER_NAME);
                             if (values3.size() == 1) {
                                 assertEquals("method", values3.get(0));
                             } else if (values3.size() == 2) {
@@ -98,13 +99,13 @@ public class InterceptorTest {
             });
             mockWebServer.start(41220);
 
-            var client = ohLoader.getClient(InterceptorClient.class);
+            val client = ohLoader.getClient(InterceptorClient.class);
             assertEquals(CONTENT, client.sample1());
             assertEquals(CONTENT, client.sample2());
             assertEquals(CONTENT, client.sample3(new ParamInterceptor(), Level.BODY, BODY));
             assertEquals(CONTENT, client.sample3(null, Level.BODY, BODY));
 
-            var providerClient = ohLoader.getClient(InterceptorProviderClient.class);
+            val providerClient = ohLoader.getClient(InterceptorProviderClient.class);
             assertEquals(CONTENT, providerClient.sample1());
             assertEquals(CONTENT, providerClient.sample2());
             assertEquals(CONTENT, providerClient.sample3(new ParamInterceptor(), Level.BODY, BODY));
@@ -120,9 +121,9 @@ public class InterceptorTest {
         assertThrows(ProviderException.class, () ->
                 ohLoader.getClient(ErrorClassInterceptorClient.class));
 
-        var loggingClient = ohLoader.getClient(ErrorMethodLoggingClient.class);
+        val loggingClient = ohLoader.getClient(ErrorMethodLoggingClient.class);
         assertThrows(ProviderException.class, loggingClient::sample);
-        var interceptorClient = ohLoader.getClient(ErrorMethodInterceptorClient.class);
+        val interceptorClient = ohLoader.getClient(ErrorMethodInterceptorClient.class);
         assertThrows(ProviderException.class, interceptorClient::sample);
     }
 
@@ -212,7 +213,7 @@ public class InterceptorTest {
 
         @Override
         public Response intercept(Chain chain) throws IOException {
-            var requestBuilder = chain.request().newBuilder();
+            val requestBuilder = chain.request().newBuilder();
             requestBuilder.addHeader(HEADER_NAME, "class");
             return chain.proceed(requestBuilder.build());
         }
@@ -236,7 +237,7 @@ public class InterceptorTest {
 
         @Override
         public Response intercept(Chain chain) throws IOException {
-            var requestBuilder = chain.request().newBuilder();
+            val requestBuilder = chain.request().newBuilder();
             requestBuilder.addHeader(HEADER_NAME, "method");
             return chain.proceed(requestBuilder.build());
         }
@@ -247,7 +248,7 @@ public class InterceptorTest {
 
         @Override
         public Response intercept(Chain chain) throws IOException {
-            var requestBuilder = chain.request().newBuilder();
+            val requestBuilder = chain.request().newBuilder();
             requestBuilder.addHeader(HEADER_NAME, "parameter");
             return chain.proceed(requestBuilder.build());
         }

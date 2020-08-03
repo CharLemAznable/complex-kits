@@ -7,6 +7,7 @@ import com.github.charlemaznable.core.net.ohclient.internal.OhResponseBody;
 import com.github.charlemaznable.core.net.ohclient.internal.ResponseBodyExtractor;
 import com.github.charlemaznable.core.net.ohclient.internal.StatusErrorFunction;
 import lombok.SneakyThrows;
+import lombok.val;
 import okhttp3.ConnectionPool;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -154,7 +155,7 @@ public class OhReq extends CommonReq<OhReq> {
 
     @SuppressWarnings("deprecation")
     public OkHttpClient buildHttpClient() {
-        var httpClientBuilder = new OkHttpClient.Builder().proxy(this.clientProxy);
+        val httpClientBuilder = new OkHttpClient.Builder().proxy(this.clientProxy);
         notNullThen(this.sslSocketFactory, xx -> checkNull(this.x509TrustManager,
                 () -> httpClientBuilder.sslSocketFactory(this.sslSocketFactory, defaultTrustManager()),
                 yy -> httpClientBuilder.sslSocketFactory(this.sslSocketFactory, this.x509TrustManager)));
@@ -170,9 +171,9 @@ public class OhReq extends CommonReq<OhReq> {
     }
 
     private X509TrustManager defaultTrustManager() {
-        var trustManagers = new TrustManager[0];
+        TrustManager[] trustManagers = new TrustManager[0];
         try {
-            var trustManagerFactory = TrustManagerFactory
+            val trustManagerFactory = TrustManagerFactory
                     .getInstance(TrustManagerFactory.getDefaultAlgorithm());
             trustManagerFactory.init((KeyStore) null);
             trustManagers = trustManagerFactory.getTrustManagers();
@@ -188,22 +189,22 @@ public class OhReq extends CommonReq<OhReq> {
     }
 
     private Request buildGetRequest() {
-        var requestUrl = concatRequestUrl();
-        var parameterMap = fetchParameterMap();
-        var requestBuilder = buildCommon();
+        val requestUrl = concatRequestUrl();
+        val parameterMap = fetchParameterMap();
+        val requestBuilder = buildCommon();
 
         requestBuilder.method(HttpMethod.GET.toString(), null);
-        var addQuery = this.contentFormatter.format(parameterMap, newHashMap());
+        val addQuery = this.contentFormatter.format(parameterMap, newHashMap());
         requestBuilder.url(concatRequestQuery(requestUrl, addQuery));
         return requestBuilder.build();
     }
 
     private Request buildPostRequest() {
-        var requestUrl = concatRequestUrl();
-        var parameterMap = fetchParameterMap();
-        var requestBuilder = buildCommon();
+        val requestUrl = concatRequestUrl();
+        val parameterMap = fetchParameterMap();
+        val requestBuilder = buildCommon();
 
-        var content = nullThen(this.requestBody, () ->
+        val content = nullThen(this.requestBody, () ->
                 this.contentFormatter.format(parameterMap, newHashMap()));
         requestBuilder.method(HttpMethod.POST.toString(), RequestBody.create(
                 MediaType.parse(this.contentFormatter.contentType()), content));
@@ -212,12 +213,12 @@ public class OhReq extends CommonReq<OhReq> {
     }
 
     private Request.Builder buildCommon() {
-        var requestBuilder = new Request.Builder();
-        var acceptCharsetName = this.acceptCharset.name();
+        val requestBuilder = new Request.Builder();
+        val acceptCharsetName = this.acceptCharset.name();
         requestBuilder.header(ACCEPT_CHARSET, acceptCharsetName);
-        var contentType = this.contentFormatter.contentType();
+        val contentType = this.contentFormatter.contentType();
         requestBuilder.header(CONTENT_TYPE, contentType);
-        for (var header : this.headers) {
+        for (val header : this.headers) {
             checkNull(header.getValue(),
                     () -> requestBuilder.removeHeader(header.getKey()),
                     xx -> requestBuilder.header(header.getKey(), header.getValue()));
@@ -227,12 +228,12 @@ public class OhReq extends CommonReq<OhReq> {
 
     @SneakyThrows
     private String execute(Request request) {
-        var response = buildHttpClient().newCall(request).execute();
+        val response = buildHttpClient().newCall(request).execute();
 
-        var statusCode = response.code();
-        var responseBody = notNullThen(response.body(), OhResponseBody::new);
+        val statusCode = response.code();
+        val responseBody = notNullThen(response.body(), OhResponseBody::new);
 
-        var errorMapping = new StatusErrorFunction(statusCode, responseBody);
+        val errorMapping = new StatusErrorFunction(statusCode, responseBody);
         notNullThen(this.statusErrorMapping.get(
                 HttpStatus.valueOf(statusCode)), errorMapping);
         notNullThen(this.statusSeriesErrorMapping.get(

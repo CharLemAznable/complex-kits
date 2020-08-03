@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.spring.mutable;
 
+import lombok.val;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -15,7 +16,7 @@ public class MutableHttpServletFilterController {
 
     @RequestMapping("/mutable-filter")
     public void mutable(HttpServletRequest request, HttpServletResponse response) {
-        var requestMap = fetchParameterMap(request);
+        val requestMap = fetchParameterMap(request);
         requestMap.put("IN_CONTROLLER", "TRUE");
         responseJson(response, json(requestMap));
     }

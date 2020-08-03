@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.spring.mutable;
 
+import lombok.val;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -29,8 +30,8 @@ public class MutableHttpServletFilterInterceptor implements HandlerInterceptor {
     public void postHandle(@Nonnull HttpServletRequest request,
                            @Nonnull HttpServletResponse response,
                            @Nonnull Object handler, ModelAndView modelAndView) {
-        var responseContentAsString = getResponseContentAsString(response);
-        var responseMap = unJson(responseContentAsString);
+        val responseContentAsString = getResponseContentAsString(response);
+        val responseMap = unJson(responseContentAsString);
         responseMap.put("IN_POSTHANDLE", "TRUE");
         setResponseContentByString(response, json(responseMap));
     }

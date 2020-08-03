@@ -4,6 +4,7 @@ import com.github.charlemaznable.core.config.EnvConfig.ConfigKeyProvider;
 import com.github.charlemaznable.core.config.EnvConfig.DefaultValueProvider;
 import com.github.charlemaznable.core.config.ex.ConfigValueFormatException;
 import com.github.charlemaznable.core.config.ex.EnvConfigException;
+import lombok.val;
 import org.joor.ReflectException;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +30,7 @@ public class EnvFactoryTest {
 
     @Test
     public void testEnvConfig() {
-        var testEnvConfig = EnvFactory.getEnv(TestEnvConfig.class);
+        val testEnvConfig = EnvFactory.getEnv(TestEnvConfig.class);
 
         assertEquals("value1", testEnvConfig.key1());
         assertEquals("value2", testEnvConfig.key2());
@@ -39,20 +40,20 @@ public class EnvFactoryTest {
         assertEquals("value5", testEnvConfig.key5Def());
         assertEquals("value5", testEnvConfig.key5("value5"));
 
-        var springEnvConfig = EnvFactory.springEnvLoader().getEnv(TestEnvConfig.class);
+        val springEnvConfig = EnvFactory.springEnvLoader().getEnv(TestEnvConfig.class);
 
-        var custom1 = springEnvConfig.subset("custom1");
+        val custom1 = springEnvConfig.subset("custom1");
         assertEquals(springEnvConfig.custom1Key1(), custom1.getStr("key1"));
         assertEquals(springEnvConfig.custom1Key2(), custom1.getStr("key2"));
 
-        var custom2 = springEnvConfig.subset("custom2");
+        val custom2 = springEnvConfig.subset("custom2");
         assertEquals(springEnvConfig.custom2Key1(), custom2.getStr("key1"));
         assertEquals(springEnvConfig.custom2Key2(), custom2.getStr("key2"));
 
         assertEquals(testEnvConfig, springEnvConfig);
         assertEquals(testEnvConfig.toString(), springEnvConfig.toString());
 
-        var primEnvConfig = EnvFactory.getEnv(PrimEnvConfig.class);
+        val primEnvConfig = EnvFactory.getEnv(PrimEnvConfig.class);
 
         assertEquals(1, primEnvConfig.int1());
         assertEquals(1, primEnvConfig.short1());
@@ -90,28 +91,28 @@ public class EnvFactoryTest {
         assertEquals(3F, primEnvConfig.float3Def());
         assertEquals(4D, primEnvConfig.double3Def());
 
-        var beanEnvConfig = EnvFactory.getEnv(BeanEnvConfig.class);
+        val beanEnvConfig = EnvFactory.getEnv(BeanEnvConfig.class);
 
-        var bean1 = beanEnvConfig.bean1();
+        val bean1 = beanEnvConfig.bean1();
         assertEquals("value1", bean1.getKey1());
         assertEquals("value2", bean1.getKey2());
 
-        var bean2 = beanEnvConfig.bean2();
+        val bean2 = beanEnvConfig.bean2();
         assertEquals("value1", bean2.getKey1());
         assertEquals("value2", bean2.getKey2());
         assertEquals("value1value2", bean2.getKey3());
 
-        var bean3 = beanEnvConfig.bean3();
+        val bean3 = beanEnvConfig.bean3();
         assertEquals("value1", bean3.getKey1());
         assertEquals("value2", bean3.getKey2());
         assertEquals("value3", bean3.getKey3());
 
-        var bean1List1 = beanEnvConfig.bean1List1();
+        val bean1List1 = beanEnvConfig.bean1List1();
         assertEquals(1, bean1List1.size());
         assertEquals("value1", bean1List1.get(0).getKey1());
         assertEquals("value2", bean1List1.get(0).getKey2());
 
-        var bean1List2 = beanEnvConfig.bean1List2();
+        val bean1List2 = beanEnvConfig.bean1List2();
         assertEquals(2, bean1List2.size());
         assertEquals("value1", bean1List2.get(0).getKey1());
         assertEquals("value2", bean1List2.get(0).getKey2());
@@ -120,7 +121,7 @@ public class EnvFactoryTest {
         assertEquals("value4", bean1List2.get(1).getKey2());
         assertEquals("value3value4", bean1List2.get(1).getKey3());
 
-        var provEnvConfig = EnvFactory.getEnv(ProvEnvConfig.class);
+        val provEnvConfig = EnvFactory.getEnv(ProvEnvConfig.class);
         assertEquals("PROV", provEnvConfig.prov());
         assertThrows(EnvConfigException.class, provEnvConfig::error1);
         assertThrows(EnvConfigException.class, provEnvConfig::error2);

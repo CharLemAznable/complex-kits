@@ -1,5 +1,7 @@
 package com.github.charlemaznable.core.codec.text;
 
+import lombok.val;
+
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -26,9 +28,9 @@ public abstract class Textable {
         Map<String, String> result = newHashMap();
 
         Map<String, Object> describe = desc(this);
-        for (var entry : describe.entrySet()) {
-            var key = entry.getKey();
-            var value = toStr(entry.getValue());
+        for (val entry : describe.entrySet()) {
+            val key = entry.getKey();
+            val value = toStr(entry.getValue());
             if ((isNotEmpty(excludedKeys()) &&
                     excludedKeys().contains(key)) ||
                     isEmpty(value)) continue;

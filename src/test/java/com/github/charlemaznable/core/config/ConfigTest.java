@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.config;
 
 import com.github.charlemaznable.core.config.ex.ConfigNotFoundException;
 import com.github.charlemaznable.core.config.ex.ConfigValueFormatException;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,11 +22,11 @@ public class ConfigTest {
         assertNull(Config.getStr("key5"));
         assertEquals("value5", Config.getStr("key5", "value5"));
 
-        var custom1 = Config.subset("custom1");
+        val custom1 = Config.subset("custom1");
         assertEquals(Config.getStr("custom1.key1"), custom1.getStr("key1"));
         assertEquals(Config.getStr("custom1.key2"), custom1.getStr("key2"));
 
-        var custom2 = Config.subset("custom2");
+        val custom2 = Config.subset("custom2");
         assertEquals(Config.getStr("custom2.key1"), custom2.getStr("key1"));
         assertEquals(Config.getStr("custom2.key2"), custom2.getStr("key2"));
 
@@ -58,26 +59,26 @@ public class ConfigTest {
         assertEquals(3F, Config.getFloat("float3", 3F));
         assertEquals(4D, Config.getDouble("double3", 4D));
 
-        var bean1 = Config.getBean("bean1", ConfigBean.class);
+        val bean1 = Config.getBean("bean1", ConfigBean.class);
         assertEquals("value1", bean1.getKey1());
         assertEquals("value2", bean1.getKey2());
 
-        var bean2 = Config.getBean("bean2", ConfigBean2.class);
+        val bean2 = Config.getBean("bean2", ConfigBean2.class);
         assertEquals("value1", bean2.getKey1());
         assertEquals("value2", bean2.getKey2());
         assertEquals("value1value2", bean2.getKey3());
 
-        var bean3 = Config.getBean("bean3", ConfigBean2.class);
+        val bean3 = Config.getBean("bean3", ConfigBean2.class);
         assertEquals("value1", bean3.getKey1());
         assertEquals("value2", bean3.getKey2());
         assertEquals("value3", bean3.getKey3());
 
-        var bean1List1 = Config.getBeans("bean1List1", ConfigBean.class);
+        val bean1List1 = Config.getBeans("bean1List1", ConfigBean.class);
         assertEquals(1, bean1List1.size());
         assertEquals("value1", bean1List1.get(0).getKey1());
         assertEquals("value2", bean1List1.get(0).getKey2());
 
-        var bean1List2 = Config.getBeans("bean1List2", ConfigBean2.class);
+        val bean1List2 = Config.getBeans("bean1List2", ConfigBean2.class);
         assertEquals(2, bean1List2.size());
         assertEquals("value1", bean1List2.get(0).getKey1());
         assertEquals("value2", bean1List2.get(0).getKey2());

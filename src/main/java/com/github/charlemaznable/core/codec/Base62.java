@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.codec;
 
+import lombok.val;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.ByteArrayOutputStream;
@@ -11,7 +12,7 @@ public final class Base62 {
     private static byte[] decodes = new byte[256];
 
     static {
-        for (var i = 0; i < encodes.length; i++) {
+        for (int i = 0; i < encodes.length; i++) {
             decodes[encodes[i]] = (byte) i;
         }
     }
@@ -19,57 +20,57 @@ public final class Base62 {
     private Base62() {}
 
     public static String base64(byte[] data) {
-        var sb = new StringBuilder(data.length * 2);
-        var pos = 0;
-        var val = 0;
-        for (var b : data) {
-            val = (val << 8) | (b & 0xFF);
+        val sb = new StringBuilder(data.length * 2);
+        int pos = 0;
+        int value = 0;
+        for (val b : data) {
+            value = (value << 8) | (b & 0xFF);
             pos += 8;
             while (pos > 5) {
                 pos -= 6;
-                sb.append(encodes[val >> pos]);
-                val &= ((1 << pos) - 1);
+                sb.append(encodes[value >> pos]);
+                value &= ((1 << pos) - 1);
             }
         }
         if (pos > 0) {
-            sb.append(encodes[val << (6 - pos)]);
+            sb.append(encodes[value << (6 - pos)]);
         }
         return sb.toString();
     }
 
     public static byte[] unBase64(String dataStr) {
-        var data = dataStr.toCharArray();
-        var baos = new ByteArrayOutputStream(data.length);
-        var pos = 0;
-        var val = 0;
-        for (var c : data) {
-            val = (val << 6) | (decodes[c] & 0xff);
+        val data = dataStr.toCharArray();
+        val baos = new ByteArrayOutputStream(data.length);
+        int pos = 0;
+        int value = 0;
+        for (val c : data) {
+            value = (value << 6) | (decodes[c] & 0xff);
             pos += 6;
             while (pos > 7) {
                 pos -= 8;
-                baos.write(val >> pos);
-                val &= ((1 << pos) - 1);
+                baos.write(value >> pos);
+                value &= ((1 << pos) - 1);
             }
         }
         return baos.toByteArray();
     }
 
     public static String base62(byte[] data) {
-        var sb = new StringBuilder(data.length * 2);
-        var pos = 0;
-        var val = 0;
-        for (var b : data) {
-            val = (val << 8) | (b & 0xFF);
+        val sb = new StringBuilder(data.length * 2);
+        int pos = 0;
+        int value = 0;
+        for (val b : data) {
+            value = (value << 8) | (b & 0xFF);
             pos += 8;
             while (pos > 5) {
                 pos -= 6;
-                var c = encodes[val >> pos];
+                val c = encodes[value >> pos];
                 sb.append(translate(c));
-                val &= ((1 << pos) - 1);
+                value &= ((1 << pos) - 1);
             }
         }
         if (pos > 0) {
-            var c = encodes[val << (6 - pos)];
+            val c = encodes[value << (6 - pos)];
             sb.append(translate(c));
         }
         return sb.toString();
@@ -82,29 +83,29 @@ public final class Base62 {
     }
 
     public static byte[] unBase62(String dataStr) {
-        var data = dataStr.toCharArray();
-        var baos = new ByteArrayOutputStream(data.length);
-        var pos = 0;
-        var val = 0;
+        val data = dataStr.toCharArray();
+        val baos = new ByteArrayOutputStream(data.length);
+        int pos = 0;
+        int value = 0;
         int step;
-        for (var i = 0; i < data.length; i += step) {
-            var ut = untranslate(data, i);
-            var c = ut.getLeft();
+        for (int i = 0; i < data.length; i += step) {
+            val ut = untranslate(data, i);
+            val c = ut.getLeft();
             step = ut.getRight();
-            val = (val << 6) | (decodes[c] & 0xff);
+            value = (value << 6) | (decodes[c] & 0xff);
             pos += 6;
             while (pos > 7) {
                 pos -= 8;
-                baos.write(val >> pos);
-                val &= ((1 << pos) - 1);
+                baos.write(value >> pos);
+                value &= ((1 << pos) - 1);
             }
         }
         return baos.toByteArray();
     }
 
     private static Pair<Character, Integer> untranslate(char[] data, int i) {
-        var step = 1;
-        var c = data[i];
+        int step = 1;
+        char c = data[i];
         if (c == 'i') {
             c = data[i + 1];
             if (c == 'a') c = 'i';

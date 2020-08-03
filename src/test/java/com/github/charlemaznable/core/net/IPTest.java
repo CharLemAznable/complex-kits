@@ -12,7 +12,7 @@ public class IPTest {
 
     @Test
     public void testIPV4() {
-        var ip = V4.netIP();
+        String ip = V4.netIP();
         log.info(ip);
         assertNotEquals("127.0.0.1", ip);
         ip = V4.localIP();
@@ -22,7 +22,7 @@ public class IPTest {
 
     @Test
     public void testIPV6() {
-        var ip = V6.netIP();
+        String ip = V6.netIP();
         log.info(ip);
         assertNotEquals("0:0:0:0:0:0:0:1", ip);
         ip = V6.localIP();

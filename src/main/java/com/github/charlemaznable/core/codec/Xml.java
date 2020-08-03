@@ -1,6 +1,7 @@
 package com.github.charlemaznable.core.codec;
 
 import lombok.SneakyThrows;
+import lombok.val;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -44,7 +45,7 @@ public final class Xml {
     }
 
     public static String xml(Map<String, Object> map, String rootName, boolean prettyFormat) {
-        var rootElement = createElement(rootName);
+        val rootElement = createElement(rootName);
         Map2XmlString.map2Element(map, rootElement);
         return Map2XmlString.document2XmlString(createDocument(rootElement), prettyFormat);
     }
@@ -54,12 +55,12 @@ public final class Xml {
     }
 
     public static Map<String, Object> unXml(String text, boolean rootAsTop) {
-        var document = XmlString2Map.xmlString2Document(text);
-        var rootElement = document.getRootElement();
+        val document = XmlString2Map.xmlString2Document(text);
+        val rootElement = document.getRootElement();
         if (rootElement.elements().isEmpty() &&
                 rootElement.attributes().isEmpty())
             return new LinkedHashMap<>();
-        var map = XmlString2Map.element2Map(rootElement, false);
+        val map = XmlString2Map.element2Map(rootElement, false);
         return rootAsTop ? of(rootElement.getName(), map) : map;
     }
 
@@ -67,17 +68,17 @@ public final class Xml {
 
         @SneakyThrows
         public static Document xmlString2Document(String text) {
-            var reader = new SAXReader();
+            val reader = new SAXReader();
 
             reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
             reader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             reader.setFeature("http://xml.org/sax/features/external-general-entities", false);
             reader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 
-            var encoding = getEncoding(text);
-            var source = new InputSource(new StringReader(text));
+            val encoding = getEncoding(text);
+            val source = new InputSource(new StringReader(text));
             source.setEncoding(encoding);
-            var result = reader.read(source);
+            val result = reader.read(source);
             if (isNull(result.getXMLEncoding())) {
                 result.setXMLEncoding(encoding);
             }
@@ -86,14 +87,14 @@ public final class Xml {
 
         private static String getEncoding(String text) {
             String result = null;
-            var xml = text.trim();
+            val xml = text.trim();
             if (xml.startsWith("<?xml")) {
                 int end = xml.indexOf("?>");
-                var sub = xml.substring(0, end);
-                var tokens = new StringTokenizer(sub, " =\"'");
+                val sub = xml.substring(0, end);
+                val tokens = new StringTokenizer(sub, " =\"'");
 
                 while (tokens.hasMoreTokens()) {
-                    var token = tokens.nextToken();
+                    val token = tokens.nextToken();
                     if ("encoding".equals(token)) {
                         if (tokens.hasMoreTokens()) {
                             result = tokens.nextToken();
@@ -107,19 +108,19 @@ public final class Xml {
 
         @SuppressWarnings("unchecked")
         private static Map<String, Object> element2Map(Element element, boolean parseAttr) {
-            var map = new LinkedHashMap<String, Object>();
-            var elements = element.elements();
+            val map = new LinkedHashMap<String, Object>();
+            val elements = element.elements();
 
             List<Attribute> attributes = null;
             if (parseAttr) {
                 attributes = element.attributes(); // 当前节点的所有属性的list
-                for (var attribute : attributes) {
+                for (val attribute : attributes) {
                     map.put("@" + attribute.getName(), attribute.getValue());
                 }
             }
 
             if (!elements.isEmpty()) {
-                for (var elem : elements) {
+                for (val elem : elements) {
                     List mapList = newArrayList();
 
                     if (!elem.elements().isEmpty()) {
@@ -138,9 +139,9 @@ public final class Xml {
 
         @SuppressWarnings("unchecked")
         private static void parseElementWithChildren(LinkedHashMap<String, Object> map, Element elem, List mapList, boolean parseAttr) {
-            var m = element2Map(elem, parseAttr);
+            val m = element2Map(elem, parseAttr);
             if (nonNull(map.get(elem.getName()))) {
-                var obj = map.get(elem.getName());
+                val obj = map.get(elem.getName());
                 if (!(obj instanceof List)) {
                     mapList = newArrayList();
                     mapList.add(obj);
@@ -156,21 +157,21 @@ public final class Xml {
 
         private static void parseElementWithoutChildren(LinkedHashMap<String, Object> map, Element elem, boolean parseAttr) {
             List mapList;
-            var hasAttributes = false;
+            boolean hasAttributes = false;
             Map<String, Object> attributesMap = null;
             if (parseAttr) {
-                var attrs = elem.attributes(); // 当前节点的所有属性的list
+                val attrs = elem.attributes(); // 当前节点的所有属性的list
                 if (!attrs.isEmpty()) {
                     hasAttributes = true;
                     attributesMap = new LinkedHashMap<>();
-                    for (var attr : attrs) {
+                    for (val attr : attrs) {
                         attributesMap.put("@" + attr.getName(), attr.getValue());
                     }
                 }
             }
 
             if (nonNull(map.get(elem.getName()))) {
-                var obj = map.get(elem.getName());
+                val obj = map.get(elem.getName());
                 mapList = obj instanceof List ?
                         (List) obj : newArrayList(obj);
                 addListItem(mapList, elem,
@@ -210,9 +211,9 @@ public final class Xml {
 
         @SneakyThrows
         private static String document2XmlString(Document document, boolean prettyFormat) {
-            var writer = new StringWriter();
-            var format = prettyFormat ? createPrettyPrint() : createCompactFormat();
-            var xmlWriter = new XMLWriter(writer, format);
+            val writer = new StringWriter();
+            val format = prettyFormat ? createPrettyPrint() : createCompactFormat();
+            val xmlWriter = new XMLWriter(writer, format);
             xmlWriter.write(document);
             xmlWriter.close();
             return writer.toString();
@@ -220,9 +221,9 @@ public final class Xml {
 
         @SuppressWarnings("unchecked")
         private static void map2Element(Map<String, Object> map, Element body) {
-            for (var entry : map.entrySet()) {
-                var key = entry.getKey();
-                var value = entry.getValue();
+            for (val entry : map.entrySet()) {
+                val key = entry.getKey();
+                val value = entry.getValue();
                 if (key.startsWith("@")) { // 属性
                     body.addAttribute(key.substring(1, key.length()), value.toString());
                 } else if (key.equals(TEXT)) { // 有属性时的文本
@@ -231,7 +232,7 @@ public final class Xml {
                     if (value instanceof List) {
                         parseListElement(body, key, (List) value);
                     } else if (value instanceof Map) {
-                        var subElement = body.addElement(key);
+                        val subElement = body.addElement(key);
                         map2Element((Map) value, subElement);
                     } else {
                         if (isNull(value)) continue;
@@ -243,10 +244,10 @@ public final class Xml {
 
         @SuppressWarnings("unchecked")
         private static void parseListElement(Element body, String key, List list) {
-            for (var obj : list) {
+            for (val obj : list) {
                 // list里是map或String，不会存在list里直接是list的，
                 if (obj instanceof Map) {
-                    var subElement = body.addElement(key);
+                    val subElement = body.addElement(key);
                     map2Element((Map) obj, subElement);
                 } else {
                     body.addElement(key).addCDATA((String) obj);

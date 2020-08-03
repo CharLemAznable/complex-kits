@@ -4,6 +4,7 @@ import com.github.charlemaznable.core.codec.Digest;
 import com.github.charlemaznable.core.codec.DigestHMAC;
 import com.github.charlemaznable.core.crypto.SHAXWithRSA;
 import com.github.charlemaznable.core.lang.Mapp;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -42,15 +43,15 @@ public class SignatureTest {
     private static final String CUSTOM_KEY = "sign";
 
     static {
-        var keyPair = generateKeyPair();
+        val keyPair = generateKeyPair();
         RSA_PUB_KEY = getPublicKeyString(keyPair);
         RSA_PRV_KEY = getPrivateKeyString(keyPair);
     }
 
     @Test
     public void testSignature() {
-        var signature = signature(SOURCE);
-        var verifySource = newHashMap(SOURCE);
+        Signature signature = signature(SOURCE);
+        Map<String, Object> verifySource = newHashMap(SOURCE);
         verifySource.put(signature.getKey(), signature.getValue());
         assertTrue(verify(verifySource));
 
@@ -59,7 +60,7 @@ public class SignatureTest {
         verifySource.put(signature.getKey(), signature.getValue());
         assertTrue(verify(CUSTOM_KEY, verifySource));
 
-        var falseOptions = new SignatureOptions().flatValue(false).keySortAsc(false);
+        val falseOptions = new SignatureOptions().flatValue(false).keySortAsc(false);
         signature = signature(SOURCE, falseOptions);
         verifySource = newHashMap(SOURCE);
         verifySource.put(signature.getKey(), signature.getValue());
@@ -68,8 +69,8 @@ public class SignatureTest {
 
     @Test
     public void testSignatureDigest() {
-        var signature = signatureDigestBase64(SOURCE, Digest.SHA512);
-        var verifySource = newHashMap(SOURCE);
+        Signature signature = signatureDigestBase64(SOURCE, Digest.SHA512);
+        Map<String, Object> verifySource = newHashMap(SOURCE);
         verifySource.put(signature.getKey(), signature.getValue());
         assertTrue(verifyDigestBase64(verifySource, Digest.SHA512));
 
@@ -91,8 +92,8 @@ public class SignatureTest {
 
     @Test
     public void testSignatureDigestHMAC() {
-        var signature = signatureDigestHMACBase64(SOURCE, DigestHMAC.SHA256, DIGEST_HMAC_KEY);
-        var verifySource = newHashMap(SOURCE);
+        Signature signature = signatureDigestHMACBase64(SOURCE, DigestHMAC.SHA256, DIGEST_HMAC_KEY);
+        Map<String, Object> verifySource = newHashMap(SOURCE);
         verifySource.put(signature.getKey(), signature.getValue());
         assertTrue(verifyDigestHMACBase64(verifySource, DigestHMAC.SHA256, DIGEST_HMAC_KEY));
 
@@ -114,8 +115,8 @@ public class SignatureTest {
 
     @Test
     public void testSignatureSHAWithRSA() {
-        var signature = signatureSHAWithRSABase64(SOURCE, SHAXWithRSA.SHA1_WITH_RSA, RSA_PRV_KEY);
-        var verifySource = newHashMap(SOURCE);
+        Signature signature = signatureSHAWithRSABase64(SOURCE, SHAXWithRSA.SHA1_WITH_RSA, RSA_PRV_KEY);
+        Map<String, Object> verifySource = newHashMap(SOURCE);
         verifySource.put(signature.getKey(), signature.getValue());
         assertTrue(verifySHAWithRSABase64(verifySource, SHAXWithRSA.SHA1_WITH_RSA, RSA_PUB_KEY));
 

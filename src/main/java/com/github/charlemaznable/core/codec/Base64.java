@@ -91,7 +91,7 @@ public final class Base64 {
                                    final int lineLength, final int chunkSeparatorLength, final byte pad) {
             this.unencodedBlockSize = unencodedBlockSize;
             this.encodedBlockSize = encodedBlockSize;
-            var useChunking = lineLength > 0 && chunkSeparatorLength > 0;
+            val useChunking = lineLength > 0 && chunkSeparatorLength > 0;
             this.lineLength = useChunking ? (lineLength / encodedBlockSize) * encodedBlockSize : 0;
             this.chunkSeparatorLength = chunkSeparatorLength;
             this.pad = pad;
@@ -111,7 +111,7 @@ public final class Base64 {
                 context.pos = 0;
                 context.readPos = 0;
             } else {
-                var b = new byte[context.buffer.length * DEFAULT_BUFFER_RESIZE_FACTOR];
+                val b = new byte[context.buffer.length * DEFAULT_BUFFER_RESIZE_FACTOR];
                 arraycopy(context.buffer, 0, b, 0, context.buffer.length);
                 context.buffer = b;
             }
@@ -128,7 +128,7 @@ public final class Base64 {
         @SuppressWarnings("UnusedReturnValue")
         int readResults(final byte[] b, final int bPos, final int bAvail, final Context context) {
             if (nonNull(context.buffer)) {
-                var len = min(available(context), bAvail);
+                val len = min(available(context), bAvail);
                 arraycopy(context.buffer, context.readPos, b, bPos, len);
                 context.readPos += len;
                 if (context.readPos >= context.pos) {
@@ -147,10 +147,10 @@ public final class Base64 {
             if (isNull(pArray) || pArray.length == 0) {
                 return pArray;
             }
-            var context = new Context();
+            val context = new Context();
             decode(pArray, 0, pArray.length, context);
             decode(pArray, 0, EOF, context); // Notify decoder of EOF.
-            var result = new byte[context.pos];
+            val result = new byte[context.pos];
             readResults(result, 0, result.length, context);
             return result;
         }
@@ -159,10 +159,10 @@ public final class Base64 {
             if (isNull(pArray) || pArray.length == 0) {
                 return pArray;
             }
-            var context = new Context();
+            val context = new Context();
             encode(pArray, 0, pArray.length, context);
             encode(pArray, 0, EOF, context); // Notify encoder of EOF.
-            var buf = new byte[context.pos - context.readPos];
+            val buf = new byte[context.pos - context.readPos];
             readResults(buf, 0, buf.length, context);
             return buf;
         }
@@ -179,7 +179,7 @@ public final class Base64 {
             if (isNull(arrayOctet)) {
                 return false;
             }
-            for (var element : arrayOctet) {
+            for (val element : arrayOctet) {
                 if (pad == element || isInAlphabet(element)) {
                     return true;
                 }
@@ -190,7 +190,7 @@ public final class Base64 {
         public long getEncodedLength(final byte[] pArray) {
             // Calculate non-chunked size - rounded up to allow for padding
             // cast to long is needed to avoid possibility of overflow
-            var len = ((pArray.length + unencodedBlockSize - 1) / unencodedBlockSize) * (long) encodedBlockSize;
+            long len = ((pArray.length + unencodedBlockSize - 1) / unencodedBlockSize) * (long) encodedBlockSize;
             if (lineLength > 0) { // We're using chunking
                 // Round up to nearest multiple
                 len += ((len + lineLength - 1) / lineLength) * chunkSeparatorLength;
@@ -294,7 +294,7 @@ public final class Base64 {
                     isNull(lineSeparator) ? 0 : lineSeparator.length);
             if (nonNull(lineSeparator)) {
                 if (containsAlphabetOrPad(lineSeparator)) {
-                    var sep = string(lineSeparator);
+                    val sep = string(lineSeparator);
                     throw new IllegalArgumentException("lineSeparator must not contain base64 characters: [" + sep + "]");
                 }
                 if (lineLength > 0) { // null line-sep forces no chunking rather than throwing IAE
@@ -345,8 +345,8 @@ public final class Base64 {
 
             // Create this so can use the super-class method
             // Also ensures that the same roundings are performed by the ctor and the code
-            var b64 = isChunked ? new ApacheBase64(urlSafe) : new ApacheBase64(0, CHUNK_SEPARATOR, urlSafe);
-            var len = b64.getEncodedLength(binaryData);
+            val b64 = isChunked ? new ApacheBase64(urlSafe) : new ApacheBase64(0, CHUNK_SEPARATOR, urlSafe);
+            val len = b64.getEncodedLength(binaryData);
             if (len > maxResultSize) {
                 throw new IllegalArgumentException("Input array too big, the output array would be bigger (" +
                         len +
@@ -370,10 +370,10 @@ public final class Base64 {
             if (inAvail < 0) {
                 encodeInAvailLessThen0(context);
             } else {
-                for (var i = 0; i < inAvail; i++) {
-                    var buffer = ensureBufferSize(encodeSize, context);
+                for (int i = 0; i < inAvail; i++) {
+                    val buffer = ensureBufferSize(encodeSize, context);
                     context.modulus = (context.modulus + 1) % BYTES_PER_UNENCODED_BLOCK;
-                    var b = (int) in[inPos++];
+                    int b = (int) in[inPos++];
                     if (b < 0) {
                         b += 256;
                     }
@@ -389,8 +389,8 @@ public final class Base64 {
             if (0 == context.modulus && lineLength == 0) {
                 return; // no leftovers to process and not using chunking
             }
-            var buffer = ensureBufferSize(encodeSize, context);
-            var savedPos = context.pos;
+            val buffer = ensureBufferSize(encodeSize, context);
+            val savedPos = context.pos;
             switch (context.modulus) { // 0-2
                 case 0: // nothing to do here
                     break;
@@ -457,9 +457,9 @@ public final class Base64 {
             if (inAvail < 0) {
                 context.eof = true;
             }
-            for (var i = 0; i < inAvail; i++) {
-                var buffer = ensureBufferSize(decodeSize, context);
-                var b = in[inPos++];
+            for (int i = 0; i < inAvail; i++) {
+                val buffer = ensureBufferSize(decodeSize, context);
+                val b = in[inPos++];
                 if (b == pad) {
                     // We're done.
                     context.eof = true;
@@ -473,7 +473,7 @@ public final class Base64 {
             // EOF (-1) and first time '=' character is encountered in stream.
             // This approach makes the '=' padding characters completely optional.
             if (context.eof && context.modulus != 0) {
-                var buffer = ensureBufferSize(decodeSize, context);
+                val buffer = ensureBufferSize(decodeSize, context);
 
                 // We have some spare bits remaining
                 // Output all whole multiples of 8 bits and ignore the rest
@@ -498,7 +498,7 @@ public final class Base64 {
 
         private void decodeNotDone(Context context, byte[] buffer, byte b) {
             if (b >= 0 && b < DECODE_TABLE.length) {
-                var result = (int) DECODE_TABLE[b];
+                val result = (int) DECODE_TABLE[b];
                 if (result >= 0) {
                     context.modulus = (context.modulus + 1) % BYTES_PER_ENCODED_BLOCK;
                     context.ibitWorkArea = (context.ibitWorkArea << BITS_PER_ENCODED_BYTE) + result;

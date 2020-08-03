@@ -9,6 +9,7 @@ import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSL.SSLSocke
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSL.X509TrustManagerProvider;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientSSLDisabled;
 import lombok.SneakyThrows;
+import lombok.val;
 import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.Test;
 
@@ -41,8 +42,8 @@ public class SSLProviderTest {
 
     @Test
     public void testSSLDef() {
-        var httpClient = ohLoader.getClient(SSLDefHttpClient.class);
-        var callback = on(httpClient).field("CGLIB$CALLBACK_0").get();
+        val httpClient = ohLoader.getClient(SSLDefHttpClient.class);
+        val callback = on(httpClient).field("CGLIB$CALLBACK_0").get();
         OkHttpClient okHttpClient = on(callback).field("okHttpClient").get();
         assertTrue(okHttpClient.sslSocketFactory() instanceof TestSSLSocketFactory);
         assertTrue(okHttpClient.hostnameVerifier() instanceof TestHostnameVerifier);
@@ -50,8 +51,8 @@ public class SSLProviderTest {
 
     @Test
     public void testSSLAll() {
-        var httpClient = ohLoader.getClient(SSLAllHttpClient.class);
-        var callback = on(httpClient).field("CGLIB$CALLBACK_0").get();
+        val httpClient = ohLoader.getClient(SSLAllHttpClient.class);
+        val callback = on(httpClient).field("CGLIB$CALLBACK_0").get();
         OkHttpClient okHttpClient = on(callback).field("okHttpClient").get();
         assertTrue(okHttpClient.sslSocketFactory() instanceof TestSSLSocketFactory);
         assertTrue(okHttpClient.hostnameVerifier() instanceof TestHostnameVerifier);
@@ -60,9 +61,9 @@ public class SSLProviderTest {
     @SneakyThrows
     @Test
     public void testSSLDefParam() {
-        var httpClient = ohLoader.getClient(SSLDefParamHttpClient.class);
-        var sslSocketFactory = new TestSSLSocketFactory();
-        var hostnameVerifier = new TestHostnameVerifier
+        val httpClient = ohLoader.getClient(SSLDefParamHttpClient.class);
+        val sslSocketFactory = new TestSSLSocketFactory();
+        val hostnameVerifier = new TestHostnameVerifier
                 ();
         try {
             httpClient.sample(sslSocketFactory, hostnameVerifier);
@@ -79,10 +80,10 @@ public class SSLProviderTest {
     @SneakyThrows
     @Test
     public void testSSLAllParam() {
-        var httpClient = ohLoader.getClient(SSLAllParamHttpClient.class);
-        var sslSocketFactory = new TestSSLSocketFactory();
-        var x509TrustManager = new TestX509TrustManager();
-        var hostnameVerifier = new TestHostnameVerifier();
+        val httpClient = ohLoader.getClient(SSLAllParamHttpClient.class);
+        val sslSocketFactory = new TestSSLSocketFactory();
+        val x509TrustManager = new TestX509TrustManager();
+        val hostnameVerifier = new TestHostnameVerifier();
         try {
             httpClient.sample(sslSocketFactory, x509TrustManager, hostnameVerifier);
         } catch (Exception e) {
@@ -98,7 +99,7 @@ public class SSLProviderTest {
     @SneakyThrows
     @Test
     public void testMethodSSL() {
-        var httpClient = ohLoader.getClient(MethodSSLHttpClient.class);
+        val httpClient = ohLoader.getClient(MethodSSLHttpClient.class);
         try {
             httpClient.sample();
         } catch (Exception e) {
@@ -124,7 +125,7 @@ public class SSLProviderTest {
     @SneakyThrows
     @Test
     public void testDisabledSSL() {
-        var httpClient = ohLoader.getClient(DisableSSLHttpClient.class);
+        val httpClient = ohLoader.getClient(DisableSSLHttpClient.class);
         try {
             httpClient.sample();
         } catch (Exception e) {
@@ -147,7 +148,7 @@ public class SSLProviderTest {
         assertThrows(ProviderException.class, () ->
                 ohLoader.getClient(ErrorSSLHttpClient3.class));
 
-        var httpClient = ohLoader.getClient(ErrorSSLHttpClient4.class);
+        val httpClient = ohLoader.getClient(ErrorSSLHttpClient4.class);
         assertThrows(ProviderException.class, httpClient::error1);
         assertThrows(ProviderException.class, httpClient::error2);
         assertThrows(ProviderException.class, httpClient::error3);

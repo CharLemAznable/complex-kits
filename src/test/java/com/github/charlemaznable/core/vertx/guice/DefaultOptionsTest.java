@@ -4,6 +4,7 @@ import com.google.inject.Guice;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.impl.EventBusImpl;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import static org.joor.Reflect.on;
@@ -16,14 +17,14 @@ public class DefaultOptionsTest {
 
     @Test
     public void testVertxModular() {
-        var injector = Guice.createInjector(new VertxModular().createModule());
-        var vertx = injector.getInstance(Vertx.class);
+        val injector = Guice.createInjector(new VertxModular().createModule());
+        val vertx = injector.getInstance(Vertx.class);
         assertNotNull(vertx);
-        var reflectVertx = on(vertx);
+        val reflectVertx = on(vertx);
         int defaultWorkerPoolSize = reflectVertx.field("defaultWorkerPoolSize").get();
         assertEquals(VertxOptions.DEFAULT_WORKER_POOL_SIZE, defaultWorkerPoolSize);
         assertSame(vertx, injector.getInstance(Vertx.class));
-        var eventBus = reflectVertx.field("eventBus").get();
+        val eventBus = reflectVertx.field("eventBus").get();
         assertTrue(eventBus instanceof EventBusImpl);
     }
 }

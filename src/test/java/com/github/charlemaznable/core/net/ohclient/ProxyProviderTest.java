@@ -7,6 +7,7 @@ import com.github.charlemaznable.core.net.ohclient.annotation.ClientProxy;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientProxy.ProxyProvider;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientProxyDisabled;
 import lombok.SneakyThrows;
+import lombok.val;
 import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.Test;
 
@@ -35,20 +36,20 @@ public class ProxyProviderTest {
 
     @Test
     public void testProxyPlain() {
-        var httpClient = ohLoader.getClient(ProxyPlainHttpClient.class);
-        var callback = on(httpClient).field("CGLIB$CALLBACK_0").get();
+        val httpClient = ohLoader.getClient(ProxyPlainHttpClient.class);
+        val callback = on(httpClient).field("CGLIB$CALLBACK_0").get();
         OkHttpClient okHttpClient = on(callback).field("okHttpClient").get();
-        var address = (InetSocketAddress) checkNotNull(okHttpClient.proxy()).address();
+        val address = (InetSocketAddress) checkNotNull(okHttpClient.proxy()).address();
         assertEquals(LOCAL_HOST, address.getAddress().getHostAddress());
         assertEquals(41111, address.getPort());
     }
 
     @Test
     public void testProxyProvider() {
-        var httpClient = ohLoader.getClient(ProxyProviderHttpClient.class);
-        var callback = on(httpClient).field("CGLIB$CALLBACK_0").get();
+        val httpClient = ohLoader.getClient(ProxyProviderHttpClient.class);
+        val callback = on(httpClient).field("CGLIB$CALLBACK_0").get();
         OkHttpClient okHttpClient = on(callback).field("okHttpClient").get();
-        var address = (InetSocketAddress) checkNotNull(okHttpClient.proxy()).address();
+        val address = (InetSocketAddress) checkNotNull(okHttpClient.proxy()).address();
         assertEquals(LOCAL_HOST, address.getAddress().getHostAddress());
         assertEquals(41113, address.getPort());
     }
@@ -56,8 +57,8 @@ public class ProxyProviderTest {
     @SneakyThrows
     @Test
     public void testProxyParam() {
-        var httpClient = ohLoader.getClient(ProxyParamHttpClient.class);
-        var proxyParam = new Proxy(Type.HTTP, new InetSocketAddress(LOCAL_HOST, 41115));
+        val httpClient = ohLoader.getClient(ProxyParamHttpClient.class);
+        val proxyParam = new Proxy(Type.HTTP, new InetSocketAddress(LOCAL_HOST, 41115));
         try {
             httpClient.sample(proxyParam);
         } catch (Exception e) {
@@ -73,7 +74,7 @@ public class ProxyProviderTest {
     @SneakyThrows
     @Test
     public void testMethodProxy() {
-        var httpClient = ohLoader.getClient(MethodProxyHttpClient.class);
+        val httpClient = ohLoader.getClient(MethodProxyHttpClient.class);
         try {
             httpClient.sampleDefault();
         } catch (Exception e) {
@@ -102,7 +103,7 @@ public class ProxyProviderTest {
         assertThrows(ProviderException.class, () ->
                 ohLoader.getClient(ErrorProxyHttpClient1.class));
 
-        var httpClient = ohLoader.getClient(ErrorProxyHttpClient2.class);
+        val httpClient = ohLoader.getClient(ErrorProxyHttpClient2.class);
         assertThrows(ProviderException.class, httpClient::sample);
     }
 
