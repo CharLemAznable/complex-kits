@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.spring;
 
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -45,7 +46,8 @@ public class MutableHttpServletRequestTest {
         val body23 = dealRequestBodyStream(mutableRequest, "UTF-8");
         assertEquals(body2, body23);
 
-        assertDoesNotThrow(() -> setRequestBody(null, body2));
+        assertDoesNotThrow((Executable)
+                () -> setRequestBody(null, body2));
     }
 
     @Test
@@ -74,7 +76,8 @@ public class MutableHttpServletRequestTest {
         val value22 = fetchParameterMap(mutableRequest).get(key2);
         assertEquals(value2, value22);
 
-        assertDoesNotThrow(() -> setRequestParameter(null, key2, value2));
+        assertDoesNotThrow((Executable)
+                () -> setRequestParameter(null, key2, value2));
 
         val value3 = "value3";
         setRequestParameterMap(mutableRequest, of(key2, value3));
@@ -83,16 +86,21 @@ public class MutableHttpServletRequestTest {
         val value32 = fetchParameterMap(mutableRequest).get(key2);
         assertEquals(value3, value32);
 
-        assertDoesNotThrow(() -> setRequestParameterMap(null, of(key2, value3)));
+        assertDoesNotThrow((Executable)
+                () -> setRequestParameterMap(null, of(key2, value3)));
 
-        assertDoesNotThrow(() -> mutableRequest.setParameter("SET_KEY", null));
+        assertDoesNotThrow((Executable)
+                () -> mutableRequest.setParameter("SET_KEY", null));
         assertNull(mutableRequest.getParameterValues("SET_KEY"));
-        assertDoesNotThrow(() -> mutableRequest.setParameter("SET_KEY", "SET_VALUE"));
+        assertDoesNotThrow((Executable)
+                () -> mutableRequest.setParameter("SET_KEY", "SET_VALUE"));
         assertEquals("SET_VALUE", mutableRequest.getParameterValues("SET_KEY")[0]);
-        assertDoesNotThrow(() -> mutableRequest.setParameter("SET_KEY", new String[]{"SET_VALUE1", "SET_VALUE2"}));
+        assertDoesNotThrow((Executable)
+                () -> mutableRequest.setParameter("SET_KEY", new String[]{"SET_VALUE1", "SET_VALUE2"}));
         assertEquals("SET_VALUE1", mutableRequest.getParameterValues("SET_KEY")[0]);
         assertEquals("SET_VALUE2", mutableRequest.getParameterValues("SET_KEY")[1]);
-        assertDoesNotThrow(() -> mutableRequest.setParameter("SET_KEY", 123));
+        assertDoesNotThrow((Executable)
+                () -> mutableRequest.setParameter("SET_KEY", 123));
         assertEquals("123", mutableRequest.getParameterValues("SET_KEY")[0]);
     }
 

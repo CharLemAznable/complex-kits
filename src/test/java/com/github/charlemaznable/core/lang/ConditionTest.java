@@ -8,6 +8,7 @@ import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import static com.github.charlemaznable.core.lang.Condition.blankThen;
 import static com.github.charlemaznable.core.lang.Condition.checkCondition;
@@ -129,23 +130,32 @@ public class ConditionTest {
         assertDoesNotThrow(() -> checkCondition(() -> Objects.isNull(strnull), new ConditionTestException()));
 
         val testBean = new ConditionTestBean();
-        assertThrows(BadConditionException.class, () -> checkCondition(() -> Objects.nonNull(strnull), () -> testBean.setValue("true")));
+        assertThrows(BadConditionException.class, () -> checkCondition(
+                () -> Objects.nonNull(strnull), (Executable) () -> testBean.setValue("true")));
         assertNull(testBean.getValue());
-        assertThrows(BadConditionException.class, () -> checkCondition(() -> Objects.nonNull(strnull), () -> testBean.setValue("true"), "strnull is Null"));
+        assertThrows(BadConditionException.class, () -> checkCondition(
+                () -> Objects.nonNull(strnull), (Executable) () -> testBean.setValue("true"), "strnull is Null"));
         assertNull(testBean.getValue());
-        assertThrows(ConditionTestException.class, () -> checkCondition(() -> Objects.nonNull(strnull), () -> testBean.setValue("true"), new ConditionTestException()));
+        assertThrows(ConditionTestException.class, () -> checkCondition(
+                () -> Objects.nonNull(strnull), (Executable) () -> testBean.setValue("true"), new ConditionTestException()));
         assertNull(testBean.getValue());
 
-        assertDoesNotThrow(() -> checkCondition(() -> Objects.isNull(strnull), () -> testBean.setValue("1")));
+        assertDoesNotThrow(() -> checkCondition(() -> Objects.isNull(strnull),
+                (Executable) () -> testBean.setValue("1")));
         assertEquals("1", testBean.getValue());
-        assertDoesNotThrow(() -> checkCondition(() -> Objects.isNull(strnull), () -> testBean.setValue("2"), "strnull is Null"));
+        assertDoesNotThrow(() -> checkCondition(() -> Objects.isNull(strnull),
+                (Executable) () -> testBean.setValue("2"), "strnull is Null"));
         assertEquals("2", testBean.getValue());
-        assertDoesNotThrow(() -> checkCondition(() -> Objects.isNull(strnull), () -> testBean.setValue("3"), new ConditionTestException()));
+        assertDoesNotThrow(() -> checkCondition(() -> Objects.isNull(strnull),
+                (Executable) () -> testBean.setValue("3"), new ConditionTestException()));
         assertEquals("3", testBean.getValue());
 
-        assertThrows(BadConditionException.class, () -> checkCondition(() -> Objects.nonNull(strnull), () -> "result"));
-        assertThrows(BadConditionException.class, () -> checkCondition(() -> Objects.nonNull(strnull), () -> "result", "strnull is Null"));
-        assertThrows(ConditionTestException.class, () -> checkCondition(() -> Objects.nonNull(strnull), () -> "result", new ConditionTestException()));
+        assertThrows(BadConditionException.class, () -> checkCondition(
+                () -> Objects.nonNull(strnull), (Supplier<String>) () -> "result"));
+        assertThrows(BadConditionException.class, () -> checkCondition(
+                () -> Objects.nonNull(strnull), (Supplier<String>) () -> "result", "strnull is Null"));
+        assertThrows(ConditionTestException.class, () -> checkCondition(
+                () -> Objects.nonNull(strnull), (Supplier<String>) () -> "result", new ConditionTestException()));
 
         assertEquals("result", checkCondition(() -> Objects.isNull(strnull), () -> "result"));
         assertEquals("result", checkCondition(() -> Objects.isNull(strnull), () -> "result", "strnull is Null"));
