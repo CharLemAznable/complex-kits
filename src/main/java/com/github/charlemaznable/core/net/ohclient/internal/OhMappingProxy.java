@@ -265,6 +265,7 @@ public final class OhMappingProxy extends OhRoot {
 
         val statusCode = response.code();
         val responseBody = notNullThen(response.body(), OhResponseBody::new);
+        if (nonNull(response.body())) response.close();
 
         val errorMapping = new StatusErrorFunction(statusCode, responseBody);
         notNullThen(this.statusErrorMapping.get(
