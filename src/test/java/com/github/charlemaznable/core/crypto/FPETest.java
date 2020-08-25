@@ -1,19 +1,28 @@
 package com.github.charlemaznable.core.crypto;
 
 import com.github.charlemaznable.core.crypto.FPE.AlphabetDomain;
+import com.github.charlemaznable.core.crypto.FPE.AlphabetDomains;
 import com.github.charlemaznable.core.crypto.FPE.GenericAlphabet;
 import com.github.charlemaznable.core.lang.Rand;
 import com.idealista.fpe.builder.FormatPreservingEncryptionBuilder;
+import com.idealista.fpe.config.Domain;
 import com.idealista.fpe.config.LengthRange;
+import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.charlemaznable.core.codec.Bytes.bytes;
 import static com.github.charlemaznable.core.crypto.FPE.AlphabetDomains.ALPHANUMERIC;
 import static com.github.charlemaznable.core.crypto.FPE.AlphabetDomains.LOWER_LETTERS;
+import static java.lang.Runtime.getRuntime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FPETest {
+
+    public final int TIMES = 10000;
+    public final AtomicInteger success = new AtomicInteger(0);
 
     @Test
     public void testFPEDefault() {
@@ -51,6 +60,10 @@ public class FPETest {
                 .build();
         val fpe = FPE.ff1()
                 .withDomain("abcdefghij")
+                .withDomain((Domain) null)
+                .withDomain((AlphabetDomains) null)
+                .withDomain((String) null)
+                .withDomain((char[]) null)
                 .withPseudoRandomKey(bytes("0123456789"), 192)
                 .build();
 
@@ -77,6 +90,9 @@ public class FPETest {
                 .build();
         val fpe = FPE.ff1()
                 .withPseudoRandomKey("0123456789")
+                .withPseudoRandomFunction(null)
+                .withPseudoRandomKey((String) null)
+                .withPseudoRandomKey((byte[]) null)
                 .build();
 
         val plainText = "aaaa";
@@ -102,6 +118,8 @@ public class FPETest {
                 .build();
         val fpe = FPE.ff1()
                 .withPseudoRandomKey("0123456789", 256)
+                .withPseudoRandomKey((String) null, 256)
+                .withPseudoRandomKey((byte[]) null, 256)
                 .build();
 
         val plainText = "aaaa";
@@ -129,6 +147,7 @@ public class FPETest {
                 .withDomain("abcde")
                 .withPseudoRandomKey("0123456789")
                 .withLengthRange(3, null)
+                .withLengthRange(null)
                 .build();
 
         val plainText = "aaaa";
@@ -142,5 +161,41 @@ public class FPETest {
         val decrypt2 = fpe.decrypt(encrypt2, tweakText);
         assertEquals(plainText, decrypt1);
         assertEquals(plainText, decrypt1);
+    }
+
+    public void batchRun(FPE fpe, int times) {
+        val plainText = Rand.randAlphanumeric(100);
+        val tweakText = Rand.randAlphanumeric(4);
+
+        for (int i = 0; i < times; ++i) {
+            val plain = plainText + i;
+            val enc = fpe.encrypt(plain, tweakText);
+            val dec = fpe.decrypt(enc, tweakText);
+            assertEquals(plain, dec);
+            success.incrementAndGet();
+        }
+    }
+
+    @SneakyThrows
+    public void routineRun(int threads) {
+        val fpe = FPE.ff1()
+                .withPseudoRandomKey("0123456789")
+                .build();
+        val service = new Thread[threads];
+        for (int i = 0; i < threads; i++) {
+            service[i] = new Thread(() -> batchRun(fpe, TIMES));
+            service[i].start();
+        }
+
+        for (int i = 0; i < threads; i++) {
+            service[i].join();
+        }
+    }
+
+    @Test
+    public void testFPEBatch() {
+        val threads = getRuntime().availableProcessors() + 1;
+        routineRun(threads);
+        assertEquals(threads * TIMES, success.get());
     }
 }
