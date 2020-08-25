@@ -22,7 +22,7 @@ public enum IP {
         protected final boolean checkInetAddress(InetAddress inetAddress) {
             return inetAddress instanceof Inet6Address;
         }
-    };
+    },;
 
     protected abstract boolean checkInetAddress(InetAddress inetAddress);
 

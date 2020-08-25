@@ -64,7 +64,7 @@ public final class Base64 {
         // URL安全(将Base64中的URL非法字符'+'和'/'转为'-'和'_', 见RFC3548)
         URL_SAFE,
         // 去除末尾=号
-        PURIFIED
+        PURIFIED,
     }
 
     @SuppressWarnings("SameParameterValue")

@@ -28,7 +28,7 @@ public enum SHAXWithRSA {
         protected final String signAlgorithms() {
             return "SHA256WithRSA";
         }
-    };
+    },;
 
     protected abstract String signAlgorithms();
 

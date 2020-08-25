@@ -89,6 +89,7 @@
         <vertx.version>3.9.2</vertx.version>
         <guice.version>4.2.3</guice.version>
         <expiringmap.version>0.5.9</expiringmap.version>
+        <format-preserving-encryption.version>1.0.0</format-preserving-encryption.version>
 
         <lombok.version>1.18.12</lombok.version>
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
@@ -214,6 +215,11 @@
             <groupId>net.jodah</groupId>
             <artifactId>expiringmap</artifactId>
             <version>${expiringmap.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.idealista</groupId>
+            <artifactId>format-preserving-encryption</artifactId>
+            <version>${format-preserving-encryption.version}</version>
         </dependency>
 
         <dependency>

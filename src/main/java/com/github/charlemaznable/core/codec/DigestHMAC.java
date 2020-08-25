@@ -58,7 +58,7 @@ public enum DigestHMAC {
         protected final Hasher digestHasher(byte[] key) {
             return hmacSha512(key).newHasher();
         }
-    };
+    },;
 
     protected abstract Hasher digestHasher(Key key);
 

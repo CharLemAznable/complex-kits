@@ -45,7 +45,7 @@ public enum Digest {
         protected final Hasher digestHasher() {
             return sha512().newHasher();
         }
-    };
+    },;
 
     protected abstract Hasher digestHasher();
 
