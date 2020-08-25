@@ -52,30 +52,37 @@ public final class AES {
         return decrypt(value, getKey(keyString, keySize));
     }
 
-    private static Key getKey(String keyString) {
-        /* Default 128bit */
-        return getKey(keyString, 128);
+    static Key getKey(String keyString) {
+        return getKey(bytes(keyString));
     }
 
-    private static Key getKey(String keyString, int size) {
-        val keyBytes = new byte[size >> 3];
-        val srcBytes = bytes(keyString);
+    static Key getKey(String keyString, int size) {
+        return getKey(bytes(keyString), size);
+    }
 
-        if (srcBytes.length >= keyBytes.length) {
-            arraycopy(srcBytes, 0, keyBytes, 0, keyBytes.length);
-            return keyFromString(keyBytes);
+    static Key getKey(byte[] keyBytes) {
+        /* Default 128bit */
+        return getKey(keyBytes, 128);
+    }
+
+    static Key getKey(byte[] keyBytes, int size) {
+        val dstBytes = new byte[size >> 3];
+
+        if (keyBytes.length >= dstBytes.length) {
+            arraycopy(keyBytes, 0, dstBytes, 0, dstBytes.length);
+            return keySpec(dstBytes);
         }
 
         int pos = 0;
-        while (pos + srcBytes.length < keyBytes.length) {
-            arraycopy(srcBytes, 0, keyBytes, pos, srcBytes.length);
-            pos += srcBytes.length;
+        while (pos + keyBytes.length < dstBytes.length) {
+            arraycopy(keyBytes, 0, dstBytes, pos, keyBytes.length);
+            pos += keyBytes.length;
         }
-        arraycopy(srcBytes, 0, keyBytes, pos, keyBytes.length - pos);
-        return keyFromString(keyBytes);
+        arraycopy(keyBytes, 0, dstBytes, pos, dstBytes.length - pos);
+        return keySpec(dstBytes);
     }
 
-    private static Key keyFromString(byte[] keyBytes) {
+    static Key keySpec(byte[] keyBytes) {
         return new SecretKeySpec(keyBytes, KEY_ALGORITHM);
     }
 }
