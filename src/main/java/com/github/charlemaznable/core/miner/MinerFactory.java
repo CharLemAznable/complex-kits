@@ -193,9 +193,9 @@ public final class MinerFactory {
             //   if minerable instanceof AbstractMiner
             //     use its defaultGroupName
             //   else do nothing
-            val stoneGroup = blankThen(group, () -> minerable instanceof AbstractMiner ?
+            String stoneGroup = blankThen(group, () -> minerable instanceof AbstractMiner ?
                     ((AbstractMiner) minerable).getDefaultGroupName() : group);
-            val stone = minerable.getStone(stoneGroup, blankThen(dataId, method::getName));
+            String stone = minerable.getStone(stoneGroup, blankThen(dataId, method::getName));
             val cacheSeconds = checkMinerCacheSeconds(minerConfig);
             return new ExpiringValue(Pair.of(stone, defaultValue), cacheSeconds, TimeUnit.SECONDS);
         }
