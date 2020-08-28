@@ -194,7 +194,34 @@ public class MinerFactoryTest {
     }
 
     @Test
+    public void testMinerDefault() {
+        MockDiamondServer.setConfigInfo("DEF_GROUP", "DEF_DATA",
+                "name=John\nfull=${this.name} Doe\nlong=${this.full} Richard\n" +
+                        "testMode=yes\ntestMode2=TRUE\n" +
+                        "content=@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.long})\n" +
+                        "list=@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.name}) " +
+                        "@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.full}) " +
+                        "@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.long})");
+
+        val minerDefaultData = minerLoader.getMiner(MinerDefData.class);
+        val properties = minerDefaultData.properties();
+
+        assertEquals("John", properties.getProperty("name"));
+        assertEquals("John Doe", properties.getProperty("full"));
+        assertEquals("John Doe Richard", properties.getProperty("long"));
+
+        assertEquals("yes", properties.getProperty("testMode"));
+        assertEquals("TRUE", properties.getProperty("testMode2"));
+
+        assertEquals("@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John Doe Richard)",
+                properties.getProperty("content"));
+        assertEquals("@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John) @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John Doe) @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John Doe Richard)",
+                properties.getProperty("list"));
+    }
+
+    @Test
     public void testStoneProps() {
+        onClass(MinerFactory.class).call("substitute", "");
         StringSubstitutor minerMinerSubstitutor =
                 onClass(MinerFactory.class).field("minerMinerSubstitutor").get();
         minerMinerSubstitutor.setVariableResolver(
@@ -323,6 +350,13 @@ public class MinerFactoryTest {
 
     @MinerConfig("DEFAULT_DATA")
     public interface MinerableDefault extends Minerable {}
+
+    @MinerConfig(group = "DEF_GROUP")
+    public interface MinerDefData {
+
+        @MinerConfig("DEF_DATA")
+        Properties properties();
+    }
 
     interface StoneNone {}
 

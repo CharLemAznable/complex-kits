@@ -23,6 +23,7 @@ import net.sf.cglib.proxy.MethodProxy;
 import net.sf.cglib.proxy.NoOp;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.text.StringSubstitutor;
+import org.n3r.diamond.client.AbstractMiner;
 import org.n3r.diamond.client.Miner;
 import org.n3r.diamond.client.Minerable;
 import org.n3r.diamond.client.impl.DiamondUtils;
@@ -188,7 +189,12 @@ public final class MinerFactory {
             val dataId = checkMinerDataId(method, minerConfig);
             val defaultValue = checkMinerDefaultValue(method, minerConfig);
             val minerable = minerLoader.getMinerable(minerClass);
-            val stone = minerable.getStone(group, blankThen(dataId, method::getName));
+            // group blank:
+            //   if minerable instanceof AbstractMiner
+            //     use its defaultGroupName
+            //   else do nothing
+            val stone = minerable.getStone(blankThen(group, () -> minerable instanceof AbstractMiner ?
+                    ((AbstractMiner) minerable).getDefaultGroupName() : group), blankThen(dataId, method::getName));
             val cacheSeconds = checkMinerCacheSeconds(minerConfig);
             return new ExpiringValue(Pair.of(stone, defaultValue), cacheSeconds, TimeUnit.SECONDS);
         }
@@ -210,8 +216,11 @@ public final class MinerFactory {
         private String checkMinerDefaultValue(Method method, MinerConfig minerConfig) {
             if (isNull(minerConfig)) return null;
             val providerClass = minerConfig.defaultValueProvider();
-            val defaultValue = DefaultValueProvider.class == providerClass ? minerConfig.defaultValue()
-                    : FactoryContext.apply(factory, providerClass, p -> p.defaultValue(minerClass, method));
+            String defaultValue = minerConfig.defaultValue();
+            if (DefaultValueProvider.class != providerClass) {
+                defaultValue = FactoryContext.apply(factory, providerClass,
+                        p -> p.defaultValue(minerClass, method));
+            }
             return substitute(blankThen(defaultValue, () -> null));
         }
 
