@@ -185,7 +185,7 @@ public final class MinerFactory {
         @SuppressWarnings("unchecked")
         private ExpiringValue<Pair<String, String>> loadStone(Method method) {
             val minerConfig = findAnnotation(method, MinerConfig.class);
-            val group = checkMinerGroup(method, minerConfig);
+            String group = checkMinerGroup(method, minerConfig);
             val dataId = checkMinerDataId(method, minerConfig);
             val defaultValue = checkMinerDefaultValue(method, minerConfig);
             val minerable = minerLoader.getMinerable(minerClass);
