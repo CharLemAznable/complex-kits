@@ -19,6 +19,7 @@ import org.n3r.diamond.client.impl.MockDiamondServer;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
@@ -204,19 +205,28 @@ public class MinerFactoryTest {
                         "@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.long})");
 
         val minerDefaultData = minerLoader.getMiner(MinerDefData.class);
-        val properties = minerDefaultData.properties();
 
+        val properties = minerDefaultData.properties();
         assertEquals("John", properties.getProperty("name"));
         assertEquals("John Doe", properties.getProperty("full"));
         assertEquals("John Doe Richard", properties.getProperty("long"));
-
         assertEquals("yes", properties.getProperty("testMode"));
         assertEquals("TRUE", properties.getProperty("testMode2"));
-
         assertEquals("@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John Doe Richard)",
                 properties.getProperty("content"));
         assertEquals("@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John) @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John Doe) @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John Doe Richard)",
                 properties.getProperty("list"));
+
+        val map = minerDefaultData.map();
+        assertEquals("John", map.get("name"));
+        assertEquals("John Doe", map.get("full"));
+        assertEquals("John Doe Richard", map.get("long"));
+        assertEquals("yes", map.get("testMode"));
+        assertEquals("TRUE", map.get("testMode2"));
+        assertEquals("@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John Doe Richard)",
+                map.get("content"));
+        assertEquals("@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John) @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John Doe) @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John Doe Richard)",
+                map.get("list"));
     }
 
     @Test
@@ -356,6 +366,9 @@ public class MinerFactoryTest {
 
         @MinerConfig("DEF_DATA")
         Properties properties();
+
+        @MinerConfig("DEF_DATA")
+        Map<String, Object> map();
     }
 
     interface StoneNone {}

@@ -31,6 +31,7 @@ import org.n3r.diamond.client.impl.DiamondUtils;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -235,7 +236,7 @@ public final class MinerFactory {
             if (rt == String.class) return value;
             if (rt.isPrimitive()) return parsePrimitive(rt, value);
 
-            if (Properties.class.isAssignableFrom(rt))
+            if (Map.class.isAssignableFrom(rt))
                 return parseProperties(value);
 
             val grt = method.getGenericReturnType();
