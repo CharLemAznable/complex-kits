@@ -248,6 +248,7 @@ public final class MinerFactory {
                     .getActualTypeArguments()[0], value);
         }
 
+        @SuppressWarnings("Duplicates")
         private Object parsePrimitive(Class<?> rt, String value) {
             if (rt == boolean.class) return Str.anyOfIgnoreCase(value, "yes", "true", "on", "y");
             if (rt == short.class) return Short.parseShort(value);
