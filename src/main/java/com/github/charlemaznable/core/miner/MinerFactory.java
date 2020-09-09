@@ -249,7 +249,7 @@ public final class MinerFactory {
         }
 
         private Object parsePrimitive(Class<?> rt, String value) {
-            if (rt == boolean.class) return Str.anyOfIgnoreCase(value, "yes", "true", "on");
+            if (rt == boolean.class) return Str.anyOfIgnoreCase(value, "yes", "true", "on", "y");
             if (rt == short.class) return Short.parseShort(value);
             if (rt == int.class) return Integer.parseInt(value);
             if (rt == long.class) return Long.parseLong(value);
