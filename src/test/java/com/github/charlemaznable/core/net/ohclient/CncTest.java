@@ -43,8 +43,7 @@ public class CncTest {
     @BeforeAll
     public static void beforeAll() {
         MockDiamondServer.setUpMockServer();
-        MockDiamondServer.setConfigInfo("Env", "ohclient",
-                "port=41200");
+        MockDiamondServer.setConfigInfo("Env", "ohclient", "port=41200");
     }
 
     @AfterAll

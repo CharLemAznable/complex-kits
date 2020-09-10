@@ -48,8 +48,7 @@ public class InterceptorTest {
     @BeforeAll
     public static void beforeAll() {
         MockDiamondServer.setUpMockServer();
-        MockDiamondServer.setConfigInfo("Env", "ohclient",
-                "port=41220");
+        MockDiamondServer.setConfigInfo("Env", "ohclient", "port=41220");
     }
 
     @AfterAll
