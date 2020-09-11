@@ -16,6 +16,7 @@ public final class VertxElf {
         throw new UnsupportedOperationException();
     }
 
+    @SuppressWarnings("Duplicates")
     @SneakyThrows
     public static Vertx buildVertx(VertxOptions vertxOptions) {
         if (vertxOptions.getEventBusOptions().isClustered()) {
