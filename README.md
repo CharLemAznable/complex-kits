@@ -30,7 +30,7 @@ JAVA常用工具包.
 <dependency>
   <groupId>com.github.charlemaznable</groupId>
   <artifactId>complex-kits</artifactId>
-  <version>0.11.7</version>
+  <version>0.11.8</version>
 </dependency>
 ```
 
@@ -40,6 +40,6 @@ JAVA常用工具包.
 <dependency>
   <groupId>com.github.charlemaznable</groupId>
   <artifactId>complex-kits</artifactId>
-  <version>0.11.8-SNAPSHOT</version>
+  <version>0.11.9-SNAPSHOT</version>
 </dependency>
 ```
