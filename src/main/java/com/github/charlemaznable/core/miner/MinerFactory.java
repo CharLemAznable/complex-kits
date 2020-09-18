@@ -10,6 +10,7 @@ import com.github.charlemaznable.core.lang.Str;
 import com.github.charlemaznable.core.miner.MinerConfig.DataIdProvider;
 import com.github.charlemaznable.core.miner.MinerConfig.DefaultValueProvider;
 import com.github.charlemaznable.core.miner.MinerConfig.GroupProvider;
+import com.github.charlemaznable.core.miner.MinerStoneParse.MinerStoneParser;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.primitives.Primitives;
@@ -32,7 +33,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.charlemaznable.core.context.FactoryContext.SpringFactory.springFactory;
@@ -236,16 +236,25 @@ public final class MinerFactory {
             if (rt == String.class) return value;
             if (rt.isPrimitive()) return parsePrimitive(rt, value);
 
+            val minerStoneParse = findAnnotation(method, MinerStoneParse.class);
+            if (nonNull(minerStoneParse)) {
+                val parserClass = minerStoneParse.value();
+                if (MinerStoneParser.class != parserClass) {
+                    return FactoryContext.apply(factory, parserClass,
+                            parser -> parser.parse(value, rt));
+                }
+            }
+
             if (Map.class.isAssignableFrom(rt))
-                return parseProperties(value);
+                return DiamondUtils.parseStoneToProperties(value);
 
             val grt = method.getGenericReturnType();
             val isCollection = grt instanceof ParameterizedType
                     && Collection.class.isAssignableFrom(rt);
-            if (!isCollection) return parseObject(rt, value);
 
-            return parseObjects((Class) ((ParameterizedType) grt)
-                    .getActualTypeArguments()[0], value);
+            if (!isCollection) return DiamondUtils.parseObject(value, rt);
+            return DiamondUtils.parseObjects(value,
+                    (Class<?>) ((ParameterizedType) grt).getActualTypeArguments()[0]);
         }
 
         @SuppressWarnings("Duplicates")
@@ -259,18 +268,6 @@ public final class MinerFactory {
             if (rt == byte.class) return Byte.parseByte(value);
             if (rt == char.class) return value.length() > 0 ? value.charAt(0) : '\0';
             return null;
-        }
-
-        private Properties parseProperties(String value) {
-            return DiamondUtils.parseStoneToProperties(value);
-        }
-
-        private Object parseObject(Class<?> rt, String value) {
-            return DiamondUtils.parseObject(value, rt);
-        }
-
-        private Object parseObjects(Class<?> rt, String value) {
-            return DiamondUtils.parseObjects(value, rt);
         }
     }
 

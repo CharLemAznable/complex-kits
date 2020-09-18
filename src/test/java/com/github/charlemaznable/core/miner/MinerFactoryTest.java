@@ -4,7 +4,10 @@ import com.github.charlemaznable.core.miner.MinerConfig.DataIdProvider;
 import com.github.charlemaznable.core.miner.MinerConfig.DefaultValueProvider;
 import com.github.charlemaznable.core.miner.MinerConfig.GroupProvider;
 import com.github.charlemaznable.core.miner.MinerFactory.MinerLoader;
+import com.github.charlemaznable.core.miner.MinerStoneParse.MinerStoneParser;
+import com.github.charlemaznable.vertx.diamond.VertxDiamondElf;
 import com.google.common.base.Splitter;
+import io.vertx.core.VertxOptions;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -104,13 +107,13 @@ public class MinerFactoryTest {
     @SneakyThrows
     @Test
     public void testMiner() {
-        MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA",
+        MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA", "" +
                 "name=John\nfull=${this.name} Doe\nlong=${this.full} Richard\n" +
-                        "testMode=yes\ntestMode2=TRUE\n" +
-                        "content=@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.long})\n" +
-                        "list=@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.name}) " +
-                        "@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.full}) " +
-                        "@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.long})");
+                "testMode=yes\ntestMode2=TRUE\n" +
+                "content=@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.long})\n" +
+                "list=@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.name}) " +
+                "@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.full}) " +
+                "@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.long})");
 
         val minerDefault = minerLoader.getMiner(MinerDefault.class);
         assertNotNull(minerDefault);
@@ -196,13 +199,13 @@ public class MinerFactoryTest {
 
     @Test
     public void testMinerDefault() {
-        MockDiamondServer.setConfigInfo("DEF_GROUP", "DEF_DATA",
+        MockDiamondServer.setConfigInfo("DEF_GROUP", "DEF_DATA", "" +
                 "name=John\nfull=${this.name} Doe\nlong=${this.full} Richard\n" +
-                        "testMode=yes\ntestMode2=TRUE\n" +
-                        "content=@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.long})\n" +
-                        "list=@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.name}) " +
-                        "@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.full}) " +
-                        "@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.long})");
+                "testMode=yes\ntestMode2=TRUE\n" +
+                "content=@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.long})\n" +
+                "list=@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.name}) " +
+                "@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.full}) " +
+                "@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(${this.long})");
 
         val minerDefaultData = minerLoader.getMiner(MinerDefData.class);
 
@@ -227,6 +230,22 @@ public class MinerFactoryTest {
                 map.get("content"));
         assertEquals("@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John) @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John Doe) @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John Doe Richard)",
                 map.get("list"));
+    }
+
+    @Test
+    public void testMinerParse() {
+        MockDiamondServer.setConfigInfo("PARSE_GROUP", "PARSE_DATA", "workerPoolSize=30\n");
+
+        val minerParseData = minerLoader.getMiner(MinerParseData.class);
+
+        val properties = minerParseData.properties();
+        assertEquals("30", properties.getProperty("workerPoolSize"));
+
+        val vertxOptions = minerParseData.vertxOptions();
+        assertEquals(30, vertxOptions.getWorkerPoolSize());
+
+        val parseRaw = minerParseData.parseRaw();
+        assertEquals(30, parseRaw.getWorkerPoolSize());
     }
 
     @Test
@@ -369,6 +388,25 @@ public class MinerFactoryTest {
 
         @MinerConfig("DEF_DATA")
         Map<String, Object> map();
+    }
+
+    @MinerConfig(group = "PARSE_GROUP")
+    public interface MinerParseData {
+
+        @MinerConfig("PARSE_DATA")
+        @MinerStoneParse(MinerStoneParser.class)
+        Properties properties();
+
+        @MinerConfig("PARSE_DATA")
+        @MinerStoneParse(VertxOptionsParser.class)
+        VertxOptions vertxOptions();
+
+        @MinerConfig("PARSE_DATA")
+        String raw();
+
+        default VertxOptions parseRaw() {
+            return VertxDiamondElf.parseStoneToVertxOptions(raw());
+        }
     }
 
     interface StoneNone {}
@@ -537,4 +575,13 @@ public class MinerFactoryTest {
 
     @MinerConfig
     class StoneConcrete {}
+
+    public static class VertxOptionsParser implements MinerStoneParser {
+
+        @Override
+        public Object parse(String stone, Class<?> clazz) {
+            if (VertxOptions.class != clazz) return null;
+            return VertxDiamondElf.parseStoneToVertxOptions(stone);
+        }
+    }
 }
