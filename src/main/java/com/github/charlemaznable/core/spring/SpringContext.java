@@ -185,6 +185,7 @@ public class SpringContext implements ApplicationContextAware {
         return createBean(null, clazz);
     }
 
+    @Synchronized
     public static <T> T createBean(String beanName, Class<T> clazz) {
         if (isNull(clazz) || !isConcrete(clazz)) return null;
         if (isNull(applicationContext)) {
@@ -213,6 +214,7 @@ public class SpringContext implements ApplicationContextAware {
         return autowireBean(null, bean);
     }
 
+    @Synchronized
     @CanIgnoreReturnValue
     public static <T> T autowireBean(String beanName, T bean) {
         if (isNull(applicationContext)) return bean;
