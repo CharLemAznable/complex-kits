@@ -6,7 +6,7 @@
 
     <groupId>com.github.charlemaznable</groupId>
     <artifactId>complex-kits</artifactId>
-    <version>0.11.11-SNAPSHOT</version>
+    <version>0.11.12-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Complex Kits</name>
@@ -87,7 +87,7 @@
         <auto-service.version>1.0-rc7</auto-service.version>
         <okhttp.version>3.14.9</okhttp.version>
         <vertx.version>3.9.4</vertx.version>
-        <vertx-diamond-config.version>0.0.3-SNAPSHOT</vertx-diamond-config.version>
+        <vertx-diamond-config.version>0.0.4-SNAPSHOT</vertx-diamond-config.version>
         <guice.version>4.2.3</guice.version>
         <expiringmap.version>0.5.9</expiringmap.version>
         <format-preserving-encryption.version>1.0.0</format-preserving-encryption.version>
@@ -96,7 +96,7 @@
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
         <spring.version>5.2.10.RELEASE</spring.version>
 
-        <logback-miner.version>0.0.5-SNAPSHOT</logback-miner.version>
+        <logback-miner.version>0.0.6-SNAPSHOT</logback-miner.version>
         <junit-jupiter.version>5.7.0</junit-jupiter.version>
         <jmockit.version>1.49</jmockit.version>
         <awaitility.version>4.0.3</awaitility.version>
