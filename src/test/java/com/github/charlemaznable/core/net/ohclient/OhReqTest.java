@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.net.ohclient;
 
 import com.github.charlemaznable.core.net.common.CommonReqTest;
 import com.github.charlemaznable.core.net.common.ContentFormat.FormContentFormatter;
+import com.github.charlemaznable.core.net.common.ContentFormat.JsonContentFormatter;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.StatusError;
 import com.github.charlemaznable.core.net.ohclient.OhResponseMappingTest.ClientErrorException;
@@ -106,6 +107,15 @@ public class OhReqTest extends CommonReqTest {
             assertEquals(HttpStatus.FORBIDDEN.value(), e.getStatusCode());
             assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), e.getMessage());
         }
+
+        val ohReq7 = new OhReq("http://127.0.0.1:41103/sample7")
+                .contentFormat(new JsonContentFormatter())
+                .parameter("BBB", "bbb")
+                .extraUrlQueryBuilder((parameterMap, contextMap) -> "AAA=aaa")
+                .addInterceptor(loggingInterceptor)
+                .loggingLevel(Level.BASIC);
+        assertEquals("Sample7", ohReq7.get());
+        assertEquals("Sample7", ohReq7.post());
 
         shutdownMockWebServer();
     }

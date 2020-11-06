@@ -39,6 +39,7 @@ import static com.github.charlemaznable.core.lang.Condition.notNullThen;
 import static com.github.charlemaznable.core.lang.Condition.nullThen;
 import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
+import static com.github.charlemaznable.core.net.Url.concatUrlQuery;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.ACCEPT_CHARSET;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.CONTENT_TYPE;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_CALL_TIMEOUT;
@@ -189,19 +190,19 @@ public class OhReq extends CommonReq<OhReq> {
     }
 
     private Request buildGetRequest() {
-        val requestUrl = concatRequestUrl();
         val parameterMap = fetchParameterMap();
+        val requestUrl = concatRequestUrl(parameterMap);
         val requestBuilder = buildCommon();
 
         requestBuilder.method(HttpMethod.GET.toString(), null);
-        val addQuery = this.contentFormatter.format(parameterMap, newHashMap());
-        requestBuilder.url(concatRequestQuery(requestUrl, addQuery));
+        val query = URL_QUERY_FORMATTER.format(parameterMap, newHashMap());
+        requestBuilder.url(concatUrlQuery(requestUrl, query));
         return requestBuilder.build();
     }
 
     private Request buildPostRequest() {
-        val requestUrl = concatRequestUrl();
         val parameterMap = fetchParameterMap();
+        val requestUrl = concatRequestUrl(parameterMap);
         val requestBuilder = buildCommon();
 
         val content = nullThen(this.requestBody, () ->

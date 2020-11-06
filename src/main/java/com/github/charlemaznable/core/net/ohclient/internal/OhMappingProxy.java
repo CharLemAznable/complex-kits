@@ -6,6 +6,8 @@ import com.github.charlemaznable.core.net.common.AcceptCharset;
 import com.github.charlemaznable.core.net.common.CncResponse;
 import com.github.charlemaznable.core.net.common.ContentFormat;
 import com.github.charlemaznable.core.net.common.ContentFormat.ContentFormatter;
+import com.github.charlemaznable.core.net.common.ExtraUrlQuery;
+import com.github.charlemaznable.core.net.common.ExtraUrlQuery.ExtraUrlQueryBuilder;
 import com.github.charlemaznable.core.net.common.FixedContext;
 import com.github.charlemaznable.core.net.common.FixedHeader;
 import com.github.charlemaznable.core.net.common.FixedParameter;
@@ -161,6 +163,8 @@ public final class OhMappingProxy extends OhRoot {
         this.statusSeriesErrorMapping = Elf.checkStatusSeriesErrorMapping(this.ohMethod, proxy);
 
         this.responseParser = Elf.checkResponseParser(this.ohMethod, this.factory, proxy);
+
+        this.extraUrlQueryBuilder = Elf.checkExtraUrlQueryBuilder(this.ohMethod, this.factory, proxy);
 
         processReturnType(this.ohMethod);
     }
@@ -631,6 +635,13 @@ public final class OhMappingProxy extends OhRoot {
                 Method method, Factory factory, OhProxy proxy) {
             val responseParse = findAnnotation(method, ResponseParse.class);
             return checkNull(responseParse, () -> proxy.responseParser, annotation ->
+                    FactoryContext.build(factory, annotation.value()));
+        }
+
+        static ExtraUrlQueryBuilder checkExtraUrlQueryBuilder(
+                Method method, Factory factory, OhProxy proxy) {
+            val extraUrlQuery = findAnnotation(method, ExtraUrlQuery.class);
+            return checkNull(extraUrlQuery, () -> proxy.extraUrlQueryBuilder, annotation ->
                     FactoryContext.build(factory, annotation.value()));
         }
     }

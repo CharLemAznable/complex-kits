@@ -5,6 +5,8 @@ import com.github.charlemaznable.core.lang.Str;
 import com.github.charlemaznable.core.net.common.Bundle;
 import com.github.charlemaznable.core.net.common.CncRequest;
 import com.github.charlemaznable.core.net.common.CncResponse.CncResponseImpl;
+import com.github.charlemaznable.core.net.common.ContentFormat.ContentFormatter;
+import com.github.charlemaznable.core.net.common.ContentFormat.FormContentFormatter;
 import com.github.charlemaznable.core.net.common.Context;
 import com.github.charlemaznable.core.net.common.Header;
 import com.github.charlemaznable.core.net.common.Parameter;
@@ -40,8 +42,8 @@ import static com.github.charlemaznable.core.lang.Condition.checkNull;
 import static com.github.charlemaznable.core.lang.Condition.notNullThen;
 import static com.github.charlemaznable.core.lang.Condition.nullThen;
 import static com.github.charlemaznable.core.lang.Listt.newArrayList;
-import static com.github.charlemaznable.core.lang.Str.isBlank;
 import static com.github.charlemaznable.core.lang.Str.toStr;
+import static com.github.charlemaznable.core.net.Url.concatUrlQuery;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.ACCEPT_CHARSET;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.CONTENT_TYPE;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.log;
@@ -50,6 +52,8 @@ import static java.util.Objects.nonNull;
 import static org.joor.Reflect.on;
 
 public final class OhCall extends OhRoot {
+
+    private static final ContentFormatter URL_QUERY_FORMATTER = new FormContentFormatter();
 
     Class responseClass = CncResponseImpl.class;
     String requestBodyRaw;
@@ -87,6 +91,8 @@ public final class OhCall extends OhRoot {
         this.pathVars = newArrayList(proxy.pathVars);
         this.parameters = newArrayList(proxy.parameters);
         this.contexts = newArrayList(proxy.contexts);
+
+        this.extraUrlQueryBuilder = proxy.extraUrlQueryBuilder;
     }
 
     private void processArguments(Method method, Object[] args) {
@@ -265,19 +271,22 @@ public final class OhCall extends OhRoot {
         Map<String, String> pathVarMap = this.pathVars.stream().collect(
                 HashMap::new, (m, p) -> m.put(p.getKey(), p.getValue()), HashMap::putAll);
         val pathVarSubstitutor = new StringSubstitutor(pathVarMap, "{", "}");
-        val requestUrl = pathVarSubstitutor.replace(url);
+        val substitutedUrl = pathVarSubstitutor.replace(url);
         Map<String, Object> parameterMap = this.parameters.stream().collect(
                 HashMap::new, (m, p) -> m.put(p.getKey(), p.getValue()), HashMap::putAll);
         Map<String, Object> contextMap = this.contexts.stream().collect(
                 HashMap::new, (m, p) -> m.put(p.getKey(), p.getValue()), HashMap::putAll);
 
+        val extraUrlQuery = checkNull(this.extraUrlQueryBuilder, () -> "",
+                builder -> builder.build(parameterMap, contextMap));
+        val requestUrl = concatUrlQuery(substitutedUrl, extraUrlQuery);
+
         val requestMethod = this.httpMethod.toString();
         if (!HttpMethod.permitsRequestBody(requestMethod)) {
             requestBuilder.method(requestMethod, null);
-            val addQuery = this.contentFormatter.format(parameterMap, contextMap);
-            if (isBlank(addQuery)) requestBuilder.url(requestUrl);
-            else requestBuilder.url(requestUrl +
-                    (requestUrl.contains("?") ? "&" : "?") + addQuery);
+            val query = URL_QUERY_FORMATTER.format(parameterMap, contextMap);
+            requestBuilder.url(concatUrlQuery(requestUrl, query));
+
         } else {
             val content = nullThen(this.requestBodyRaw, () ->
                     this.contentFormatter.format(parameterMap, contextMap));

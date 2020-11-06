@@ -1,6 +1,7 @@
 package com.github.charlemaznable.core.net.ohclient.internal;
 
 import com.github.charlemaznable.core.net.common.ContentFormat.ContentFormatter;
+import com.github.charlemaznable.core.net.common.ExtraUrlQuery.ExtraUrlQueryBuilder;
 import com.github.charlemaznable.core.net.common.HttpMethod;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.ResponseParse.ResponseParser;
@@ -51,4 +52,6 @@ class OhRoot {
     Map<HttpStatus.Series, Class<? extends StatusError>> statusSeriesErrorMapping;
 
     ResponseParser responseParser;
+
+    ExtraUrlQueryBuilder extraUrlQueryBuilder;
 }

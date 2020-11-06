@@ -2,6 +2,8 @@ package com.github.charlemaznable.core.net.common;
 
 import com.github.charlemaznable.core.lang.Mapp;
 import com.github.charlemaznable.core.net.common.ContentFormat.ContentFormatter;
+import com.github.charlemaznable.core.net.common.ContentFormat.FormContentFormatter;
+import com.github.charlemaznable.core.net.common.ExtraUrlQuery.ExtraUrlQueryBuilder;
 import lombok.val;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -9,14 +11,18 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.charlemaznable.core.lang.Condition.checkNull;
 import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
-import static com.github.charlemaznable.core.lang.Str.isBlank;
+import static com.github.charlemaznable.core.lang.Str.toStr;
+import static com.github.charlemaznable.core.net.Url.concatUrlQuery;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_ACCEPT_CHARSET;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.DEFAULT_CONTENT_FORMATTER;
 
 @SuppressWarnings("unchecked")
 public abstract class CommonReq<T extends CommonReq> {
+
+    protected static final ContentFormatter URL_QUERY_FORMATTER = new FormContentFormatter();
 
     protected String baseUrl;
 
@@ -28,6 +34,8 @@ public abstract class CommonReq<T extends CommonReq> {
     protected List<Pair<String, String>> headers = newArrayList();
     protected List<Pair<String, Object>> parameters = newArrayList();
     protected String requestBody;
+
+    protected ExtraUrlQueryBuilder extraUrlQueryBuilder;
 
     protected Map<HttpStatus, Class<? extends StatusError>>
             statusErrorMapping = newHashMap();
@@ -84,6 +92,11 @@ public abstract class CommonReq<T extends CommonReq> {
         return (T) this;
     }
 
+    public T extraUrlQueryBuilder(ExtraUrlQueryBuilder extraUrlQueryBuilder) {
+        this.extraUrlQueryBuilder = extraUrlQueryBuilder;
+        return (T) this;
+    }
+
     public T statusErrorMapping(HttpStatus httpStatus,
                                 Class<? extends StatusError> errorClass) {
         this.statusErrorMapping.put(httpStatus, errorClass);
@@ -96,12 +109,6 @@ public abstract class CommonReq<T extends CommonReq> {
         return (T) this;
     }
 
-    protected String concatRequestUrl() {
-        if (isBlank(this.reqPath)) return this.baseUrl;
-        if (isBlank(this.baseUrl)) return this.reqPath;
-        return this.baseUrl + this.reqPath;
-    }
-
     protected Map<String, Object> fetchParameterMap() {
         Map<String, Object> parameterMap = newHashMap();
         for (val parameter : this.parameters) {
@@ -110,8 +117,10 @@ public abstract class CommonReq<T extends CommonReq> {
         return parameterMap;
     }
 
-    protected String concatRequestQuery(String requestUrl, String query) {
-        if (isBlank(query)) return requestUrl;
-        return requestUrl + (requestUrl.contains("?") ? "&" : "?") + query;
+    protected String concatRequestUrl(Map<String, Object> parameterMap) {
+        val requestUrl = toStr(this.baseUrl).trim() + toStr(this.reqPath).trim();
+        val extraUrlQuery = checkNull(this.extraUrlQueryBuilder, () -> "",
+                builder -> builder.build(parameterMap, Mapp.newHashMap()));
+        return concatUrlQuery(requestUrl, extraUrlQuery);
     }
 }

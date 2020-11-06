@@ -68,6 +68,18 @@ public abstract class CommonReqTest {
                                     .setResponseCode(HttpStatus.FORBIDDEN.value())
                                     .setBody(HttpStatus.FORBIDDEN.getReasonPhrase());
                         }
+                    case "/sample7":
+                        assertEquals("aaa", requestUrl.queryParameter("AAA"));
+                        if ("GET".equals(request.getMethod())) {
+                            assertEquals("bbb", requestUrl.queryParameter("BBB"));
+                        } else if ("POST".equals(request.getMethod())) {
+                            assertEquals("{\"BBB\":\"bbb\"}", request.getBody().readUtf8());
+                        } else {
+                            return new MockResponse()
+                                    .setResponseCode(HttpStatus.NOT_FOUND.value())
+                                    .setBody(HttpStatus.NOT_FOUND.getReasonPhrase());
+                        }
+                        return new MockResponse().setBody("Sample7");
                     default:
                         return new MockResponse()
                                 .setResponseCode(HttpStatus.NOT_FOUND.value())

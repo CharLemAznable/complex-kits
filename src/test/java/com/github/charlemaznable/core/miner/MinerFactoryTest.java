@@ -27,6 +27,7 @@ import java.util.Properties;
 
 import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
 import static com.github.charlemaznable.core.miner.MinerElf.minerAsSubstitutor;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.joor.Reflect.onClass;
@@ -92,6 +93,7 @@ public class MinerFactoryTest {
         assertNull(testCache.key2());
 
         MockDiamondServer.setConfigInfo("CACHE_GROUP", "CACHE_KEY", "key2=value2");
+        await().pollDelay(100, MILLISECONDS).until(() -> true);
         assertNull(testNoCache.key1());
         assertEquals("value1", testCache.key1());
         assertEquals("value2", testNoCache.key2());

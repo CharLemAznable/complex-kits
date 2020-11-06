@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
+import static com.github.charlemaznable.core.lang.Str.isBlank;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.StringUtils.replace;
 
@@ -28,5 +29,10 @@ public final class Url {
 
     public static String decodeDotAndColon(String s) {
         return replace(replace(s, "-", "."), "_", ":");
+    }
+
+    public static String concatUrlQuery(String url, String query) {
+        if (isBlank(query)) return url;
+        return url + (url.contains("?") ? "&" : "?") + query;
     }
 }

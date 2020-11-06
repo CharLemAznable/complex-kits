@@ -26,6 +26,7 @@ import static com.github.charlemaznable.core.lang.Condition.checkNull;
 import static com.github.charlemaznable.core.lang.Condition.notNullThen;
 import static com.github.charlemaznable.core.lang.Condition.nullThen;
 import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
+import static com.github.charlemaznable.core.net.Url.concatUrlQuery;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.ACCEPT_CHARSET;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.CONTENT_TYPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -74,20 +75,20 @@ public class VxReq extends CommonReq<VxReq> {
     @SafeVarargs
     public final void get(Handler<AsyncResult<String>>... handlers) {
         val webClient = buildWebClient();
-        val requestUrl = concatRequestUrl();
         val parameterMap = fetchParameterMap();
+        val requestUrl = concatRequestUrl(parameterMap);
         val headersMap = fetchHeaderMap();
 
-        val addQuery = this.contentFormatter.format(parameterMap, newHashMap());
-        webClient.getAbs(concatRequestQuery(requestUrl, addQuery))
+        val query = URL_QUERY_FORMATTER.format(parameterMap, newHashMap());
+        webClient.getAbs(concatUrlQuery(requestUrl, query))
                 .putHeaders(headersMap).send(handle(handlers));
     }
 
     @SafeVarargs
     public final void post(Handler<AsyncResult<String>>... handlers) {
         val webClient = buildWebClient();
-        val requestUrl = concatRequestUrl();
         val parameterMap = fetchParameterMap();
+        val requestUrl = concatRequestUrl(parameterMap);
         val headersMap = fetchHeaderMap();
 
         val content = nullThen(this.requestBody, () ->
