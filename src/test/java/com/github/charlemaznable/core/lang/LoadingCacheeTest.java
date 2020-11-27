@@ -52,17 +52,17 @@ public class LoadingCacheeTest {
             public String load(@Nonnull String s) {
                 return s + toStr(currentTimeMillis());
             }
-        }, Duration.ofMillis(200));
+        }, Duration.ofMillis(2000));
 
         val cachedValue = get(accessCache, "abc");
         assertEquals(cachedValue, get(accessCache, "abc"));
 
         assertDoesNotThrow(() ->
-                await().pollDelay(Duration.ofMillis(100)).until(() ->
+                await().pollDelay(Duration.ofMillis(1000)).until(() ->
                         cachedValue.equals(get(accessCache, "abc"))));
 
         assertDoesNotThrow(() ->
-                await().pollDelay(Duration.ofMillis(300)).until(() ->
+                await().pollDelay(Duration.ofMillis(3000)).until(() ->
                         !cachedValue.equals(get(accessCache, "abc"))));
     }
 
@@ -74,17 +74,17 @@ public class LoadingCacheeTest {
             public String load(@Nonnull String s) {
                 return s + toStr(currentTimeMillis());
             }
-        }, Duration.ofMillis(100));
+        }, Duration.ofMillis(2000));
 
         val cachedValue = get(writeCache, "abc");
         assertEquals(cachedValue, get(writeCache, "abc"));
 
         assertDoesNotThrow(() ->
-                await().pollDelay(Duration.ofMillis(50)).until(() ->
+                await().pollDelay(Duration.ofMillis(1000)).until(() ->
                         cachedValue.equals(get(writeCache, "abc"))));
 
         assertDoesNotThrow(() ->
-                await().pollDelay(Duration.ofMillis(150)).until(() ->
+                await().pollDelay(Duration.ofMillis(3000)).until(() ->
                         !cachedValue.equals(get(writeCache, "abc"))));
     }
 }
