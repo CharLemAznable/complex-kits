@@ -201,16 +201,18 @@ public class MinerFactoryTest {
         MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA",
                 "# toml\nname=John\nfull=${this.name} Doe\nlong=${this.full} Richard");
 
-        assertNull(minerableDefault.getString("name"));
-        assertNull(minerableDefault.getString("full"));
-        assertNull(minerableDefault.getString("long"));
+        val minerableDefaultError = minerLoader.getMiner(MinerableDefault.class);
+        assertNull(minerableDefaultError.getString("name"));
+        assertNull(minerableDefaultError.getString("full"));
+        assertNull(minerableDefaultError.getString("long"));
 
         MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA",
                 "# TOML\nname='John'\nfull='John Doe'\nlong='John Doe Richard'");
 
-        assertEquals("John", minerableDefault.getString("name"));
-        assertEquals("John Doe", minerableDefault.getString("full"));
-        assertEquals("John Doe Richard", minerableDefault.getString("long"));
+        val minerableDefaultToml = minerLoader.getMiner(MinerableDefault.class);
+        assertEquals("John", minerableDefaultToml.getString("name"));
+        assertEquals("John Doe", minerableDefaultToml.getString("full"));
+        assertEquals("John Doe Richard", minerableDefaultToml.getString("long"));
     }
 
     @Test
@@ -255,7 +257,9 @@ public class MinerFactoryTest {
                 "@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(\"John Doe\") " +
                 "@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(\"John Doe Richard\")'");
 
-        val propertiesToml = minerDefaultData.properties();
+        val minerDefaultDataToml = minerLoader.getMiner(MinerDefData.class);
+
+        val propertiesToml = minerDefaultDataToml.properties();
         assertEquals("John", propertiesToml.getProperty("name"));
         assertEquals("John Doe", propertiesToml.getProperty("full"));
         assertEquals("John Doe Richard", propertiesToml.getProperty("long"));
@@ -266,7 +270,7 @@ public class MinerFactoryTest {
         assertEquals("@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(\"John\") @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(\"John Doe\") @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(\"John Doe Richard\")",
                 propertiesToml.getProperty("list"));
 
-        val mapToml = minerDefaultData.map();
+        val mapToml = minerDefaultDataToml.map();
         assertEquals("John", mapToml.get("name"));
         assertEquals("John Doe", mapToml.get("full"));
         assertEquals("John Doe Richard", mapToml.get("long"));
