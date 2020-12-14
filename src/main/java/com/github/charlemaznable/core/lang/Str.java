@@ -16,6 +16,11 @@ public final class Str {
      */
     public static final Pattern INTEGER_PATTERN = compile("[-+]?([0-9]+)$");
 
+    /**
+     * 点分隔.
+     */
+    public static final String DOT_SPLITTER = "\\.";
+
     private Str() {}
 
     public static boolean isNull(String str) {
@@ -47,7 +52,6 @@ public final class Str {
         while (repeats-- > 0) {
             sb.append(letter);
         }
-
         return sb.toString();
     }
 
@@ -55,7 +59,6 @@ public final class Str {
         val sb = new StringBuilder(s);
         while (sb.charAt(sb.length() - 1) == letter)
             sb.deleteCharAt(sb.length() - 1);
-
         return sb.toString();
     }
 
@@ -80,7 +83,6 @@ public final class Str {
                 --leftTimes;
             }
         }
-
         return "";
     }
 
@@ -211,7 +213,33 @@ public final class Str {
         for (val any : anys) {
             if (StringUtils.equalsIgnoreCase(s, any)) return true;
         }
-
         return false;
+    }
+
+    public static int compareDotSplitSerialNumber(final String str1, final String str2) {
+        return compareDotSplitSerialNumber(str1, str2, true);
+    }
+
+    /**
+     * @return 小于0, 0, 大于0, 分别表示{@code str1}小于, 等于, 大于{@code str2}
+     */
+    public static int compareDotSplitSerialNumber(final String str1, final String str2, final boolean nullIsLess) {
+        if (Objects.isNull(str1) && Objects.isNull(str2)) return 0;
+        if (Objects.isNull(str1)) return nullIsLess ? -1 : 1;
+        if (Objects.isNull(str2)) return nullIsLess ? 1 : -1;
+        if (str1.equals(str2)) return 0;
+
+        val arr1 = str1.split(DOT_SPLITTER);
+        val arr2 = str2.split(DOT_SPLITTER);
+        int idx = 0;
+        val minLength = java.lang.Math.min(arr1.length, arr2.length);
+        int diff = 0;
+        while (idx < minLength
+                && (diff = arr1[idx].length() - arr2[idx].length()) == 0//先比较长度
+                && (diff = arr1[idx].compareTo(arr2[idx])) == 0) {//再比较字符
+            ++idx;
+        }
+        diff = diff != 0 ? diff : arr1.length - arr2.length;
+        return diff;
     }
 }

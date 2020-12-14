@@ -70,4 +70,18 @@ public class StrTest {
         assertEquals(123.45D, Str.doubleOf("123.45"));
         assertEquals(-123.45D, Str.doubleOf("-123.45"));
     }
+
+    @Test
+    public void testCompareDotSplitSerialNumber() {
+        assertEquals(0, Str.compareDotSplitSerialNumber(null, null));
+        assertEquals(-1, Str.compareDotSplitSerialNumber(null, "abc"));
+        assertEquals(1, Str.compareDotSplitSerialNumber(null, "abc", false));
+        assertEquals(1, Str.compareDotSplitSerialNumber("abc", null));
+        assertEquals(-1, Str.compareDotSplitSerialNumber("abc", null, false));
+        assertEquals(0, Str.compareDotSplitSerialNumber("abc", "abc"));
+
+        assertEquals(-1, Str.compareDotSplitSerialNumber("1.0", "1.1"));
+        assertEquals(-1, Str.compareDotSplitSerialNumber("1.9", "1.10"));
+        assertEquals(-1, Str.compareDotSplitSerialNumber("1.9", "1.9.1"));
+    }
 }
