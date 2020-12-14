@@ -40,8 +40,10 @@ import static com.github.charlemaznable.core.lang.ClzPath.classResourceAsSubstit
 import static com.github.charlemaznable.core.lang.Condition.blankThen;
 import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static com.github.charlemaznable.core.lang.LoadingCachee.get;
-import static com.github.charlemaznable.core.lang.Str.isNotBlank;
+import static com.github.charlemaznable.core.lang.Str.isBlank;
 import static com.github.charlemaznable.core.miner.MinerElf.minerAsSubstitutor;
+import static com.github.charlemaznable.core.miner.MinerElf.parseStoneToMinerable;
+import static com.github.charlemaznable.core.miner.MinerElf.parseStoneToProperties;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
@@ -129,7 +131,8 @@ public final class MinerFactory {
             val group = checkMinerGroup(clazz, minerConfig);
             val minerable = new Miner(blankThen(group, () -> "DEFAULT_GROUP"));
             val dataId = checkMinerDataId(clazz, minerConfig);
-            val value = isNotBlank(dataId) ? minerable.getMiner(dataId) : minerable;
+            val value = isBlank(dataId) ? minerable :
+                    parseStoneToMinerable(minerable.getString(dataId));
             val cacheSeconds = Math.max(0, minerConfig.cacheSeconds());
             return new ExpiringValue(value, cacheSeconds, TimeUnit.SECONDS);
         }
@@ -246,7 +249,7 @@ public final class MinerFactory {
             }
 
             if (Map.class.isAssignableFrom(rt))
-                return DiamondUtils.parseStoneToProperties(value);
+                return parseStoneToProperties(value);
 
             val grt = method.getGenericReturnType();
             val isCollection = grt instanceof ParameterizedType

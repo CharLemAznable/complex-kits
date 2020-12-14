@@ -197,6 +197,20 @@ public class MinerFactoryTest {
         assertEquals("John", minerableDefault.getString("name"));
         assertEquals("John Doe", minerableDefault.getString("full"));
         assertEquals("John Doe Richard", minerableDefault.getString("long"));
+
+        MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA",
+                "# toml\nname=John\nfull=${this.name} Doe\nlong=${this.full} Richard");
+
+        assertNull(minerableDefault.getString("name"));
+        assertNull(minerableDefault.getString("full"));
+        assertNull(minerableDefault.getString("long"));
+
+        MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA",
+                "# TOML\nname='John'\nfull='John Doe'\nlong='John Doe Richard'");
+
+        assertEquals("John", minerableDefault.getString("name"));
+        assertEquals("John Doe", minerableDefault.getString("full"));
+        assertEquals("John Doe Richard", minerableDefault.getString("long"));
     }
 
     @Test
@@ -232,6 +246,36 @@ public class MinerFactoryTest {
                 map.get("content"));
         assertEquals("@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John) @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John Doe) @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John Doe Richard)",
                 map.get("list"));
+
+        MockDiamondServer.setConfigInfo("DEF_GROUP", "DEF_DATA", "# Toml\n" +
+                "name='John'\nfull='John Doe'\nlong='John Doe Richard'\n" +
+                "testMode='yes'\ntestMode2='TRUE'\n" +
+                "content='@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(\"John Doe Richard\")'\n" +
+                "list='@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(\"John\") " +
+                "@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(\"John Doe\") " +
+                "@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(\"John Doe Richard\")'");
+
+        val propertiesToml = minerDefaultData.properties();
+        assertEquals("John", propertiesToml.getProperty("name"));
+        assertEquals("John Doe", propertiesToml.getProperty("full"));
+        assertEquals("John Doe Richard", propertiesToml.getProperty("long"));
+        assertEquals("yes", propertiesToml.getProperty("testMode"));
+        assertEquals("TRUE", propertiesToml.getProperty("testMode2"));
+        assertEquals("@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(\"John Doe Richard\")",
+                propertiesToml.getProperty("content"));
+        assertEquals("@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(\"John\") @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(\"John Doe\") @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(\"John Doe Richard\")",
+                propertiesToml.getProperty("list"));
+
+        val mapToml = minerDefaultData.map();
+        assertEquals("John", mapToml.get("name"));
+        assertEquals("John Doe", mapToml.get("full"));
+        assertEquals("John Doe Richard", mapToml.get("long"));
+        assertEquals("yes", mapToml.get("testMode"));
+        assertEquals("TRUE", mapToml.get("testMode2"));
+        assertEquals("@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(\"John Doe Richard\")",
+                mapToml.get("content"));
+        assertEquals("@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(\"John\") @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(\"John Doe\") @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(\"John Doe Richard\")",
+                mapToml.get("list"));
     }
 
     @Test
