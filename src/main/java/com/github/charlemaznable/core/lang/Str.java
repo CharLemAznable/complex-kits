@@ -224,10 +224,9 @@ public final class Str {
      * @return 小于0, 0, 大于0, 分别表示{@code str1}小于, 等于, 大于{@code str2}
      */
     public static int compareDotSplitSerialNumber(final String str1, final String str2, final boolean nullIsLess) {
-        if (Objects.isNull(str1) && Objects.isNull(str2)) return 0;
+        if (Objects.equals(str1, str2)) return 0;
         if (Objects.isNull(str1)) return nullIsLess ? -1 : 1;
         if (Objects.isNull(str2)) return nullIsLess ? 1 : -1;
-        if (str1.equals(str2)) return 0;
 
         val arr1 = str1.split(DOT_SPLITTER);
         val arr2 = str2.split(DOT_SPLITTER);
