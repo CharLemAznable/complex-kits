@@ -5,6 +5,7 @@ import com.github.charlemaznable.core.miner.MinerConfig.DefaultValueProvider;
 import com.github.charlemaznable.core.miner.MinerConfig.GroupProvider;
 import com.github.charlemaznable.core.miner.MinerFactory.MinerLoader;
 import com.github.charlemaznable.core.miner.MinerStoneParse.MinerStoneParser;
+import com.github.charlemaznable.core.miner.parser.VertxOptionsParser;
 import com.github.charlemaznable.vertx.diamond.VertxDiamondElf;
 import com.google.common.base.Splitter;
 import io.vertx.core.VertxOptions;
@@ -625,13 +626,4 @@ public class MinerFactoryTest {
 
     @MinerConfig
     class StoneConcrete {}
-
-    public static class VertxOptionsParser implements MinerStoneParser {
-
-        @Override
-        public Object parse(String stone, Class<?> clazz) {
-            if (VertxOptions.class != clazz) return null;
-            return VertxDiamondElf.parseStoneToVertxOptions(stone);
-        }
-    }
 }
