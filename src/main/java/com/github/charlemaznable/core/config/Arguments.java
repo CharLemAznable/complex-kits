@@ -80,12 +80,9 @@ public final class Arguments extends BaseConfigable {
 
         private final Source source;
 
-        private final String[] args;
-
         public ArgumentsWrapper(String... args) {
             checkNotNull(args, "Args must not be null");
             this.source = new Source(args);
-            this.args = args;
         }
 
         public Set<String> getOptionNames() {

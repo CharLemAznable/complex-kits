@@ -42,11 +42,14 @@ public class EnvFactoryTest {
 
         val springEnvConfig = EnvFactory.springEnvLoader().getEnv(TestEnvConfig.class);
 
+        val empty = springEnvConfig.subset("");
+        assertTrue(empty.getProperties().isEmpty());
+
         val custom1 = springEnvConfig.subset("custom1");
         assertEquals(springEnvConfig.custom1Key1(), custom1.getStr("key1"));
         assertEquals(springEnvConfig.custom1Key2(), custom1.getStr("key2"));
 
-        val custom2 = springEnvConfig.subset("custom2");
+        val custom2 = springEnvConfig.subset("custom2.");
         assertEquals(springEnvConfig.custom2Key1(), custom2.getStr("key1"));
         assertEquals(springEnvConfig.custom2Key2(), custom2.getStr("key2"));
 

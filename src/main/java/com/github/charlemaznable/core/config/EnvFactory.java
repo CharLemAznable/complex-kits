@@ -40,6 +40,10 @@ public final class EnvFactory {
     private static LoadingCache<Factory, EnvLoader> envLoaderCache
             = LoadingCachee.simpleCache(from(EnvLoader::new));
 
+    static {
+        envClassPathSubstitutor = classResourceAsSubstitutor("config.env.props");
+    }
+
     private EnvFactory() {
         throw new UnsupportedOperationException();
     }
@@ -54,14 +58,6 @@ public final class EnvFactory {
 
     public static EnvLoader envLoader(Factory factory) {
         return LoadingCachee.get(envLoaderCache, factory);
-    }
-
-    private static String substitute(String source) {
-        if (isNull(envClassPathSubstitutor)) {
-            envClassPathSubstitutor = classResourceAsSubstitutor("config.env.props");
-        }
-        return envClassPathSubstitutor.replace(
-                argumentsAsSubstitutor().replace(source));
     }
 
     @SuppressWarnings("unchecked")
@@ -170,6 +166,10 @@ public final class EnvFactory {
             String defaultValue = DefaultValueProvider.class == providerClass ? envConfig.defaultValue()
                     : FactoryContext.apply(factory, providerClass, p -> p.defaultValue(envClass, method));
             return substitute(blankThen(defaultValue, () -> null));
+        }
+
+        private String substitute(String source) {
+            return envClassPathSubstitutor.replace(argumentsAsSubstitutor().replace(source));
         }
 
         private Object parseValue(String key, String value, Method method) {

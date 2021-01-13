@@ -37,11 +37,14 @@ public class ArgumentsTest {
                 "--custom2.key1=value2",
                 "--custom2.key2=value1");
 
+        val empty = arguments.subset("");
+        assertTrue(empty.getProperties().isEmpty());
+
         val custom1 = arguments.subset("custom1");
         assertEquals(arguments.getStr("custom1.key1"), custom1.getStr("key1"));
         assertEquals(arguments.getStr("custom1.key2"), custom1.getStr("key2"));
 
-        val custom2 = arguments.subset("custom2");
+        val custom2 = arguments.subset("custom2.");
         assertEquals(arguments.getStr("custom2.key1"), custom2.getStr("key1"));
         assertEquals(arguments.getStr("custom2.key2"), custom2.getStr("key2"));
     }
