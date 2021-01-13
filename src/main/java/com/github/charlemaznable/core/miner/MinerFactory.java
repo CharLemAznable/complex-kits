@@ -35,6 +35,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static com.github.charlemaznable.core.config.Arguments.argumentsAsSubstitutor;
 import static com.github.charlemaznable.core.context.FactoryContext.SpringFactory.springFactory;
 import static com.github.charlemaznable.core.lang.ClzPath.classResourceAsSubstitutor;
 import static com.github.charlemaznable.core.lang.Condition.blankThen;
@@ -79,7 +80,8 @@ public final class MinerFactory {
         if (isNull(minerClassPathSubstitutor)) {
             minerClassPathSubstitutor = classResourceAsSubstitutor("miner.env.props");
         }
-        return minerClassPathSubstitutor.replace(minerMinerSubstitutor.replace(source));
+        return minerClassPathSubstitutor.replace(minerMinerSubstitutor
+                .replace(argumentsAsSubstitutor().replace(source)));
     }
 
     @SuppressWarnings("unchecked")

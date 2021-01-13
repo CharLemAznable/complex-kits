@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.miner;
 
+import com.github.charlemaznable.core.config.Arguments;
 import com.github.charlemaznable.core.miner.MinerConfig.DataIdProvider;
 import com.github.charlemaznable.core.miner.MinerConfig.DefaultValueProvider;
 import com.github.charlemaznable.core.miner.MinerConfig.GroupProvider;
@@ -328,6 +329,24 @@ public class MinerFactoryTest {
         assertThrows(MinerConfigException.class, error5::prop);
     }
 
+    @Test
+    public void testArgMiner() {
+        MockDiamondServer.setConfigInfo("Arg", "data",
+                "custom1.key1=value1\ncustom1.key2=value2\ncustom2.key1=value2\ncustom2.key2=value1\n");
+
+        val argMiner = minerLoader.getMiner(ArgMiner.class);
+        assertNull(argMiner.custom1());
+        assertNull(argMiner.custom2());
+
+        Arguments.initial("--customKey1=key1", "--customKey2=key2");
+        assertEquals("value1", argMiner.custom1());
+        assertEquals("value1", argMiner.custom2());
+
+        Arguments.initial("--customKey1=key2", "--customKey2=key1");
+        assertEquals("value2", argMiner.custom1());
+        assertEquals("value2", argMiner.custom2());
+    }
+
     @MinerConfig
     interface StoneDefault {
 
@@ -537,6 +556,16 @@ public class MinerFactoryTest {
                 defaultValueProvider = ErrorDefaultValueProvider.class
         )
         String prop();
+    }
+
+    @MinerConfig(group = "Arg", dataId = "data")
+    interface ArgMiner {
+
+        @MinerConfig("custom1.${customKey1}")
+        String custom1();
+
+        @MinerConfig("custom2.${customKey2}")
+        String custom2();
     }
 
     @Data

@@ -125,6 +125,18 @@ public class EnvFactoryTest {
         assertEquals("PROV", provEnvConfig.prov());
         assertThrows(EnvConfigException.class, provEnvConfig::error1);
         assertThrows(EnvConfigException.class, provEnvConfig::error2);
+
+        val argEnvConfig = EnvFactory.getEnv(ArgEnvConfig.class);
+        assertNull(argEnvConfig.custom1());
+        assertNull(argEnvConfig.custom2());
+
+        Arguments.initial("--customKey1=key1", "--customKey2=key2");
+        assertEquals("value1", argEnvConfig.custom1());
+        assertEquals("value1", argEnvConfig.custom2());
+
+        Arguments.initial("--customKey1=key2", "--customKey2=key1");
+        assertEquals("value2", argEnvConfig.custom1());
+        assertEquals("value2", argEnvConfig.custom2());
     }
 
     @EnvConfig
@@ -273,6 +285,16 @@ public class EnvFactoryTest {
         public String defaultValue(Class<?> minerClass, Method method) {
             return "PROV";
         }
+    }
+
+    @EnvConfig
+    public interface ArgEnvConfig {
+
+        @EnvConfig("custom1.${customKey1}")
+        String custom1();
+
+        @EnvConfig("custom2.${customKey2}")
+        String custom2();
     }
 
     public static class ErrorProvider implements ConfigKeyProvider, DefaultValueProvider {}

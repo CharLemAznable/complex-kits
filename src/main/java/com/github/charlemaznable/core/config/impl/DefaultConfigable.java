@@ -60,11 +60,10 @@ public class DefaultConfigable extends BaseConfigable {
 
         val prefixMatch = prefix.charAt(prefix.length() - 1) != '.' ? prefix + '.' : prefix;
         val subProps = subProperties(properties, prefixMatch);
-
         return new DefaultConfigable(subProps);
     }
 
-    protected final Properties subProperties(Properties properties, String prefixMatch) {
+    public static Properties subProperties(Properties properties, String prefixMatch) {
         val subProps = new Properties();
         for (val entry : properties.entrySet()) {
             val key = (String) entry.getKey();
@@ -72,7 +71,6 @@ public class DefaultConfigable extends BaseConfigable {
 
             subProps.put(key.substring(prefixMatch.length()), entry.getValue());
         }
-
         return subProps;
     }
 }
