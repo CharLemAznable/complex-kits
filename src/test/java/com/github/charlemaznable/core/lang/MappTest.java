@@ -4,7 +4,10 @@ import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import java.text.ParseException;
+import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
+import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -68,6 +71,22 @@ public class MappTest {
         assertEquals("A", Mapp.getStr(result, "a"));
         assertEquals("BB", Mapp.getStr(result, "b"));
         assertEquals("CCC", Mapp.getStr(result, "c"));
+    }
 
+    @Test
+    public void testToMap() {
+        val list = newArrayList("A", "B", "C");
+
+        val map = list.stream().collect(Mapp.toMap(s -> s, s -> s));
+        assertTrue(map instanceof HashMap);
+        assertEquals("A", Mapp.getStr(map, "A"));
+        assertEquals("B", Mapp.getStr(map, "B"));
+        assertEquals("C", Mapp.getStr(map, "C"));
+
+        val cmap = list.stream().collect(Mapp.toConcurrentMap(s -> s, s -> s));
+        assertTrue(cmap instanceof ConcurrentHashMap);
+        assertEquals("A", Mapp.getStr(cmap, "A"));
+        assertEquals("B", Mapp.getStr(cmap, "B"));
+        assertEquals("C", Mapp.getStr(cmap, "C"));
     }
 }

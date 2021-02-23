@@ -7,8 +7,15 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.NumberFormat;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -151,5 +158,21 @@ public final class Mapp {
             if (nonNull(map)) result.putAll(map);
         }
         return result;
+    }
+
+    public static <T, K, U>
+    Collector<T, ?, Map<K, U>> toMap(Function<? super T, ? extends K> keyMapper,
+                                     Function<? super T, ? extends U> valueMapper) {
+        return Collectors.toMap(keyMapper, valueMapper, defaultMerger(), HashMap::new);
+    }
+
+    public static <T, K, U>
+    Collector<T, ?, ConcurrentMap<K,U>> toConcurrentMap(Function<? super T, ? extends K> keyMapper,
+                                                        Function<? super T, ? extends U> valueMapper) {
+        return Collectors.toConcurrentMap(keyMapper, valueMapper, defaultMerger(), ConcurrentHashMap::new);
+    }
+
+    private static <T> BinaryOperator<T> defaultMerger() {
+        return (u, v) -> v;
     }
 }
