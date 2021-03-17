@@ -8,8 +8,11 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
+import static java.util.Objects.isNull;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EventBusExecutorTest {
 
@@ -17,7 +20,19 @@ public class EventBusExecutorTest {
     @Test
     public void testEventBusCachedExecutor() {
         val testEventBusCachedExecutor = new TestEventBusCachedExecutor();
+        testEventBusCachedExecutor.periodSupplier(() -> 10L);
+        testEventBusCachedExecutor.unitSupplier(() -> TimeUnit.MILLISECONDS);
+        testEventBusCachedExecutor.suspend();
+        assertTrue(testEventBusCachedExecutor.suspended());
+
         testEventBusCachedExecutor.post("test");
+        assertDoesNotThrow(() ->
+                await().pollDelay(Duration.ofMillis(1000)).until(() ->
+                        isNull(testEventBusCachedExecutor.message)));
+
+        testEventBusCachedExecutor.resume();
+        assertFalse(testEventBusCachedExecutor.suspended());
+
         assertDoesNotThrow(() ->
                 await().pollDelay(Duration.ofMillis(100)).until(() ->
                         "test".equals(testEventBusCachedExecutor.message)));
@@ -32,7 +47,19 @@ public class EventBusExecutorTest {
 
         val testEventBusCachedSubscriber = new TestEventBusCachedSubscriber();
         val testEventBusCachedExecutor2 = new EventBusCachedExecutor(testEventBusCachedSubscriber) {};
+        testEventBusCachedExecutor2.periodSupplier(() -> 10L);
+        testEventBusCachedExecutor2.unitSupplier(() -> TimeUnit.MILLISECONDS);
+        testEventBusCachedExecutor2.suspend();
+        assertTrue(testEventBusCachedExecutor2.suspended());
+
         testEventBusCachedExecutor2.post("test");
+        assertDoesNotThrow(() ->
+                await().pollDelay(Duration.ofMillis(1000)).until(() ->
+                        isNull(testEventBusCachedSubscriber.message)));
+
+        testEventBusCachedExecutor2.resume();
+        assertFalse(testEventBusCachedExecutor2.suspended());
+
         assertDoesNotThrow(() ->
                 await().pollDelay(Duration.ofMillis(100)).until(() ->
                         "test".equals(testEventBusCachedSubscriber.message)));
@@ -50,7 +77,19 @@ public class EventBusExecutorTest {
     @Test
     public void testEventBusFixedExecutor() {
         val testEventBusFixedExecutor = new TestEventBusFixedExecutor();
+        testEventBusFixedExecutor.periodSupplier(() -> 10L);
+        testEventBusFixedExecutor.unitSupplier(() -> TimeUnit.MILLISECONDS);
+        testEventBusFixedExecutor.suspend();
+        assertTrue(testEventBusFixedExecutor.suspended());
+
         testEventBusFixedExecutor.post("test");
+        assertDoesNotThrow(() ->
+                await().pollDelay(Duration.ofMillis(1000)).until(() ->
+                        isNull(testEventBusFixedExecutor.message)));
+
+        testEventBusFixedExecutor.resume();
+        assertFalse(testEventBusFixedExecutor.suspended());
+
         assertDoesNotThrow(() ->
                 await().pollDelay(Duration.ofMillis(100)).until(() ->
                         "test".equals(testEventBusFixedExecutor.message)));
@@ -65,7 +104,19 @@ public class EventBusExecutorTest {
 
         val testEventBusFixedSubscriber = new TestEventBusFixedSubscriber();
         val testEventBusFixedExecutor2 = new EventBusFixedExecutor(testEventBusFixedSubscriber) {};
+        testEventBusFixedExecutor2.periodSupplier(() -> 10L);
+        testEventBusFixedExecutor2.unitSupplier(() -> TimeUnit.MILLISECONDS);
+        testEventBusFixedExecutor2.suspend();
+        assertTrue(testEventBusFixedExecutor2.suspended());
+
         testEventBusFixedExecutor2.post("test");
+        assertDoesNotThrow(() ->
+                await().pollDelay(Duration.ofMillis(1000)).until(() ->
+                        isNull(testEventBusFixedSubscriber.message)));
+
+        testEventBusFixedExecutor2.resume();
+        assertFalse(testEventBusFixedExecutor2.suspended());
+
         assertDoesNotThrow(() ->
                 await().pollDelay(Duration.ofMillis(100)).until(() ->
                         "test".equals(testEventBusFixedSubscriber.message)));
