@@ -1,6 +1,7 @@
 package com.google.common.eventbus;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -50,6 +51,26 @@ public final class SuspendableDispatcher extends Dispatcher {
         }
     }
 
+    boolean remove(Object event) {
+        checkNotNull(event);
+        try {
+            suspend();
+            return queue.remove(new EventWithSubscriber(event, null));
+        } finally {
+            resume();
+        }
+    }
+
+    boolean removeAll(Object event) {
+        checkNotNull(event);
+        try {
+            suspend();
+            return queue.removeIf(e -> event.equals(e.event));
+        } finally {
+            resume();
+        }
+    }
+
     boolean suspended() {
         return suspended.get();
     }
@@ -84,9 +105,11 @@ public final class SuspendableDispatcher extends Dispatcher {
     private interface PollEvent {}
 
     @AllArgsConstructor
+    @EqualsAndHashCode
     private static final class EventWithSubscriber {
 
         private final Object event;
+        @EqualsAndHashCode.Exclude
         private final Subscriber subscriber;
     }
 }

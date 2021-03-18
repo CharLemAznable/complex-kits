@@ -22,6 +22,14 @@ public class SuspendableEventBus extends EventBus {
         super("default", executor, new SuspendableDispatcher(executor), LoggingHandler.INSTANCE);
     }
 
+    public boolean remove(Object event) {
+        return dispatcher().remove(event);
+    }
+
+    public boolean removeAll(Object event) {
+        return dispatcher().removeAll(event);
+    }
+
     public boolean suspended() {
         return dispatcher().suspended();
     }

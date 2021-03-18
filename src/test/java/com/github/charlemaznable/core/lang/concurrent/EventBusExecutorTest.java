@@ -149,9 +149,15 @@ public class EventBusExecutorTest {
         testSequenceDispatchEventBus.post("1");
         testSequenceDispatchEventBus.post("1");
         testSequenceDispatchEventBus.post("1");
+        testSequenceDispatchEventBus.post("1");
+        testSequenceDispatchEventBus.post("2");
+        testSequenceDispatchEventBus.post("2");
+        await().pollDelay(Duration.ofMillis(100)).until(() -> true);
+        assertTrue(testSequenceDispatchEventBus.remove("1"));
+        assertTrue(testSequenceDispatchEventBus.removeAll("2"));
         assertDoesNotThrow(() ->
                 await().pollDelay(Duration.ofMillis(400)).until(() ->
-                    "1111".equals(testSequenceDispatchEventBus.message)));
+                        "1111".equals(testSequenceDispatchEventBus.message)));
 
         testSequenceDispatchEventBus.message = "";
         testSequenceDispatchEventBus.poolSize.incrementAndGet();
