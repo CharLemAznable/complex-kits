@@ -136,8 +136,13 @@ public class EventBusExecutorTest {
         testSequenceDispatchEventBus.executorConfiger(executor -> {
             val threadPoolExecutor = (ThreadPoolExecutor) executor;
             val poolSize = testSequenceDispatchEventBus.poolSize.get();
-            threadPoolExecutor.setCorePoolSize(poolSize);
-            threadPoolExecutor.setMaximumPoolSize(poolSize);
+            if (poolSize >= threadPoolExecutor.getMaximumPoolSize()) {
+                threadPoolExecutor.setMaximumPoolSize(poolSize);
+                threadPoolExecutor.setCorePoolSize(poolSize);
+            } else {
+                threadPoolExecutor.setCorePoolSize(poolSize);
+                threadPoolExecutor.setMaximumPoolSize(poolSize);
+            }
         });
 
         testSequenceDispatchEventBus.post("1");
