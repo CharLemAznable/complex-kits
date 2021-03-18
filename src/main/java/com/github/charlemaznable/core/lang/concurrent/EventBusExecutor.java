@@ -5,6 +5,7 @@ import com.google.common.eventbus.SuspendableEventBus;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
 import static java.lang.Runtime.getRuntime;
@@ -47,11 +48,13 @@ public abstract class EventBusExecutor {
         eventBus.resume();
     }
 
-    public EventBusExecutor periodSupplier(Supplier<Long> periodSupplier) {
+    @SuppressWarnings("UnusedReturnValue")
+    public EventBusExecutor periodSupplier(LongSupplier periodSupplier) {
         eventBus.periodSupplier(periodSupplier);
         return this;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public EventBusExecutor unitSupplier(Supplier<TimeUnit> unitSupplier) {
         eventBus.unitSupplier(unitSupplier);
         return this;

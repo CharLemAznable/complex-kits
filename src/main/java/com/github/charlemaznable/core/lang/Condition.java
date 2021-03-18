@@ -11,6 +11,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -124,6 +125,45 @@ public final class Condition {
         return isBlank(string) ? blankAction.get() : notBlankAction.apply(string);
     }
 
+    public static <T> void notNullThenRun(T object, Consumer<? super T> action) {
+        checkNullRun(object, () -> {}, action);
+    }
+
+    public static <T> void notEmptyThenRun(T object, Consumer<? super T> action) {
+        checkEmptyRun(object, () -> {}, action);
+    }
+
+    public static void notBlankThenRun(String string, Consumer<? super String> action) {
+        checkBlankRun(string, () -> {}, action);
+    }
+
+    public static <T> void nullThenRun(T object, Runnable action) {
+        checkNullRun(object, action, t -> {});
+    }
+
+    public static <T> void emptyThenRun(T object, Runnable action) {
+        checkEmptyRun(object, action, t -> {});
+    }
+
+    public static void blankThenRun(String string, Runnable action) {
+        checkBlankRun(string, action, s -> {});
+    }
+
+    public static <T> void checkNullRun(T object, Runnable nullAction, Consumer<? super T> notNullAction) {
+        if (isNull(object)) nullAction.run();
+        else notNullAction.accept(object);
+    }
+
+    public static <T> void checkEmptyRun(T object, Runnable emptyAction, Consumer<? super T> notEmptyAction) {
+        if (isEmpty(object)) emptyAction.run();
+        else notEmptyAction.accept(object);
+    }
+
+    public static void checkBlankRun(String string, Runnable blankAction, Consumer<? super String> notBlankAction) {
+        if (isBlank(string)) blankAction.run();
+        else notBlankAction.accept(string);
+    }
+
     @Contract(value = "null -> fail", pure = true)
     @Nonnull
     @CanIgnoreReturnValue
@@ -220,19 +260,19 @@ public final class Condition {
         if (!condition.getAsBoolean()) throw nullThen(errorException, BadConditionException::new);
     }
 
-    public static void checkCondition(BooleanSupplier condition, Executable executable) {
+    public static void checkCondition(BooleanSupplier condition, Runnable runnable) {
         if (!condition.getAsBoolean()) throw new BadConditionException();
-        executable.execute();
+        runnable.run();
     }
 
-    public static void checkCondition(BooleanSupplier condition, Executable executable, Object errorMessage) {
+    public static void checkCondition(BooleanSupplier condition, Runnable runnable, Object errorMessage) {
         if (!condition.getAsBoolean()) throw new BadConditionException(String.valueOf(errorMessage));
-        executable.execute();
+        runnable.run();
     }
 
-    public static void checkCondition(BooleanSupplier condition, Executable executable, RuntimeException errorException) {
+    public static void checkCondition(BooleanSupplier condition, Runnable runnable, RuntimeException errorException) {
         if (!condition.getAsBoolean()) throw nullThen(errorException, BadConditionException::new);
-        executable.execute();
+        runnable.run();
     }
 
     @CanIgnoreReturnValue

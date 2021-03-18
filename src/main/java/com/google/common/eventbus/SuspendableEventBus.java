@@ -2,6 +2,7 @@ package com.google.common.eventbus;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
 import static org.joor.Reflect.on;
@@ -9,15 +10,15 @@ import static org.joor.Reflect.on;
 public class SuspendableEventBus extends EventBus {
 
     public SuspendableEventBus(String identifier, Executor executor) {
-        super(identifier, executor, new SuspendableDispatcher(), LoggingHandler.INSTANCE);
+        super(identifier, executor, new SuspendableDispatcher(executor), LoggingHandler.INSTANCE);
     }
 
     public SuspendableEventBus(Executor executor, SubscriberExceptionHandler subscriberExceptionHandler) {
-        super("default", executor, new SuspendableDispatcher(), subscriberExceptionHandler);
+        super("default", executor, new SuspendableDispatcher(executor), subscriberExceptionHandler);
     }
 
     public SuspendableEventBus(Executor executor) {
-        super("default", executor, new SuspendableDispatcher(), LoggingHandler.INSTANCE);
+        super("default", executor, new SuspendableDispatcher(executor), LoggingHandler.INSTANCE);
     }
 
     public boolean suspended() {
@@ -33,7 +34,7 @@ public class SuspendableEventBus extends EventBus {
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    public SuspendableEventBus periodSupplier(Supplier<Long> periodSupplier) {
+    public SuspendableEventBus periodSupplier(LongSupplier periodSupplier) {
         dispatcher().periodSupplier(periodSupplier);
         return this;
     }
