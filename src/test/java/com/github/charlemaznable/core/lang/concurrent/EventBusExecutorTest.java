@@ -135,8 +135,9 @@ public class EventBusExecutorTest {
         val testSequenceDispatchEventBus = new TestSequenceDispatchEventBus();
         testSequenceDispatchEventBus.executorConfiger(executor -> {
             val threadPoolExecutor = (ThreadPoolExecutor) executor;
-            threadPoolExecutor.setCorePoolSize(testSequenceDispatchEventBus.poolSize);
-            threadPoolExecutor.setMaximumPoolSize(testSequenceDispatchEventBus.poolSize);
+            val poolSize = testSequenceDispatchEventBus.poolSize.get();
+            threadPoolExecutor.setCorePoolSize(poolSize);
+            threadPoolExecutor.setMaximumPoolSize(poolSize);
         });
 
         testSequenceDispatchEventBus.post("1");
@@ -148,7 +149,7 @@ public class EventBusExecutorTest {
                     "1111".equals(testSequenceDispatchEventBus.message)));
 
         testSequenceDispatchEventBus.message = "";
-        testSequenceDispatchEventBus.poolSize = 2;
+        testSequenceDispatchEventBus.poolSize.incrementAndGet();
 
         testSequenceDispatchEventBus.post("2");
         testSequenceDispatchEventBus.post("2");
@@ -219,12 +220,12 @@ public class EventBusExecutorTest {
 
         private AtomicInteger count = new AtomicInteger(0);
         private String message = "";
-        private int poolSize = 1;
+        private AtomicInteger poolSize = new AtomicInteger(1);
 
         @AllowConcurrentEvents
         @Subscribe
         public void testMethod(String message) {
-            assertTrue(count.incrementAndGet() <= poolSize);
+            assertTrue(count.incrementAndGet() <= poolSize.get());
             await().pollDelay(Duration.ofMillis(100)).until(() -> true);
             this.message = this.message + message;
             count.decrementAndGet();
