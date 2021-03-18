@@ -2,6 +2,7 @@ package com.google.common.eventbus;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
@@ -42,6 +43,12 @@ public class SuspendableEventBus extends EventBus {
     @SuppressWarnings("UnusedReturnValue")
     public SuspendableEventBus unitSupplier(Supplier<TimeUnit> unitSupplier) {
         dispatcher().unitSupplier(unitSupplier);
+        return this;
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public SuspendableEventBus executorConfiger(Consumer<Executor> executorConfiger) {
+        dispatcher().executorConfiger(executorConfiger);
         return this;
     }
 

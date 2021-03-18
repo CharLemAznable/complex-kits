@@ -11,6 +11,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
@@ -27,10 +28,13 @@ public final class SuspendableDispatcher extends Dispatcher {
     private final ScheduledExecutorService delayer = Executors.newSingleThreadScheduledExecutor();
     @Setter
     @Accessors(fluent = true)
-    private LongSupplier periodSupplier = () -> 100L;
+    private LongSupplier periodSupplier = () -> 10L;
     @Setter
     @Accessors(fluent = true)
     private Supplier<TimeUnit> unitSupplier = () -> TimeUnit.MILLISECONDS;
+    @Setter
+    @Accessors(fluent = true)
+    private Consumer<Executor> executorConfiger = e -> {};
 
     SuspendableDispatcher(Executor executor) {
         this.executor = checkNotNull(executor);
@@ -60,6 +64,7 @@ public final class SuspendableDispatcher extends Dispatcher {
 
     @Subscribe
     private void pollDispatch(PollEvent event) {
+        executorConfiger.accept(executor);
         executor.execute(() -> {
             try {
                 if (suspended()) return;

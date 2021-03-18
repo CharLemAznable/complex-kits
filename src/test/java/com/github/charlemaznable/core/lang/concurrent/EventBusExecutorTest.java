@@ -1,12 +1,14 @@
 package com.github.charlemaznable.core.lang.concurrent;
 
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
-import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Objects.isNull;
 import static org.awaitility.Awaitility.await;
@@ -16,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EventBusExecutorTest {
 
-    @SneakyThrows
     @Test
     public void testEventBusCachedExecutor() {
         val testEventBusCachedExecutor = new TestEventBusCachedExecutor();
@@ -73,7 +74,6 @@ public class EventBusExecutorTest {
                         "delay".equals(testEventBusCachedSubscriber.message)));
     }
 
-    @SneakyThrows
     @Test
     public void testEventBusFixedExecutor() {
         val testEventBusFixedExecutor = new TestEventBusFixedExecutor();
@@ -130,6 +130,35 @@ public class EventBusExecutorTest {
                         "delay".equals(testEventBusFixedSubscriber.message)));
     }
 
+    @Test
+    public void testEventBusSequenceDispatch() {
+        val testSequenceDispatchEventBus = new TestSequenceDispatchEventBus();
+        testSequenceDispatchEventBus.executorConfiger(executor -> {
+            val threadPoolExecutor = (ThreadPoolExecutor) executor;
+            threadPoolExecutor.setCorePoolSize(testSequenceDispatchEventBus.poolSize);
+            threadPoolExecutor.setMaximumPoolSize(testSequenceDispatchEventBus.poolSize);
+        });
+
+        testSequenceDispatchEventBus.post("1");
+        testSequenceDispatchEventBus.post("1");
+        testSequenceDispatchEventBus.post("1");
+        testSequenceDispatchEventBus.post("1");
+        assertDoesNotThrow(() ->
+                await().pollDelay(Duration.ofMillis(400)).until(() ->
+                    "1111".equals(testSequenceDispatchEventBus.message)));
+
+        testSequenceDispatchEventBus.message = "";
+        testSequenceDispatchEventBus.poolSize = 2;
+
+        testSequenceDispatchEventBus.post("2");
+        testSequenceDispatchEventBus.post("2");
+        testSequenceDispatchEventBus.post("2");
+        testSequenceDispatchEventBus.post("2");
+        assertDoesNotThrow(() ->
+                await().pollDelay(Duration.ofMillis(200)).until(() ->
+                        "2222".equals(testSequenceDispatchEventBus.message)));
+    }
+
     static class TestEventBusCachedExecutor extends EventBusCachedExecutor {
 
         private String message;
@@ -183,6 +212,22 @@ public class EventBusExecutorTest {
         @Subscribe
         public void testMethod(String message) {
             this.message = message;
+        }
+    }
+
+    static class TestSequenceDispatchEventBus extends EventBusFixedExecutor {
+
+        private AtomicInteger count = new AtomicInteger(0);
+        private String message = "";
+        private int poolSize = 1;
+
+        @AllowConcurrentEvents
+        @Subscribe
+        public void testMethod(String message) {
+            assertTrue(count.incrementAndGet() <= poolSize);
+            await().pollDelay(Duration.ofMillis(100)).until(() -> true);
+            this.message = this.message + message;
+            count.decrementAndGet();
         }
     }
 }
