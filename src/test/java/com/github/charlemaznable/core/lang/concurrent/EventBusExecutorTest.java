@@ -10,6 +10,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.github.charlemaznable.core.lang.Await.awaitOfMillis;
 import static java.util.Objects.isNull;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -152,7 +153,7 @@ public class EventBusExecutorTest {
         testSequenceDispatchEventBus.post("1");
         testSequenceDispatchEventBus.post("2");
         testSequenceDispatchEventBus.post("2");
-        await().pollDelay(Duration.ofMillis(100)).until(() -> true);
+        awaitOfMillis(100);
         assertTrue(testSequenceDispatchEventBus.remove("1"));
         assertTrue(testSequenceDispatchEventBus.removeAll("2"));
         assertDoesNotThrow(() ->
@@ -237,7 +238,7 @@ public class EventBusExecutorTest {
         @Subscribe
         public void testMethod(String message) {
             assertTrue(count.incrementAndGet() <= poolSize.get());
-            await().pollDelay(Duration.ofMillis(100)).until(() -> true);
+            awaitOfMillis(100);
             this.message = this.message + message;
             count.decrementAndGet();
         }
