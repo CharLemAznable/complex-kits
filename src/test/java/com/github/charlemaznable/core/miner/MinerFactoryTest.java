@@ -23,6 +23,7 @@ import org.n3r.diamond.client.cache.ParamsAppliable;
 import org.n3r.diamond.client.impl.MockDiamondServer;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -200,6 +201,8 @@ public class MinerFactoryTest {
         assertEquals("John Doe", minerableDefault.getString("full"));
         assertEquals("John Doe Richard", minerableDefault.getString("long"));
 
+        await().pollDelay(Duration.ofMillis(100)).until(() -> true);
+
         MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA",
                 "# toml\nname=John\nfull=${this.name} Doe\nlong=${this.full} Richard");
 
@@ -207,6 +210,8 @@ public class MinerFactoryTest {
         assertNull(minerableDefaultError.getString("name"));
         assertNull(minerableDefaultError.getString("full"));
         assertNull(minerableDefaultError.getString("long"));
+
+        await().pollDelay(Duration.ofMillis(100)).until(() -> true);
 
         MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA",
                 "# TOML\nname='John'\nfull='John Doe'\nlong='John Doe Richard'");
@@ -250,6 +255,8 @@ public class MinerFactoryTest {
                 map.get("content"));
         assertEquals("@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John) @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John Doe) @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John Doe Richard)",
                 map.get("list"));
+
+        await().pollDelay(Duration.ofMillis(100)).until(() -> true);
 
         MockDiamondServer.setConfigInfo("DEF_GROUP", "DEF_DATA", "# Toml\n" +
                 "name='John'\nfull='John Doe'\nlong='John Doe Richard'\n" +
