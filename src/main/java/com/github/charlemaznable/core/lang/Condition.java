@@ -260,35 +260,35 @@ public final class Condition {
         if (!condition.getAsBoolean()) throw nullThen(errorException, BadConditionException::new);
     }
 
-    public static void checkCondition(BooleanSupplier condition, Runnable runnable) {
+    public static void checkConditionRun(BooleanSupplier condition, Runnable runnable) {
         if (!condition.getAsBoolean()) throw new BadConditionException();
         runnable.run();
     }
 
-    public static void checkCondition(BooleanSupplier condition, Runnable runnable, Object errorMessage) {
+    public static void checkConditionRun(BooleanSupplier condition, Runnable runnable, Object errorMessage) {
         if (!condition.getAsBoolean()) throw new BadConditionException(String.valueOf(errorMessage));
         runnable.run();
     }
 
-    public static void checkCondition(BooleanSupplier condition, Runnable runnable, RuntimeException errorException) {
+    public static void checkConditionRun(BooleanSupplier condition, Runnable runnable, RuntimeException errorException) {
         if (!condition.getAsBoolean()) throw nullThen(errorException, BadConditionException::new);
         runnable.run();
     }
 
     @CanIgnoreReturnValue
-    public static <T> T checkCondition(BooleanSupplier condition, Supplier<T> action) {
+    public static <T> T checkConditionThen(BooleanSupplier condition, Supplier<T> action) {
         if (!condition.getAsBoolean()) throw new BadConditionException();
         return action.get();
     }
 
     @CanIgnoreReturnValue
-    public static <T> T checkCondition(BooleanSupplier condition, Supplier<T> action, Object errorMessage) {
+    public static <T> T checkConditionThen(BooleanSupplier condition, Supplier<T> action, Object errorMessage) {
         if (!condition.getAsBoolean()) throw new BadConditionException(String.valueOf(errorMessage));
         return action.get();
     }
 
     @CanIgnoreReturnValue
-    public static <T> T checkCondition(BooleanSupplier condition, Supplier<T> action, RuntimeException errorException) {
+    public static <T> T checkConditionThen(BooleanSupplier condition, Supplier<T> action, RuntimeException errorException) {
         if (!condition.getAsBoolean()) throw nullThen(errorException, BadConditionException::new);
         return action.get();
     }
