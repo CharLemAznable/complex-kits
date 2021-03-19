@@ -29,9 +29,9 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
-import static com.github.charlemaznable.core.lang.Await.awaitOfMicros;
-import static com.github.charlemaznable.core.lang.Await.awaitOfMillis;
-import static com.github.charlemaznable.core.lang.Await.awaitOfSeconds;
+import static com.github.charlemaznable.core.lang.Await.awaitForMicros;
+import static com.github.charlemaznable.core.lang.Await.awaitForMillis;
+import static com.github.charlemaznable.core.lang.Await.awaitForSeconds;
 import static com.github.charlemaznable.core.miner.MinerElf.minerAsSubstitutor;
 import static org.joor.Reflect.onClass;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -96,13 +96,13 @@ public class MinerFactoryTest {
         assertNull(testCache.key2());
 
         MockDiamondServer.setConfigInfo("CACHE_GROUP", "CACHE_KEY", "key2=value2");
-        awaitOfMillis(100);
+        awaitForMillis(100);
         assertNull(testNoCache.key1());
         assertEquals("value1", testCache.key1());
         assertEquals("value2", testNoCache.key2());
         assertNull(testCache.key2());
 
-        awaitOfSeconds(2);
+        awaitForSeconds(2);
         assertNull(testNoCache.key1());
         assertNull(testCache.key1());
         assertEquals("value2", testNoCache.key2());
@@ -201,7 +201,7 @@ public class MinerFactoryTest {
         assertEquals("John Doe", minerableDefault.getString("full"));
         assertEquals("John Doe Richard", minerableDefault.getString("long"));
 
-        awaitOfMillis(100);
+        awaitForMillis(100);
 
         MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA",
                 "# toml\nname=John\nfull=${this.name} Doe\nlong=${this.full} Richard");
@@ -211,7 +211,7 @@ public class MinerFactoryTest {
         assertNull(minerableDefaultError.getString("full"));
         assertNull(minerableDefaultError.getString("long"));
 
-        awaitOfMillis(100);
+        awaitForMillis(100);
 
         MockDiamondServer.setConfigInfo("DEFAULT_GROUP", "DEFAULT_DATA",
                 "# TOML\nname='John'\nfull='John Doe'\nlong='John Doe Richard'");
@@ -256,7 +256,7 @@ public class MinerFactoryTest {
         assertEquals("@com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John) @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John Doe) @com.github.charlemaznable.core.miner.MinerFactoryTest$MinerContentBean(John Doe Richard)",
                 map.get("list"));
 
-        awaitOfMicros(TimeUnit.MILLISECONDS.toMicros(100));
+        awaitForMicros(TimeUnit.MILLISECONDS.toMicros(100));
 
         MockDiamondServer.setConfigInfo("DEF_GROUP", "DEF_DATA", "# Toml\n" +
                 "name='John'\nfull='John Doe'\nlong='John Doe Richard'\n" +

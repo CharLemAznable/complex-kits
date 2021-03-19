@@ -11,15 +11,15 @@ public final class Await {
         throw new UnsupportedOperationException();
     }
 
-    public static void awaitOfMicros(long duration) {
+    public static void awaitForMicros(long duration) {
         await(duration, TimeUnit.MICROSECONDS);
     }
 
-    public static void awaitOfMillis(long duration) {
+    public static void awaitForMillis(long duration) {
         await(duration, TimeUnit.MILLISECONDS);
     }
 
-    public static void awaitOfSeconds(long duration) {
+    public static void awaitForSeconds(long duration) {
         await(duration, TimeUnit.SECONDS);
     }
 
