@@ -29,7 +29,7 @@ public final class SuspendableDispatcher extends Dispatcher {
     private final ScheduledExecutorService delayer = Executors.newSingleThreadScheduledExecutor();
     @Setter
     @Accessors(fluent = true)
-    private LongSupplier periodSupplier = () -> 10L;
+    private LongSupplier periodSupplier = () -> 0L;
     @Setter
     @Accessors(fluent = true)
     private Supplier<TimeUnit> unitSupplier = () -> TimeUnit.MILLISECONDS;
@@ -53,22 +53,12 @@ public final class SuspendableDispatcher extends Dispatcher {
 
     boolean remove(Object event) {
         checkNotNull(event);
-        try {
-            suspend();
-            return queue.remove(new EventWithSubscriber(event, null));
-        } finally {
-            resume();
-        }
+        return queue.remove(new EventWithSubscriber(event, null));
     }
 
     boolean removeAll(Object event) {
         checkNotNull(event);
-        try {
-            suspend();
-            return queue.removeIf(e -> event.equals(e.event));
-        } finally {
-            resume();
-        }
+        return queue.removeIf(e -> event.equals(e.event));
     }
 
     boolean suspended() {

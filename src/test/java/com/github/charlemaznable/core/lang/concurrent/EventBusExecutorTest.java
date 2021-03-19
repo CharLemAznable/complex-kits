@@ -134,6 +134,8 @@ public class EventBusExecutorTest {
     @Test
     public void testEventBusSequenceDispatch() {
         val testSequenceDispatchEventBus = new TestSequenceDispatchEventBus();
+        testSequenceDispatchEventBus.periodSupplier(() -> 10L);
+        testSequenceDispatchEventBus.unitSupplier(() -> TimeUnit.MILLISECONDS);
         testSequenceDispatchEventBus.executorConfiger(executor -> {
             val threadPoolExecutor = (ThreadPoolExecutor) executor;
             val poolSize = testSequenceDispatchEventBus.poolSize.get();
