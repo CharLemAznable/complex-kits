@@ -10,16 +10,15 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
-import java.util.function.LongSupplier;
-import java.util.function.Supplier;
 
+import static com.github.charlemaznable.core.lang.Condition.nonNull;
 import static com.github.charlemaznable.core.lang.Condition.notNullThenRun;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public final class SuspendableDispatcher extends Dispatcher {
+public final class ScheduledDispatcher extends Dispatcher {
+
+    private static final ScheduledDispatcherDelegate DEFAULT_DELEGATE = new ScheduledDispatcherDelegate() {};
 
     private final Executor executor;
     private final ConcurrentLinkedQueue<EventWithSubscriber> queue = new ConcurrentLinkedQueue<>();
@@ -29,15 +28,9 @@ public final class SuspendableDispatcher extends Dispatcher {
     private final ScheduledExecutorService delayer = Executors.newSingleThreadScheduledExecutor();
     @Setter
     @Accessors(fluent = true)
-    private LongSupplier periodSupplier = () -> 0L;
-    @Setter
-    @Accessors(fluent = true)
-    private Supplier<TimeUnit> unitSupplier = () -> TimeUnit.MILLISECONDS;
-    @Setter
-    @Accessors(fluent = true)
-    private Consumer<Executor> executorConfiger = e -> {};
+    private ScheduledDispatcherDelegate delegate;
 
-    SuspendableDispatcher(Executor executor) {
+    ScheduledDispatcher(Executor executor) {
         this.executor = checkNotNull(executor);
         poller.register(this);
         schedule();
@@ -75,7 +68,7 @@ public final class SuspendableDispatcher extends Dispatcher {
 
     @Subscribe
     private void pollDispatch(PollEvent event) {
-        executorConfiger.accept(executor);
+        delegate().configExecutorBeforeDispatch(executor);
         executor.execute(() -> {
             try {
                 if (suspended()) return;
@@ -89,7 +82,12 @@ public final class SuspendableDispatcher extends Dispatcher {
 
     private void schedule() {
         delayer.schedule(() -> poller.post(pollEvent),
-                periodSupplier.getAsLong(), unitSupplier.get());
+                delegate().schedulePeriod(),
+                delegate().schedulePeriodUnit());
+    }
+
+    private ScheduledDispatcherDelegate delegate() {
+        return nonNull(delegate, DEFAULT_DELEGATE);
     }
 
     private interface PollEvent {}

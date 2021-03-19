@@ -1,13 +1,11 @@
 package com.github.charlemaznable.core.lang.concurrent;
 
-import com.google.common.eventbus.SuspendableEventBus;
+import com.google.common.eventbus.ScheduledDispatcherDelegate;
+import com.google.common.eventbus.ScheduledEventBus;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-import java.util.function.LongSupplier;
-import java.util.function.Supplier;
 
 import static java.lang.Runtime.getRuntime;
 import static java.util.Objects.isNull;
@@ -15,7 +13,7 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 public abstract class EventBusExecutor {
 
-    private SuspendableEventBus eventBus;
+    private ScheduledEventBus eventBus;
     private ScheduledThreadPoolExecutor executor;
 
     public EventBusExecutor() {
@@ -23,7 +21,7 @@ public abstract class EventBusExecutor {
     }
 
     public EventBusExecutor(Object subscriber) {
-        eventBus = new SuspendableEventBus(eventBusIdentifier(), eventBusExecutor());
+        eventBus = new ScheduledEventBus(eventBusIdentifier(), eventBusExecutor());
         eventBus.register(isNull(subscriber) ? this : subscriber);
 
         executor = new ScheduledThreadPoolExecutor(getRuntime().availableProcessors() + 1);
@@ -58,20 +56,8 @@ public abstract class EventBusExecutor {
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    public EventBusExecutor periodSupplier(LongSupplier periodSupplier) {
-        eventBus.periodSupplier(periodSupplier);
-        return this;
-    }
-
-    @SuppressWarnings("UnusedReturnValue")
-    public EventBusExecutor unitSupplier(Supplier<TimeUnit> unitSupplier) {
-        eventBus.unitSupplier(unitSupplier);
-        return this;
-    }
-
-    @SuppressWarnings("UnusedReturnValue")
-    public EventBusExecutor executorConfiger(Consumer<Executor> executorConfiger) {
-        eventBus.executorConfiger(executorConfiger);
+    public EventBusExecutor delegate(ScheduledDispatcherDelegate delegate) {
+        eventBus.delegate(delegate);
         return this;
     }
 

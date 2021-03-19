@@ -1,11 +1,14 @@
 package com.github.charlemaznable.core.lang.concurrent;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.ScheduledDispatcherDelegate;
 import com.google.common.eventbus.Subscribe;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.Nonnull;
 import java.time.Duration;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,8 +25,12 @@ public class EventBusExecutorTest {
     @Test
     public void testEventBusCachedExecutor() {
         val testEventBusCachedExecutor = new TestEventBusCachedExecutor();
-        testEventBusCachedExecutor.periodSupplier(() -> 10L);
-        testEventBusCachedExecutor.unitSupplier(() -> TimeUnit.MILLISECONDS);
+        testEventBusCachedExecutor.delegate(new ScheduledDispatcherDelegate() {
+            @Override
+            public long schedulePeriod() {
+                return 10L;
+            }
+        });
         testEventBusCachedExecutor.suspend();
         assertTrue(testEventBusCachedExecutor.suspended());
 
@@ -49,8 +56,12 @@ public class EventBusExecutorTest {
 
         val testEventBusCachedSubscriber = new TestEventBusCachedSubscriber();
         val testEventBusCachedExecutor2 = new EventBusCachedExecutor(testEventBusCachedSubscriber) {};
-        testEventBusCachedExecutor2.periodSupplier(() -> 10L);
-        testEventBusCachedExecutor2.unitSupplier(() -> TimeUnit.MILLISECONDS);
+        testEventBusCachedExecutor2.delegate(new ScheduledDispatcherDelegate() {
+            @Override
+            public long schedulePeriod() {
+                return 10L;
+            }
+        });
         testEventBusCachedExecutor2.suspend();
         assertTrue(testEventBusCachedExecutor2.suspended());
 
@@ -78,8 +89,12 @@ public class EventBusExecutorTest {
     @Test
     public void testEventBusFixedExecutor() {
         val testEventBusFixedExecutor = new TestEventBusFixedExecutor();
-        testEventBusFixedExecutor.periodSupplier(() -> 10L);
-        testEventBusFixedExecutor.unitSupplier(() -> TimeUnit.MILLISECONDS);
+        testEventBusFixedExecutor.delegate(new ScheduledDispatcherDelegate() {
+            @Override
+            public long schedulePeriod() {
+                return 10L;
+            }
+        });
         testEventBusFixedExecutor.suspend();
         assertTrue(testEventBusFixedExecutor.suspended());
 
@@ -105,8 +120,12 @@ public class EventBusExecutorTest {
 
         val testEventBusFixedSubscriber = new TestEventBusFixedSubscriber();
         val testEventBusFixedExecutor2 = new EventBusFixedExecutor(testEventBusFixedSubscriber) {};
-        testEventBusFixedExecutor2.periodSupplier(() -> 10L);
-        testEventBusFixedExecutor2.unitSupplier(() -> TimeUnit.MILLISECONDS);
+        testEventBusFixedExecutor2.delegate(new ScheduledDispatcherDelegate() {
+            @Override
+            public long schedulePeriod() {
+                return 10L;
+            }
+        });
         testEventBusFixedExecutor2.suspend();
         assertTrue(testEventBusFixedExecutor2.suspended());
 
@@ -134,17 +153,23 @@ public class EventBusExecutorTest {
     @Test
     public void testEventBusSequenceDispatch() {
         val testSequenceDispatchEventBus = new TestSequenceDispatchEventBus();
-        testSequenceDispatchEventBus.periodSupplier(() -> 10L);
-        testSequenceDispatchEventBus.unitSupplier(() -> TimeUnit.MILLISECONDS);
-        testSequenceDispatchEventBus.executorConfiger(executor -> {
-            val threadPoolExecutor = (ThreadPoolExecutor) executor;
-            val poolSize = testSequenceDispatchEventBus.poolSize.get();
-            if (poolSize >= threadPoolExecutor.getMaximumPoolSize()) {
-                threadPoolExecutor.setMaximumPoolSize(poolSize);
-                threadPoolExecutor.setCorePoolSize(poolSize);
-            } else {
-                threadPoolExecutor.setCorePoolSize(poolSize);
-                threadPoolExecutor.setMaximumPoolSize(poolSize);
+        testSequenceDispatchEventBus.delegate(new ScheduledDispatcherDelegate() {
+            @Override
+            public void configExecutorBeforeDispatch(@Nonnull Executor executor) {
+                val threadPoolExecutor = (ThreadPoolExecutor) executor;
+                val poolSize = testSequenceDispatchEventBus.poolSize.get();
+                if (poolSize >= threadPoolExecutor.getMaximumPoolSize()) {
+                    threadPoolExecutor.setMaximumPoolSize(poolSize);
+                    threadPoolExecutor.setCorePoolSize(poolSize);
+                } else {
+                    threadPoolExecutor.setCorePoolSize(poolSize);
+                    threadPoolExecutor.setMaximumPoolSize(poolSize);
+                }
+            }
+
+            @Override
+            public long schedulePeriod() {
+                return 10L;
             }
         });
 
