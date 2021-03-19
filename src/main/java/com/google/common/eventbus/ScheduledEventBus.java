@@ -18,12 +18,16 @@ public class ScheduledEventBus extends EventBus {
         super("default", executor, new ScheduledDispatcher(executor), LoggingHandler.INSTANCE);
     }
 
-    public boolean remove(Object event) {
-        return dispatcher().remove(event);
+    public boolean cancel(Object event) {
+        return dispatcher().cancel(event);
     }
 
-    public boolean removeAll(Object event) {
-        return dispatcher().removeAll(event);
+    public boolean cancelAll(Object event) {
+        return dispatcher().cancelAll(event);
+    }
+
+    public void cancelAll() {
+        dispatcher().cancelAll();
     }
 
     public boolean suspended() {

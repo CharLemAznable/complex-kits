@@ -17,6 +17,7 @@ import static com.github.charlemaznable.core.lang.Await.awaitForMillis;
 import static java.util.Objects.isNull;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -181,13 +182,15 @@ public class EventBusExecutorTest {
         testSequenceDispatchEventBus.post("2");
         testSequenceDispatchEventBus.post("2");
         awaitForMillis(100);
-        assertTrue(testSequenceDispatchEventBus.remove("1"));
-        assertTrue(testSequenceDispatchEventBus.removeAll("2"));
+        assertTrue(testSequenceDispatchEventBus.cancel("1"));
+        assertTrue(testSequenceDispatchEventBus.cancelAll("2"));
         assertDoesNotThrow(() ->
                 await().pollDelay(Duration.ofMillis(400)).until(() ->
-                        "1111".equals(testSequenceDispatchEventBus.message)));
+                        "1111".equals(testSequenceDispatchEventBus.message.toString())));
+        assertEquals(1, testSequenceDispatchEventBus.max);
 
-        testSequenceDispatchEventBus.message = "";
+        testSequenceDispatchEventBus.max = 0;
+        testSequenceDispatchEventBus.message.setLength(0);
         testSequenceDispatchEventBus.poolSize.incrementAndGet();
 
         testSequenceDispatchEventBus.post("2");
@@ -196,7 +199,23 @@ public class EventBusExecutorTest {
         testSequenceDispatchEventBus.post("2");
         assertDoesNotThrow(() ->
                 await().pollDelay(Duration.ofMillis(200)).until(() ->
-                        "2222".equals(testSequenceDispatchEventBus.message)));
+                        "2222".equals(testSequenceDispatchEventBus.message.toString())));
+        assertEquals(2, testSequenceDispatchEventBus.max);
+
+        testSequenceDispatchEventBus.max = 0;
+        testSequenceDispatchEventBus.message.setLength(0);
+        testSequenceDispatchEventBus.poolSize.decrementAndGet();
+
+        testSequenceDispatchEventBus.post("3");
+        testSequenceDispatchEventBus.post("3");
+        testSequenceDispatchEventBus.post("3");
+        testSequenceDispatchEventBus.post("3");
+        awaitForMillis(50);
+        testSequenceDispatchEventBus.cancelAll();
+        assertDoesNotThrow(() ->
+                await().pollDelay(Duration.ofMillis(100)).until(() ->
+                        "3".equals(testSequenceDispatchEventBus.message.toString())));
+        assertEquals(1, testSequenceDispatchEventBus.max);
     }
 
     static class TestEventBusCachedExecutor extends EventBusCachedExecutor {
@@ -258,15 +277,20 @@ public class EventBusExecutorTest {
     static class TestSequenceDispatchEventBus extends EventBusFixedExecutor {
 
         private AtomicInteger count = new AtomicInteger(0);
-        private String message = "";
+        private int max = 0;
+        private StringBuffer message = new StringBuffer();
         private AtomicInteger poolSize = new AtomicInteger(1);
 
         @AllowConcurrentEvents
         @Subscribe
         public void testMethod(String message) {
-            assertTrue(count.incrementAndGet() <= poolSize.get());
+            val curr = count.incrementAndGet();
+            assertTrue(curr <= poolSize.get());
+            synchronized (this) {
+                max = Math.max(max, curr);
+            }
             awaitForMillis(100);
-            this.message = this.message + message;
+            this.message.append(message);
             count.decrementAndGet();
         }
     }

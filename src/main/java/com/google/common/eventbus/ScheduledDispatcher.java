@@ -44,14 +44,18 @@ public final class ScheduledDispatcher extends Dispatcher {
         }
     }
 
-    boolean remove(Object event) {
+    boolean cancel(Object event) {
         checkNotNull(event);
         return queue.remove(new EventWithSubscriber(event, null));
     }
 
-    boolean removeAll(Object event) {
+    boolean cancelAll(Object event) {
         checkNotNull(event);
         return queue.removeIf(e -> event.equals(e.event));
+    }
+
+    void cancelAll() {
+        queue.clear();
     }
 
     boolean suspended() {

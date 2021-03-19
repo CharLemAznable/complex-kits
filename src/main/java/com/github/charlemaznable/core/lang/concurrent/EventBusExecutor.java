@@ -35,12 +35,16 @@ public abstract class EventBusExecutor {
         executor.schedule(() -> eventBus.post(event), delay, unit);
     }
 
-    public final boolean remove(Object event) {
-        return eventBus.remove(event);
+    public final boolean cancel(Object event) {
+        return eventBus.cancel(event);
     }
 
-    public final boolean removeAll(Object event) {
-        return eventBus.removeAll(event);
+    public final boolean cancelAll(Object event) {
+        return eventBus.cancelAll(event);
+    }
+
+    public final void cancelAll() {
+        eventBus.cancelAll();
     }
 
     public boolean suspended() {
