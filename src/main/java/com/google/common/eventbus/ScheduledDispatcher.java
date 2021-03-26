@@ -4,15 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.val;
 
 import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.github.charlemaznable.core.lang.Await.await;
 import static com.github.charlemaznable.core.lang.Condition.nonNull;
 import static com.github.charlemaznable.core.lang.Condition.notNullThenRun;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -26,7 +27,7 @@ public final class ScheduledDispatcher extends Dispatcher {
     private final AtomicBoolean suspended = new AtomicBoolean(false);
     private final AsyncEventBus poller = new AsyncEventBus(Executors.newCachedThreadPool());
     private final PollEvent pollEvent = new PollEvent() {};
-    private final ExecutorService delayer = Executors.newCachedThreadPool();
+    private final Timer delayer = new Timer();
     @Setter
     @Accessors(fluent = true)
     private ScheduledDispatcherDelegate delegate;
@@ -86,11 +87,14 @@ public final class ScheduledDispatcher extends Dispatcher {
     }
 
     private void schedule() {
-        delayer.submit(() -> {
-            await(delegate().schedulePeriod(),
-                    delegate().schedulePeriodUnit());
-            poller.post(pollEvent);
-        });
+        val period = delegate().schedulePeriod();
+        val unit = delegate().schedulePeriodUnit();
+        delayer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                poller.post(pollEvent);
+            }
+        }, unit.toMillis(period));
     }
 
     private ScheduledDispatcherDelegate delegate() {

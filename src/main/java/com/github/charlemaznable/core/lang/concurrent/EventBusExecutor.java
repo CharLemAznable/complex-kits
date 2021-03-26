@@ -3,19 +3,18 @@ package com.github.charlemaznable.core.lang.concurrent;
 import com.google.common.eventbus.ScheduledDispatcherDelegate;
 import com.google.common.eventbus.ScheduledEventBus;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.charlemaznable.core.lang.Await.await;
 import static java.util.Objects.isNull;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 public abstract class EventBusExecutor {
 
     private ScheduledEventBus eventBus;
-    private final ExecutorService delayer = Executors.newCachedThreadPool();
+    private final Timer delayer = new Timer();
 
     public EventBusExecutor() {
         this(null);
@@ -31,10 +30,12 @@ public abstract class EventBusExecutor {
     }
 
     public final void post(Object event, long delay, TimeUnit unit) {
-        delayer.submit(() -> {
-            await(delay, unit);
-            eventBus.post(event);
-        });
+        delayer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                eventBus.post(event);
+            }
+        }, unit.toMillis(delay));
     }
 
     public final boolean cancel(Object event) {
