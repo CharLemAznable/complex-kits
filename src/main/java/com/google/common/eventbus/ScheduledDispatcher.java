@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -25,6 +26,7 @@ public final class ScheduledDispatcher extends Dispatcher {
     private final AtomicBoolean suspended = new AtomicBoolean(false);
     private final AsyncEventBus poller = new AsyncEventBus(Executors.newCachedThreadPool());
     private final PollEvent pollEvent = new PollEvent() {};
+    private final ExecutorService delayer = Executors.newCachedThreadPool();
     @Setter
     @Accessors(fluent = true)
     private ScheduledDispatcherDelegate delegate;
@@ -84,11 +86,11 @@ public final class ScheduledDispatcher extends Dispatcher {
     }
 
     private void schedule() {
-        new Thread(() -> {
+        delayer.submit(() -> {
             await(delegate().schedulePeriod(),
                     delegate().schedulePeriodUnit());
             poller.post(pollEvent);
-        }).start();
+        });
     }
 
     private ScheduledDispatcherDelegate delegate() {
