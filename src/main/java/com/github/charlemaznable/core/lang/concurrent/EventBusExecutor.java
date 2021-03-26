@@ -16,7 +16,7 @@ public abstract class EventBusExecutor {
     private static final ScheduledExecutorService scheduler
             = Executors.newScheduledThreadPool(getRuntime().availableProcessors() + 1);
 
-    private AsyncEventBus eventBus;
+    protected final AsyncEventBus eventBus;
 
     public EventBusExecutor() {
         this(null);
