@@ -1,27 +1,29 @@
 package com.github.charlemaznable.core.lang.concurrent;
 
-import com.google.common.eventbus.ScheduledDispatcherDelegate;
-import com.google.common.eventbus.ScheduledEventBus;
+import com.google.common.eventbus.AsyncEventBus;
 
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static java.lang.Runtime.getRuntime;
 import static java.util.Objects.isNull;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 public abstract class EventBusExecutor {
 
-    private ScheduledEventBus eventBus;
-    private final Timer delayer = new Timer();
+    private static final ScheduledExecutorService scheduler
+            = Executors.newScheduledThreadPool(getRuntime().availableProcessors() + 1);
+
+    private AsyncEventBus eventBus;
 
     public EventBusExecutor() {
         this(null);
     }
 
     public EventBusExecutor(Object subscriber) {
-        eventBus = new ScheduledEventBus(eventBusIdentifier(), eventBusExecutor());
+        eventBus = new AsyncEventBus(eventBusIdentifier(), eventBusExecutor());
         eventBus.register(isNull(subscriber) ? this : subscriber);
     }
 
@@ -30,42 +32,7 @@ public abstract class EventBusExecutor {
     }
 
     public final void post(Object event, long delay, TimeUnit unit) {
-        delayer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                eventBus.post(event);
-            }
-        }, unit.toMillis(delay));
-    }
-
-    public final boolean cancel(Object event) {
-        return eventBus.cancel(event);
-    }
-
-    public final boolean cancelAll(Object event) {
-        return eventBus.cancelAll(event);
-    }
-
-    public final void cancelAll() {
-        eventBus.cancelAll();
-    }
-
-    public boolean suspended() {
-        return eventBus.suspended();
-    }
-
-    public void suspend() {
-        eventBus.suspend();
-    }
-
-    public void resume() {
-        eventBus.resume();
-    }
-
-    @SuppressWarnings("UnusedReturnValue")
-    public EventBusExecutor delegate(ScheduledDispatcherDelegate delegate) {
-        eventBus.delegate(delegate);
-        return this;
+        scheduler.schedule(() -> eventBus.post(event), delay, unit);
     }
 
     public String eventBusIdentifier() {
