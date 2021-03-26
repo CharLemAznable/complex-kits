@@ -9,9 +9,9 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.github.charlemaznable.core.lang.Await.await;
 import static com.github.charlemaznable.core.lang.Condition.nonNull;
 import static com.github.charlemaznable.core.lang.Condition.notNullThenRun;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -25,7 +25,6 @@ public final class ScheduledDispatcher extends Dispatcher {
     private final AtomicBoolean suspended = new AtomicBoolean(false);
     private final AsyncEventBus poller = new AsyncEventBus(Executors.newCachedThreadPool());
     private final PollEvent pollEvent = new PollEvent() {};
-    private final ScheduledExecutorService delayer = Executors.newSingleThreadScheduledExecutor();
     @Setter
     @Accessors(fluent = true)
     private ScheduledDispatcherDelegate delegate;
@@ -85,9 +84,11 @@ public final class ScheduledDispatcher extends Dispatcher {
     }
 
     private void schedule() {
-        delayer.schedule(() -> poller.post(pollEvent),
-                delegate().schedulePeriod(),
-                delegate().schedulePeriodUnit());
+        new Thread(() -> {
+            await(delegate().schedulePeriod(),
+                    delegate().schedulePeriodUnit());
+            poller.post(pollEvent);
+        }).start();
     }
 
     private ScheduledDispatcherDelegate delegate() {

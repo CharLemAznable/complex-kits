@@ -4,17 +4,15 @@ import com.google.common.eventbus.ScheduledDispatcherDelegate;
 import com.google.common.eventbus.ScheduledEventBus;
 
 import java.util.concurrent.Executor;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static java.lang.Runtime.getRuntime;
+import static com.github.charlemaznable.core.lang.Await.await;
 import static java.util.Objects.isNull;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 public abstract class EventBusExecutor {
 
     private ScheduledEventBus eventBus;
-    private ScheduledThreadPoolExecutor executor;
 
     public EventBusExecutor() {
         this(null);
@@ -23,8 +21,6 @@ public abstract class EventBusExecutor {
     public EventBusExecutor(Object subscriber) {
         eventBus = new ScheduledEventBus(eventBusIdentifier(), eventBusExecutor());
         eventBus.register(isNull(subscriber) ? this : subscriber);
-
-        executor = new ScheduledThreadPoolExecutor(getRuntime().availableProcessors() + 1);
     }
 
     public final void post(Object event) {
@@ -32,7 +28,10 @@ public abstract class EventBusExecutor {
     }
 
     public final void post(Object event, long delay, TimeUnit unit) {
-        executor.schedule(() -> eventBus.post(event), delay, unit);
+        new Thread(() -> {
+            await(delay, unit);
+            eventBus.post(event);
+        }).start();
     }
 
     public final boolean cancel(Object event) {
