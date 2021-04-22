@@ -380,7 +380,7 @@ public final class OhMappingProxy extends OhRoot {
                                       Factory factory, OhProxy proxy) {
             val mapping = findAnnotation(method, Mapping.class);
             val url = checkNull(mapping, () -> "/" + method.getName(), annotation -> {
-                val providerClass = annotation.urlProvider();
+                Class<? extends UrlProvider> providerClass = annotation.urlProvider();
                 return substitute(UrlProvider.class == providerClass ? annotation.value()
                         : FactoryContext.apply(factory, providerClass, p -> p.url(clazz, method)));
             });
