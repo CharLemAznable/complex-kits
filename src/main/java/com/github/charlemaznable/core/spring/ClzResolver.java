@@ -14,6 +14,7 @@ import java.util.function.Predicate;
 
 import static com.github.charlemaznable.core.lang.Clz.isAssignable;
 import static com.github.charlemaznable.core.lang.ClzPath.findClass;
+import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 import static java.util.Arrays.stream;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -45,8 +46,14 @@ public final class ClzResolver {
         return getClasses(basePackage, null);
     }
 
-    public static List<Class<?>> getSubClasses(String basePackage, Class<?> superClass) {
-        return getClasses(basePackage, clazz -> isAssignable(clazz, superClass) && !clazz.equals(superClass));
+    public static <T> List<Class<? extends T>> getSubClasses(String basePackage, Class<T> superClass) {
+        return getSubClasses(basePackage, superClass, false);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> List<Class<? extends T>> getSubClasses(String basePackage, Class<T> superClass, boolean includeSuperClass) {
+        return newArrayList(getClasses(basePackage, clazz -> isAssignable(clazz, superClass)
+                && (includeSuperClass || !clazz.equals(superClass))).toArray(new Class[0]));
     }
 
     public static List<Class<?>> getAnnotatedClasses(String basePackage, Class<? extends Annotation> annoClass) {
