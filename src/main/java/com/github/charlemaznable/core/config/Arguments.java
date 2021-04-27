@@ -59,7 +59,9 @@ public final class Arguments extends BaseConfigable {
 
     @Override
     public Properties getProperties() {
-        return new Properties(properties);
+        val prop = new Properties();
+        prop.putAll(properties);
+        return prop;
     }
 
     @Override
