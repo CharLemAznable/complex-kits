@@ -83,7 +83,7 @@
         <fastjson.version>1.2.76</fastjson.version>
         <dom4j.version>2.1.3</dom4j.version>
         <diamond-client.version>0.0.22</diamond-client.version>
-        <annotations.version>20.1.0</annotations.version>
+        <annotations.version>21.0.1</annotations.version>
         <auto-service.version>1.0</auto-service.version>
         <okhttp.version>3.14.9</okhttp.version>
         <vertx.version>3.9.7</vertx.version>
@@ -92,14 +92,14 @@
         <expiringmap.version>0.5.9</expiringmap.version>
         <format-preserving-encryption.version>1.0.0</format-preserving-encryption.version>
         <toml4j.version>0.7.2</toml4j.version>
-        <awaitility.version>4.0.3</awaitility.version>
+        <awaitility.version>4.1.0</awaitility.version>
 
         <lombok.version>1.18.20</lombok.version>
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
-        <spring.version>5.3.6</spring.version>
+        <spring.version>5.3.7</spring.version>
 
         <logback-miner.version>0.1.2-SNAPSHOT</logback-miner.version>
-        <junit-jupiter.version>5.7.1</junit-jupiter.version>
+        <junit-jupiter.version>5.7.2</junit-jupiter.version>
         <jmockit.version>1.49</jmockit.version>
 
         <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
