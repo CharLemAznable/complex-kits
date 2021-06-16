@@ -58,7 +58,7 @@ public final class BaseX {
         val digits = new int[value.length()];
         int digitpos = 0;
         for (int i = 0; i < value.length(); i++) {
-            int b = (int) this.bytes[value.charAt(i)];
+            int b = this.bytes[value.charAt(i)];
             if (b == 0) throw new IllegalArgumentException("Illegal character!");
             b -= 1;
             for (int j = 0; j <= digitpos; j++) {

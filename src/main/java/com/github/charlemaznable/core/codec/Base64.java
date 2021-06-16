@@ -373,7 +373,7 @@ public final class Base64 {
                 for (int i = 0; i < inAvail; i++) {
                     val buffer = ensureBufferSize(encodeSize, context);
                     context.modulus = (context.modulus + 1) % BYTES_PER_UNENCODED_BLOCK;
-                    int b = (int) in[inPos++];
+                    int b = in[inPos++];
                     if (b < 0) {
                         b += 256;
                     }
