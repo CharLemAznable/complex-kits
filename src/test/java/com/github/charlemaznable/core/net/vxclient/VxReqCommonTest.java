@@ -122,7 +122,7 @@ public abstract class VxReqCommonTest extends CommonReqTest {
                                 }), null))
         )).onComplete(result -> {
             shutdownMockWebServer();
-            test.<CompositeFuture>completing().handle(result);
+            test.<CompositeFuture>succeedingThenComplete().handle(result);
         });
     }
 

@@ -10,7 +10,11 @@ import lombok.val;
 
 import java.util.concurrent.CompletableFuture;
 
+import static java.util.Objects.nonNull;
+
 public final class VertxElf {
+
+    private static final String CLUSTER_MANAGER_CLASS_PROPERTY = "vertx.cluster.managerClass";
 
     private VertxElf() {
         throw new UnsupportedOperationException();
@@ -18,7 +22,8 @@ public final class VertxElf {
 
     @SneakyThrows
     public static Vertx buildVertx(VertxOptions vertxOptions) {
-        if (vertxOptions.getEventBusOptions().isClustered()) {
+        if (nonNull(vertxOptions.getClusterManager()) ||
+                nonNull(System.getProperty(CLUSTER_MANAGER_CLASS_PROPERTY))) {
             val completableFuture = new CompletableFuture<Vertx>();
             Vertx.clusteredVertx(vertxOptions, asyncResult -> {
                 if (asyncResult.failed()) {

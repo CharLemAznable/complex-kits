@@ -5,6 +5,7 @@ import com.google.inject.Provider;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.impl.clustered.ClusteredEventBus;
+import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +23,7 @@ public class CustomOptionsTest {
     static {
         vertxOptions = new VertxOptions();
         vertxOptions.setWorkerPoolSize(DEFAULT_WORKER_POOL_SIZE);
-        vertxOptions.getEventBusOptions().setClustered(true);
+        vertxOptions.setClusterManager(new HazelcastClusterManager());
     }
 
     @Test

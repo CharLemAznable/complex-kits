@@ -1,6 +1,7 @@
 package com.github.charlemaznable.core.vertx.spring;
 
 import io.vertx.core.VertxOptions;
+import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
 import lombok.val;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +16,7 @@ public class CustomOptionsConfiguration {
     public VertxOptions vertxOptions() {
         val vertxOptions = new VertxOptions();
         vertxOptions.setWorkerPoolSize(DEFAULT_WORKER_POOL_SIZE);
-        vertxOptions.getEventBusOptions().setClustered(true);
+        vertxOptions.setClusterManager(new HazelcastClusterManager());
         return vertxOptions;
     }
 }

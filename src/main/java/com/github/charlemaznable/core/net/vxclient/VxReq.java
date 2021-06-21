@@ -10,7 +10,6 @@ import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.http.impl.headers.VertxHttpHeaders;
 import io.vertx.core.net.KeyCertOptions;
 import io.vertx.core.net.ProxyOptions;
 import io.vertx.core.net.TrustOptions;
@@ -103,7 +102,7 @@ public class VxReq extends CommonReq<VxReq> {
     }
 
     private MultiMap fetchHeaderMap() {
-        val headersMap = new VertxHttpHeaders();
+        val headersMap = MultiMap.caseInsensitiveMultiMap();
         val acceptCharsetName = this.acceptCharset.name();
         headersMap.set(ACCEPT_CHARSET, acceptCharsetName);
         val contentType = this.contentFormatter.contentType();
