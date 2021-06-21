@@ -18,16 +18,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class CustomOptionsTest {
 
     static final int DEFAULT_WORKER_POOL_SIZE = 42;
-    static final VertxOptions vertxOptions;
-
-    static {
-        vertxOptions = new VertxOptions();
-        vertxOptions.setWorkerPoolSize(DEFAULT_WORKER_POOL_SIZE);
-        vertxOptions.setClusterManager(new HazelcastClusterManager());
-    }
 
     @Test
     public void testVertxModular() {
+        val vertxOptions = new VertxOptions();
+        vertxOptions.setWorkerPoolSize(DEFAULT_WORKER_POOL_SIZE);
+        vertxOptions.setClusterManager(new HazelcastClusterManager());
         val injector = Guice.createInjector(new VertxModular(vertxOptions).createModule());
         val vertx = injector.getInstance(Vertx.class);
         assertNotNull(vertx);
@@ -56,6 +52,9 @@ public class CustomOptionsTest {
 
         @Override
         public VertxOptions get() {
+            val vertxOptions = new VertxOptions();
+            vertxOptions.setWorkerPoolSize(DEFAULT_WORKER_POOL_SIZE);
+            vertxOptions.setClusterManager(new HazelcastClusterManager());
             return vertxOptions;
         }
     }

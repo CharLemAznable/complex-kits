@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.net.ohclient;
 
+import com.github.charlemaznable.core.lang.EverythingIsNonNull;
 import com.github.charlemaznable.core.net.common.CommonReqTest;
 import com.github.charlemaznable.core.net.common.ContentFormat.FormContentFormatter;
 import com.github.charlemaznable.core.net.common.ContentFormat.JsonContentFormatter;
@@ -13,7 +14,6 @@ import lombok.val;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.internal.annotations.EverythingIsNonNull;
 import okhttp3.logging.HttpLoggingInterceptor.Level;
 import org.junit.jupiter.api.Test;
 
