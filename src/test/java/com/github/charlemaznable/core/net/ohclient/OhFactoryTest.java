@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.net.ohclient;
 
+import com.github.charlemaznable.core.lang.EverythingIsNonNull;
 import com.github.charlemaznable.core.net.common.AcceptCharset;
 import com.github.charlemaznable.core.net.common.ContentFormat;
 import com.github.charlemaznable.core.net.common.ContentFormat.ApplicationXmlContentFormatter;
@@ -20,6 +21,7 @@ import org.joor.ReflectException;
 import org.junit.jupiter.api.Test;
 
 import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
+import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.ACCEPT_CHARSET;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.CONTENT_TYPE;
 import static com.google.common.net.MediaType.APPLICATION_XML_UTF_8;
@@ -47,6 +49,7 @@ public class OhFactoryTest {
         assertThrows(OhException.class, () -> ohLoader.getClient(TestNotInterface.class));
     }
 
+    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testAcceptCharset() {
@@ -54,13 +57,13 @@ public class OhFactoryTest {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
-                    switch (request.getPath()) {
+                    switch (checkNotNull(request.getPath())) {
                         case SAMPLE:
-                            val acceptCharset = request.getHeader(ACCEPT_CHARSET);
+                            val acceptCharset = checkNotNull(request.getHeader(ACCEPT_CHARSET));
                             assertEquals(ISO_8859_1.name(), acceptCharset);
                             return new MockResponse().setBody(acceptCharset);
                         case SAMPLE2:
-                            val acceptCharset2 = request.getHeader(ACCEPT_CHARSET);
+                            val acceptCharset2 = checkNotNull(request.getHeader(ACCEPT_CHARSET));
                             assertEquals(UTF_8.name(), acceptCharset2);
                             return new MockResponse().setBody(acceptCharset2);
                         default:
@@ -82,6 +85,7 @@ public class OhFactoryTest {
         }
     }
 
+    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testContentFormat() {
@@ -89,19 +93,19 @@ public class OhFactoryTest {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
-                    switch (request.getPath()) {
+                    switch (checkNotNull(request.getPath())) {
                         case SAMPLE:
-                            val contentType = request.getHeader(CONTENT_TYPE);
+                            val contentType = checkNotNull(request.getHeader(CONTENT_TYPE));
                             assertTrue(contentType.startsWith(FORM_DATA.toString()));
                             val bodyString = request.getBody().readUtf8();
                             return new MockResponse().setBody(bodyString);
                         case SAMPLE2:
-                            val contentType2 = request.getHeader(CONTENT_TYPE);
+                            val contentType2 = checkNotNull(request.getHeader(CONTENT_TYPE));
                             assertTrue(contentType2.startsWith(JSON_UTF_8.toString()));
                             val bodyString2 = request.getBody().readUtf8();
                             return new MockResponse().setBody(bodyString2);
                         case "/sample3":
-                            val contentType3 = request.getHeader(CONTENT_TYPE);
+                            val contentType3 = checkNotNull(request.getHeader(CONTENT_TYPE));
                             assertTrue(contentType3.startsWith(APPLICATION_XML_UTF_8.toString()));
                             val bodyString3 = request.getBody().readUtf8();
                             return new MockResponse().setBody(bodyString3);
@@ -125,6 +129,7 @@ public class OhFactoryTest {
         }
     }
 
+    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testRequestMethod() {
@@ -132,13 +137,13 @@ public class OhFactoryTest {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
-                    switch (request.getPath()) {
+                    switch (checkNotNull(request.getPath())) {
                         case SAMPLE:
-                            val method = request.getMethod();
+                            val method = checkNotNull(request.getMethod());
                             assertEquals("POST", method);
                             return new MockResponse().setBody(method);
                         case SAMPLE2:
-                            val method2 = request.getMethod();
+                            val method2 = checkNotNull(request.getMethod());
                             assertEquals("GET", method2);
                             return new MockResponse().setBody(method2);
                         default:
@@ -160,6 +165,7 @@ public class OhFactoryTest {
         }
     }
 
+    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testExtendInterface() {

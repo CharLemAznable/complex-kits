@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.net.ohclient;
 
+import com.github.charlemaznable.core.lang.EverythingIsNonNull;
 import com.github.charlemaznable.core.net.common.FixedHeader;
 import com.github.charlemaznable.core.net.common.FixedValueProvider;
 import com.github.charlemaznable.core.net.common.Header;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
+import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,6 +28,7 @@ public class HeaderTest {
 
     private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
+    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testOhHeader() {
@@ -33,7 +36,7 @@ public class HeaderTest {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
-                    switch (request.getPath()) {
+                    switch (checkNotNull(request.getPath())) {
                         case "/sampleDefault":
                             assertEquals("V1", request.getHeader("H1"));
                             assertEquals("V2", request.getHeader("H2"));

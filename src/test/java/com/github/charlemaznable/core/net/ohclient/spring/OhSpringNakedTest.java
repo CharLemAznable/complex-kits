@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.net.ohclient.spring;
 
+import com.github.charlemaznable.core.lang.EverythingIsNonNull;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.ohclient.OhException;
 import com.github.charlemaznable.core.net.ohclient.testclient.TestComponentSpring;
@@ -22,6 +23,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static com.github.charlemaznable.core.net.ohclient.OhFactory.getClient;
 import static org.joor.Reflect.onClass;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,6 +38,7 @@ public class OhSpringNakedTest {
     @Autowired
     private TestComponentSpring testComponent;
 
+    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testOhClientNaked() {
@@ -43,7 +46,7 @@ public class OhSpringNakedTest {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
-                    switch (request.getPath()) {
+                    switch (checkNotNull(request.getPath())) {
                         case "/sample":
                             return new MockResponse().setBody("SampleError");
                         case "/sampleError":

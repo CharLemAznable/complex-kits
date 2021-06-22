@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.net.ohclient;
 
+import com.github.charlemaznable.core.lang.EverythingIsNonNull;
 import com.github.charlemaznable.core.net.common.DefaultErrorMappingDisabled;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
@@ -31,6 +32,7 @@ import java.util.concurrent.Future;
 
 import static com.github.charlemaznable.core.codec.Bytes.string;
 import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
+import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,6 +44,7 @@ public class ReturnTest {
 
     private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
+    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testStatusCode() {
@@ -49,7 +52,7 @@ public class ReturnTest {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
-                    switch (request.getPath()) {
+                    switch (checkNotNull(request.getPath())) {
                         case "/sampleVoid":
                         case "/sampleFutureVoid":
                             return new MockResponse().setResponseCode(HttpStatus.OK.value());
@@ -98,6 +101,7 @@ public class ReturnTest {
         }
     }
 
+    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testResponseBody() {

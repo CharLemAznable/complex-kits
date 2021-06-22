@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.net.ohclient;
 
+import com.github.charlemaznable.core.lang.EverythingIsNonNull;
 import com.github.charlemaznable.core.net.common.ContentFormat;
 import com.github.charlemaznable.core.net.common.ContentFormat.JsonContentFormatter;
 import com.github.charlemaznable.core.net.common.ExtraUrlQuery;
@@ -23,12 +24,14 @@ import java.util.Map;
 
 import static com.github.charlemaznable.core.codec.Json.unJson;
 import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
+import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ExtraQueryTest {
 
     private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
+    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testExtraQuery() {
@@ -36,7 +39,7 @@ public class ExtraQueryTest {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
-                    val requestUrl = request.getRequestUrl();
+                    val requestUrl = checkNotNull(request.getRequestUrl());
                     switch (requestUrl.encodedPath()) {
                         case "/sampleGet":
                             assertEquals("GET", request.getMethod());

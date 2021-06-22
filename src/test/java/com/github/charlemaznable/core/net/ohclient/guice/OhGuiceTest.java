@@ -1,6 +1,7 @@
 package com.github.charlemaznable.core.net.ohclient.guice;
 
 import com.github.charlemaznable.core.guice.GuiceFactory;
+import com.github.charlemaznable.core.lang.EverythingIsNonNull;
 import com.github.charlemaznable.core.miner.MinerModular;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.ohclient.OhException;
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.n3r.diamond.client.impl.MockDiamondServer;
 
+import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -55,6 +57,7 @@ public class OhGuiceTest {
         MockDiamondServer.tearDownMockServer();
     }
 
+    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testOhClient() {
@@ -69,7 +72,7 @@ public class OhGuiceTest {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
-                    switch (request.getPath()) {
+                    switch (checkNotNull(request.getPath())) {
                         case SAMPLE:
                             return new MockResponse().setBody(SAMPLE_RESULT);
                         case CONTEXT:
@@ -104,6 +107,7 @@ public class OhGuiceTest {
         }
     }
 
+    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testOhClientError() {
@@ -116,7 +120,7 @@ public class OhGuiceTest {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
-                    switch (request.getPath()) {
+                    switch (checkNotNull(request.getPath())) {
                         case SAMPLE:
                             return new MockResponse().setBody(SAMPLE_ERROR_RESULT);
                         case SAMPLE_ERROR:
@@ -146,6 +150,7 @@ public class OhGuiceTest {
         }
     }
 
+    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testOhClientNaked() {
@@ -155,7 +160,7 @@ public class OhGuiceTest {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
-                    switch (request.getPath()) {
+                    switch (checkNotNull(request.getPath())) {
                         case SAMPLE:
                             return new MockResponse().setBody(SAMPLE_ERROR_RESULT);
                         case SAMPLE_ERROR:
@@ -198,6 +203,7 @@ public class OhGuiceTest {
         }
     }
 
+    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testOhClientScan() {

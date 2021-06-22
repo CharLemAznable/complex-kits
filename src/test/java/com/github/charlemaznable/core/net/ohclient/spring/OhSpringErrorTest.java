@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.net.ohclient.spring;
 
+import com.github.charlemaznable.core.lang.EverythingIsNonNull;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.ohclient.testclient.TestComponentSpring;
 import com.github.charlemaznable.core.net.ohclient.testclient.TestHttpClientConcrete;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -30,6 +32,7 @@ public class OhSpringErrorTest {
     @Autowired
     private TestComponentSpring testComponent;
 
+    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testOhClientError() {
@@ -37,7 +40,7 @@ public class OhSpringErrorTest {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
-                    switch (request.getPath()) {
+                    switch (checkNotNull(request.getPath())) {
                         case "/sample":
                             return new MockResponse().setBody("SampleError");
                         case "/sampleError":

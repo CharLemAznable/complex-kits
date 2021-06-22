@@ -1,5 +1,6 @@
 package com.github.charlemaznable.core.net.ohclient;
 
+import com.github.charlemaznable.core.lang.EverythingIsNonNull;
 import com.github.charlemaznable.core.net.common.FixedPathVar;
 import com.github.charlemaznable.core.net.common.FixedValueProvider;
 import com.github.charlemaznable.core.net.common.HttpStatus;
@@ -17,12 +18,14 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
+import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PathVarTest {
 
     private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
+    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testOhPathVar() {
@@ -30,7 +33,7 @@ public class PathVarTest {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
-                    switch (request.getPath()) {
+                    switch (checkNotNull(request.getPath())) {
                         case "/V1/V2":
                             return new MockResponse().setBody("V2");
                         case "/V1/V3":
