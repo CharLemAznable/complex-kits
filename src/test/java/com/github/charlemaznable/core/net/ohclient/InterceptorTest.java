@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.lang.EverythingIsNonNull;
 import com.github.charlemaznable.core.net.common.HttpMethod;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
@@ -18,6 +17,7 @@ import lombok.SneakyThrows;
 import lombok.val;
 import okhttp3.Interceptor;
 import okhttp3.Response;
+import okhttp3.internal.annotations.EverythingIsNonNull;
 import okhttp3.logging.HttpLoggingInterceptor.Level;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 
 import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
-import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static com.github.charlemaznable.core.miner.MinerElf.minerAsSubstitutor;
 import static org.joor.Reflect.onClass;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -57,7 +56,6 @@ public class InterceptorTest {
         MockDiamondServer.tearDownMockServer();
     }
 
-    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testInterceptorClient() {
@@ -69,7 +67,7 @@ public class InterceptorTest {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
-                    switch (checkNotNull(request.getPath())) {
+                    switch (request.getPath()) {
                         case "/sample1":
                             val values1 = request.getHeaders().values(HEADER_NAME);
                             assertEquals(1, values1.size());

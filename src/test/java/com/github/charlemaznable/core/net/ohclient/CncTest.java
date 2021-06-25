@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.lang.EverythingIsNonNull;
 import com.github.charlemaznable.core.net.common.CncRequest;
 import com.github.charlemaznable.core.net.common.CncResponse;
 import com.github.charlemaznable.core.net.common.CncResponse.CncResponseImpl;
@@ -52,7 +51,6 @@ public class CncTest {
         MockDiamondServer.tearDownMockServer();
     }
 
-    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testCncClient() {

@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.lang.EverythingIsNonNull;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
@@ -21,7 +20,6 @@ import java.util.concurrent.Future;
 
 import static com.github.charlemaznable.core.codec.Json.json;
 import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
-import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -29,7 +27,6 @@ public class ReturnPairTest {
 
     private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
-    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testPair() {
@@ -37,7 +34,7 @@ public class ReturnPairTest {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
-                    switch (checkNotNull(request.getPath())) {
+                    switch (request.getPath()) {
                         case "/sampleStatusAndBean":
                         case "/sampleFutureStatusAndBean":
                             return new MockResponse().setResponseCode(HttpStatus.OK.value())

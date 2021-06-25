@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.lang.EverythingIsNonNull;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
@@ -21,7 +20,6 @@ import java.util.concurrent.Future;
 import static com.github.charlemaznable.core.codec.Json.json;
 import static com.github.charlemaznable.core.codec.Json.jsonOf;
 import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
-import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -30,7 +28,6 @@ public class ReturnErrorTest {
 
     private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
-    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testError() {
@@ -38,7 +35,7 @@ public class ReturnErrorTest {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
-                    switch (checkNotNull(request.getPath())) {
+                    switch (request.getPath()) {
                         case "/sampleFuture":
                         case "/sampleList":
                             return new MockResponse().setResponseCode(HttpStatus.OK.value())

@@ -85,7 +85,7 @@
         <diamond-client.version>0.0.22</diamond-client.version>
         <annotations.version>21.0.1</annotations.version>
         <auto-service.version>1.0</auto-service.version>
-        <okhttp.version>4.9.1</okhttp.version>
+        <okhttp.version>3.14.9</okhttp.version><!-- from spring-boot 2.5.1 -->
         <vertx.version>4.1.0</vertx.version>
         <vertx-diamond-config.version>0.1.3-SNAPSHOT</vertx-diamond-config.version>
         <guice.version>5.0.1</guice.version>

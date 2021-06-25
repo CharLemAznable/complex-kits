@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.lang.EverythingIsNonNull;
 import com.github.charlemaznable.core.net.common.DefaultErrorMappingDisabled;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
@@ -18,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
-import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -66,14 +64,13 @@ public class UrlConcatTest {
         assertThrows(ProviderException.class, httpClient::sample);
     }
 
-    @EverythingIsNonNull
     @SneakyThrows
     private MockWebServer startMockWebServer(int port) {
         val mockWebServer = new MockWebServer();
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
             public MockResponse dispatch(RecordedRequest request) {
-                switch (checkNotNull(request.getPath())) {
+                switch (request.getPath()) {
                     case "/":
                         return new MockResponse().setBody(ROOT);
                     case "/sample":

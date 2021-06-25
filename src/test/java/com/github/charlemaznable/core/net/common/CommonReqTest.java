@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.net.common;
 
-import com.github.charlemaznable.core.lang.EverythingIsNonNull;
 import lombok.SneakyThrows;
 import lombok.val;
 import okhttp3.mockwebserver.Dispatcher;
@@ -22,7 +21,6 @@ public abstract class CommonReqTest {
 
     protected MockWebServer mockWebServer;
 
-    @EverythingIsNonNull
     @SneakyThrows
     protected void startMockWebServer(int port) {
         mockWebServer = new MockWebServer();

@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.lang.EverythingIsNonNull;
 import com.github.charlemaznable.core.lang.Mapp;
 import com.github.charlemaznable.core.net.common.ContentFormat;
 import com.github.charlemaznable.core.net.common.ContentFormat.ContentFormatter;
@@ -31,7 +30,6 @@ import java.util.Map;
 import static com.github.charlemaznable.core.codec.Json.json;
 import static com.github.charlemaznable.core.codec.Json.unJson;
 import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
-import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static com.github.charlemaznable.core.lang.Str.toStr;
 import static com.google.common.net.MediaType.JSON_UTF_8;
@@ -42,7 +40,6 @@ public class ContextTest {
 
     private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
-    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testOhContext() {
@@ -51,7 +48,7 @@ public class ContextTest {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
                     val body = unJson(request.getBody().readUtf8());
-                    switch (checkNotNull(request.getPath())) {
+                    switch (request.getPath()) {
                         case "/sampleDefault":
                             assertEquals("CV1", body.get("C1"));
                             assertEquals("CV2", body.get("C2"));

@@ -291,7 +291,7 @@ public final class OhCall extends OhRoot {
             val content = nullThen(this.requestBodyRaw, () ->
                     this.contentFormatter.format(parameterMap, contextMap));
             requestBuilder.method(requestMethod, RequestBody.create(
-                    content, MediaType.parse(contentType)));
+                    MediaType.parse(contentType), content));
             requestBuilder.url(requestUrl);
         }
         return requestBuilder.build();

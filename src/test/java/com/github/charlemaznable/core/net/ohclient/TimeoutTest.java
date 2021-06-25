@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.lang.EverythingIsNonNull;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.ProviderException;
@@ -18,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
-import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -27,7 +25,6 @@ public class TimeoutTest {
     private static final String SAMPLE = "Sample";
     private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
-    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testTimeout() {
@@ -35,7 +32,7 @@ public class TimeoutTest {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
-                    switch (checkNotNull(request.getPath())) {
+                    switch (request.getPath()) {
                         case "/sample":
                             return new MockResponse().setBody(SAMPLE);
                         default:

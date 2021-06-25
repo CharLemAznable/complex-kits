@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.lang.EverythingIsNonNull;
 import com.github.charlemaznable.core.net.common.DefaultErrorMappingDisabled;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
@@ -17,7 +16,6 @@ import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.Test;
 
 import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
-import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -25,7 +23,6 @@ public class OhResponseMappingTest {
 
     private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
-    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testOhResponseMapping() {
@@ -33,7 +30,7 @@ public class OhResponseMappingTest {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
-                    switch (checkNotNull(request.getPath())) {
+                    switch (request.getPath()) {
                         case "/sampleNotFound":
                             return new MockResponse()
                                     .setResponseCode(HttpStatus.NOT_FOUND.value())

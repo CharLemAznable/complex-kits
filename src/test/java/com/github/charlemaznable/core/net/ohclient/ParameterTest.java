@@ -1,6 +1,5 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.lang.EverythingIsNonNull;
 import com.github.charlemaznable.core.net.common.Bundle;
 import com.github.charlemaznable.core.net.common.ContentFormat;
 import com.github.charlemaznable.core.net.common.ContentFormat.FormContentFormatter;
@@ -34,7 +33,6 @@ import java.util.Map;
 import static com.github.charlemaznable.core.codec.Json.unJson;
 import static com.github.charlemaznable.core.codec.Xml.unXml;
 import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
-import static com.github.charlemaznable.core.lang.Condition.checkNotNull;
 import static com.github.charlemaznable.core.lang.Mapp.of;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -43,7 +41,6 @@ public class ParameterTest {
 
     private static OhLoader ohLoader = OhFactory.ohLoader(reflectFactory());
 
-    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testOhParameterGet() {
@@ -51,7 +48,7 @@ public class ParameterTest {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
-                    val requestUrl = checkNotNull(request.getRequestUrl());
+                    val requestUrl = request.getRequestUrl();
                     switch (requestUrl.encodedPath()) {
                         case "/sampleDefault":
                             assertNull(requestUrl.queryParameter("T0"));
@@ -114,7 +111,6 @@ public class ParameterTest {
         }
     }
 
-    @EverythingIsNonNull
     @SneakyThrows
     @Test
     public void testOhParameterPost() {
@@ -123,7 +119,7 @@ public class ParameterTest {
                 @Override
                 public MockResponse dispatch(RecordedRequest request) {
                     val body = request.getBody().readUtf8();
-                    switch (checkNotNull(request.getPath())) {
+                    switch (request.getPath()) {
                         case "/sampleDefault":
                             val defaultMap = Splitter.on("&")
                                     .withKeyValueSeparator("=").split(body);

@@ -208,7 +208,7 @@ public class OhReq extends CommonReq<OhReq> {
         val content = nullThen(this.requestBody, () ->
                 this.contentFormatter.format(parameterMap, newHashMap()));
         requestBuilder.method(HttpMethod.POST.toString(), RequestBody.create(
-                content, MediaType.parse(this.contentFormatter.contentType())));
+                MediaType.parse(this.contentFormatter.contentType()), content));
         requestBuilder.url(requestUrl);
         return requestBuilder.build();
     }
