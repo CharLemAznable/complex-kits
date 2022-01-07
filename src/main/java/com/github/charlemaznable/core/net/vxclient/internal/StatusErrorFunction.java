@@ -8,7 +8,7 @@ import java.util.function.Function;
 import static org.joor.Reflect.onClass;
 
 @AllArgsConstructor
-public class StatusErrorFunction
+public final class StatusErrorFunction
         implements Function<Class<? extends StatusError>, Void> {
 
     private int statusCode;

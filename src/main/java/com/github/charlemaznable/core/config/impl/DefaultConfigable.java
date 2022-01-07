@@ -13,7 +13,7 @@ import static org.apache.commons.lang3.StringUtils.startsWith;
 import static org.apache.commons.lang3.StringUtils.trim;
 import static org.apache.commons.text.StringSubstitutor.replace;
 
-public class DefaultConfigable extends BaseConfigable {
+public final class DefaultConfigable extends BaseConfigable {
 
     private Properties properties;
 
