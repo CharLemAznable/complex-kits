@@ -29,6 +29,7 @@ import org.n3r.diamond.client.Miner;
 import org.n3r.diamond.client.Minerable;
 import org.n3r.diamond.client.impl.DiamondUtils;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
@@ -105,6 +106,7 @@ public final class MinerFactory {
             return minerableCache.get(minerClass);
         }
 
+        @Nonnull
         private <T> Object loadMiner(Class<T> minerClass) {
             ensureClassIsAnInterface(minerClass);
             checkClassConfig(minerClass);
@@ -193,7 +195,8 @@ public final class MinerFactory {
             val minerConfig = findAnnotation(method, MinerConfig.class);
             String group = checkMinerGroup(method, minerConfig);
             val dataId = checkMinerDataId(method, minerConfig);
-            val defaultValue = checkMinerDefaultValue(method, minerConfig);
+            val defaultEmptyString = nonNull(findAnnotation(method, DefaultEmptyString.class));
+            val defaultValue = checkMinerDefaultValue(method, minerConfig, defaultEmptyString);
             val minerable = minerLoader.getMinerable(minerClass);
             // group blank:
             //   if minerable instanceof AbstractMiner
@@ -220,15 +223,15 @@ public final class MinerFactory {
                     : FactoryContext.apply(factory, providerClass, p -> p.dataId(minerClass, method)));
         }
 
-        private String checkMinerDefaultValue(Method method, MinerConfig minerConfig) {
-            if (isNull(minerConfig)) return null;
+        private String checkMinerDefaultValue(Method method, MinerConfig minerConfig, boolean defaultEmptyString) {
+            if (isNull(minerConfig)) return defaultEmptyString ? "" : null;
             val providerClass = minerConfig.defaultValueProvider();
             String defaultValue = minerConfig.defaultValue();
             if (DefaultValueProvider.class != providerClass) {
                 defaultValue = FactoryContext.apply(factory, providerClass,
                         p -> p.defaultValue(minerClass, method));
             }
-            return substitute(blankThen(defaultValue, () -> null));
+            return substitute(blankThen(defaultValue, () -> defaultEmptyString ? "" : null));
         }
 
         private long checkMinerCacheSeconds(MinerConfig minerConfig) {

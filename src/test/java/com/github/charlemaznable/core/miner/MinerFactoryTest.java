@@ -135,6 +135,10 @@ public class MinerFactoryTest {
         assertEquals("xyz", minerDefault.abc("xyz"));
         assertEquals("abc", minerDefault.abc(null));
 
+        assertNull(minerDefault.xyzNull());
+        assertEquals("", minerDefault.xyzEmpty());
+        assertEquals("", minerDefault.xyzEmpty2());
+
         assertEquals(3, minerDefault.count(3));
         assertEquals(0, minerDefault.count(null));
         assertEquals(1, minerDefault.count1());
@@ -397,6 +401,15 @@ public class MinerFactoryTest {
 
         @MinerConfig(defaultValue = "abc")
         String abc(String defaultValue);
+
+        String xyzNull();
+
+        @DefaultEmptyString
+        String xyzEmpty();
+
+        @DefaultEmptyString
+        @MinerConfig
+        String xyzEmpty2();
 
         int count(Integer defaultValue);
 
