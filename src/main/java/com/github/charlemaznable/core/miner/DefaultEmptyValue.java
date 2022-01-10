@@ -9,11 +9,11 @@ import java.lang.annotation.Target;
 
 /**
  * MinerConfig default value is null
- * Add this annotation, set default value is empty string
+ * Add this annotation, set default value is empty value
  */
 @Documented
 @Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DefaultEmptyString {
+public @interface DefaultEmptyValue {
 }

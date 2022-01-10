@@ -195,8 +195,8 @@ public final class MinerFactory {
             val minerConfig = findAnnotation(method, MinerConfig.class);
             String group = checkMinerGroup(method, minerConfig);
             val dataId = checkMinerDataId(method, minerConfig);
-            val defaultEmptyString = nonNull(findAnnotation(method, DefaultEmptyString.class));
-            val defaultValue = checkMinerDefaultValue(method, minerConfig, defaultEmptyString);
+            val defaultEmptyValue = nonNull(findAnnotation(method, DefaultEmptyValue.class));
+            val defaultValue = checkMinerDefaultValue(method, minerConfig, defaultEmptyValue);
             val minerable = minerLoader.getMinerable(minerClass);
             // group blank:
             //   if minerable instanceof AbstractMiner
@@ -223,15 +223,15 @@ public final class MinerFactory {
                     : FactoryContext.apply(factory, providerClass, p -> p.dataId(minerClass, method)));
         }
 
-        private String checkMinerDefaultValue(Method method, MinerConfig minerConfig, boolean defaultEmptyString) {
-            if (isNull(minerConfig)) return defaultEmptyString ? "" : null;
+        private String checkMinerDefaultValue(Method method, MinerConfig minerConfig, boolean defaultEmptyValue) {
+            if (isNull(minerConfig)) return defaultEmptyValue ? "" : null;
             val providerClass = minerConfig.defaultValueProvider();
             String defaultValue = minerConfig.defaultValue();
             if (DefaultValueProvider.class != providerClass) {
                 defaultValue = FactoryContext.apply(factory, providerClass,
                         p -> p.defaultValue(minerClass, method));
             }
-            return substitute(blankThen(defaultValue, () -> defaultEmptyString ? "" : null));
+            return substitute(blankThen(defaultValue, () -> defaultEmptyValue ? "" : null));
         }
 
         private long checkMinerCacheSeconds(MinerConfig minerConfig) {

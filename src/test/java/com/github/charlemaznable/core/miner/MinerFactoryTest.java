@@ -192,6 +192,10 @@ public class MinerFactoryTest {
 
         assertNotEquals(minerDefault.hashCode(), minerDefaultData.hashCode());
         assertNotEquals(minerDefault, minerDefaultData);
+
+        val minerDefaultDataEmpty = minerLoader.getMiner(MinerDefaultDataEmpty.class);
+        assertNull(minerDefaultDataEmpty.propertiesNull());
+        assertTrue(minerDefaultDataEmpty.propertiesEmpty().isEmpty());
     }
 
     @Test
@@ -404,10 +408,10 @@ public class MinerFactoryTest {
 
         String xyzNull();
 
-        @DefaultEmptyString
+        @DefaultEmptyValue
         String xyzEmpty();
 
-        @DefaultEmptyString
+        @DefaultEmptyValue
         @MinerConfig
         String xyzEmpty2();
 
@@ -465,6 +469,17 @@ public class MinerFactoryTest {
 
         @MinerConfig("DEFAULT_DATA")
         Properties properties();
+    }
+
+    @MinerConfig
+    public interface MinerDefaultDataEmpty {
+
+        @MinerConfig("DEFAULT_DATA_EMPTY")
+        Properties propertiesNull();
+
+        @DefaultEmptyValue
+        @MinerConfig("DEFAULT_DATA_EMPTY")
+        Properties propertiesEmpty();
     }
 
     @MinerConfig("DEFAULT_DATA")
