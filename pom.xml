@@ -7,11 +7,11 @@
     <parent>
         <groupId>com.github.charlemaznable</groupId>
         <artifactId>char-dependencies</artifactId>
-        <version>0.0.5-SNAPSHOT</version>
+        <version>0.0.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>complex-kits</artifactId>
-    <version>0.12.5-SNAPSHOT</version>
+    <version>0.12.6-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Complex Kits</name>
@@ -25,8 +25,8 @@
     </scm>
 
     <properties>
-        <vertx-diamond-config.version>0.1.5-SNAPSHOT</vertx-diamond-config.version>
-        <logback-miner.version>0.1.5-SNAPSHOT</logback-miner.version>
+        <vertx-diamond-config.version>0.1.6-SNAPSHOT</vertx-diamond-config.version>
+        <logback-miner.version>0.1.6-SNAPSHOT</logback-miner.version>
     </properties>
 
     <dependencies>
