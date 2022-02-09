@@ -20,9 +20,8 @@ import com.github.charlemaznable.core.net.common.Mapping.UrlProvider;
 import com.github.charlemaznable.core.net.common.RequestMethod;
 import com.github.charlemaznable.core.net.common.ResponseParse;
 import com.github.charlemaznable.core.net.common.ResponseParse.ResponseParser;
-import com.github.charlemaznable.core.net.common.StatusError;
-import com.github.charlemaznable.core.net.common.StatusErrorMapping;
-import com.github.charlemaznable.core.net.common.StatusSeriesErrorMapping;
+import com.github.charlemaznable.core.net.common.StatusFallback;
+import com.github.charlemaznable.core.net.common.StatusSeriesFallback;
 import com.github.charlemaznable.core.net.ohclient.OhException;
 import com.github.charlemaznable.core.net.ohclient.OhReq;
 import com.github.charlemaznable.core.net.ohclient.annotation.ClientInterceptor;
@@ -159,8 +158,8 @@ public final class OhMappingProxy extends OhRoot {
         this.contexts = Elf.checkFixedContexts(
                 this.ohClass, this.ohMethod, this.factory, proxy);
 
-        this.statusErrorMapping = Elf.checkStatusErrorMapping(this.ohMethod, proxy);
-        this.statusSeriesErrorMapping = Elf.checkStatusSeriesErrorMapping(this.ohMethod, proxy);
+        this.statusFallbackMapping = Elf.checkStatusFallbackMapping(this.ohMethod, proxy);
+        this.statusSeriesFallbackMapping = Elf.checkStatusSeriesFallbackMapping(this.ohMethod, proxy);
 
         this.responseParser = Elf.checkResponseParser(this.ohMethod, this.factory, proxy);
 
@@ -271,13 +270,19 @@ public final class OhMappingProxy extends OhRoot {
         val responseBody = notNullThen(response.body(), OhResponseBody::new);
         if (nonNull(response.body())) response.close();
 
-        val statusError = this.statusErrorMapping
+        val statusFallback = this.statusFallbackMapping
                 .get(HttpStatus.valueOf(statusCode));
-        val statusSeriesError = this.statusSeriesErrorMapping
+        if (nonNull(statusFallback)) {
+            return FactoryContext.apply(factory, statusFallback,
+                    f -> f.apply(statusCode, responseBody));
+        }
+
+        val statusSeriesFallback = this.statusSeriesFallbackMapping
                 .get(HttpStatus.Series.valueOf(statusCode));
-        val errorThrower = new StatusErrorThrower(statusCode, responseBody);
-        notNullThen(statusError, errorThrower);
-        notNullThen(statusSeriesError, errorThrower);
+        if (nonNull(statusSeriesFallback)) {
+            return FactoryContext.apply(factory, statusSeriesFallback,
+                    f -> f.apply(statusCode, responseBody));
+        }
 
         val responseObjs = processResponseBody(
                 statusCode, responseBody, ohCall.responseClass);
@@ -613,23 +618,23 @@ public final class OhMappingProxy extends OhRoot {
             return result;
         }
 
-        static Map<HttpStatus, Class<? extends StatusError>>
-        checkStatusErrorMapping(Method method, OhProxy proxy) {
-            val result = newHashMap(proxy.statusErrorMapping);
+        static Map<HttpStatus, Class<? extends OhFallbackFunction>>
+        checkStatusFallbackMapping(Method method, OhProxy proxy) {
+            val result = newHashMap(proxy.statusFallbackMapping);
             result.putAll(newArrayList(findMergedRepeatableAnnotations(
-                    method, StatusErrorMapping.class)).stream()
-                    .collect(Collectors.toMap(StatusErrorMapping::status,
-                            StatusErrorMapping::exception)));
+                    method, StatusFallback.class)).stream()
+                    .collect(Collectors.toMap(StatusFallback::status,
+                            StatusFallback::fallback)));
             return result;
         }
 
-        static Map<HttpStatus.Series, Class<? extends StatusError>>
-        checkStatusSeriesErrorMapping(Method method, OhProxy proxy) {
-            val result = newHashMap(proxy.statusSeriesErrorMapping);
+        static Map<HttpStatus.Series, Class<? extends OhFallbackFunction>>
+        checkStatusSeriesFallbackMapping(Method method, OhProxy proxy) {
+            val result = newHashMap(proxy.statusSeriesFallbackMapping);
             result.putAll(newArrayList(findMergedRepeatableAnnotations(
-                    method, StatusSeriesErrorMapping.class)).stream()
-                    .collect(Collectors.toMap(StatusSeriesErrorMapping::statusSeries,
-                            StatusSeriesErrorMapping::exception)));
+                    method, StatusSeriesFallback.class)).stream()
+                    .collect(Collectors.toMap(StatusSeriesFallback::statusSeries,
+                            StatusSeriesFallback::fallback)));
             return result;
         }
 

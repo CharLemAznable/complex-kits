@@ -5,7 +5,6 @@ import com.github.charlemaznable.core.net.common.ExtraUrlQuery.ExtraUrlQueryBuil
 import com.github.charlemaznable.core.net.common.HttpMethod;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.ResponseParse.ResponseParser;
-import com.github.charlemaznable.core.net.common.StatusError;
 import okhttp3.ConnectionPool;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -48,8 +47,8 @@ class OhRoot {
     List<Pair<String, Object>> parameters;
     List<Pair<String, Object>> contexts;
 
-    Map<HttpStatus, Class<? extends StatusError>> statusErrorMapping;
-    Map<HttpStatus.Series, Class<? extends StatusError>> statusSeriesErrorMapping;
+    Map<HttpStatus, Class<? extends OhFallbackFunction>> statusFallbackMapping;
+    Map<HttpStatus.Series, Class<? extends OhFallbackFunction>> statusSeriesFallbackMapping;
 
     ResponseParser responseParser;
 

@@ -9,9 +9,7 @@ import java.lang.annotation.Target;
 
 @Documented
 @Inherited
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface StatusErrorMappings {
-
-    StatusErrorMapping[] value();
+public @interface DefaultFallbackDisabled {
 }

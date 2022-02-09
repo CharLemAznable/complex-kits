@@ -5,8 +5,8 @@ import com.github.charlemaznable.core.net.common.ContentFormat.FormContentFormat
 import com.github.charlemaznable.core.net.common.ContentFormat.JsonContentFormatter;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.StatusError;
-import com.github.charlemaznable.core.net.ohclient.OhResponseMappingTest.ClientErrorException;
-import com.github.charlemaznable.core.net.ohclient.OhResponseMappingTest.NotFoundException;
+import com.github.charlemaznable.core.net.ohclient.OhResponseMappingTest.ClientError;
+import com.github.charlemaznable.core.net.ohclient.OhResponseMappingTest.NotFound;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -91,22 +91,12 @@ public class OhReqTest extends CommonReqTest {
         }
 
         val ohReq6 = new OhReq("http://127.0.0.1:41103/sample6")
-                .statusErrorMapping(HttpStatus.NOT_FOUND, NotFoundException.class)
-                .statusSeriesErrorMapping(HttpStatus.Series.CLIENT_ERROR, ClientErrorException.class)
+                .statusFallback(HttpStatus.NOT_FOUND, NotFound.class)
+                .statusSeriesFallback(HttpStatus.Series.CLIENT_ERROR, ClientError.class)
                 .addInterceptors(newArrayList(loggingInterceptor))
                 .loggingLevel(Level.BASIC);
-        try {
-            ohReq6.get();
-        } catch (NotFoundException e) {
-            assertEquals(HttpStatus.NOT_FOUND.value(), e.getStatusCode());
-            assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), e.getMessage());
-        }
-        try {
-            ohReq6.parameter("AAA", "aaa").get();
-        } catch (ClientErrorException e) {
-            assertEquals(HttpStatus.FORBIDDEN.value(), e.getStatusCode());
-            assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), e.getMessage());
-        }
+        assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), ohReq6.get());
+        assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), ohReq6.parameter("AAA", "aaa").get());
 
         val ohReq7 = new OhReq("http://127.0.0.1:41103/sample7")
                 .contentFormat(new JsonContentFormatter())

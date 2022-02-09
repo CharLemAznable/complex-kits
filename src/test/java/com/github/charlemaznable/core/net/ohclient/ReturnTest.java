@@ -1,6 +1,6 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.net.common.DefaultErrorMappingDisabled;
+import com.github.charlemaznable.core.net.common.DefaultFallbackDisabled;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
@@ -161,7 +161,7 @@ public class ReturnTest {
         }
     }
 
-    @DefaultErrorMappingDisabled
+    @DefaultFallbackDisabled
     @OhClient
     @Mapping("${root}:41190")
     public interface StatusCodeHttpClient {

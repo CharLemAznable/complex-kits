@@ -5,6 +5,7 @@ import com.github.charlemaznable.core.net.common.ContentFormat.FormContentFormat
 import com.github.charlemaznable.core.net.common.ContentFormat.JsonContentFormatter;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.StatusError;
+import com.github.charlemaznable.core.net.vxclient.internal.VxFallbackFunction;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
@@ -74,27 +75,17 @@ public abstract class VxReqCommonTest extends CommonReqTest {
                                 }))),
                 Future.<String>future(f ->
                         new VxReq(vertx, "http://127.0.0.1:9300/sample6")
-                                .statusErrorMapping(HttpStatus.NOT_FOUND, NotFoundException.class)
-                                .statusSeriesErrorMapping(HttpStatus.Series.CLIENT_ERROR, ClientErrorException.class)
-                                .get(async -> test.verify(() -> {
-                                    assertTrue(async.cause() instanceof NotFoundException);
-                                    NotFoundException e = (NotFoundException) async.cause();
-                                    assertEquals(HttpStatus.NOT_FOUND.value(), e.getStatusCode());
-                                    assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), e.getMessage());
-                                    f.complete();
-                                }))),
+                                .statusFallback(HttpStatus.NOT_FOUND, NotFound.class)
+                                .statusSeriesFallback(HttpStatus.Series.CLIENT_ERROR, ClientError.class)
+                                .get(async -> test.verify(() ->
+                                        assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), async.result())), f)),
                 Future.<String>future(f ->
                         new VxReq(vertx, "http://127.0.0.1:9300/sample6")
                                 .parameter("AAA", "aaa")
-                                .statusErrorMapping(HttpStatus.NOT_FOUND, NotFoundException.class)
-                                .statusSeriesErrorMapping(HttpStatus.Series.CLIENT_ERROR, ClientErrorException.class)
-                                .get(async -> test.verify(() -> {
-                                    assertTrue(async.cause() instanceof ClientErrorException);
-                                    ClientErrorException e = (ClientErrorException) async.cause();
-                                    assertEquals(HttpStatus.FORBIDDEN.value(), e.getStatusCode());
-                                    assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), e.getMessage());
-                                    f.complete();
-                                }))),
+                                .statusFallback(HttpStatus.NOT_FOUND, NotFound.class)
+                                .statusSeriesFallback(HttpStatus.Series.CLIENT_ERROR, ClientError.class)
+                                .get(async -> test.verify(() ->
+                                        assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), async.result())), f)),
                 Future.<String>future(f ->
                         new VxReq(vertx, "http://127.0.0.1:9300/sample7")
                                 .contentFormat(new JsonContentFormatter())
@@ -126,21 +117,19 @@ public abstract class VxReqCommonTest extends CommonReqTest {
         });
     }
 
-    public static class NotFoundException extends StatusError {
+    public static class NotFound implements VxFallbackFunction<String> {
 
-        private static final long serialVersionUID = -7904971326378842916L;
-
-        public NotFoundException(int statusCode, String message) {
-            super(statusCode, message);
+        @Override
+        public String apply(Integer statusCode, String responseBody) {
+            return responseBody;
         }
     }
 
-    public static class ClientErrorException extends StatusError {
+    public static class ClientError implements VxFallbackFunction<String> {
 
-        private static final long serialVersionUID = -1930086236315973535L;
-
-        public ClientErrorException(int statusCode, String message) {
-            super(statusCode, message);
+        @Override
+        public String apply(Integer statusCode, String responseBody) {
+            return responseBody;
         }
     }
 }

@@ -1,11 +1,14 @@
 package com.github.charlemaznable.core.net.ohclient;
 
+import com.github.charlemaznable.core.lang.Mapp;
 import com.github.charlemaznable.core.net.common.CommonReq;
 import com.github.charlemaznable.core.net.common.HttpMethod;
 import com.github.charlemaznable.core.net.common.HttpStatus;
+import com.github.charlemaznable.core.net.common.HttpStatus.Series;
+import com.github.charlemaznable.core.net.ohclient.internal.OhFallbackFunction;
 import com.github.charlemaznable.core.net.ohclient.internal.OhResponseBody;
+import com.github.charlemaznable.core.net.ohclient.internal.OhStatusErrorThrower;
 import com.github.charlemaznable.core.net.ohclient.internal.ResponseBodyExtractor;
-import com.github.charlemaznable.core.net.ohclient.internal.StatusErrorThrower;
 import lombok.SneakyThrows;
 import lombok.val;
 import okhttp3.ConnectionPool;
@@ -14,6 +17,7 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import okhttp3.logging.HttpLoggingInterceptor.Level;
 
@@ -30,15 +34,18 @@ import java.security.KeyStore;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
 import static com.github.charlemaznable.core.lang.Condition.checkNull;
 import static com.github.charlemaznable.core.lang.Condition.notNullThen;
 import static com.github.charlemaznable.core.lang.Condition.nullThen;
 import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
+import static com.github.charlemaznable.core.lang.Str.toStr;
 import static com.github.charlemaznable.core.net.Url.concatUrlQuery;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.ACCEPT_CHARSET;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhConstant.CONTENT_TYPE;
@@ -65,6 +72,12 @@ public class OhReq extends CommonReq<OhReq> {
     private long writeTimeout = DEFAULT_WRITE_TIMEOUT; // in milliseconds
     private final List<Interceptor> interceptors = newArrayList();
     private final HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+    private Map<HttpStatus, Class<? extends OhFallbackFunction>>
+            statusFallbackMapping = newHashMap();
+    private Map<Series, Class<? extends OhFallbackFunction>>
+            statusSeriesFallbackMapping = Mapp.of(
+            HttpStatus.Series.CLIENT_ERROR, OhStatusErrorThrower.class,
+            HttpStatus.Series.SERVER_ERROR, OhStatusErrorThrower.class);
 
     public OhReq() {
         super();
@@ -133,6 +146,18 @@ public class OhReq extends CommonReq<OhReq> {
 
     public OhReq loggingLevel(Level level) {
         this.loggingInterceptor.setLevel(level);
+        return this;
+    }
+
+    public OhReq statusFallback(HttpStatus httpStatus,
+                                Class<? extends OhFallbackFunction> errorClass) {
+        this.statusFallbackMapping.put(httpStatus, errorClass);
+        return this;
+    }
+
+    public OhReq statusSeriesFallback(HttpStatus.Series httpStatusSeries,
+                                      Class<? extends OhFallbackFunction> errorClass) {
+        this.statusSeriesFallbackMapping.put(httpStatusSeries, errorClass);
         return this;
     }
 
@@ -235,15 +260,26 @@ public class OhReq extends CommonReq<OhReq> {
         val responseBody = notNullThen(response.body(), OhResponseBody::new);
         if (nonNull(response.body())) response.close();
 
-        val statusError = this.statusErrorMapping
+        val statusFallback = statusFallbackMapping
                 .get(HttpStatus.valueOf(statusCode));
-        val statusSeriesError = this.statusSeriesErrorMapping
+        if (nonNull(statusFallback)) {
+            return applyFallback(statusFallback,
+                    statusCode, responseBody);
+        }
+
+        val statusSeriesFallback = statusSeriesFallbackMapping
                 .get(HttpStatus.Series.valueOf(statusCode));
-        val errorThrower = new StatusErrorThrower(statusCode, responseBody);
-        notNullThen(statusError, errorThrower);
-        notNullThen(statusSeriesError, errorThrower);
+        if (nonNull(statusSeriesFallback)) {
+            return applyFallback(statusSeriesFallback,
+                    statusCode, responseBody);
+        }
 
         return notNullThen(responseBody, ResponseBodyExtractor::string);
+    }
+
+    private String applyFallback(Class<? extends OhFallbackFunction> fallbackClass,
+                                 Integer statusCode, ResponseBody responseBody) {
+        return toStr(reflectFactory().build(fallbackClass).apply(statusCode, responseBody));
     }
 
     private static class DummyX509TrustManager extends X509ExtendedTrustManager implements X509TrustManager {

@@ -1,5 +1,7 @@
 package com.github.charlemaznable.core.net.common;
 
+import com.github.charlemaznable.core.net.ohclient.internal.OhFallbackFunction;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -12,10 +14,10 @@ import java.lang.annotation.Target;
 @Inherited
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-@Repeatable(StatusErrorMappings.class)
-public @interface StatusErrorMapping {
+@Repeatable(StatusFallbacks.class)
+public @interface StatusFallback {
 
     HttpStatus status();
 
-    Class<? extends StatusError> exception() default StatusError.class;
+    Class<? extends OhFallbackFunction> fallback();
 }

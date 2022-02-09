@@ -1,6 +1,6 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.net.common.DefaultErrorMappingDisabled;
+import com.github.charlemaznable.core.net.common.DefaultFallbackDisabled;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.Mapping.UrlProvider;
@@ -86,7 +86,7 @@ public class UrlConcatTest {
         return mockWebServer;
     }
 
-    @DefaultErrorMappingDisabled
+    @DefaultFallbackDisabled
     @OhClient
     @Mapping("${root}:41100")
     public interface UrlPlainHttpClient {
@@ -105,7 +105,7 @@ public class UrlConcatTest {
         String notFound();
     }
 
-    @DefaultErrorMappingDisabled
+    @DefaultFallbackDisabled
     @OhClient
     @Mapping(urlProvider = TestUrlProvider.class)
     public interface UrlProviderHttpClient {

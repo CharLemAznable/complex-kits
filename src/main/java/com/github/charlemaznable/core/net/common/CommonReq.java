@@ -37,13 +37,6 @@ public abstract class CommonReq<T extends CommonReq> {
 
     protected ExtraUrlQueryBuilder extraUrlQueryBuilder;
 
-    protected Map<HttpStatus, Class<? extends StatusError>>
-            statusErrorMapping = newHashMap();
-    protected Map<HttpStatus.Series, Class<? extends StatusError>>
-            statusSeriesErrorMapping = Mapp.of(
-            HttpStatus.Series.CLIENT_ERROR, StatusError.class,
-            HttpStatus.Series.SERVER_ERROR, StatusError.class);
-
     public CommonReq() {
         this(null);
     }
@@ -94,18 +87,6 @@ public abstract class CommonReq<T extends CommonReq> {
 
     public T extraUrlQueryBuilder(ExtraUrlQueryBuilder extraUrlQueryBuilder) {
         this.extraUrlQueryBuilder = extraUrlQueryBuilder;
-        return (T) this;
-    }
-
-    public T statusErrorMapping(HttpStatus httpStatus,
-                                Class<? extends StatusError> errorClass) {
-        this.statusErrorMapping.put(httpStatus, errorClass);
-        return (T) this;
-    }
-
-    public T statusSeriesErrorMapping(HttpStatus.Series httpStatusSeries,
-                                      Class<? extends StatusError> errorClass) {
-        this.statusSeriesErrorMapping.put(httpStatusSeries, errorClass);
         return (T) this;
     }
 

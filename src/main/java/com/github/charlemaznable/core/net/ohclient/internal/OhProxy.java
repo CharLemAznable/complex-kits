@@ -6,7 +6,7 @@ import com.github.charlemaznable.core.lang.LoadingCachee;
 import com.github.charlemaznable.core.net.common.AcceptCharset;
 import com.github.charlemaznable.core.net.common.ContentFormat;
 import com.github.charlemaznable.core.net.common.ContentFormat.ContentFormatter;
-import com.github.charlemaznable.core.net.common.DefaultErrorMappingDisabled;
+import com.github.charlemaznable.core.net.common.DefaultFallbackDisabled;
 import com.github.charlemaznable.core.net.common.ExtraUrlQuery;
 import com.github.charlemaznable.core.net.common.ExtraUrlQuery.ExtraUrlQueryBuilder;
 import com.github.charlemaznable.core.net.common.FixedContext;
@@ -21,9 +21,8 @@ import com.github.charlemaznable.core.net.common.Mapping.UrlProvider;
 import com.github.charlemaznable.core.net.common.RequestMethod;
 import com.github.charlemaznable.core.net.common.ResponseParse;
 import com.github.charlemaznable.core.net.common.ResponseParse.ResponseParser;
-import com.github.charlemaznable.core.net.common.StatusError;
-import com.github.charlemaznable.core.net.common.StatusErrorMapping;
-import com.github.charlemaznable.core.net.common.StatusSeriesErrorMapping;
+import com.github.charlemaznable.core.net.common.StatusFallback;
+import com.github.charlemaznable.core.net.common.StatusSeriesFallback;
 import com.github.charlemaznable.core.net.ohclient.OhClient;
 import com.github.charlemaznable.core.net.ohclient.OhException;
 import com.github.charlemaznable.core.net.ohclient.OhReq;
@@ -131,8 +130,8 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
         this.parameters = Elf.checkFixedParameters(this.ohClass, this.factory);
         this.contexts = Elf.checkFixedContexts(this.ohClass, this.factory);
 
-        this.statusErrorMapping = Elf.checkStatusErrorMapping(this.ohClass);
-        this.statusSeriesErrorMapping = Elf.checkStatusSeriesErrorMapping(this.ohClass);
+        this.statusFallbackMapping = Elf.checkStatusFallbackMapping(this.ohClass);
+        this.statusSeriesFallbackMapping = Elf.checkStatusSeriesFallbackMapping(this.ohClass);
 
         this.responseParser = Elf.checkResponseParser(this.ohClass, this.factory);
 
@@ -361,24 +360,24 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
                     }).collect(Collectors.toList());
         }
 
-        static Map<HttpStatus, Class<? extends StatusError>>
-        checkStatusErrorMapping(Class clazz) {
+        static Map<HttpStatus, Class<? extends OhFallbackFunction>>
+        checkStatusFallbackMapping(Class clazz) {
             return newArrayList(findMergedRepeatableAnnotations(
-                    clazz, StatusErrorMapping.class)).stream()
-                    .collect(Collectors.toMap(StatusErrorMapping::status,
-                            StatusErrorMapping::exception));
+                    clazz, StatusFallback.class)).stream()
+                    .collect(Collectors.toMap(StatusFallback::status,
+                            StatusFallback::fallback));
         }
 
-        static Map<HttpStatus.Series, Class<? extends StatusError>>
-        checkStatusSeriesErrorMapping(Class clazz) {
-            val defaultDisabled = findAnnotation(clazz, DefaultErrorMappingDisabled.class);
-            Map<HttpStatus.Series, Class<? extends StatusError>> result = checkNull(
-                    defaultDisabled, () -> of(HttpStatus.Series.CLIENT_ERROR, StatusError.class,
-                            HttpStatus.Series.SERVER_ERROR, StatusError.class), x -> newHashMap());
+        static Map<HttpStatus.Series, Class<? extends OhFallbackFunction>>
+        checkStatusSeriesFallbackMapping(Class clazz) {
+            val defaultDisabled = findAnnotation(clazz, DefaultFallbackDisabled.class);
+            Map<HttpStatus.Series, Class<? extends OhFallbackFunction>> result = checkNull(
+                    defaultDisabled, () -> of(HttpStatus.Series.CLIENT_ERROR, OhStatusErrorThrower.class,
+                            HttpStatus.Series.SERVER_ERROR, OhStatusErrorThrower.class), x -> newHashMap());
             result.putAll(newArrayList(findMergedRepeatableAnnotations(clazz,
-                    StatusSeriesErrorMapping.class)).stream()
-                    .collect(Collectors.toMap(StatusSeriesErrorMapping::statusSeries,
-                            StatusSeriesErrorMapping::exception)));
+                    StatusSeriesFallback.class)).stream()
+                    .collect(Collectors.toMap(StatusSeriesFallback::statusSeries,
+                            StatusSeriesFallback::fallback)));
             return result;
         }
 

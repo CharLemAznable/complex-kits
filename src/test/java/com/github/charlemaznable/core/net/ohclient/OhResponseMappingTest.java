@@ -1,14 +1,17 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.net.common.DefaultErrorMappingDisabled;
+import com.github.charlemaznable.core.net.common.DefaultFallbackDisabled;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.StatusError;
-import com.github.charlemaznable.core.net.common.StatusErrorMapping;
-import com.github.charlemaznable.core.net.common.StatusSeriesErrorMapping;
+import com.github.charlemaznable.core.net.common.StatusFallback;
+import com.github.charlemaznable.core.net.common.StatusSeriesFallback;
 import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
+import com.github.charlemaznable.core.net.ohclient.internal.OhFallbackFunction;
+import com.github.charlemaznable.core.net.ohclient.internal.ResponseBodyExtractor;
 import lombok.SneakyThrows;
 import lombok.val;
+import okhttp3.ResponseBody;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -16,6 +19,8 @@ import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.Test;
 
 import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
+import static com.github.charlemaznable.core.lang.Condition.notNullThen;
+import static com.github.charlemaznable.core.lang.Str.toStr;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -59,10 +64,10 @@ public class OhResponseMappingTest {
             mockWebServer.start(41180);
 
             val httpClient = ohLoader.getClient(MappingHttpClient.class);
-            assertThrows(NotFoundException.class, httpClient::sampleNotFound);
-            assertThrows(ClientErrorException.class, httpClient::sampleClientError);
-            assertThrows(NotFoundException2.class, httpClient::sampleMappingNotFound);
-            assertThrows(ClientErrorException2.class, httpClient::sampleMappingClientError);
+            assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), httpClient.sampleNotFound());
+            assertEquals(HttpStatus.FORBIDDEN.getReasonPhrase(), httpClient.sampleClientError());
+            assertEquals("\"" + HttpStatus.NOT_FOUND.getReasonPhrase() + "\"", httpClient.sampleMappingNotFound());
+            assertEquals("\"" + HttpStatus.FORBIDDEN.getReasonPhrase() + "\"", httpClient.sampleMappingClientError());
             assertThrows(StatusError.class, httpClient::sampleServerError);
 
             val defaultHttpClient = ohLoader.getClient(DefaultMappingHttpClient.class);
@@ -116,10 +121,8 @@ public class OhResponseMappingTest {
         }
     }
 
-    @StatusErrorMapping(status = HttpStatus.NOT_FOUND,
-            exception = NotFoundException.class)
-    @StatusSeriesErrorMapping(statusSeries = HttpStatus.Series.CLIENT_ERROR,
-            exception = ClientErrorException.class)
+    @StatusFallback(status = HttpStatus.NOT_FOUND, fallback = NotFound.class)
+    @StatusSeriesFallback(statusSeries = HttpStatus.Series.CLIENT_ERROR, fallback = ClientError.class)
     @Mapping("${root}:41180")
     @OhClient
     public interface MappingHttpClient {
@@ -128,16 +131,12 @@ public class OhResponseMappingTest {
 
         String sampleClientError();
 
-        @StatusErrorMapping(status = HttpStatus.NOT_FOUND,
-                exception = NotFoundException2.class)
-        @StatusSeriesErrorMapping(statusSeries = HttpStatus.Series.CLIENT_ERROR,
-                exception = ClientErrorException2.class)
+        @StatusFallback(status = HttpStatus.NOT_FOUND, fallback = NotFound2.class)
+        @StatusSeriesFallback(statusSeries = HttpStatus.Series.CLIENT_ERROR, fallback = ClientError2.class)
         String sampleMappingNotFound();
 
-        @StatusErrorMapping(status = HttpStatus.NOT_FOUND,
-                exception = NotFoundException2.class)
-        @StatusSeriesErrorMapping(statusSeries = HttpStatus.Series.CLIENT_ERROR,
-                exception = ClientErrorException2.class)
+        @StatusFallback(status = HttpStatus.NOT_FOUND, fallback = NotFound2.class)
+        @StatusSeriesFallback(statusSeries = HttpStatus.Series.CLIENT_ERROR, fallback = ClientError2.class)
         String sampleMappingClientError();
 
         String sampleServerError();
@@ -158,7 +157,7 @@ public class OhResponseMappingTest {
         void sampleServerError();
     }
 
-    @DefaultErrorMappingDisabled
+    @DefaultFallbackDisabled
     @Mapping("${root}:41180")
     @OhClient
     public interface DisabledMappingHttpClient {
@@ -174,39 +173,35 @@ public class OhResponseMappingTest {
         String sampleServerError();
     }
 
-    public static class NotFoundException extends StatusError {
+    public static class NotFound implements OhFallbackFunction<String> {
 
-        private static final long serialVersionUID = -6500698707558354057L;
-
-        public NotFoundException(int statusCode, String message) {
-            super(statusCode, message);
+        @Override
+        public String apply(Integer statusCode, ResponseBody responseBody) {
+            return toStr(notNullThen(responseBody, ResponseBodyExtractor::string));
         }
     }
 
-    public static class ClientErrorException extends StatusError {
+    public static class ClientError implements OhFallbackFunction<String> {
 
-        private static final long serialVersionUID = -3870950937253448454L;
-
-        public ClientErrorException(int statusCode, String message) {
-            super(statusCode, message);
+        @Override
+        public String apply(Integer statusCode, ResponseBody responseBody) {
+            return toStr(notNullThen(responseBody, ResponseBodyExtractor::string));
         }
     }
 
-    public static class NotFoundException2 extends StatusError {
+    public static class NotFound2 implements OhFallbackFunction<String> {
 
-        private static final long serialVersionUID = 8138254149072329848L;
-
-        public NotFoundException2(int statusCode, String message) {
-            super(statusCode, message);
+        @Override
+        public String apply(Integer statusCode, ResponseBody responseBody) {
+            return "\"" + toStr(notNullThen(responseBody, ResponseBodyExtractor::string)) + "\"";
         }
     }
 
-    public static class ClientErrorException2 extends StatusError {
+    public static class ClientError2 implements OhFallbackFunction<String> {
 
-        private static final long serialVersionUID = -7855725166604686605L;
-
-        public ClientErrorException2(int statusCode, String message) {
-            super(statusCode, message);
+        @Override
+        public String apply(Integer statusCode, ResponseBody responseBody) {
+            return "\"" + toStr(notNullThen(responseBody, ResponseBodyExtractor::string)) + "\"";
         }
     }
 }
