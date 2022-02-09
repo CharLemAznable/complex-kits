@@ -5,7 +5,7 @@ import com.github.charlemaznable.core.net.common.HttpMethod;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.ohclient.internal.OhResponseBody;
 import com.github.charlemaznable.core.net.ohclient.internal.ResponseBodyExtractor;
-import com.github.charlemaznable.core.net.ohclient.internal.StatusErrorFunction;
+import com.github.charlemaznable.core.net.ohclient.internal.StatusErrorThrower;
 import lombok.SneakyThrows;
 import lombok.val;
 import okhttp3.ConnectionPool;
@@ -235,11 +235,13 @@ public class OhReq extends CommonReq<OhReq> {
         val responseBody = notNullThen(response.body(), OhResponseBody::new);
         if (nonNull(response.body())) response.close();
 
-        val errorMapping = new StatusErrorFunction(statusCode, responseBody);
-        notNullThen(this.statusErrorMapping.get(
-                HttpStatus.valueOf(statusCode)), errorMapping);
-        notNullThen(this.statusSeriesErrorMapping.get(
-                HttpStatus.Series.valueOf(statusCode)), errorMapping);
+        val statusError = this.statusErrorMapping
+                .get(HttpStatus.valueOf(statusCode));
+        val statusSeriesError = this.statusSeriesErrorMapping
+                .get(HttpStatus.Series.valueOf(statusCode));
+        val errorThrower = new StatusErrorThrower(statusCode, responseBody);
+        notNullThen(statusError, errorThrower);
+        notNullThen(statusSeriesError, errorThrower);
 
         return notNullThen(responseBody, ResponseBodyExtractor::string);
     }

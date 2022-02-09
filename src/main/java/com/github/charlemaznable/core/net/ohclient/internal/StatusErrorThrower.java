@@ -12,7 +12,7 @@ import static com.github.charlemaznable.core.lang.Str.toStr;
 import static org.joor.Reflect.onClass;
 
 @AllArgsConstructor
-public final class StatusErrorFunction
+public final class StatusErrorThrower
         implements Function<Class<? extends StatusError>, Void> {
 
     private int statusCode;
