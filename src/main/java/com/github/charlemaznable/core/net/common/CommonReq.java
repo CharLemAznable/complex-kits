@@ -37,6 +37,13 @@ public abstract class CommonReq<T extends CommonReq> {
 
     protected ExtraUrlQueryBuilder extraUrlQueryBuilder;
 
+    protected Map<HttpStatus, Class<? extends FallbackFunction>>
+            statusFallbackMapping = newHashMap();
+    protected Map<HttpStatus.Series, Class<? extends FallbackFunction>>
+            statusSeriesFallbackMapping = Mapp.of(
+            HttpStatus.Series.CLIENT_ERROR, StatusErrorThrower.class,
+            HttpStatus.Series.SERVER_ERROR, StatusErrorThrower.class);
+
     public CommonReq() {
         this(null);
     }
@@ -87,6 +94,18 @@ public abstract class CommonReq<T extends CommonReq> {
 
     public T extraUrlQueryBuilder(ExtraUrlQueryBuilder extraUrlQueryBuilder) {
         this.extraUrlQueryBuilder = extraUrlQueryBuilder;
+        return (T) this;
+    }
+
+    public T statusFallback(HttpStatus httpStatus,
+                            Class<? extends FallbackFunction> errorClass) {
+        this.statusFallbackMapping.put(httpStatus, errorClass);
+        return (T) this;
+    }
+
+    public T statusSeriesFallback(HttpStatus.Series httpStatusSeries,
+                                  Class<? extends FallbackFunction> errorClass) {
+        this.statusSeriesFallbackMapping.put(httpStatusSeries, errorClass);
         return (T) this;
     }
 

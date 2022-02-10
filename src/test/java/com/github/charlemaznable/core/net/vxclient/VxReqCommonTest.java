@@ -3,9 +3,9 @@ package com.github.charlemaznable.core.net.vxclient;
 import com.github.charlemaznable.core.net.common.CommonReqTest;
 import com.github.charlemaznable.core.net.common.ContentFormat.FormContentFormatter;
 import com.github.charlemaznable.core.net.common.ContentFormat.JsonContentFormatter;
+import com.github.charlemaznable.core.net.common.FallbackFunction;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.StatusError;
-import com.github.charlemaznable.core.net.vxclient.internal.VxFallbackFunction;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
@@ -117,19 +117,19 @@ public abstract class VxReqCommonTest extends CommonReqTest {
         });
     }
 
-    public static class NotFound implements VxFallbackFunction<String> {
+    public static class NotFound implements FallbackFunction<String> {
 
         @Override
-        public String apply(Integer statusCode, String responseBody) {
-            return responseBody;
+        public String apply(Response response) {
+            return response.responseBodyAsString();
         }
     }
 
-    public static class ClientError implements VxFallbackFunction<String> {
+    public static class ClientError implements FallbackFunction<String> {
 
         @Override
-        public String apply(Integer statusCode, String responseBody) {
-            return responseBody;
+        public String apply(Response response) {
+            return response.responseBodyAsString();
         }
     }
 }

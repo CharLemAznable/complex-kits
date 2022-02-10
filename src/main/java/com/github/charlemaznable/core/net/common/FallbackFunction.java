@@ -1,10 +1,24 @@
 package com.github.charlemaznable.core.net.common;
 
-import java.util.function.BiFunction;
+import com.github.charlemaznable.core.net.common.FallbackFunction.Response;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-public interface FallbackFunction<R, T>
-        extends BiFunction<Integer, R, T> {
+import java.util.function.Function;
+
+public interface FallbackFunction<R>
+        extends Function<Response, R> {
 
     @Override
-    T apply(Integer statusCode, R responseBody);
+    R apply(Response response);
+
+    @AllArgsConstructor
+    @Getter
+    abstract class Response<T> {
+
+        private int statusCode;
+        private T responseBody;
+
+        public abstract String responseBodyAsString();
+    }
 }

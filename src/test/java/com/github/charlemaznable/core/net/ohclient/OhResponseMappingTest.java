@@ -1,17 +1,15 @@
 package com.github.charlemaznable.core.net.ohclient;
 
 import com.github.charlemaznable.core.net.common.DefaultFallbackDisabled;
+import com.github.charlemaznable.core.net.common.FallbackFunction;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.Mapping;
 import com.github.charlemaznable.core.net.common.StatusError;
 import com.github.charlemaznable.core.net.common.StatusFallback;
 import com.github.charlemaznable.core.net.common.StatusSeriesFallback;
 import com.github.charlemaznable.core.net.ohclient.OhFactory.OhLoader;
-import com.github.charlemaznable.core.net.ohclient.internal.OhFallbackFunction;
-import com.github.charlemaznable.core.net.ohclient.internal.ResponseBodyExtractor;
 import lombok.SneakyThrows;
 import lombok.val;
-import okhttp3.ResponseBody;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -19,8 +17,6 @@ import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.Test;
 
 import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
-import static com.github.charlemaznable.core.lang.Condition.notNullThen;
-import static com.github.charlemaznable.core.lang.Str.toStr;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -173,35 +169,35 @@ public class OhResponseMappingTest {
         String sampleServerError();
     }
 
-    public static class NotFound implements OhFallbackFunction<String> {
+    public static class NotFound implements FallbackFunction<String> {
 
         @Override
-        public String apply(Integer statusCode, ResponseBody responseBody) {
-            return toStr(notNullThen(responseBody, ResponseBodyExtractor::string));
+        public String apply(Response response) {
+            return response.responseBodyAsString();
         }
     }
 
-    public static class ClientError implements OhFallbackFunction<String> {
+    public static class ClientError implements FallbackFunction<String> {
 
         @Override
-        public String apply(Integer statusCode, ResponseBody responseBody) {
-            return toStr(notNullThen(responseBody, ResponseBodyExtractor::string));
+        public String apply(Response response) {
+            return response.responseBodyAsString();
         }
     }
 
-    public static class NotFound2 implements OhFallbackFunction<String> {
+    public static class NotFound2 implements FallbackFunction<String> {
 
         @Override
-        public String apply(Integer statusCode, ResponseBody responseBody) {
-            return "\"" + toStr(notNullThen(responseBody, ResponseBodyExtractor::string)) + "\"";
+        public String apply(Response response) {
+            return "\"" + response.responseBodyAsString() + "\"";
         }
     }
 
-    public static class ClientError2 implements OhFallbackFunction<String> {
+    public static class ClientError2 implements FallbackFunction<String> {
 
         @Override
-        public String apply(Integer statusCode, ResponseBody responseBody) {
-            return "\"" + toStr(notNullThen(responseBody, ResponseBodyExtractor::string)) + "\"";
+        public String apply(Response response) {
+            return "\"" + response.responseBodyAsString() + "\"";
         }
     }
 }

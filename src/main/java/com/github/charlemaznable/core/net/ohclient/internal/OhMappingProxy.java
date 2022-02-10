@@ -8,6 +8,8 @@ import com.github.charlemaznable.core.net.common.ContentFormat;
 import com.github.charlemaznable.core.net.common.ContentFormat.ContentFormatter;
 import com.github.charlemaznable.core.net.common.ExtraUrlQuery;
 import com.github.charlemaznable.core.net.common.ExtraUrlQuery.ExtraUrlQueryBuilder;
+import com.github.charlemaznable.core.net.common.FallbackFunction;
+import com.github.charlemaznable.core.net.common.FallbackFunction.Response;
 import com.github.charlemaznable.core.net.common.FixedContext;
 import com.github.charlemaznable.core.net.common.FixedHeader;
 import com.github.charlemaznable.core.net.common.FixedParameter;
@@ -76,6 +78,7 @@ import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static com.github.charlemaznable.core.lang.Str.isBlank;
 import static com.github.charlemaznable.core.lang.Str.isNotBlank;
+import static com.github.charlemaznable.core.lang.Str.toStr;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.ohExecutorService;
 import static com.github.charlemaznable.core.net.ohclient.internal.OhDummy.substitute;
 import static java.util.Objects.isNull;
@@ -273,15 +276,13 @@ public final class OhMappingProxy extends OhRoot {
         val statusFallback = this.statusFallbackMapping
                 .get(HttpStatus.valueOf(statusCode));
         if (nonNull(statusFallback)) {
-            return FactoryContext.apply(factory, statusFallback,
-                    f -> f.apply(statusCode, responseBody));
+            return applyFallback(statusFallback, statusCode, responseBody);
         }
 
         val statusSeriesFallback = this.statusSeriesFallbackMapping
                 .get(HttpStatus.Series.valueOf(statusCode));
         if (nonNull(statusSeriesFallback)) {
-            return FactoryContext.apply(factory, statusSeriesFallback,
-                    f -> f.apply(statusCode, responseBody));
+            return applyFallback(statusSeriesFallback, statusCode, responseBody);
         }
 
         val responseObjs = processResponseBody(
@@ -313,6 +314,18 @@ public final class OhMappingProxy extends OhRoot {
         } else {
             return responseObjs.get(0);
         }
+    }
+
+    private Object applyFallback(Class<? extends FallbackFunction> function,
+                                 int statusCode, ResponseBody responseBody) {
+        return FactoryContext.apply(factory, function,
+                f -> f.apply(new Response<ResponseBody>(statusCode, responseBody) {
+                    @Override
+                    public String responseBodyAsString() {
+                        return toStr(notNullThen(getResponseBody(),
+                                ResponseBodyExtractor::string));
+                    }
+                }));
     }
 
     private List<Object> processResponseBody(int statusCode,
@@ -618,7 +631,7 @@ public final class OhMappingProxy extends OhRoot {
             return result;
         }
 
-        static Map<HttpStatus, Class<? extends OhFallbackFunction>>
+        static Map<HttpStatus, Class<? extends FallbackFunction>>
         checkStatusFallbackMapping(Method method, OhProxy proxy) {
             val result = newHashMap(proxy.statusFallbackMapping);
             result.putAll(newArrayList(findMergedRepeatableAnnotations(
@@ -628,7 +641,7 @@ public final class OhMappingProxy extends OhRoot {
             return result;
         }
 
-        static Map<HttpStatus.Series, Class<? extends OhFallbackFunction>>
+        static Map<HttpStatus.Series, Class<? extends FallbackFunction>>
         checkStatusSeriesFallbackMapping(Method method, OhProxy proxy) {
             val result = newHashMap(proxy.statusSeriesFallbackMapping);
             result.putAll(newArrayList(findMergedRepeatableAnnotations(

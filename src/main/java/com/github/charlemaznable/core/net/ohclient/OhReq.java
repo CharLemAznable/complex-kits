@@ -1,13 +1,11 @@
 package com.github.charlemaznable.core.net.ohclient;
 
-import com.github.charlemaznable.core.lang.Mapp;
 import com.github.charlemaznable.core.net.common.CommonReq;
+import com.github.charlemaznable.core.net.common.FallbackFunction;
+import com.github.charlemaznable.core.net.common.FallbackFunction.Response;
 import com.github.charlemaznable.core.net.common.HttpMethod;
 import com.github.charlemaznable.core.net.common.HttpStatus;
-import com.github.charlemaznable.core.net.common.HttpStatus.Series;
-import com.github.charlemaznable.core.net.ohclient.internal.OhFallbackFunction;
 import com.github.charlemaznable.core.net.ohclient.internal.OhResponseBody;
-import com.github.charlemaznable.core.net.ohclient.internal.OhStatusErrorThrower;
 import com.github.charlemaznable.core.net.ohclient.internal.ResponseBodyExtractor;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -34,7 +32,6 @@ import java.security.KeyStore;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -72,12 +69,6 @@ public class OhReq extends CommonReq<OhReq> {
     private long writeTimeout = DEFAULT_WRITE_TIMEOUT; // in milliseconds
     private final List<Interceptor> interceptors = newArrayList();
     private final HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-    private Map<HttpStatus, Class<? extends OhFallbackFunction>>
-            statusFallbackMapping = newHashMap();
-    private Map<Series, Class<? extends OhFallbackFunction>>
-            statusSeriesFallbackMapping = Mapp.of(
-            HttpStatus.Series.CLIENT_ERROR, OhStatusErrorThrower.class,
-            HttpStatus.Series.SERVER_ERROR, OhStatusErrorThrower.class);
 
     public OhReq() {
         super();
@@ -146,18 +137,6 @@ public class OhReq extends CommonReq<OhReq> {
 
     public OhReq loggingLevel(Level level) {
         this.loggingInterceptor.setLevel(level);
-        return this;
-    }
-
-    public OhReq statusFallback(HttpStatus httpStatus,
-                                Class<? extends OhFallbackFunction> errorClass) {
-        this.statusFallbackMapping.put(httpStatus, errorClass);
-        return this;
-    }
-
-    public OhReq statusSeriesFallback(HttpStatus.Series httpStatusSeries,
-                                      Class<? extends OhFallbackFunction> errorClass) {
-        this.statusSeriesFallbackMapping.put(httpStatusSeries, errorClass);
         return this;
     }
 
@@ -277,9 +256,16 @@ public class OhReq extends CommonReq<OhReq> {
         return notNullThen(responseBody, ResponseBodyExtractor::string);
     }
 
-    private String applyFallback(Class<? extends OhFallbackFunction> fallbackClass,
-                                 Integer statusCode, ResponseBody responseBody) {
-        return toStr(reflectFactory().build(fallbackClass).apply(statusCode, responseBody));
+    private String applyFallback(Class<? extends FallbackFunction> function,
+                                 int statusCode, ResponseBody responseBody) {
+        return toStr(reflectFactory().build(function).apply(
+                new Response<ResponseBody>(statusCode, responseBody) {
+                    @Override
+                    public String responseBodyAsString() {
+                        return toStr(notNullThen(getResponseBody(),
+                                ResponseBodyExtractor::string));
+                    }
+                }));
     }
 
     private static class DummyX509TrustManager extends X509ExtendedTrustManager implements X509TrustManager {

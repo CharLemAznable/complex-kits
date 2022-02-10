@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.net.ohclient.internal;
 
 import com.github.charlemaznable.core.net.common.ContentFormat.ContentFormatter;
 import com.github.charlemaznable.core.net.common.ExtraUrlQuery.ExtraUrlQueryBuilder;
+import com.github.charlemaznable.core.net.common.FallbackFunction;
 import com.github.charlemaznable.core.net.common.HttpMethod;
 import com.github.charlemaznable.core.net.common.HttpStatus;
 import com.github.charlemaznable.core.net.common.ResponseParse.ResponseParser;
@@ -47,8 +48,8 @@ class OhRoot {
     List<Pair<String, Object>> parameters;
     List<Pair<String, Object>> contexts;
 
-    Map<HttpStatus, Class<? extends OhFallbackFunction>> statusFallbackMapping;
-    Map<HttpStatus.Series, Class<? extends OhFallbackFunction>> statusSeriesFallbackMapping;
+    Map<HttpStatus, Class<? extends FallbackFunction>> statusFallbackMapping;
+    Map<HttpStatus.Series, Class<? extends FallbackFunction>> statusSeriesFallbackMapping;
 
     ResponseParser responseParser;
 

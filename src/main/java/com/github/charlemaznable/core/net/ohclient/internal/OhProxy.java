@@ -9,6 +9,7 @@ import com.github.charlemaznable.core.net.common.ContentFormat.ContentFormatter;
 import com.github.charlemaznable.core.net.common.DefaultFallbackDisabled;
 import com.github.charlemaznable.core.net.common.ExtraUrlQuery;
 import com.github.charlemaznable.core.net.common.ExtraUrlQuery.ExtraUrlQueryBuilder;
+import com.github.charlemaznable.core.net.common.FallbackFunction;
 import com.github.charlemaznable.core.net.common.FixedContext;
 import com.github.charlemaznable.core.net.common.FixedHeader;
 import com.github.charlemaznable.core.net.common.FixedParameter;
@@ -21,6 +22,7 @@ import com.github.charlemaznable.core.net.common.Mapping.UrlProvider;
 import com.github.charlemaznable.core.net.common.RequestMethod;
 import com.github.charlemaznable.core.net.common.ResponseParse;
 import com.github.charlemaznable.core.net.common.ResponseParse.ResponseParser;
+import com.github.charlemaznable.core.net.common.StatusErrorThrower;
 import com.github.charlemaznable.core.net.common.StatusFallback;
 import com.github.charlemaznable.core.net.common.StatusSeriesFallback;
 import com.github.charlemaznable.core.net.ohclient.OhClient;
@@ -360,7 +362,7 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
                     }).collect(Collectors.toList());
         }
 
-        static Map<HttpStatus, Class<? extends OhFallbackFunction>>
+        static Map<HttpStatus, Class<? extends FallbackFunction>>
         checkStatusFallbackMapping(Class clazz) {
             return newArrayList(findMergedRepeatableAnnotations(
                     clazz, StatusFallback.class)).stream()
@@ -368,12 +370,12 @@ public final class OhProxy extends OhRoot implements MethodInterceptor {
                             StatusFallback::fallback));
         }
 
-        static Map<HttpStatus.Series, Class<? extends OhFallbackFunction>>
+        static Map<HttpStatus.Series, Class<? extends FallbackFunction>>
         checkStatusSeriesFallbackMapping(Class clazz) {
             val defaultDisabled = findAnnotation(clazz, DefaultFallbackDisabled.class);
-            Map<HttpStatus.Series, Class<? extends OhFallbackFunction>> result = checkNull(
-                    defaultDisabled, () -> of(HttpStatus.Series.CLIENT_ERROR, OhStatusErrorThrower.class,
-                            HttpStatus.Series.SERVER_ERROR, OhStatusErrorThrower.class), x -> newHashMap());
+            Map<HttpStatus.Series, Class<? extends FallbackFunction>> result = checkNull(
+                    defaultDisabled, () -> of(HttpStatus.Series.CLIENT_ERROR, StatusErrorThrower.class,
+                            HttpStatus.Series.SERVER_ERROR, StatusErrorThrower.class), x -> newHashMap());
             result.putAll(newArrayList(findMergedRepeatableAnnotations(clazz,
                     StatusSeriesFallback.class)).stream()
                     .collect(Collectors.toMap(StatusSeriesFallback::statusSeries,

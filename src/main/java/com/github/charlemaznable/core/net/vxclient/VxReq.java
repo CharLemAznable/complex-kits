@@ -1,10 +1,9 @@
 package com.github.charlemaznable.core.net.vxclient;
 
-import com.github.charlemaznable.core.lang.Mapp;
 import com.github.charlemaznable.core.net.common.CommonReq;
+import com.github.charlemaznable.core.net.common.FallbackFunction;
+import com.github.charlemaznable.core.net.common.FallbackFunction.Response;
 import com.github.charlemaznable.core.net.common.HttpStatus;
-import com.github.charlemaznable.core.net.vxclient.internal.VxFallbackFunction;
-import com.github.charlemaznable.core.net.vxclient.internal.VxStatusErrorThrower;
 import com.google.common.collect.Iterators;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -22,7 +21,6 @@ import lombok.val;
 import okhttp3.MediaType;
 
 import java.nio.charset.Charset;
-import java.util.Map;
 
 import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
 import static com.github.charlemaznable.core.lang.Condition.checkNull;
@@ -40,12 +38,6 @@ public class VxReq extends CommonReq<VxReq> {
 
     private Vertx vertx;
     private WebClientOptions webClientOptions = new WebClientOptions();
-    private Map<HttpStatus, Class<? extends VxFallbackFunction>>
-            statusFallbackMapping = newHashMap();
-    private Map<HttpStatus.Series, Class<? extends VxFallbackFunction>>
-            statusSeriesFallbackMapping = Mapp.of(
-            HttpStatus.Series.CLIENT_ERROR, VxStatusErrorThrower.class,
-            HttpStatus.Series.SERVER_ERROR, VxStatusErrorThrower.class);
 
     public VxReq(Vertx vertx) {
         super();
@@ -79,18 +71,6 @@ public class VxReq extends CommonReq<VxReq> {
 
     public VxReq connectTimeout(int connectTimeout) {
         webClientOptions.setConnectTimeout(connectTimeout);
-        return this;
-    }
-
-    public VxReq statusFallback(HttpStatus httpStatus,
-                                Class<? extends VxFallbackFunction> errorClass) {
-        this.statusFallbackMapping.put(httpStatus, errorClass);
-        return this;
-    }
-
-    public VxReq statusSeriesFallback(HttpStatus.Series httpStatusSeries,
-                                      Class<? extends VxFallbackFunction> errorClass) {
-        this.statusSeriesFallbackMapping.put(httpStatusSeries, errorClass);
         return this;
     }
 
@@ -160,12 +140,12 @@ public class VxReq extends CommonReq<VxReq> {
                             .get(HttpStatus.Series.valueOf(statusCode));
 
                     if (nonNull(statusFallback)) {
-                        promise.complete(applyFallback(
-                                statusFallback, statusCode, responseBody));
+                        promise.complete(applyFallback(statusFallback,
+                                statusCode, responseBody));
 
                     } else if (nonNull(statusSeriesFallback)) {
-                        promise.complete(applyFallback(
-                                statusSeriesFallback, statusCode, responseBody));
+                        promise.complete(applyFallback(statusSeriesFallback,
+                                statusCode, responseBody));
 
                     } else promise.complete(responseBody);
                 } catch (Exception e) {
@@ -179,9 +159,15 @@ public class VxReq extends CommonReq<VxReq> {
         };
     }
 
-    private String applyFallback(Class<? extends VxFallbackFunction> fallbackClass,
-                                 Integer statusCode, String responseBody) {
-        return toStr(reflectFactory().build(fallbackClass).apply(statusCode, responseBody));
+    private String applyFallback(Class<? extends FallbackFunction> function,
+                                 int statusCode, String responseBody) {
+        return toStr(reflectFactory().build(function).apply(
+                new Response<String>(statusCode, responseBody) {
+                    @Override
+                    public String responseBodyAsString() {
+                        return getResponseBody();
+                    }
+                }));
     }
 
     @SafeVarargs

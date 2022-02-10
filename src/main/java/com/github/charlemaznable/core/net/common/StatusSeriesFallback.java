@@ -1,7 +1,5 @@
 package com.github.charlemaznable.core.net.common;
 
-import com.github.charlemaznable.core.net.ohclient.internal.OhFallbackFunction;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -19,5 +17,5 @@ public @interface StatusSeriesFallback {
 
     HttpStatus.Series statusSeries();
 
-    Class<? extends OhFallbackFunction> fallback();
+    Class<? extends FallbackFunction> fallback();
 }
