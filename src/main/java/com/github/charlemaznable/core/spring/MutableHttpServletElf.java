@@ -12,9 +12,9 @@ import java.util.function.Consumer;
 
 import static java.util.Objects.isNull;
 
-public final class MutableHttpServletUtils {
+public final class MutableHttpServletElf {
 
-    private MutableHttpServletUtils() {}
+    private MutableHttpServletElf() {}
 
     public static MutableHttpServletRequest mutableRequest(HttpServletRequest request) {
         HttpServletRequest internalRequest = request;

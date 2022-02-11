@@ -11,9 +11,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import static com.github.charlemaznable.core.codec.Json.json;
 import static com.github.charlemaznable.core.codec.Json.unJson;
-import static com.github.charlemaznable.core.spring.MutableHttpServletUtils.getResponseContentAsString;
-import static com.github.charlemaznable.core.spring.MutableHttpServletUtils.setRequestParameter;
-import static com.github.charlemaznable.core.spring.MutableHttpServletUtils.setResponseContentByString;
+import static com.github.charlemaznable.core.spring.MutableHttpServletElf.getResponseContentAsString;
+import static com.github.charlemaznable.core.spring.MutableHttpServletElf.setRequestParameter;
+import static com.github.charlemaznable.core.spring.MutableHttpServletElf.setResponseContentByString;
 
 @Component
 public class MutableHttpServletFilterInterceptor implements HandlerInterceptor {
