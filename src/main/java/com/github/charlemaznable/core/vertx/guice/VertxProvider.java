@@ -8,7 +8,7 @@ import io.vertx.core.VertxOptions;
 import javax.annotation.Nullable;
 
 import static com.github.charlemaznable.core.lang.Condition.nullThen;
-import static com.github.charlemaznable.core.vertx.VertxElf.buildVertx;
+import static com.github.charlemaznable.vertx.diamond.VertxElf.buildVertx;
 
 public final class VertxProvider implements Provider<Vertx> {
 

@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import javax.annotation.Nullable;
 
 import static com.github.charlemaznable.core.lang.Condition.nullThen;
-import static com.github.charlemaznable.core.vertx.VertxElf.buildVertx;
+import static com.github.charlemaznable.vertx.diamond.VertxElf.buildVertx;
 
 @SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection", "SpringFacetCodeInspection"})
 @Configuration
