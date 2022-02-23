@@ -3,6 +3,7 @@ package com.github.charlemaznable.core.net;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class UrlTest {
 
@@ -13,5 +14,7 @@ public class UrlTest {
 
         assertEquals("abc_def---", Url.encodeDotAndColon("abc:def..."));
         assertEquals("abc:def...", Url.decodeDotAndColon("abc_def---"));
+
+        assertNotNull(Url.build("http://a.b.c"));
     }
 }

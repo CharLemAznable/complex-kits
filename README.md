@@ -1,7 +1,6 @@
 ### complex-kits
 
-[![Build Status](https://travis-ci.org/CharLemAznable/complex-kits.svg?branch=master)](https://travis-ci.org/CharLemAznable/complex-kits)
-[![codecov](https://codecov.io/gh/CharLemAznable/complex-kits/branch/master/graph/badge.svg)](https://codecov.io/gh/CharLemAznable/complex-kits)
+[![Build](https://github.com/CharLemAznable/complex-kits/actions/workflows/build.yml/badge.svg)](https://github.com/CharLemAznable/complex-kits/actions/workflows/build.yml)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.charlemaznable/complex-kits/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.charlemaznable/complex-kits/)
 [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)
 ![GitHub code size](https://img.shields.io/github/languages/code-size/CharLemAznable/complex-kits)

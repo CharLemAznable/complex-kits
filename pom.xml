@@ -24,8 +24,31 @@
         <url>https://github.com/CharLemAznable/complex-kits</url>
     </scm>
 
+    <repositories>
+        <repository>
+            <id>central</id>
+            <url>https://repo1.maven.org/maven2/</url>
+            <layout>default</layout>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>sonatype</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <layout>default</layout>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <properties>
+        <sonar.projectKey>CharLemAznable_complex-kits</sonar.projectKey>
+
         <vertx-diamond-config.version>0.1.6-SNAPSHOT</vertx-diamond-config.version>
+        <es-diamond-config.version>0.0.6-SNAPSHOT</es-diamond-config.version>
         <logback-miner.version>0.1.6-SNAPSHOT</logback-miner.version>
     </properties>
 
@@ -34,6 +57,11 @@
             <groupId>com.github.charlemaznable</groupId>
             <artifactId>vertx-diamond-config</artifactId>
             <version>${vertx-diamond-config.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.charlemaznable</groupId>
+            <artifactId>es-diamond-config</artifactId>
+            <version>${es-diamond-config.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
@@ -142,6 +170,16 @@
             <groupId>com.github.charlemaznable</groupId>
             <artifactId>logback-miner</artifactId>
             <version>${logback-miner.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

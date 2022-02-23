@@ -14,7 +14,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.Proxy;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +21,7 @@ import java.util.Map;
 import static com.github.charlemaznable.core.codec.Json.json;
 import static com.github.charlemaznable.core.lang.Listt.newArrayList;
 import static com.github.charlemaznable.core.lang.Str.isEmpty;
+import static com.github.charlemaznable.core.net.Url.build;
 import static com.github.charlemaznable.core.net.Url.encode;
 import static java.lang.String.format;
 import static java.net.HttpURLConnection.setFollowRedirects;
@@ -165,7 +165,7 @@ public final class HttpReq {
 
     private HttpURLConnection commonSettings(String urlString) throws IOException {
         setFollowRedirects(true);
-        val url = new URL(urlString);
+        val url = build(urlString);
         val http = (HttpURLConnection) (isNull(this.proxy) ?
                 url.openConnection() : url.openConnection(this.proxy));
         http.setRequestProperty("Accept-Charset", this.charset.name());

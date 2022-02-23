@@ -2,6 +2,7 @@ package com.github.charlemaznable.core.net;
 
 import lombok.SneakyThrows;
 
+import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
@@ -34,5 +35,10 @@ public final class Url {
     public static String concatUrlQuery(String url, String query) {
         if (isBlank(query)) return url;
         return url + (url.contains("?") ? "&" : "?") + query;
+    }
+
+    @SneakyThrows
+    public static URL build(String urlString) {
+        return new URL(urlString);
     }
 }

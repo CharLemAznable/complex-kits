@@ -3,19 +3,14 @@ package com.github.charlemaznable.core.net;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.val;
-import mockit.Invocation;
-import mockit.Mock;
-import mockit.MockUp;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -23,20 +18,57 @@ import java.net.Proxy;
 import java.net.Proxy.Type;
 import java.net.Socket;
 import java.net.URL;
-import java.net.URLConnection;
-import java.security.cert.Certificate;
-import java.util.List;
-import java.util.Map;
 
 import static com.github.charlemaznable.core.codec.Bytes.bytes;
 import static com.github.charlemaznable.core.lang.Mapp.newHashMap;
 import static com.github.charlemaznable.core.lang.Mapp.of;
 import static java.lang.String.format;
-import static java.util.Objects.nonNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 public class HttpReqTest {
+
+    private static SSLSocketFactory sslSocketFactory = new SSLSocketFactory() {
+        @Override
+        public Socket createSocket(String s, int i) {
+            return null;
+        }
+
+        @Override
+        public Socket createSocket(String s, int i, InetAddress inetAddress, int i1) {
+            return null;
+        }
+
+        @Override
+        public Socket createSocket(InetAddress inetAddress, int i) {
+            return null;
+        }
+
+        @Override
+        public Socket createSocket(InetAddress inetAddress, int i, InetAddress inetAddress1, int i1) {
+            return null;
+        }
+
+        @Override
+        public String[] getDefaultCipherSuites() {
+            return new String[0];
+        }
+
+        @Override
+        public String[] getSupportedCipherSuites() {
+            return new String[0];
+        }
+
+        @Override
+        public Socket createSocket(Socket socket, String s, int i, boolean b) {
+            return null;
+        }
+    };
+    private static HostnameVerifier hostnameVerifier = (s, sslSession) -> false;
 
     @SneakyThrows
     @Test
@@ -46,95 +78,20 @@ public class HttpReqTest {
         val responseString = "RESPONSE";
         @Cleanup val responseStream = new ByteArrayInputStream(bytes(responseString));
 
-        new MockUp<URL>(URL.class) {
-            @SneakyThrows
-            @Mock
-            public URLConnection openConnection() {
-                return new HttpsURLConnection(null) {
-                    @Override
-                    public String getCipherSuite() {
-                        return null;
-                    }
+        try (val mockUrlStatic = mockStatic(Url.class)) {
+            val mockHttpsURLConnection = mock(HttpURLConnection.class);
+            when(mockHttpsURLConnection.getResponseCode()).thenReturn(HttpStatus.OK.value());
+            when(mockHttpsURLConnection.getHeaderField("Content-Type")).thenReturn("text/plain; charset=UTF-8");
+            when(mockHttpsURLConnection.getInputStream()).thenReturn(responseStream);
+            val mockURL = mock(URL.class);
+            when(mockURL.openConnection()).thenReturn(mockHttpsURLConnection);
+            mockUrlStatic.when(() -> Url.build(format(doGetUrlTemp, dogetPath))).thenReturn(mockURL);
 
-                    @Override
-                    public Certificate[] getLocalCertificates() {
-                        return new Certificate[0];
-                    }
-
-                    @Override
-                    public Certificate[] getServerCertificates() {
-                        return new Certificate[0];
-                    }
-
-                    @Override
-                    public boolean usingProxy() {
-                        return false;
-                    }
-
-                    @Override
-                    public void connect() {}
-
-                    @Override
-                    public void disconnect() {}
-
-                    @Override
-                    public int getResponseCode() {
-                        return HttpStatus.OK.value();
-                    }
-
-                    @Override
-                    public String getHeaderField(String name) {
-                        if ("Content-Type".equals(name)) {
-                            return "text/plain; charset=UTF-8";
-                        }
-                        return "";
-                    }
-
-                    @Override
-                    public InputStream getInputStream() {
-                        return responseStream;
-                    }
-                };
-            }
-        };
-
-        val result = new HttpReq(doGetUrlTemp, dogetPath).sslSocketFactory(new SSLSocketFactory() {
-            @Override
-            public Socket createSocket(String s, int i) {
-                return null;
-            }
-
-            @Override
-            public Socket createSocket(String s, int i, InetAddress inetAddress, int i1) {
-                return null;
-            }
-
-            @Override
-            public Socket createSocket(InetAddress inetAddress, int i) {
-                return null;
-            }
-
-            @Override
-            public Socket createSocket(InetAddress inetAddress, int i, InetAddress inetAddress1, int i1) {
-                return null;
-            }
-
-            @Override
-            public String[] getDefaultCipherSuites() {
-                return new String[0];
-            }
-
-            @Override
-            public String[] getSupportedCipherSuites() {
-                return new String[0];
-            }
-
-            @Override
-            public Socket createSocket(Socket socket, String s, int i, boolean b) {
-                return null;
-            }
-        }).hostnameVerifier((s, sslSession) -> false).get();
-        assertEquals(responseString, result);
+            val result = new HttpReq(doGetUrlTemp, dogetPath)
+                    .sslSocketFactory(sslSocketFactory)
+                    .hostnameVerifier(hostnameVerifier).get();
+            assertEquals(responseString, result);
+        }
     }
 
     @SneakyThrows
@@ -146,61 +103,18 @@ public class HttpReqTest {
         @Cleanup val responseStream = new ByteArrayInputStream(bytes(responseString));
         val doGetProxy = new Proxy(Type.HTTP, new InetSocketAddress("127.0.0.1", 8090));
 
-        new MockUp<URL>(URL.class) {
-            @SneakyThrows
-            @Mock
-            public URLConnection openConnection(Proxy proxy) {
-                assertEquals(doGetProxy, proxy);
-                return new HttpsURLConnection(null) {
-                    @Override
-                    public String getCipherSuite() {
-                        return null;
-                    }
+        try (val mockUrlStatic = mockStatic(Url.class)) {
+            val mockHttpsURLConnection = mock(HttpURLConnection.class);
+            when(mockHttpsURLConnection.getResponseCode()).thenReturn(HttpStatus.OK.value());
+            when(mockHttpsURLConnection.getHeaderField("Content-Type")).thenReturn("text/plain; charset=UTF-8");
+            when(mockHttpsURLConnection.getInputStream()).thenReturn(responseStream);
+            val mockURL = mock(URL.class);
+            when(mockURL.openConnection(doGetProxy)).thenReturn(mockHttpsURLConnection);
+            mockUrlStatic.when(() -> Url.build(format(doGetUrlTemp, dogetPath))).thenReturn(mockURL);
 
-                    @Override
-                    public Certificate[] getLocalCertificates() {
-                        return new Certificate[0];
-                    }
-
-                    @Override
-                    public Certificate[] getServerCertificates() {
-                        return new Certificate[0];
-                    }
-
-                    @Override
-                    public boolean usingProxy() {
-                        return nonNull(proxy);
-                    }
-
-                    @Override
-                    public void connect() {}
-
-                    @Override
-                    public void disconnect() {}
-
-                    @Override
-                    public int getResponseCode() {
-                        return HttpStatus.OK.value();
-                    }
-
-                    @Override
-                    public String getHeaderField(String name) {
-                        if ("Content-Type".equals(name)) {
-                            return "text/plain; charset=UTF-8";
-                        }
-                        return "";
-                    }
-
-                    @Override
-                    public InputStream getInputStream() {
-                        return responseStream;
-                    }
-                };
-            }
-        };
-
-        val result = new HttpReq(doGetUrlTemp, dogetPath).proxy(doGetProxy).get();
-        assertEquals(responseString, result);
+            val result = new HttpReq(doGetUrlTemp, dogetPath).proxy(doGetProxy).get();
+            assertEquals(responseString, result);
+        }
     }
 
     @SneakyThrows
@@ -209,46 +123,16 @@ public class HttpReqTest {
         val doGetUrlTemp = "http://test.addr:8080%s";
         val dogetPath = "/doGet";
 
-        new MockUp<URL>(URL.class) {
-            @Mock
-            public void $init(Invocation invocation, String url) {
-                assertEquals(format(doGetUrlTemp, dogetPath), url);
-                invocation.proceed(url);
-            }
+        try (val mockUrlStatic = mockStatic(Url.class)) {
+            val mockHttpsURLConnection = mock(HttpURLConnection.class);
+            when(mockHttpsURLConnection.getResponseCode()).thenReturn(HttpStatus.OK.value());
+            when(mockHttpsURLConnection.getInputStream()).thenThrow(new IOException());
+            val mockURL = mock(URL.class);
+            when(mockURL.openConnection()).thenReturn(mockHttpsURLConnection);
+            mockUrlStatic.when(() -> Url.build(format(doGetUrlTemp, dogetPath))).thenReturn(mockURL);
 
-            @SneakyThrows
-            @Mock
-            public URLConnection openConnection() {
-                return new HttpURLConnection(null) {
-                    @Override
-                    public boolean usingProxy() {
-                        return false;
-                    }
-
-                    @Override
-                    public void connect() {}
-
-                    @Override
-                    public void disconnect() {}
-
-                    @Override
-                    public int getResponseCode() {
-                        return HttpStatus.OK.value();
-                    }
-
-                    @Override
-                    public String getHeaderField(String name) {
-                        return null;
-                    }
-
-                    @Override
-                    public InputStream getInputStream() throws IOException {
-                        throw new IOException();
-                    }
-                };
-            }
-        };
-        assertNull(HttpReq.get(doGetUrlTemp, dogetPath));
+            assertNull(HttpReq.get(doGetUrlTemp, dogetPath));
+        }
     }
 
     @SneakyThrows
@@ -260,112 +144,35 @@ public class HttpReqTest {
         val responseString = "RESPONSE";
         @Cleanup val responseStream = new ByteArrayInputStream(bytes(responseString));
 
-        new MockUp<URL>(URL.class) {
-            @SneakyThrows
-            @Mock
-            public URLConnection openConnection() {
-                return new HttpsURLConnection(null) {
-                    @Override
-                    public String getCipherSuite() {
-                        return null;
-                    }
+        try (val mockUrlStatic = mockStatic(Url.class)) {
+            val mockHttpsURLConnection = mock(HttpURLConnection.class);
+            when(mockHttpsURLConnection.getOutputStream()).thenReturn(requestStream);
+            when(mockHttpsURLConnection.getResponseCode()).thenReturn(HttpStatus.OK.value());
+            when(mockHttpsURLConnection.getHeaderField("Content-Type")).thenReturn("text/plain; charset=UTF-8");
+            when(mockHttpsURLConnection.getInputStream()).thenReturn(responseStream);
+            val mockURL = mock(URL.class);
+            when(mockURL.openConnection()).thenReturn(mockHttpsURLConnection);
+            mockUrlStatic.when(() -> Url.build(doPostRoot)).thenReturn(mockURL);
+            mockUrlStatic.when(() -> Url.build(doPostRoot + doPostPath)).thenReturn(mockURL);
+            mockUrlStatic.when(() -> Url.encode(anyString())).thenCallRealMethod();
 
-                    @Override
-                    public Certificate[] getLocalCertificates() {
-                        return new Certificate[0];
-                    }
+            String result = new HttpReq(doPostRoot)
+                    .sslSocketFactory(sslSocketFactory)
+                    .hostnameVerifier(hostnameVerifier).post();
+            assertEquals(responseString, result);
 
-                    @Override
-                    public Certificate[] getServerCertificates() {
-                        return new Certificate[0];
-                    }
+            responseStream.reset();
 
-                    @Override
-                    public boolean usingProxy() {
-                        return false;
-                    }
-
-                    @Override
-                    public void connect() {}
-
-                    @Override
-                    public void disconnect() {}
-
-                    @Mock
-                    public OutputStream getOutputStream() {
-                        return requestStream;
-                    }
-
-                    @Override
-                    public int getResponseCode() {
-                        return HttpStatus.OK.value();
-                    }
-
-                    @Override
-                    public String getHeaderField(String name) {
-                        if ("Content-Type".equals(name)) {
-                            return "text/plain; charset=UTF-8";
-                        }
-                        return "";
-                    }
-
-                    @Override
-                    public InputStream getInputStream() {
-                        return responseStream;
-                    }
-                };
-            }
-        };
-
-        String result = new HttpReq(doPostRoot).sslSocketFactory(new SSLSocketFactory() {
-            @Override
-            public Socket createSocket(String s, int i) {
-                return null;
-            }
-
-            @Override
-            public Socket createSocket(String s, int i, InetAddress inetAddress, int i1) {
-                return null;
-            }
-
-            @Override
-            public Socket createSocket(InetAddress inetAddress, int i) {
-                return null;
-            }
-
-            @Override
-            public Socket createSocket(InetAddress inetAddress, int i, InetAddress inetAddress1, int i1) {
-                return null;
-            }
-
-            @Override
-            public String[] getDefaultCipherSuites() {
-                return new String[0];
-            }
-
-            @Override
-            public String[] getSupportedCipherSuites() {
-                return new String[0];
-            }
-
-            @Override
-            public Socket createSocket(Socket socket, String s, int i, boolean b) {
-                return null;
-            }
-        }).hostnameVerifier((s, sslSession) -> false).post();
-        assertEquals(responseString, result);
-
-        responseStream.reset();
-
-        result = new HttpReq(doPostRoot)
-                .req(doPostPath)
-                .cookie(null)
-                .cookie("TestCookie")
-                .params(of("AAA", "aaa", "BBB", "bbb", "Z", "", "", "z"))
-                .requestBody("CCC=ccc")
-                .post();
-        assertEquals(responseString, result);
-        assertEquals("AAA=aaa&BBB=bbb&CCC=ccc", requestStream.toString());
+            result = new HttpReq(doPostRoot)
+                    .req(doPostPath)
+                    .cookie(null)
+                    .cookie("TestCookie")
+                    .params(of("AAA", "aaa", "BBB", "bbb", "Z", "", "", "z"))
+                    .requestBody("CCC=ccc")
+                    .post();
+            assertEquals(responseString, result);
+            assertEquals("AAA=aaa&BBB=bbb&CCC=ccc", requestStream.toString());
+        }
     }
 
     @SneakyThrows
@@ -377,63 +184,29 @@ public class HttpReqTest {
         val responseString = "RESPONSE";
         @Cleanup val responseStream = new ByteArrayInputStream(bytes(responseString));
 
-        new MockUp<URL>(URL.class) {
-            @SneakyThrows
-            @Mock
-            public URLConnection openConnection() {
-                return new HttpURLConnection(null) {
-                    @Override
-                    public boolean usingProxy() {
-                        return false;
-                    }
+        try (val mockUrlStatic = mockStatic(Url.class)) {
+            val mockHttpsURLConnection = mock(HttpURLConnection.class);
+            when(mockHttpsURLConnection.getOutputStream()).thenReturn(requestStream);
+            when(mockHttpsURLConnection.getResponseCode()).thenReturn(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            when(mockHttpsURLConnection.getHeaderField("Content-Type")).thenReturn("text/plain; charset=UTF-8");
+            when(mockHttpsURLConnection.getErrorStream()).thenReturn(responseStream);
+            when(mockHttpsURLConnection.getHeaderFields()).thenReturn(newHashMap());
+            val mockURL = mock(URL.class);
+            when(mockURL.openConnection()).thenReturn(mockHttpsURLConnection);
+            mockUrlStatic.when(() -> Url.build(doPostRoot + doPostPath)).thenReturn(mockURL);
+            mockUrlStatic.when(() -> Url.encode(anyString())).thenCallRealMethod();
 
-                    @Override
-                    public void connect() {}
-
-                    @Override
-                    public void disconnect() {}
-
-                    @Mock
-                    public OutputStream getOutputStream() {
-                        return requestStream;
-                    }
-
-                    @Override
-                    public int getResponseCode() {
-                        return HttpStatus.INTERNAL_SERVER_ERROR.value();
-                    }
-
-                    @Override
-                    public String getHeaderField(String name) {
-                        if ("Content-Type".equals(name)) {
-                            return "text/plain; charset=UTF-8";
-                        }
-                        return "";
-                    }
-
-                    @Override
-                    public InputStream getErrorStream() {
-                        return responseStream;
-                    }
-
-                    @Override
-                    public Map<String, List<String>> getHeaderFields() {
-                        return newHashMap();
-                    }
-                };
-            }
-        };
-
-        val result = new HttpReq(doPostRoot)
-                .req(doPostPath)
-                .cookie(null)
-                .cookie("TestCookie")
-                .requestBody(null)
-                .requestBody("CCC=ccc")
-                .params(of("AAA", "aaa", "BBB", "bbb", "Z", "", "", "z"))
-                .post();
-        assertNull(result);
-        assertEquals("CCC=ccc&AAA=aaa&BBB=bbb", requestStream.toString());
+            val result = new HttpReq(doPostRoot)
+                    .req(doPostPath)
+                    .cookie(null)
+                    .cookie("TestCookie")
+                    .requestBody(null)
+                    .requestBody("CCC=ccc")
+                    .params(of("AAA", "aaa", "BBB", "bbb", "Z", "", "", "z"))
+                    .post();
+            assertNull(result);
+            assertEquals("CCC=ccc&AAA=aaa&BBB=bbb", requestStream.toString());
+        }
     }
 
     @SneakyThrows
@@ -443,54 +216,20 @@ public class HttpReqTest {
         val doPostPath = "/doPost";
         @Cleanup val requestStream = new ByteArrayOutputStream();
 
-        new MockUp<URL>(URL.class) {
-            @SneakyThrows
-            @Mock
-            public URLConnection openConnection() {
-                return new HttpURLConnection(null) {
-                    @Override
-                    public boolean usingProxy() {
-                        return false;
-                    }
+        try (val mockUrlStatic = mockStatic(Url.class)) {
+            val mockHttpsURLConnection = mock(HttpURLConnection.class);
+            when(mockHttpsURLConnection.getOutputStream()).thenReturn(requestStream);
+            when(mockHttpsURLConnection.getResponseCode()).thenReturn(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            when(mockHttpsURLConnection.getHeaderField("Content-Type")).thenReturn("text/plain; charset=UTF-8");
+            when(mockHttpsURLConnection.getHeaderFields()).thenReturn(newHashMap());
+            val mockURL = mock(URL.class);
+            when(mockURL.openConnection()).thenReturn(mockHttpsURLConnection);
+            mockUrlStatic.when(() -> Url.build(doPostRoot)).thenReturn(mockURL);
+            mockUrlStatic.when(() -> Url.encode(anyString())).thenCallRealMethod();
 
-                    @Override
-                    public void connect() {}
-
-                    @Override
-                    public void disconnect() {}
-
-                    @Mock
-                    public OutputStream getOutputStream() {
-                        return requestStream;
-                    }
-
-                    @Override
-                    public int getResponseCode() {
-                        return HttpStatus.INTERNAL_SERVER_ERROR.value();
-                    }
-
-                    @Override
-                    public String getHeaderField(String name) {
-                        if ("Content-Type".equals(name)) {
-                            return "text/plain; charset=UTF-8";
-                        }
-                        return "";
-                    }
-
-                    @Override
-                    public InputStream getErrorStream() {
-                        return null;
-                    }
-
-                    @Override
-                    public Map<String, List<String>> getHeaderFields() {
-                        return newHashMap();
-                    }
-                };
-            }
-        };
-        val result = new HttpReq(doPostRoot).post();
-        assertNull(result);
+            val result = new HttpReq(doPostRoot).post();
+            assertNull(result);
+        }
     }
 
     @SneakyThrows
@@ -500,48 +239,19 @@ public class HttpReqTest {
         val doPostPath = "/doPost";
         @Cleanup val requestStream = new ByteArrayOutputStream();
 
-        new MockUp<URL>(URL.class) {
-            @SneakyThrows
-            @Mock
-            public URLConnection openConnection() {
-                return new HttpURLConnection(null) {
-                    @Override
-                    public boolean usingProxy() {
-                        return false;
-                    }
+        try (val mockUrlStatic = mockStatic(Url.class)) {
+            val mockHttpsURLConnection = mock(HttpURLConnection.class);
+            when(mockHttpsURLConnection.getOutputStream()).thenReturn(requestStream);
+            when(mockHttpsURLConnection.getResponseCode()).thenReturn(HttpStatus.OK.value());
+            when(mockHttpsURLConnection.getHeaderField("Content-Type")).thenReturn("text/plain; charset=UTF-8");
+            when(mockHttpsURLConnection.getInputStream()).thenThrow(new IOException());
+            val mockURL = mock(URL.class);
+            when(mockURL.openConnection()).thenReturn(mockHttpsURLConnection);
+            mockUrlStatic.when(() -> Url.build(doPostRoot)).thenReturn(mockURL);
+            mockUrlStatic.when(() -> Url.encode(anyString())).thenCallRealMethod();
 
-                    @Override
-                    public void connect() {}
-
-                    @Override
-                    public void disconnect() {}
-
-                    @Mock
-                    public OutputStream getOutputStream() {
-                        return requestStream;
-                    }
-
-                    @Override
-                    public int getResponseCode() {
-                        return HttpStatus.OK.value();
-                    }
-
-                    @Override
-                    public String getHeaderField(String name) {
-                        if ("Content-Type".equals(name)) {
-                            return "text/plain; charset=UTF-8";
-                        }
-                        return "";
-                    }
-
-                    @Override
-                    public InputStream getInputStream() throws IOException {
-                        throw new IOException();
-                    }
-                };
-            }
-        };
-        val result = new HttpReq(doPostRoot).post();
-        assertNull(result);
+            val result = new HttpReq(doPostRoot).post();
+            assertNull(result);
+        }
     }
 }
