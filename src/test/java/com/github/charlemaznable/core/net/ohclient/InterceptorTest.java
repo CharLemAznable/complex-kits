@@ -23,7 +23,6 @@ import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
-import org.apache.commons.text.StringSubstitutor;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -33,7 +32,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 
 import static com.github.charlemaznable.core.context.FactoryContext.ReflectFactory.reflectFactory;
-import static com.github.charlemaznable.core.miner.MinerElf.minerAsSubstitutor;
 import static org.joor.Reflect.onClass;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -59,10 +57,7 @@ public class InterceptorTest {
     @SneakyThrows
     @Test
     public void testInterceptorClient() {
-        StringSubstitutor ohMinerSubstitutor =
-                onClass(OhDummy.class).field("ohMinerSubstitutor").get();
-        ohMinerSubstitutor.setVariableResolver(
-                minerAsSubstitutor("Env", "ohclient").getStringLookup());
+        onClass(OhDummy.class).call("substitute", "").get();
         try (val mockWebServer = new MockWebServer()) {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
