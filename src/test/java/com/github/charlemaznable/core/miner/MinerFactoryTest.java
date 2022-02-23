@@ -354,10 +354,12 @@ public class MinerFactoryTest {
         assertNull(argMiner.custom2());
 
         Arguments.initial("--customKey1=key1", "--customKey2=key2");
+        awaitForSeconds(1);
         assertEquals("value1", argMiner.custom1());
         assertEquals("value1", argMiner.custom2());
 
         Arguments.initial("--customKey1=key2", "--customKey2=key1");
+        awaitForSeconds(1);
         assertEquals("value2", argMiner.custom1());
         assertEquals("value2", argMiner.custom2());
     }
